@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sproutvale</title>
-    <link rel="icon" href="Icon.png">
+    <link rel="icon" href="assets/Icon.png">
     <!-- Pixel-Schriften liegen lokal im Ordner fonts (funktioniert auch ohne Internet) -->
     <link rel="stylesheet" href="fonts/schriften.css">
     <link rel="stylesheet" href="style.css">
@@ -30,7 +30,10 @@
             <div class="stat stat-klein" id="jahreszeit-uhr"><div class="uhr-scheibe"><div class="uhr-zeiger"></div></div><span></span></div>
             <div class="stat stat-klein" id="rechnung-display" data-tipp="Nächste Rechnung. Jede 3. ist ein Kredit mit Auflage."><img class="icon" data-sprite="rechnung" alt=""><span></span></div>
             <!-- Werkzeuge vom Wanderhaendler (1 Platz, mehr durch die Tarotkarte "Der Gehaengte") -->
-            <div id="werkzeug-leiste"></div>
+            <div id="werkzeug-bereich">
+                <button class="knopf top-knopf" id="werkzeug-knopf" data-tipp="Deine Werkzeuge (anklicken)"><span>0/1</span></button>
+                <div id="werkzeug-leiste" class="versteckt"></div>
+            </div>
             <div class="stat stat-klein versteckt" id="wetter-anzeige"></div>
             <div class="stat stat-klein versteckt" id="buff-anzeige"></div>
             <div id="energie-box" data-tipp="Energie = Tageszeit. Ist sie leer, ist Feierabend.">
@@ -39,13 +42,11 @@
                 <span id="energie-text">150</span>
                 <button class="knopf top-knopf versteckt" id="neuanfang-knopf">🌙 Neuanfang</button>
             </div>
-            <button class="knopf top-knopf" id="erfolge-button" data-tipp="Erfolge (E)"><img class="icon" data-sprite="pokal" alt=""><span>0/0</span></button>
-            <button class="knopf top-knopf" id="statistik-button" data-tipp="Statistik (I)"><img class="icon" data-sprite="diagramm" alt=""></button>
-            <button class="knopf top-knopf" id="kodex-button" data-tipp="Kodex: alles, was du entdeckt hast (K)"><img class="icon" data-sprite="buch" alt=""></button>
+            <button class="knopf top-knopf" id="segen-button"><span>0</span></button>
             <button class="knopf top-knopf knopf-gelb versteckt" id="haendler-button" data-tipp="Wanderhändler: bleibt bis zum nächsten Tag">🧳</button>
             <button class="knopf top-knopf" id="shop-button" data-tipp="Marktplatz (S)"><img class="icon" data-sprite="beutel" alt=""><span>Marktplatz</span></button>
             <button class="knopf top-knopf" id="skilltree-button" data-tipp="Stellarium (B)"><img class="icon" data-sprite="sternkarte" alt=""><span>Stellarium</span></button>
-            <button class="knopf top-knopf" id="einstellungen-button" data-tipp="Einstellungen (Esc)"><img class="icon" data-sprite="zahnrad" alt=""></button>
+            <button class="knopf top-knopf" id="einstellungen-button" data-tipp="Einstellungen, Erfolge, Kodex und Statistik (Esc)"><img class="icon" data-sprite="zahnrad" alt=""><span class="neu-punkt versteckt">!</span></button>
         </div>
     </header>
 
@@ -107,22 +108,7 @@
         <div class="panel-reiter" id="shop-reiter"></div>
     </div>
 
-    <div id="erfolge-panel" class="panel pergament hidden">
-        <div class="panel-header">
-            <h2><img class="icon icon-gross" data-sprite="pokal" alt=""> Erfolge</h2>
-            <button class="knopf panel-schliessen">✕</button>
-        </div>
-        <div class="panel-content" id="erfolge-content"></div>
-    </div>
 
-    <div id="statistik-panel" class="panel pergament hidden">
-        <div class="panel-header">
-            <h2><img class="icon icon-gross" data-sprite="diagramm" alt=""> Statistik</h2>
-            <button class="knopf panel-schliessen">✕</button>
-        </div>
-        <div class="panel-reiter oben" id="statistik-reiter"></div>
-        <div class="panel-content" id="statistik-content"></div>
-    </div>
 
     <!-- Stellarium: ein grosser Skilltree, verschiebbar und zoombar -->
     <div id="skilltree-fenster" class="versteckt">
@@ -228,6 +214,19 @@
                 <p class="einstellung-hinweis">Rechtsklick auf deinen Begleiter: Aktionen. Klick aufs Haus: Kosmetik. Klick auf den Teich: Mondteich.</p>
             </div>
 
+            <div class="einstellungs-seite" data-seite="erfolge">
+                <div class="statistik-rahmen" id="erfolge-content"></div>
+            </div>
+
+            <div class="einstellungs-seite" data-seite="kodex">
+                <div class="statistik-rahmen" id="kodex-seite"></div>
+            </div>
+
+            <div class="einstellungs-seite" data-seite="statistik" id="statistik-seite">
+                <div class="panel-reiter oben" id="statistik-reiter"></div>
+                <div class="statistik-rahmen" id="statistik-content"></div>
+            </div>
+
             <div class="einstellungs-seite" data-seite="spielstand">
                 <div class="einstellung">
                     <span>📖 Tutorial</span>
@@ -260,7 +259,7 @@
         <div id="menue-wolken"></div>
         <div id="menue-teilchen"></div>
         <div class="menue-inhalt" id="menue-start">
-            <img id="menue-logo" src="Icon.png" alt="Sproutvale">
+            <img id="menue-logo" src="assets/Icon.png" alt="Sproutvale">
             <div class="menue-knoepfe">
                 <button class="knopf knopf-gruen menue-knopf menue-haupt" id="menue-spielen">▶ Spielen</button>
                 <button class="knopf menue-knopf" id="menue-einstellungen">⚙️ Einstellungen</button>

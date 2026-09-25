@@ -325,7 +325,9 @@ registriereHaken("samen", () => {
 const LADEN_BAUTEILE = {
     feuerwerk: ["bau-turm", "bau-rampe", "bau-rauch", "bau-flamme", "bau-kiste rechts"],
     zirkus: ["bau-spot", "bau-zelt", "bau-vorhang links", "bau-vorhang rechts", "bau-manege", "bau-wimpel", "bau-seeball"],
-    sternwarte: ["bau-turmhaus", "bau-kuppel", "bau-teleskop", "bau-orbit"]
+    sternwarte: ["bau-nachthimmel", "bau-turmhaus", "bau-sockel", "bau-teleskop", "bau-kuppel", "bau-orbit"],
+    hexe: ["bau-huette", "bau-dach", "bau-kessel", "bau-blasen"],
+    leuchtturm: ["bau-strahl", "bau-leuchtturm", "bau-galerie", "bau-laterne", "bau-fels", "bau-moewe"]
 };
 
 function baueLaden(laden) {
@@ -357,14 +359,27 @@ function baueLaden(laden) {
         });
     }
     if (bauweise === "sternwarte") {
-        bau.querySelector(".bau-orbit").appendChild(el("span"));
+        bau.querySelector(".bau-orbit").append(el("span"), el("span", "mond"));
+    }
+    if (bauweise === "hexe") {
+        const blasen = bau.querySelector(".bau-blasen");
+        for (let i = 0; i < 6; i++) {
+            const blase = el("span");
+            blase.style.animationDelay = -i * 0.4 + "s";
+            blase.style.left = (i % 3 - 1) * 7 + "px";
+            blase.style.setProperty("--dx", (i % 2 ? 6 : -6) + "px");
+            blasen.appendChild(blase);
+        }
+    }
+    if (bauweise === "leuchtturm") {
+        bau.querySelector(".bau-moewe").appendChild(el("span"));
     }
     marktstand.appendChild(bau);
 }
 
 // Oberkante des Gebaeudes (Dach, Zelt oder Kuppel), dort starten die Idle-Effekte
 function ladenSpitze() {
-    const teil = marktstand.querySelector(".bau-turm, .bau-zelt, .bau-kuppel") || plantButton;
+    const teil = marktstand.querySelector(".bau-turm, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne") || plantButton;
     const rect = teil.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + 6, rect };
 }
@@ -468,6 +483,22 @@ function ladenIdle(laden) {
         const rohr = marktstand.querySelector(".bau-teleskop");
         const r = rohr ? rohr.getBoundingClientRect() : spitze.rect;
         miniSchnuppe(r.right, r.top, 1);
+    } else if (laden.bauweise === "hexe") {
+        // Der Kessel blubbert ueber, ab und zu wackelt der Hut
+        const kessel = marktstand.querySelector(".bau-kessel");
+        const r = kessel ? kessel.getBoundingClientRect() : spitze.rect;
+        partikel(r.left + r.width / 2, r.top, laden.funken, 12, 55);
+        if (Math.random() < 0.5) {
+            marktstand.classList.remove("bau-trick");
+            void marktstand.offsetWidth;
+            marktstand.classList.add("bau-trick");
+        }
+    } else if (laden.bauweise === "leuchtturm") {
+        // Das Licht blitzt kurz hell auf
+        marktstand.classList.remove("bau-trick");
+        void marktstand.offsetWidth;
+        marktstand.classList.add("bau-trick");
+        partikel(spitze.x, spitze.y + 10, laden.funken, 8, 40);
     }
 }
 
@@ -482,7 +513,7 @@ function wurfAnkunft(x, y, laden, istSamen) {
     if (laden.bauweise === "feuerwerk") {
         feuerwerkRing(x, y, istSamen ? laden.ankunft : [zufall(laden.ankunft), "#ffffff"], istSamen ? 18 : 6, istSamen ? 38 : 14);
         if (istSamen) Klang.plinkoNagel(2);
-    } else if (laden.bauweise === "sternwarte") {
+    } else if (laden.bauweise === "sternwarte" || laden.bauweise === "leuchtturm") {
         feuerwerkRing(x, y, laden.ankunft, istSamen ? 10 : 4, istSamen ? 26 : 10);
     } else {
         partikel(x, y, laden.ankunft, istSamen ? 18 : 4, istSamen ? 70 : 25);
@@ -840,7 +871,10 @@ function renderHaus(inhalt) {
     }
 
     const raster = el("div", "haus-raster");
-    KOSMETIK_LISTEN[kategorie].forEach(eintrag => {
+    const sortiert = KOSMETIK_LISTEN[kategorie].map((eintrag, index) => ({ eintrag, index }))
+        .sort((a, b) => kosmetikSeltenheit(a.eintrag) - kosmetikSeltenheit(b.eintrag) || a.index - b.index)
+        .map(x => x.eintrag);
+    sortiert.forEach(eintrag => {
         const frei = istKosmetikFrei(eintrag, kategorie);
         const aktiv = kategorie === "deko" ? meta.kosmetik.deko.includes(eintrag.id) : eigeneKosmetik(kategorie).id === eintrag.id && frei;
         const vorschau = kosmetikVorschau && kosmetikVorschau.kategorie === kategorie && kosmetikVorschau.id === eintrag.id;
@@ -875,8 +909,8 @@ function renderHaus(inhalt) {
     if (KOSMETIK_LISTEN[kategorie].some(e => e.quelle === "dlc" && !istKosmetikFrei(e, kategorie))) {
         const paket = DLC_PAKETE.unterstuetzer;
         inhalt.appendChild(el("div", "panel-hinweis leise",
-            "💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. " + paket.name + " (" + euro(paket.preis) +
-            "): " + paket.inhalt + ". Legendäre Inhalte mit Animationen gibt es einzeln für je " + euro(LEGENDAER_PREIS) +
+            "💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. " + paket.name + ": " + paket.inhalt +
+            ". Legendäre Inhalte mit Animationen gibt es einzeln für je " + euro(LEGENDAER_PREIS) +
             ". Kaufen geht, sobald Sproutvale auf Steam ist."));
     }
 }
@@ -1113,8 +1147,14 @@ function zeigeHerzen(x, y, anzahl = 3) {
     }
 }
 
+let letztesStreichelnMs = 0;
+
 function streichleHaustier(event) {
     if (spielPausiert()) return;
+    // Zu schnell hintereinander zaehlt nicht (Autoklicker), die Herzen gibt es trotzdem
+    const jetzt = performance.now();
+    const zaehlt = jetzt - letztesStreichelnMs >= KONFIG.streichelSperreMs;
+    if (zaehlt) letztesStreichelnMs = jetzt;
     schliesseHaustierMenue();
     run.gesamt.streicheln += 1;
     meta.lebenszeit.streicheln += 1;
@@ -1133,11 +1173,14 @@ function streichleHaustier(event) {
     );
     zeigeHerzen(event.clientX, event.clientY);
 
-    // Jedes 3. Streicheln gibt Gold, aber nur waehrend eines Tages (wenn Energie verbraucht wird), nicht bei Feierabend.
-    // Easteregg: ab dem 333. Streicheln (fuer immer) steht dort "<3" und es gibt 3 Gold.
-    if (run.phase === "tag") {
+    // Jedes 3. Streicheln gibt eine Saat, aber nur waehrend eines Tages und hoechstens streichelMaxProTag pro Tag.
+    // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und die Saat ist 3-mal so viel wert.
+    if (zaehlt && run.phase === "tag" && (run.streichelHeute || 0) < KONFIG.streichelMaxProTag) {
         run.streichelZaehler += 1;
-        if (run.streichelZaehler % KONFIG.streichelnFuerGold === 0) gibStreichelGold();
+        if (run.streichelZaehler % KONFIG.streichelnFuerGold === 0) {
+            run.streichelHeute = (run.streichelHeute || 0) + 1;
+            gibStreichelGold();
+        }
     }
     if (meta.lebenszeit.streicheln === KONFIG.streichelHerzAb) {
         partikel(event.clientX, event.clientY, ["#ff8fb1", "#ffd6f0", "#ffffff"], 30, 120);
@@ -1145,12 +1188,20 @@ function streichleHaustier(event) {
     }
 }
 
-// Das Haustier laesst eine Muenze fallen, die man einsammeln muss (1 Gold, ab dem 333. Streicheln "<3" = 3 Gold)
+// Das Haustier laesst eine Saat fallen, die man einsammeln muss. Ihr Wert waechst mit der aktuellen Rechnung,
+// die Farbe wird wie bei einer Ernte gewuerfelt (hoechstens episch). Ab dem 33.333. Streicheln "<3" = 3-fach.
+function streichelBasisWert() {
+    const ziel = run.sandbox ? meilensteinSchwelle(run.meilensteine + 1) - meilensteinSchwelle(run.meilensteine) : naechsteRechnung().betrag;
+    return Math.max(1, ziel * KONFIG.streichelAnteil);
+}
+
 function gibStreichelGold() {
     const herz = meta.lebenszeit.streicheln >= KONFIG.streichelHerzAb;
-    const menge = ((herz ? KONFIG.streichelHerzGold : KONFIG.streichelGold) + kuschel("kuschelkatze")) * (1 + segen("tierfreund"));
+    const raritaet = Math.min(3, wuerfleRaritaetIndex());
+    const menge = Math.max(1, Math.round(streichelBasisWert() * raritaetsMulti(raritaet) * (herz ? KONFIG.streichelHerzFaktor : 1) *
+        (1 + 0.25 * kuschel("kuschelkatze")) * (1 + segen("tierfreund"))));
     const rect = haustier.bild.getBoundingClientRect();
-    spawnLootKugel(rect.left + rect.width / 2, rect.top + rect.height * 0.6, menge, 0, "gold", {
+    spawnLootKugel(rect.left + rect.width / 2, rect.top + rect.height * 0.6, menge, raritaet, "gold", {
         streicheln: true,
         anzeige: herz ? "<3" : null
     });

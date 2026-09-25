@@ -98,7 +98,9 @@ function zeigeTutorial() {
     const rect = tutorialZiel.getBoundingClientRect();
     const breite = tutorialBlase.offsetWidth;
     const hoehe = tutorialBlase.offsetHeight;
-    let y = rect.bottom + 14;
+    // Ziele in der Tageskarte: Blase unter die ganze Karte samt Lasche, sonst verdeckt sie die Lasche
+    const karte = tutorialZiel.closest("#karten-halter");
+    let y = (karte ? karte.getBoundingClientRect().bottom : rect.bottom) + 14;
     let unten = true;
     if (y + hoehe > window.innerHeight - 10) {
         y = rect.top - hoehe - 14;

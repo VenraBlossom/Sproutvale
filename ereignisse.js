@@ -479,8 +479,22 @@ function oeffneHaendler() {
     });
 }
 
+// Werkzeuge: oben ein Knopf "🧰 1/2", ein Klick klappt die Plaetze auf
+const werkzeugKnopf = $("werkzeug-knopf");
+const werkzeugBereich = $("werkzeug-bereich");
+werkzeugKnopf.prepend(pixelIcon("🧰", 28, "icon"));
+
+werkzeugKnopf.addEventListener("click", () => {
+    werkzeugLeiste.classList.toggle("versteckt");
+    Klang.klick(12);
+});
+document.addEventListener("pointerdown", event => {
+    if (!werkzeugBereich.contains(event.target) && !event.target.closest(".popup-huelle")) werkzeugLeiste.classList.add("versteckt");
+});
+
 function renderWerkzeugLeiste() {
-    werkzeugLeiste.classList.toggle("versteckt", run.phase === "runEnde");
+    werkzeugBereich.classList.toggle("versteckt", run.phase === "runEnde");
+    werkzeugKnopf.querySelector("span").textContent = run.werkzeuge.length + "/" + werkzeugPlaetze();
     const schluessel = run.werkzeuge.map(id => id + werkzeugStufe(id)).join(",") + "|" + werkzeugPlaetze();
     if (werkzeugLeiste.dataset.stand === schluessel) return;
     werkzeugLeiste.dataset.stand = schluessel;

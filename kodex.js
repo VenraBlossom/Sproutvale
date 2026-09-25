@@ -7,7 +7,6 @@
 // ============================================================
 
 let aktiverKodexReiter = "pflanzen";
-let kodexSchliessen = null;
 
 function kodexEintraege(reiter) {
     const k = meta.kodex;
@@ -61,23 +60,9 @@ const KODEX_REITER = [
     { id: "besucher", text: "🐦 Besucher" }
 ];
 
+// Der Kodex steht in den Einstellungen (Reiter "Kodex")
 function oeffneKodex() {
-    if (spielPausiert()) return;
-    if (kodexSchliessen) {
-        kodexSchliessen();
-        return;
-    }
-    const inhalt = el("div", "kodex-inhalt");
-    kodexSchliessen = zeigePopup({
-        titel: "📖 Kodex",
-        inhalt,
-        klasse: "kodex-popup",
-        breite: 1080,
-        farbe: "#6b4220",
-        onSchliessen: () => { kodexSchliessen = null; }
-    });
-    Klang.banner();
-    renderKodex(inhalt);
+    oeffneEinstellungsReiter("kodex");
 }
 
 function renderKodex(inhalt) {
@@ -121,4 +106,4 @@ function renderKodex(inhalt) {
     inhalt.appendChild(raster);
 }
 
-$("kodex-button").addEventListener("click", oeffneKodex);
+

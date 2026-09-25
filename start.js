@@ -25,10 +25,17 @@ registriereTaste("b", "Stellarium öffnen/schließen", () => {
     if (skilltreeFenster.classList.contains("versteckt")) oeffneSkilltree();
     else schliessePanels();
 });
-registriereTaste("e", "Erfolge", () => wechslePanel(erfolgePanel));
-registriereTaste("i", "Statistik", () => wechslePanel(statistikPanel));
+registriereTaste("e", "Erfolge", () => {
+    if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
+    oeffneEinstellungsReiter("erfolge");
+});
+registriereTaste("i", "Statistik", () => {
+    if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
+    if (!run) return false;
+    oeffneStatistik();
+});
 registriereTaste("k", "Kodex", () => {
-    if (!imSpiel() && !kodexSchliessen) return false;
+    if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
     oeffneKodex();
 });
 registriereTaste("h", "Haus (Kosmetik)", () => {
@@ -58,7 +65,7 @@ registriereTaste("escape", "Fenster schließen / Einstellungen", () => {
         return;
     }
     if (!hauptmenue.classList.contains("versteckt")) return false;
-    const offenesPanel = [shopPanel, erfolgePanel, statistikPanel].some(p => !p.classList.contains("hidden")) ||
+    const offenesPanel = !shopPanel.classList.contains("hidden") ||
         !skilltreeFenster.classList.contains("versteckt");
     if (offenesPanel) schliessePanels();
     else oeffneEinstellungen(false);

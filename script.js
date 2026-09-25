@@ -451,8 +451,8 @@ function magnetStaerke() { return 40 * level("magnetfeld"); }
 function ueberflussChance(pflanze) { return 0.05 * pflanze.level.ueberfluss; }
 
 function sammelRadius() {
-    let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, level("radius")) *
-        (1 + 0.05 * level("korb") + 0.04 * kuschel("igelchen"));
+    let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, Math.min(level("radius"), 30)) *
+        (1 + 0.04 * kuschel("igelchen"));
     radius *= 1 + werkzeugWert("handschuhe");
     if (wetterIst("nebel") && !hatWerkzeug("strohhut")) radius *= 0.7;
     return radius;
@@ -850,10 +850,8 @@ const karteAufgeben = $("karte-aufgeben");
 const shopPanel = $("shop-panel");
 const shopContent = $("shop-content");
 const shopReiter = $("shop-reiter");
-const erfolgePanel = $("erfolge-panel");
 const erfolgeContent = $("erfolge-content");
-const erfolgeButton = $("erfolge-button");
-const statistikPanel = $("statistik-panel");
+const statistikSeite = $("statistik-seite");
 const statistikContent = $("statistik-content");
 const statistikReiter = $("statistik-reiter");
 
@@ -1486,7 +1484,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     const sternKugeln = (variante && variante.sterne) || 1;
     for (let i = 0; i < sternKugeln; i++) {
         const extra = werkzeugWert("wuenschelrute") + (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
-        const sterne = wuerfleSternWert(KONFIG.sternensamenProErnte + extra);
+        const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index);
+        const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
         if (direkt) gibSternensamen(sterne);
         else spawnLootKugel(x, y, sterne, null, "stern");
@@ -1864,8 +1863,8 @@ function aktualisiereTimer(dtMs) {
         spawnSternschnuppe();
     }
 
-    // Am Abend kommen Gluehwuermchen (nicht in der Sandbox, dort gibt es keine Energie)
-    if (!run.sandbox && !bossIst("dunkel") && tagesAnteil() >= KONFIG.gluehwuermchenAbTageszeit) {
+    // Am Abend kommen Gluehwuermchen (in der Sandbox geben sie nur Sternensamen)
+    if (!bossIst("dunkel") && tagesAnteil() >= KONFIG.gluehwuermchenAbTageszeit) {
         run.gluehTimerMs -= dtMs;
         if (run.gluehTimerMs <= 0) {
             run.gluehTimerMs = neuerGluehTimerMs();
@@ -2219,11 +2218,15 @@ function spawnGluehwuermchen() {
     el.addEventListener("pointerdown", () => {
         if (!el.isConnected || run.phase !== "tag") return;
         el.remove();
-        const plus = gibEnergie(gluehwuermchenEnergie());
+        // Energie (ausser in der Sandbox) und immer auch Sternensamen, damit sie bei voller Energie nicht nutzlos sind
+        const plus = run.sandbox ? 0 : gibEnergie(gluehwuermchenEnergie());
+        const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne);
+        gibSternensamen(sterne);
+        aktualisiereTopBar();
         run.statistik.gluehwuermchen += 1;
         run.gesamt.gluehwuermchen += 1;
         meta.lebenszeit.gluehwuermchen += 1;
-        zeigeSchwebeText(x, y - 16, plus > 0 ? "+" + Math.round(plus) + " ⚡" : "⚡ voll", "#c9a400", false);
+        zeigeSchwebeText(x, y - 16, (plus > 0 ? "+" + Math.round(plus) + " ⚡  " : "") + "+" + zahl(sterne) + " ✨", "#c9a400", false);
         partikel(x, y, ["#fff6a0", "#d8ff7a", "#ffffff"], 14, 60);
         Klang.gluehwuermchen();
         aktualisiereEnergieAnzeige();
@@ -2333,14 +2336,14 @@ function anzahlErfolge() {
 }
 
 function renderErfolge() {
+    // Die Erfolge stehen in den Einstellungen (Reiter "Erfolge")
+    if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "erfolge") return;
     const { geschafft, gesamt } = anzahlErfolge();
-    erfolgeButton.querySelector("span").textContent = geschafft + "/" + gesamt;
-    if (erfolgePanel.classList.contains("hidden")) return;
 
     erfolgeContent.innerHTML = "";
     erfolgeContent.appendChild(erstelleHinweis(
-        "Erfolge gelten für immer. Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich." +
-        (run.sandbox ? " In der Sandbox gibt es keine Erfolge." : "")));
+        "🏆 " + geschafft + " von " + gesamt + " Stufen geschafft. Erfolge gelten für immer. Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich." +
+        (run && run.sandbox ? " In der Sandbox gibt es keine Erfolge." : "")));
 
     ERFOLG_KETTEN.forEach(kette => {
         const offenIndex = kette.ziele.findIndex((_, i) => !meta.erfolge[erfolgStufeId(kette, i)]);
@@ -2437,7 +2440,8 @@ function istBessererRun(neu, alt) {
 }
 
 function renderStatistik() {
-    if (statistikPanel.classList.contains("hidden")) return;
+    // Die Statistik steht in den Einstellungen (Reiter "Statistik")
+    if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "statistik") return;
     // Die Sandbox hat eigene Zahlen (getrennt vom Standard-Modus) und keinen "besten Run"
     const reiter = run.sandbox
         ? [{ id: "aktuell", text: "Diese Sandbox" }, { id: "gesamt", text: "Sandbox gesamt" }]
@@ -2469,15 +2473,43 @@ function renderStatistik() {
     });
     statistikContent.appendChild(tabelle);
 
-    const segenListe = Object.entries(daten.segen || {});
-    if (segenListe.length > 0) {
-        statistikContent.appendChild(el("div", "statistik-titel", "Segen in diesem Run"));
-        segenListe.forEach(([id, stufe]) => {
-            const s = SEGEN_NACH_ID[id];
-            if (s) statistikContent.appendChild(erstelleHinweis(s.badge + " " + s.name + (stufe > 1 ? " x" + stufe : "") + ": " + s.text));
-        });
-    }
 }
+
+// ---------- SEGEN-KNOPF in der Kopfleiste: alle Segen dieses Runs ----------
+
+const segenKnopf = $("segen-button");
+segenKnopf.prepend(pixelIcon("🙏", 28, "icon"));
+
+function segenText() {
+    const liste = Object.entries(run.segen).filter(([, stufe]) => stufe > 0);
+    if (liste.length === 0) return "## 🙏 Deine Segen\nNoch keine. Segen bekommst du nach jeder bezahlten Rechnung" +
+        (run.sandbox ? " (Sandbox: für jeden Meilenstein)." : ".");
+    return "## 🙏 Deine Segen\n" + liste.map(([id, stufe]) => {
+        const s = SEGEN_NACH_ID[id];
+        return s ? s.badge + " " + s.name + (stufe > 1 ? " x" + stufe : "") + ": " + s.text : "";
+    }).join("\n");
+}
+
+registriereHaken("anzeige", () => {
+    const anzahl = Object.values(run.segen).reduce((summe, stufe) => summe + stufe, 0);
+    segenKnopf.querySelector("span").textContent = anzahl;
+    setzeTipp(segenKnopf, segenText());
+});
+
+segenKnopf.addEventListener("click", () => {
+    const liste = Object.entries(run.segen).filter(([, stufe]) => stufe > 0);
+    const inhalt = el("div", "segen-liste");
+    if (liste.length === 0) inhalt.appendChild(el("p", null, "Noch keine Segen in diesem Run. Du bekommst einen nach jeder bezahlten Rechnung."));
+    liste.forEach(([id, stufe]) => {
+        const s = SEGEN_NACH_ID[id];
+        if (!s) return;
+        inhalt.appendChild(el("div", "segen-listen-eintrag", null, [
+            pixelIcon(s.badge, 48),
+            el("div", null, null, [el("b", null, s.name + (stufe > 1 ? " x" + stufe : "")), el("div", null, s.text)])
+        ]));
+    });
+    zeigePopup({ titel: "🙏 Deine Segen in diesem Run", inhalt, breite: 620 });
+});
 
 // ---------- SEGEN (nach jeder bezahlten Rechnung, Pflicht-Auswahl) ----------
 
@@ -2591,6 +2623,7 @@ function starteTag(fortsetzen = false) {
     run.gluehTimerMs = 1500;
     run.bienenMs = 0;
     run.statistik = neueTagesStatistik();
+    run.streichelHeute = 0;
     run.nachrichten = [];
     run.klickZaehler = 0;
     run.zielFeld = null;
@@ -2650,6 +2683,7 @@ function naechsterSandboxTag() {
     run.tagesBoni = run.naechsterTag;
     run.naechsterTag = leereTagesBoni();
     run.statistik = neueTagesStatistik();
+    run.streichelHeute = 0;
     run.bonusEnergie = 0;
     run.haendler = null;
     aktualisiereLebenszeitMaxima();
@@ -3488,6 +3522,32 @@ function stufenPunkte(lvl, max) {
 }
 
 // Kurze Karte rechts: Symbol, Name, ein Satz, Stufen-Punkte, "Jetzt", Preis
+// Erklaert in 1 bis 3 kurzen Saetzen, was beim Kauf passiert
+function sternErklaerung(def) {
+    const box = el("div", "stern-karte-text");
+    if (def.markt) {
+        // Stern schaltet etwas auf dem Marktplatz frei: Name und Wirkung des Upgrades zeigen
+        box.appendChild(el("div", "stern-markt", null, [
+            el("div", "stern-markt-titel", "🛒 Neu auf dem Marktplatz" + (def.marktReiter ? " (Reiter " + def.marktReiter + ")" : "")),
+            el("b", null, (def.markt.icon ? def.markt.icon + " " : "") + def.markt.name),
+            el("div", null, (/Stufe/.test(def.markt.beschreibung) ? "" : "Jede Stufe: ") + def.markt.beschreibung),
+            el("div", "stern-markt-hinweis", "Dort kaufst du es danach mit Gold, " +
+                (def.markt.max === Infinity ? "beliebig oft." : "bis Stufe " + def.markt.max + "."))
+        ]));
+        return box;
+    }
+    if (def.art === "pflanze" && def.id !== "p_weizen") {
+        box.appendChild(el("div", "stern-markt", null, [
+            el("div", "stern-markt-titel", "🌱 Neue Pflanze"),
+            el("div", null, def.beschreibung),
+            el("div", "stern-markt-hinweis", def.info())
+        ]));
+        return box;
+    }
+    box.textContent = def.beschreibung;
+    return box;
+}
+
 function renderSternDetails(def) {
     sternbildDetails.innerHTML = "";
     const lvl = level(def.id);
@@ -3506,19 +3566,17 @@ function renderSternDetails(def) {
                 el("div", "stern-karte-ast", AST_NAMEN[def.ast] || "")
             ])
         ]),
-        el("div", "stern-karte-text", verborgen ? "Noch verborgen" : def.kurz || def.beschreibung)
+        verborgen ? el("div", "stern-karte-text", "Noch verborgen") : sternErklaerung(def)
     );
     if (!verborgen) {
-        // Kurz und mit Zahl: was er jetzt bringt und was die naechste Stufe bringt
-        if (def.wirkung && def.max > 1) {
-            const jetzt = lvl > 0 ? def.wirkung(lvl) : "–";
-            karte.appendChild(el("div", "stern-karte-rechnung", null, istMax
-                ? [el("b", null, def.wirkung(lvl)), el("span", "stern-max", " (max)")]
-                : [el("span", "stern-jetzt", jetzt), el("span", "stern-pfeil", " ➜ "), el("b", null, def.wirkung(lvl + 1))]));
-        } else if (def.wirkung) {
-            karte.appendChild(el("div", "stern-karte-rechnung", null, [el("b", null, def.wirkung(1))]));
+        // Was der Stern dir gerade bringt (ohne Pfeile, nur der Stand)
+        if (def.wirkung && lvl > 0) {
+            karte.appendChild(el("div", "stern-karte-rechnung", null, [
+                el("span", "stern-jetzt", "Du hast jetzt: "), el("b", null, def.wirkung(lvl)),
+                istMax && def.max > 1 ? el("span", "stern-max", " (max)") : null
+            ]));
         }
-        karte.appendChild(stufenPunkte(lvl, def.max));
+        if (def.max > 1) karte.appendChild(stufenPunkte(lvl, def.max));
     }
     let knopfText = istMax ? (def.max > 1 ? "Maximal" : "Freigeschaltet") : "✨ " + zahl(kosten);
     if (!offen) knopfText = "🔒 Gesperrt";
@@ -3527,6 +3585,13 @@ function renderSternDetails(def) {
     knopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte"));
     karte.appendChild(knopf);
     sternbildDetails.appendChild(karte);
+    // Lange Namen ("Edelsteinschleifer") etwas kleiner schreiben, statt sie abzuschneiden oder im Wort zu trennen
+    const nameEl = karte.querySelector(".stern-karte-name");
+    let groesse = 1.2;
+    while (nameEl.scrollWidth > nameEl.clientWidth + 1 && groesse > 0.75) {
+        groesse -= 0.05;
+        nameEl.style.fontSize = groesse.toFixed(2) + "em";
+    }
 
     if (erledigt) sternbildDetails.appendChild(erstelleHinweis("✔ Schon erledigt durch " + erledigt + "."));
     if (!offen) {
@@ -3718,24 +3783,44 @@ function oeffneEinstellungen(ausMenue) {
     einstellungenHauptmenue.classList.toggle("versteckt", ausMenue);
     resetZeile.classList.toggle("versteckt", !ausMenue);
     einstellungenSchliessen.textContent = ausMenue ? "Zurück" : "Zurück zum Spiel";
-    renderEinstellungen();
     einstellungenFenster.classList.remove("versteckt");
+    renderEinstellungen();
 }
 
 function renderEinstellungen() {
-    renderReiter($("einstellungen-reiter"), [
+    // Ohne laufenden Spielstand (Hauptmenue beim Start) gibt es noch keine Statistik
+    const reiter = [
+        { id: "erfolge", text: "🏆 Erfolge" },
+        { id: "kodex", text: "📖 Kodex" },
+        run ? { id: "statistik", text: "📊 Statistik" } : null,
         { id: "audio", text: "🎵 Klang" },
         { id: "anzeige", text: "👁️ Anzeige" },
         { id: "steuerung", text: "⌨️ Tasten" },
         { id: "spielstand", text: "💾 Spielstand" }
-    ], aktiverEinstellungsReiter, id => {
+    ].filter(Boolean);
+    if (!reiter.some(r => r.id === aktiverEinstellungsReiter)) aktiverEinstellungsReiter = "audio";
+    renderReiter($("einstellungen-reiter"), reiter, aktiverEinstellungsReiter, id => {
         aktiverEinstellungsReiter = id;
+        Klang.klick(8);
         renderEinstellungen();
+    });
+    document.querySelectorAll("#einstellungen-reiter .reiter-knopf").forEach((knopf, i) => {
+        knopf.dataset.reiter = reiter[i].id;
+        // kleine Trennung zwischen "Fortschritt" und "Einstellungen"
+        if (reiter[i].id === "audio") knopf.classList.add("reiter-abstand");
     });
     document.querySelectorAll(".einstellungs-seite").forEach(seite => {
         seite.classList.toggle("versteckt", seite.dataset.seite !== aktiverEinstellungsReiter);
     });
+    // breite Seiten fuer Erfolge, Kodex und Statistik
+    document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
+        ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
+    if (run) renderStatistik();
+    renderErfolge();
+    if (aktiverEinstellungsReiter === "kodex") renderKodex($("kodex-seite"));
+    if (aktiverEinstellungsReiter === "erfolge" || aktiverEinstellungsReiter === "kodex") merkeGesehen(aktiverEinstellungsReiter);
+    aktualisiereNeuPunkt();
     // Schalter fuer Anzeige-Optionen
     document.querySelectorAll("[data-option]").forEach(schalter => {
         schalter.checked = einstellungen[schalter.dataset.option] !== false && einstellungen[schalter.dataset.option] !== undefined
@@ -3928,15 +4013,62 @@ function oeffneSkilltree() {
 
 function schliessePanels() {
     shopPanel.classList.add("hidden");
-    erfolgePanel.classList.add("hidden");
-    statistikPanel.classList.add("hidden");
     skilltreeFenster.classList.add("versteckt");
 }
 
 $("shop-button").addEventListener("click", () => oeffnePanel(shopPanel));
 $("skilltree-button").addEventListener("click", oeffneSkilltree);
-erfolgeButton.addEventListener("click", () => oeffnePanel(erfolgePanel));
-$("statistik-button").addEventListener("click", () => oeffnePanel(statistikPanel));
+// Erfolge, Kodex und Statistik: Einstellungen direkt auf dem passenden Reiter oeffnen (E, K, I).
+// Ist genau dieser Reiter schon offen, schliesst die Taste das Fenster wieder.
+function oeffneEinstellungsReiter(id) {
+    if (!einstellungenFenster.classList.contains("versteckt") && aktiverEinstellungsReiter === id) {
+        einstellungenFenster.classList.add("versteckt");
+        return;
+    }
+    aktiverEinstellungsReiter = id;
+    oeffneEinstellungen(!hauptmenue.classList.contains("versteckt"));
+}
+
+function oeffneStatistik() {
+    oeffneEinstellungsReiter("statistik");
+}
+
+// ---------- ROTES AUSRUFEZEICHEN: neue Erfolge oder neue Kodex-Eintraege ----------
+// Gemerkt wird, wie viele man schon gesehen hat (in den Einstellungen, damit es einen Reset uebersteht).
+
+function kodexEntdeckt() {
+    return KODEX_REITER.reduce((summe, r) => summe + kodexEintraege(r.id).filter(e => e.anzahl > 0).length, 0);
+}
+
+function neuStand() {
+    const gesehen = einstellungen.gesehen || (einstellungen.gesehen = {});
+    const jetzt = { erfolge: anzahlErfolge().geschafft, ["kodex:" + metaProfil]: kodexEntdeckt() };
+    const neu = {};
+    Object.entries(jetzt).forEach(([schluessel, wert]) => {
+        // Beim ersten Mal (oder nach einem Reset) nichts anzeigen, nur merken
+        if (gesehen[schluessel] === undefined || gesehen[schluessel] > wert) gesehen[schluessel] = wert;
+        neu[schluessel.split(":")[0]] = wert > gesehen[schluessel];
+    });
+    return { neu, jetzt };
+}
+
+function merkeGesehen(reiter) {
+    const { jetzt } = neuStand();
+    const schluessel = reiter === "kodex" ? "kodex:" + metaProfil : reiter;
+    if (jetzt[schluessel] === undefined || einstellungen.gesehen[schluessel] === jetzt[schluessel]) return;
+    einstellungen.gesehen[schluessel] = jetzt[schluessel];
+    speichereEinstellungen();
+}
+
+function aktualisiereNeuPunkt() {
+    const { neu } = neuStand();
+    $("einstellungen-button").querySelector(".neu-punkt").classList.toggle("versteckt", !neu.erfolge && !neu.kodex);
+    document.querySelectorAll("#einstellungen-reiter .reiter-knopf").forEach(knopf => {
+        const id = knopf.dataset.reiter;
+        knopf.classList.toggle("hat-punkt", Boolean(neu[id]));
+    });
+}
+setInterval(aktualisiereNeuPunkt, 1000);
 document.querySelectorAll(".panel-schliessen").forEach(knopf => knopf.addEventListener("click", schliessePanels));
 karteShop.addEventListener("click", () => oeffnePanel(shopPanel));
 karteSkilltree.addEventListener("click", oeffneSkilltree);

@@ -286,3 +286,21 @@ function neuePflanzeFeier(pflanze) {
     document.body.appendChild(buehne);
     setTimeout(() => buehne.remove(), 2400);
 }
+
+// ---------- GLEICHTAKT: alle Dauer-Animationen auf den Feldern laufen synchron ----------
+// Felder werden zu verschiedenen Zeiten gekauft, ihre Animationen (Kristall-Glanz, Lava, Sterne, reife Pflanzen ...)
+// starten also versetzt. Hier bekommen alle endlosen Animationen denselben Startpunkt (0 = Seitenstart).
+// Einmal-Effekte (Ernte-Hopser usw.) bleiben unberuehrt, sonst waeren sie sofort vorbei.
+
+const feldRasterFuerTakt = document.getElementById("field-grid");
+
+function synchronisiereFeldAnimationen() {
+    if (!feldRasterFuerTakt || document.hidden) return;
+    feldRasterFuerTakt.getAnimations({ subtree: true }).forEach(animation => {
+        const ziel = animation.effect && animation.effect.target;
+        if (!ziel || !ziel.closest(".feld")) return;
+        if (animation.effect.getTiming().iterations !== Infinity) return;
+        if (animation.startTime !== 0 && animation.playState === "running") animation.startTime = 0;
+    });
+}
+setInterval(synchronisiereFeldAnimationen, 400);

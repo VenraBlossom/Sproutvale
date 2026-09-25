@@ -91,7 +91,8 @@ const KONFIG = {
     rechnungBasis: 30,
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
     rechnungFaktorenStart: [20, 15, 23], // die ersten Spruenge sind sanfter: 30, 600, 9.000, 207.000, 5,4 Mio. ...
-    sternensamenProErnte: 5,          // jede Ernte laesst eine Sternensamen mit 5 Sternensamen fallen
+    sternensamenProErnte: 5,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
+    sternensamenPflanzenFaktor: 1.15, // ... und jede hoehere Pflanze gibt 15% mehr (Kuerbis ~11, Mondlilie ~35)
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen
     basisSammelRadius: 8,             // Radius um den Mauszeiger in Pixeln
     sammelRadiusFaktor: 1.10,         // jede Stufe "Breiter Cursor" = +10%
@@ -116,10 +117,13 @@ const KONFIG = {
     gluehwuermchenMaxSek: 7,
     gluehwuermchenEnergie: 10,        // ein gefangenes Gluehwuermchen verlaengert den Abend
     bonusEnergieDeckel: 0.6,          // Extra-Energie (Blitzpflanzen, Kaffee, Gluehwuermchen) hoechstens 60% der Tagesenergie, sonst endet der Tag nie
-    streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Muenze fallen (nur waehrend eines Tages)
-    streichelGold: 1,
-    streichelHerzAb: 333,             // Easteregg: ab dem 333. Streicheln (fuer immer) gibt es "<3" Gold (= 3)
-    streichelHerzGold: 3,
+    streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Saat fallen (nur waehrend eines Tages)
+    streichelSperreMs: 350,           // schneller gestreichelt zaehlt nicht (gegen Autoklicker)
+    streichelAnteil: 0.0002,          // Wert einer Streichel-Saat = 0,02% der aktuellen Rechnung (mal Farbe)
+    streichelMaxProTag: 40,           // hoechstens so viele Streichel-Saaten pro Tag: nur Streicheln reicht nie fuer eine Rechnung
+    streichelHerzAb: 33333,           // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und es gibt 3-fache Saat
+    streichelHerzFaktor: 3,
+    gluehwuermchenSterne: 10,         // ein Gluehwuermchen gibt auch Sternensamen (so viel wie 2 Ernten)
     haustierHilfeSek: 14,             // so oft schaut das Haustier, ob es helfen kann
     haustierHilfeChance: 0.3,         // Grundchance, dass es dann eine liegende Muenze einsammelt
     turmIntervall: 8,
@@ -264,9 +268,6 @@ const SHOP_UPGRADES = [
     { id: "kuhglocke", knoten: "s_kuhglocke", icon: "🔔", name: "Kuhglocke", basiskosten: 50, faktor: 2.3, max: 6,
         beschreibung: "+0,05 Sek. Zeit für die Kombo.",
         info: () => sekText(komboFensterMs() / 1000) + " Kombo-Fenster" },
-    { id: "korb", knoten: "s_korb", icon: "🧺", name: "Größerer Korb", basiskosten: 35, faktor: 1.9, max: 10,
-        beschreibung: "+5% Radius um deinen Cursor.",
-        info: () => sammelRadius().toFixed(1).replace(".", ",") + " Pixel Radius" },
     { id: "laterne", knoten: "s_laterne", icon: "🏮", name: "Nachtlaterne", basiskosten: 40, faktor: 2.2, max: 5,
         beschreibung: "Glühwürmchen geben +2 Energie mehr.",
         info: () => gluehwuermchenEnergie() + " Energie pro Glühwürmchen" },
@@ -304,7 +305,7 @@ function stern(id, ast, icon, pos, vor, name, basiskosten, faktor, max, beschrei
 // Stern, der ein Marktplatz-Upgrade freischaltet
 function shopStern(id, ast, pos, vor, kosten) {
     const u = SHOP_UPGRADES.find(s => s.knoten === id);
-    return { id, ast, icon: u.icon, pos, vor, name: u.name, basiskosten: kosten, faktor: 1, max: 1, art: "shop",
+    return { id, ast, icon: u.icon, pos, vor, name: u.name, basiskosten: kosten, faktor: 1, max: 1, art: "shop", markt: u,
         beschreibung: "Schaltet auf dem Marktplatz frei: " + u.name + " (" + u.beschreibung + ")",
         info: () => (level(id) > 0 ? "Auf dem Marktplatz freigeschaltet" : "Noch nicht auf dem Marktplatz") };
 }
@@ -365,10 +366,10 @@ const SKILLS = [
     stern("sternenquelle", "ernte", "⛲", [960, -660], "sternenstaub", "Sternenquelle", 400, 2, 10,
         "Jede Ernte gibt 2 Sternensamen mehr.",
         () => "+" + 2 * level("sternenquelle") + " pro Ernte"),
-    stern("sternenflut", "ernte", "🌌", [1180, -660], "sternenstaub", "Sternenflut", 20000, 6, 3,
+    stern("sternenflut", "ernte", "🌌", [740, -880], "sternenstaub", "Sternenflut", 20000, 6, 3,
         "Stufe 2 von Sternenstaub: Sternensamen aus Ernten x2 (jede Stufe noch einmal).",
         () => multiText(Math.pow(2, level("sternenflut"))) + " Sternensamen", { vorMax: true, abzeichen: "Ⅱ" }),
-    stern("glueck2", "ernte", "☘️", [300, -440], "glueck", "Vierblättriger Klee", 3000, 2.5, 5,
+    stern("glueck2", "ernte", "☘️", [630, -360], "glueck", "Vierblättriger Klee", 3000, 2.5, 5,
         "Stufe 2 vom Glückskleeblatt: +10% Chance, dass eine Saat doppelt zählt.",
         () => prozentText(glueckChance()) + " Chance auf doppeltes Gold", { vorMax: true, abzeichen: "Ⅱ" }),
     stern("midas", "ernte", "👑", [1400, -220], "ernterausch", "Midas' Berührung", 2500, 1, 1,
@@ -376,20 +377,19 @@ const SKILLS = [
         () => (level("midas") > 0 ? "Aktiv" : "Nicht aktiv")),
 
     // ----- Helfer (links) -----
-    stern("radius", "helfer", "🖐️", [-300, 0], "p_weizen", "Breiter Cursor", 15, 1.35, Infinity,
+    stern("radius", "helfer", "🖐️", [-520, -220], "kombo", "Breiter Cursor", 150, 1.35, 30,
         "+10% Radius um deinen Cursor. Er sammelt Saaten ein und erntet beim Klicken alle fertigen " +
-            "Pflanzen, die er berührt. Unendlich oft kaufbar.",
+            "Pflanzen, die er berührt. Bis Stufe 30.",
         () => sammelRadius().toFixed(1).replace(".", ",") + " Pixel Radius"),
-    stern("vogelscheuche", "helfer", "🧑‍🌾", [-300, 220], "radius", "Vogelscheuche", 250, 1, 1,
+    stern("vogelscheuche", "helfer", "🧑‍🌾", [-300, 220], "kombo", "Vogelscheuche", 250, 1, 1,
         "Die Vogelscheuche im Hof verscheucht jeden Tag die erste Krähe von allein.",
         () => (level("vogelscheuche") > 0 ? "Aktiv: 1 Krähe pro Tag" : "Nicht aktiv"),
         { erledigt: () => (metaLevel("vogelscheuchenlehre") > 0 ? "Vogelscheuchen-Lehre (Mondteich)" : null) }),
-    shopStern("s_korb", "helfer", [-520, -220], "radius", 80),
-    stern("kombo", "helfer", "🥁", [-520, 0], "radius", "Kombo-Meister", 60, 2, 10,
+    stern("kombo", "helfer", "🥁", [-300, 0], "p_weizen", "Kombo-Meister", 40, 2, 10,
         "+0,1 Sek. Zeit zwischen zwei Klicks, bevor die Kombo abbricht.",
         () => sekText(komboFensterMs() / 1000) + " Kombo-Fenster"),
     shopStern("s_kuhglocke", "helfer", [-740, -220], "kombo", 300),
-    stern("eichhoernchen", "helfer", "🐿️", [-520, 220], "radius", "Eichhörnchen-Helfer", 100, 1.85, 20,
+    stern("eichhoernchen", "helfer", "🐿️", [-520, 220], "kombo", "Eichhörnchen-Helfer", 100, 1.85, 20,
         "Drückt automatisch den Samenladen (baut keine Kombo auf, gibt keine Sternensamen).",
         () => helferKlicksProSek() + " Klicks pro Sekunde"),
     stern("haustiertraining", "helfer", "🐾", [-740, 0], "kombo", "Begleiter-Training", 200, 2, 5,
@@ -413,13 +413,13 @@ const SKILLS = [
     stern("eichhoernchen2", "helfer", "🐿️", [-740, 660], "eichhoernchen", "Eichhörnchen-Kolonie", 8000, 1.9, 10,
         "Stufe 2 der Eichhörnchen: +2 automatische Klicks pro Sekunde.",
         () => helferKlicksProSek() + " Klicks pro Sekunde", { vorMax: true, abzeichen: "Ⅱ" }),
-    stern("erntehase", "helfer", "🐇", [-520, -440], "s_korb", "Erntehase", 600, 2.3, 5,
+    stern("erntehase", "helfer", "🐇", [-520, -440], "radius", "Erntehase", 600, 2.3, 5,
         "Ein Hase hoppelt über den Acker und erntet regelmäßig eine fertige Pflanze für dich.",
         () => (level("erntehase") > 0 ? "Alle " + sekText(erntehaseSek()) : "Noch kein Hase")),
-    stern("sternhoernchen", "helfer", "🌰", [-300, 440], "eichhoernchen", "Sternenhörnchen", 900, 1, 1,
+    stern("sternhoernchen", "helfer", "🌰", [-340, 420], "eichhoernchen", "Sternenhörnchen", 900, 1, 1,
         "Eichhörnchen-Klicks geben jetzt auch Sternensamen (1 für je 2 Klicks).",
         () => (level("sternhoernchen") > 0 ? "Aktiv" : "Nicht aktiv")),
-    stern("helferlohn", "helfer", "💪", [-300, 660], "sternhoernchen", "Fleißige Pfoten", 3000, 1, 1,
+    stern("helferlohn", "helfer", "💪", [-560, 680], "sternhoernchen", "Fleißige Pfoten", 3000, 1, 1,
         "Jeder Klick eines Eichhörnchens zählt doppelt.",
         () => (level("helferlohn") > 0 ? "Aktiv" : "Nicht aktiv")),
 
@@ -565,6 +565,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         SKILLS.push({
             id: praefix + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: praefix === "pw_" ? "⏱️" : praefix === "pp_" ? "🎨" : "➕",
             pos, vor, name: p.name + ": " + u.name, basiskosten: rundePreis(basis * faktor), faktor: 1, max: 1, art: "pflanzenShop",
+            markt: u, marktReiter: p.name,
             beschreibung: "Schaltet auf dem Marktplatz-Reiter " + p.name + " frei: " + u.name + " (" + u.beschreibung + ")",
             info: () => (level(praefix + p.id) > 0 ? "Auf dem Marktplatz freigeschaltet" : "Noch nicht auf dem Marktplatz")
         });
@@ -597,7 +598,7 @@ const STERN_KURZ = {
     schwereMuenzen: "Gewöhnliche Saat mehr wert", doppelernte: "Doppelt so viel Saat", fuellhorn: "Mehr Gold",
     goldmarie: "Gold verdoppeln", ernterausch: "Jede 30. Ernte: 6 Sek. x3 Gold", sternenstaub: "Mehr Sternensamen",
     sternenquelle: "Sternensamen pro Ernte", sternenflut: "Sternensamen verdoppeln", glueck2: "Saat zählt doppelt",
-    midas: "Jackpot: +50 Sternensamen", radius: "Größerer Cursor · unendlich", vogelscheuche: "Verscheucht die 1. Krähe",
+    midas: "Jackpot: +50 Sternensamen", radius: "Größerer Cursor", vogelscheuche: "Verscheucht die 1. Krähe",
     kombo: "Mehr Zeit für die Kombo", eichhoernchen: "Klicken den Samenladen", haustiertraining: "Begleiter sammelt öfter",
     igel: "Igel sammeln Saat ein", saatspatz: "Spatz pflanzt Samen", gluehglas: "Mehr Glühwürmchen",
     biene: "Bienen lassen Pflanzen wachsen", magnetfeld: "Saat rollt zum Cursor", eichhoernchen2: "Mehr Eichhörnchen-Klicks",
@@ -1140,7 +1141,7 @@ function euro(preis) {
 
 // Text fuer den Preis eines DLC-Inhalts
 function dlcPreisText(eintrag) {
-    if (eintrag.paket === "unterstuetzer") return DLC_PAKETE.unterstuetzer.name + " (" + euro(DLC_PAKETE.unterstuetzer.preis) + ")";
+    if (eintrag.paket === "unterstuetzer") return "Im " + DLC_PAKETE.unterstuetzer.name + " enthalten";
     return "Einzeln " + euro(eintrag.preis || LEGENDAER_PREIS);
 }
 
@@ -1194,8 +1195,8 @@ const DEKO_OBJEKTE = [
     { id: "schneemann", name: "Schneemann", sprite: "schneemann", quelle: "dlc", paket: "unterstuetzer", effekt: "wackeln" },
     { id: "wetterhahn", name: "Wetterhahn", sprite: "wetterhahn", quelle: "dlc", paket: "unterstuetzer", effekt: "drehen" },
     { id: "kuerbislaterne", name: "Kürbislaterne", sprite: "kuerbislaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer" },
-    { id: "windmuehle", name: "Windmühle", sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
     { id: "pilzhaus", name: "Pilzhäuschen", sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
+    { id: "windmuehle", name: "Windmühle", sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
     { id: "lagerfeuer", name: "Lagerfeuer", sprite: "lagerfeuer", quelle: "dlc", paket: "einzeln", effekt: "feuer",
         partikel: ["#ffd93d", "#ff8a2a", "#ffffff"] },
     { id: "feenbrunnen", name: "Feenbrunnen", sprite: "brunnen", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
@@ -1245,7 +1246,13 @@ const SAMENLADEN_SKINS = [
         wurf: "wurf-bunt", ankunft: ["#e8434a", "#ffd93d", "#5aa9e6", "#a3dc6f", "#ff8fb1"] },
     { id: "sternenstand", name: "Sternwarte", titel: "Sternwarte", quelle: "dlc", paket: "einzeln", markise: ["#2a2f6e", "#ffe89a"],
         holz: ["#3a3f7a", "#2a2f62"], klasse: "laden-sterne", bauweise: "sternwarte", bild: "🪐", funken: ["#fff6a0", "#ffe89a", "#ffffff", "#8fa2f0"],
-        wurf: "wurf-stern", drehen: true, spur: ["#fff6a0", "#ffffff"], ankunft: ["#fff6a0", "#ffffff", "#8fa2f0", "#c9b0f5"] }
+        wurf: "wurf-stern", drehen: true, spur: ["#fff6a0", "#ffffff"], ankunft: ["#fff6a0", "#ffffff", "#8fa2f0", "#c9b0f5"] },
+    { id: "hexenhuette", name: "Hexenhütte", titel: "Hexenhütte", quelle: "dlc", paket: "einzeln", markise: ["#3a2250", "#8dff7a"],
+        holz: ["#4a2a4a", "#3a1d3a"], klasse: "laden-hexe", bauweise: "hexe", bild: "🧪", funken: ["#8dff7a", "#c9b0f5", "#ffffff"],
+        wurf: "wurf-blase", spur: ["#8dff7a", "#c9ffb0"], ankunft: ["#8dff7a", "#b48cff", "#c9ffb0", "#ffffff"] },
+    { id: "leuchtturm", name: "Leuchtturm", titel: "Leuchtturm", quelle: "dlc", paket: "einzeln", markise: ["#e8434a", "#fff6e8"],
+        holz: ["#6a7078", "#4a5058"], klasse: "laden-leuchtturm", bauweise: "leuchtturm", bild: "⚓", funken: ["#fff3b0", "#ffffff", "#9fe8ff"],
+        wurf: "wurf-licht", spur: ["#fff3b0", "#ffffff"], ankunft: ["#fff3b0", "#ffffff", "#9fe8ff", "#5aa9e6"] }
 ];
 
 // Felder: Farben der Erde (B hell, b Furche, c Kruemel). klasse = zusaetzlicher Look (style.css)
@@ -1270,10 +1277,10 @@ const FELD_SKINS = [
 // Muenzen: Farben der Goldmuenze. klasse = zusaetzlicher Look (style.css)
 const KUGEL_SKINS = [
     { id: "standard", name: "Goldmünzen", quelle: "frei", farben: {} },
-    { id: "bluete", name: "Blütenmünzen", quelle: "erspielt", bedingungText: "Sammle 50 legendäre Jackpots",
-        bedingung: () => meta.lebenszeit.jackpots >= 50, farben: { Y: "#ffc2dc", y: "#e07aa8", k: "#7a2a48" } },
+    { id: "bronze", name: "Bronzemünzen", quelle: "erspielt", bedingungText: "Sammle 50 legendäre Jackpots",
+        bedingung: () => meta.lebenszeit.jackpots >= 50, farben: { Y: "#e0a070", y: "#a86a3a", k: "#4a2a10" } },
     { id: "silber", name: "Silbermünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#e9e9ef", y: "#a9a9b6", k: "#4a4a5a" } },
-    { id: "bronze", name: "Bronzemünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#e0a070", y: "#a86a3a", k: "#4a2a10" } },
+    { id: "bluete", name: "Blütenmünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#ffc2dc", y: "#e07aa8", k: "#7a2a48" } },
     { id: "smaragd", name: "Smaragdmünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#7ae0a0", y: "#2e9e5a", k: "#14502a" } },
     { id: "rubin", name: "Rubinmünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#ff8a8a", y: "#c83a3a", k: "#5a1010" } },
     { id: "mond", name: "Mondmünzen", quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#dfe6ff", y: "#8fa2f0", k: "#2a3570" },
@@ -1461,7 +1468,7 @@ const KUSCHELTIERE = [
         text: s => "+" + 0.03 * s * 1000 + " ms Zeit für die Kombo." },
     // Ungewoehnlich
     { id: "kuschelkatze", symbol: "🐱", name: "Kuschelkatze Mimi", raritaet: 1,
-        text: s => "Streichel-Münzen sind " + s + " Gold mehr wert." },
+        text: s => "Streichel-Saat ist " + 25 * s + "% mehr wert." },
     { id: "igelchen", symbol: "🦔", name: "Igelchen Stachel", raritaet: 1,
         text: s => "+" + 4 * s + "% Radius um deinen Cursor." },
     { id: "kueken", symbol: "🐥", name: "Küken Piep", raritaet: 1,

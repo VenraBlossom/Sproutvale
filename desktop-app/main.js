@@ -133,7 +133,7 @@ function erstelleFenster() {
         useContentSize: true,
         backgroundColor: "#86c457",
         title: "Sproutvale",
-        icon: path.join(ORDNER, "Icon.png"),
+        icon: path.join(ORDNER, "assets", "Icon.png"),
         autoHideMenuBar: true,
         show: false,
         webPreferences: {

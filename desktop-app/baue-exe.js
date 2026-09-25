@@ -64,7 +64,7 @@ function erstelleIcon() {
     const png256 = path.join(BUILD, "icon-256.png");
     const befehl = [
         "Add-Type -AssemblyName System.Drawing;",
-        `$q = [System.Drawing.Image]::FromFile('${path.join(PROJEKT, "Icon.png")}');`,
+        `$q = [System.Drawing.Image]::FromFile('${path.join(PROJEKT, "assets", "Icon.png")}');`,
         "$b = New-Object System.Drawing.Bitmap 256, 256;",
         "$g = [System.Drawing.Graphics]::FromImage($b);",
         "$g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;",
