@@ -19,7 +19,7 @@ function wechslePanel(panel) {
     else schliessePanels();
 }
 
-registriereTaste("s", "Marktplatz öffnen/schließen", () => wechslePanel(shopPanel));
+registriereTaste("s", "Markt öffnen/schließen", () => wechslePanel(shopPanel));
 registriereTaste("b", "Stellarium öffnen/schließen", () => {
     if (!imSpiel()) return false;
     if (skilltreeFenster.classList.contains("versteckt")) oeffneSkilltree();
@@ -173,3 +173,5 @@ wendeKosmetikAn();
 aktualisiereAlles();
 zeigeHauptmenue();
 requestAnimationFrame(hauptSchleife);
+
+$("menue-version").textContent = SPIEL_VERSION;

@@ -19,9 +19,9 @@ const TUTORIAL_SCHRITTE = [
         ziel: () => moneyDisplay, wann: () => run.phase === "tag", weiterBei: "eingesammelt" },
     { text: "Super! Ernte und sammle weiter, bis Feierabend ist. Je schneller du klickst, desto mehr schaffst du.",
         ziel: () => energieFuellung.parentElement, wann: () => run.phase === "tag", weiterBei: "tagEnde" },
-    { text: "Feierabend! Auf dem Marktplatz kaufst du mit Gold neue Felder und mehr Ertrag für deine Pflanzen.",
+    { text: "Feierabend! Auf dem Markt kaufst du mit Gold neue Felder und mehr Ertrag für deine Pflanzen.",
         ziel: () => $("shop-button"), wann: () => run.phase === "vorTag", weiterBei: "panelOffen", bedingung: id => id === "shop-panel" },
-    { text: "Im Stellarium gibst du Sternensamen aus: für neue Pflanzen, mehr Gold, Helfer und weitere Marktplatz-Upgrades. " +
+    { text: "Im Stellarium gibst du Sternensamen aus: für neue Pflanzen, mehr Gold, Helfer und weitere Markt-Upgrades. " +
         "Kaufbare Sterne leuchten.",
         ziel: () => $("skilltree-button"), wann: () => run.phase === "vorTag", weiterBei: "panelOffen", bedingung: id => id === "skilltree" },
     { text: "Alle 5 Tage kommt eine Rechnung. Kannst du sie nicht bezahlen, endet der Run. Für bezahlte Rechnungen gibt es " +

@@ -1,7 +1,7 @@
 "use strict";
 
 // ============================================================
-// SPROUTVALE: Gluecksspiele auf dem Marktplatz (Muenzwurf, Gacha-Automat, Rubbellose, Huehnerrennen, Samen-Plinko)
+// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Gacha-Automat, Rubbellose, Huehnerrennen, Samen-Plinko)
 // Werden im Stellarium (Ast "Glueck") freigeschaltet. Jedes Spiel darf zwischen zwei Tagen nur ein paar Mal gespielt
 // werden (GLUECKSSPIEL.xyz.proPause + Stammkunde). Glueck (glueckBonus() in script.js) verbessert alle Chancen.
 // Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).

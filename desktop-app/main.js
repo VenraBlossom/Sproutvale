@@ -41,7 +41,8 @@ const SPEICHER_DATEIEN = {
     sproutvale_meta_sandbox: "sandbox-fortschritt.json",
     sproutvale_run: "run.json",
     sproutvale_sandbox: "sandbox.json",
-    sproutvale_einstellungen: "einstellungen.json"
+    sproutvale_einstellungen: "einstellungen.json",
+    sproutvale_kaeufe: "kaeufe.dat" // gekaufte Inhalte mit Pruefsumme (Hand-Aenderungen gelten nicht)
 };
 
 function findeSpeicherOrdner() {
@@ -135,6 +136,7 @@ function erstelleFenster() {
         title: "Sproutvale",
         icon: path.join(ORDNER, "assets", "Icon.png"),
         autoHideMenuBar: true,
+        fullscreen: true, // Spiel startet im Vollbild (F11 wechselt)
         show: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),

@@ -26,7 +26,8 @@
     const leeren = Storage.prototype.clear;
 
     // Dateien -> Spiel (Dateien gewinnen), fehlende Dateien aus den bisherigen Daten anlegen
-    ["sproutvale_meta", "sproutvale_meta_sandbox", "sproutvale_run", "sproutvale_sandbox", "sproutvale_einstellungen"].forEach(schluessel => {
+    ["sproutvale_meta", "sproutvale_meta_sandbox", "sproutvale_run", "sproutvale_sandbox", "sproutvale_einstellungen",
+        "sproutvale_kaeufe"].forEach(schluessel => {
         if (dateien[schluessel] !== undefined) {
             setzen.call(localStorage, schluessel, dateien[schluessel]);
         } else {

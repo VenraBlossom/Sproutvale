@@ -7,7 +7,7 @@
 // "() => ..." benutzt, also erst wenn das Spiel laeuft.
 //
 // Waehrungen:
-//   Gold             -> Marktplatz (nur in diesem Run)
+//   Gold             -> Markt (nur in diesem Run)
 //   Sternensamen     -> Stellarium (nur in diesem Run, intern "skillpunkte"), bei jeder Ernte und jedem Klick auf den Samenladen
 //   Mondblueten      -> Mondteich (dauerhaft), gibt es am Ende eines Runs fuer bezahlte Rechnungen
 //   Kuschel-Gutscheine -> 1 Gratis-Zug am Kuschel-Automaten, 1 Stueck pro geschaffter Erfolg-Stufe
@@ -82,15 +82,18 @@ function klemme(wert, min, max) {
 
 // ---------- KONFIGURATION ----------
 
+// Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
+const SPIEL_VERSION = "Alpha 0.2.0";
+
 const KONFIG = {
-    startKlicksProSamen: 30,          // weniger zaeh am Anfang (vorher 40)
+    startKlicksProSamen: 40,
     minKlicksProSamen: 6,
     startEnergie: 150,
     energieProSek: 5,
     tageProRechnung: 5,
     rechnungBasis: 30,
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
-    rechnungFaktorenStart: [20, 15, 23], // die ersten Spruenge sind sanfter: 30, 600, 9.000, 207.000, 5,4 Mio. ...
+    rechnungFaktorenStart: [18, 13, 17], // die ersten Spruenge sind sanfter: 30, 540, 7.020, 119.340, 3,1 Mio. ...
     sternensamenProErnte: 5,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
     sternensamenPflanzenFaktor: 1.07, // ... und jede hoehere Pflanze gibt 7% mehr (Kuerbis ~7,5, Mondlilie ~13)
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen
@@ -246,12 +249,12 @@ const PFLANZEN_UPGRADES = [
 const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [u.id, u]));
 
 // ---------- SHOP: ALLGEMEINE UPGRADES (Gold) ----------
-// Am Anfang gibt es auf dem Marktplatz nur neue Felder und "Ertrag". Diese Upgrades erscheinen erst,
+// Am Anfang gibt es auf dem Markt nur neue Felder und "Ertrag". Diese Upgrades erscheinen erst,
 // wenn ihr Stern im Stellarium gekauft ist (knoten).
 
 const SHOP_UPGRADES = [
-    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: "Schnellere Aussaat", basiskosten: 5, faktor: 2.1, max: 11,
-        beschreibung: "-3 Klicks pro Samen.",
+    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: "Schnellere Aussaat", basiskosten: 5, faktor: 1.9, max: 9,
+        beschreibung: "-4 Klicks pro Samen.",
         info: () => klicksProSamen() + " Klicks pro Samen" },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: "Längerer Tag", basiskosten: 25, faktor: 2.6, max: 10,
         beschreibung: "+25 Energie pro Tag.",
@@ -280,12 +283,12 @@ const SHOP_UPGRADES = [
 // Ein grosser Baum, den man mit der Maus verschieben und mit dem Mausrad zoomen kann.
 // In der Mitte steht der Weizen (von Anfang an da). Von dort gehen 4 Aeste ab:
 //   oben: Pflanzen (jede Pflanze mit eigenem kleinen Ast), rechts: Ernte (+ Spezialpflanzen),
-//   unten: Hof (schaltet die Marktplatz-Upgrades frei), links: Helfer (+ Glueck).
+//   unten: Hof (schaltet die Markt-Upgrades frei), links: Helfer (+ Glueck).
 // pos = [x, y] in Pixeln, [0, 0] = Mitte. vor = Stern, der vorher mindestens 1x gekauft sein muss.
 // vorMax: true = der Vorgaenger muss komplett ausgebaut sein ("Stufe 2"-Sterne: viel teurer, viel besser).
 // erledigt: gibt einen Namen zurueck, wenn ein dauerhafter Fortschritt (Tarot, Mondteich) denselben Nachteil schon loest.
 //           Der Stern ist dann in jedem Run von Anfang an voll.
-// art: "pflanze" (schaltet eine Pflanze frei), "shop" (schaltet ein Marktplatz-Upgrade frei), sonst ein normaler Stern.
+// art: "pflanze" (schaltet eine Pflanze frei), "shop" (schaltet ein Markt-Upgrade frei), sonst ein normaler Stern.
 
 // Sprungziele im Baum (z.B. fuer den Knopf "Zur Mitte")
 const BAUM_ZIELE = [
@@ -302,18 +305,18 @@ function stern(id, ast, icon, pos, vor, name, basiskosten, faktor, max, beschrei
     return { id, ast, icon, pos, vor, name, basiskosten, faktor, max, beschreibung, info, ...extra };
 }
 
-// Stern, der ein Marktplatz-Upgrade freischaltet
+// Stern, der ein Markt-Upgrade freischaltet
 function shopStern(id, ast, pos, vor, kosten) {
     const u = SHOP_UPGRADES.find(s => s.knoten === id);
     return { id, ast, icon: u.icon, pos, vor, name: u.name, basiskosten: kosten, faktor: 1, max: 1, art: "shop", markt: u,
-        beschreibung: "Schaltet auf dem Marktplatz frei: " + u.name + " (" + u.beschreibung + ")",
-        info: () => (level(id) > 0 ? "Auf dem Marktplatz freigeschaltet" : "Noch nicht auf dem Marktplatz") };
+        beschreibung: "Schaltet auf dem Markt frei: " + u.name + " (" + u.beschreibung + ")",
+        info: () => (level(id) > 0 ? "Auf dem Markt freigeschaltet" : "Noch nicht auf dem Markt") };
 }
 
 // Stern, der ein Gluecksspiel freischaltet (einmal kaufen)
 function spielStern(id, icon, pos, vor, name, kosten, beschreibung) {
     return { id, ast: "glueck", icon, pos, vor, name, basiskosten: kosten, faktor: 1, max: 1, beschreibung,
-        info: () => (level(id) > 0 ? "Freigeschaltet: auf dem Marktplatz unter Glücksspiel" : "Gesperrt") };
+        info: () => (level(id) > 0 ? "Freigeschaltet: auf dem Markt unter Glücksspiel" : "Gesperrt") };
 }
 
 const SKILLS = [
@@ -425,15 +428,15 @@ const SKILLS = [
 
     // ----- Glueck (links aussen, haengt am Helfer-Ast) -----
     spielStern("muenzwurf", "🪙", [-960, 0], "haustiertraining", "Münzwurf", 200,
-        "Schaltet den Münzwurf auf dem Marktplatz frei: Setz einen Teil deines Goldes. Kopf = doppelt, Zahl = weg."),
+        "Schaltet den Münzwurf auf dem Markt frei: Setz einen Teil deines Goldes. Kopf = doppelt, Zahl = weg."),
     spielStern("gacha", "🎰", [-1180, 0], "muenzwurf", "Gacha-Automat", 500,
-        "Schaltet den Gacha-Automaten auf dem Marktplatz frei: Gold einwerfen, zufällige Belohnung ziehen."),
+        "Schaltet den Gacha-Automaten auf dem Markt frei: Gold einwerfen, zufällige Belohnung ziehen."),
     spielStern("rubbellos", "🎟️", [-1400, 0], "gacha", "Rubbellose", 1200,
-        "Schaltet Rubbellose auf dem Marktplatz frei: 9 Felder aufrubbeln, 3 gleiche Symbole gewinnen."),
+        "Schaltet Rubbellose auf dem Markt frei: 9 Felder aufrubbeln, 3 gleiche Symbole gewinnen."),
     spielStern("huehnerrennen", "🐔", [-1620, 0], "rubbellos", "Hühnerrennen", 2500,
-        "Schaltet das Hühnerrennen auf dem Marktplatz frei: Wette auf ein Huhn, je größer der Außenseiter, desto höher der Gewinn."),
+        "Schaltet das Hühnerrennen auf dem Markt frei: Wette auf ein Huhn, je größer der Außenseiter, desto höher der Gewinn."),
     spielStern("plinko", "🔻", [-1840, 0], "huehnerrennen", "Samen-Plinko", 4000,
-        "Schaltet Samen-Plinko auf dem Marktplatz frei: Ein Samen hüpft durch Nägel in ein Gewinnfach."),
+        "Schaltet Samen-Plinko auf dem Markt frei: Ein Samen hüpft durch Nägel in ein Gewinnfach."),
     stern("glueckstraehne", "glueck", "🍀", [-960, -220], "muenzwurf", "Glückssträhne", 400, 2, 5,
         "+3% Glück bei allen Glücksspielen (mehr Gewinnchance).",
         () => "+" + prozentText(glueckBonus()) + " Glück"),
@@ -447,7 +450,7 @@ const SKILLS = [
         "Der Wanderhändler kommt öfter vorbei.",
         () => prozentText(haendlerChance()) + " Chance nach jedem Tag"),
 
-    // ----- Hof (unten): schaltet die meisten Marktplatz-Upgrades frei -----
+    // ----- Hof (unten): schaltet die meisten Markt-Upgrades frei -----
     shopStern("s_aussaat", "hof", [0, 300], "p_weizen", 20),
     shopStern("s_energie", "hof", [-220, 520], "s_aussaat", 60),
     stern("giessen", "hof", "💧", [0, 520], "s_aussaat", "Gießkanne", 50, 2, 8,
@@ -528,7 +531,7 @@ VARIANTEN.forEach((variante, index) => {
 });
 
 // ----- Pflanzen (oben): der Weizen ist die Mitte des Baums, darueber waechst eine Ranke mit allen Pflanzen.
-// Jede Pflanze hat einen kleinen eigenen Ast: Wachstum, Pracht und Ueberfluss auf dem Marktplatz freischalten und ein eigener Bonus.
+// Jede Pflanze hat einen kleinen eigenen Ast: Wachstum, Pracht und Ueberfluss auf dem Markt freischalten und ein eigener Bonus.
 // Kosten der Aeste haengen am Freischaltpreis der Pflanze: Der ganze Ast einer Pflanze kostet etwa so viel
 // wie die naechste Pflanze. So lohnt es sich, erst den Weizen auszubauen, bevor man zur Karotte geht, usw.
 
@@ -556,7 +559,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         id: "p_" + p.id, ast: "pflanzen", art: "pflanze", pflanze: p.id, icon: p.emoji, pos: [x, y],
         vor: vorige ? "p_" + vorige.id : null, name: p.name, basiskosten: p.unlockKosten, faktor: 1, max: 1,
         beschreibung: (index === 0 ? "Deine erste Pflanze und die Mitte des Stellariums." :
-            p.name + " wächst danach auf deinen Feldern und bekommt einen eigenen Reiter auf dem Marktplatz.") +
+            p.name + " wächst danach auf deinen Feldern und bekommt einen eigenen Reiter auf dem Markt.") +
             (p.eigenschaftText ? " " + p.eigenschaftText : ""),
         info: () => "Grundwert " + zahl(p.verkaufswert) + " Gold, " + sekText(p.sekProStufe * 3) + " bis zur Ernte"
     });
@@ -566,8 +569,8 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
             id: praefix + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: praefix === "pw_" ? "⏱️" : praefix === "pp_" ? "🎨" : "➕",
             pos, vor, name: p.name + ": " + u.name, basiskosten: rundePreis(basis * faktor), faktor: 1, max: 1, art: "pflanzenShop",
             markt: u, marktReiter: p.name,
-            beschreibung: "Schaltet auf dem Marktplatz-Reiter " + p.name + " frei: " + u.name + " (" + u.beschreibung + ")",
-            info: () => (level(praefix + p.id) > 0 ? "Auf dem Marktplatz freigeschaltet" : "Noch nicht auf dem Marktplatz")
+            beschreibung: "Schaltet auf dem Markt-Reiter " + p.name + " frei: " + u.name + " (" + u.beschreibung + ")",
+            info: () => (level(praefix + p.id) > 0 ? "Auf dem Markt freigeschaltet" : "Noch nicht auf dem Markt")
         });
     };
     shopAst("pw_", "wachstum", versatz.pw, "p_" + p.id, 0.15);
@@ -642,9 +645,9 @@ const STERN_WIRKUNG = {
 SKILLS.forEach(def => {
     if (STERN_KURZ[def.id]) def.kurz = STERN_KURZ[def.id];
     if (STERN_WIRKUNG[def.id]) def.wirkung = STERN_WIRKUNG[def.id];
-    if (def.art === "shop" && !def.kurz) def.kurz = "Marktplatz: " + def.name;
+    if (def.art === "shop" && !def.kurz) def.kurz = "Markt: " + def.name;
     if (def.id.startsWith("p_")) def.kurz = "Neue Pflanze · Grundwert " + zahl(PFLANZEN_VORLAGEN.find(p => p.id === def.pflanze).verkaufswert) + " Gold";
-    if (def.art === "pflanzenShop") def.kurz = "Marktplatz: " + def.name.split(": ")[1];
+    if (def.art === "pflanzenShop") def.kurz = "Markt: " + def.name.split(": ")[1];
     if (def.id.startsWith("pg_")) {
         def.kurz = "Mehr Wert für " + def.name.split(":")[0];
         def.wirkung = s => "+" + 300 * s + "% Wert";
@@ -655,7 +658,7 @@ SKILLS.forEach(def => {
     }
 });
 
-// ---------- GLUECKSSPIELE (auf dem Marktplatz, zwischen den Tagen, mit Gold) ----------
+// ---------- GLUECKSSPIELE (auf dem Markt, zwischen den Tagen, mit Gold) ----------
 // proPause = wie oft man zwischen zwei Tagen spielen darf (+ Stern "Stammkunde").
 // einsaetze = Anteile deines aktuellen Goldes, die du setzen kannst.
 // Alle Spiele zahlen im Schnitt etwas weniger aus, als man einsetzt (Glueck macht sie besser).
@@ -686,7 +689,7 @@ const GLUECKSSPIEL = {
         faecher: [8, 3, 1.3, 0.6, 0.3, 0.6, 1.3, 3, 8] }
 };
 
-// ---------- GACHA-AUTOMAT (auf dem Marktplatz, mit Gold) ----------
+// ---------- GACHA-AUTOMAT (auf dem Markt, mit Gold) ----------
 // Teuer, dafuer gilt jeder Preis fuer den ganzen Run (run.gachaBoni) oder sogar fuer immer (Kuschel-Gutschein).
 // Kosten: GACHA_KONFIG.anteil der naechsten Rechnung (Sandbox: des naechsten Meilensteins), jeder Zug im Run x faktor.
 // raritaet = Farbe des Preises (Index in RARITAETEN). bonus/wert = was in run.gachaBoni dazukommt.
@@ -874,7 +877,6 @@ const WERKZEUGE = [
     { id: "taschenuhr", name: "Alte Taschenuhr", symbol: "🕰️", preis: 0.8, wert: 30, ganz: true, text: w => "+" + w + " Energie pro Tag." },
     { id: "gluecksmuenze", name: "Glücksmünze", symbol: "🪙", preis: 0.9, wert: 0.1,
         text: w => "+" + prozentText(w) + " Glück bei Glücksspielen und +" + prozentText(w / 10) + " Chance auf legendäre Saaten." },
-    { id: "handschuhe", name: "Gartenhandschuhe", symbol: "🧤", preis: 0.6, wert: 0.3, text: w => "+" + prozentText(w) + " Radius um deinen Cursor." },
     { id: "saatbeutel", name: "Großer Saatbeutel", symbol: "🎒", preis: 0.7, wert: 6, ganz: true, text: w => "-" + w + " Klicks pro Samen." },
     { id: "flechtkorb", name: "Flechtkorb", symbol: "🧺", preis: 1.0, wert: 0.25, text: w => prozentText(w) + " Chance auf eine zusätzliche Saat pro Ernte." },
     { id: "laterne", name: "Laterne", symbol: "🏮", preis: 0.5, wert: 1,
@@ -1362,8 +1364,8 @@ const META_UPGRADES = [
     { id: "segensreich", name: "Segensreich", basiskosten: 60, faktor: 1, max: 1,
         beschreibung: "Nach jeder Rechnung hast du 4 Segen zur Auswahl statt 3.", info: lvl => (lvl ? "4 Segen" : "3 Segen") },
     { id: "kuschelrabatt", name: "Kuschel-Rabatt", basiskosten: 120, faktor: 1, max: 1,
-        beschreibung: "Kuschel-Züge werden nach jedem Zug nur noch x1,15 statt x1,25 teurer.",
-        info: lvl => (lvl ? "x1,15 pro Zug" : "x1,25 pro Zug") },
+        beschreibung: "Kuschel-Züge werden nur noch nach jedem 2. Zug um 1 teurer.",
+        info: lvl => (lvl ? "+1 alle 2 Züge" : "+1 pro Zug") },
     { id: "mondlicht", name: "Mondlicht", basiskosten: 8, faktor: 1.5, max: Infinity,
         beschreibung: "x1,1 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich.",
         info: lvl => multiText(Math.pow(1.1, lvl)) + " Gold" }
@@ -1433,9 +1435,7 @@ const TAROT_NACH_ID = Object.fromEntries(TAROT.map(t => [t.id, t]));
 // "Mythisch" (rosa) gibt es nur hier, es ist der super seltene Hauptgewinn.
 
 const KUSCHEL_KONFIG = {
-    preis: 8,
-    preisFaktor: 1.25,
-    preisFaktorRabatt: 1.15,  // mit Mondteich-Upgrade "Kuschel-Rabatt"
+    preis: 1,                 // erster Zug 1 Mondbluete, jeder bezahlte Zug +1 (mit "Kuschel-Rabatt" nur jeder 2.)
     maxStufe: 5
 };
 
@@ -1443,9 +1443,9 @@ const KUSCHEL_RARITAETEN = [
     { id: "gewoehnlich", name: "Gewöhnlich", chance: 0.50, farbe: "#e8e8e8", rand: "#8a8a8a" },
     { id: "ungewoehnlich", name: "Ungewöhnlich", chance: 0.27, farbe: "#5fd15f", rand: "#2e9e2e" },
     { id: "selten", name: "Selten", chance: 0.14, farbe: "#6cc0f5", rand: "#2f7fcf" },
-    { id: "episch", name: "Episch", chance: 0.06, farbe: "#b06ee8", rand: "#7c2fc2" },
-    { id: "legendaer", name: "Legendär", chance: 0.027, farbe: "#ffd93d", rand: "#d49a00" },
-    { id: "mythisch", name: "Mythisch", chance: 0.003, farbe: "#ff9ad5", rand: "#e0409a" }
+    { id: "episch", name: "Episch", chance: 0.055, farbe: "#b06ee8", rand: "#7c2fc2" },
+    { id: "legendaer", name: "Legendär", chance: 0.030, farbe: "#ffd93d", rand: "#d49a00" },
+    { id: "mythisch", name: "Mythisch", chance: 0.005, farbe: "#ff9ad5", rand: "#e0409a" }
 ];
 
 // raritaet = Index in KUSCHEL_RARITAETEN. text(stufe) beschreibt den Bonus auf der aktuellen Stufe.

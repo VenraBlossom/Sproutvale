@@ -166,11 +166,12 @@ function zeigeTarotDetails(karte) {
 }
 
 // ---------- KUSCHEL-AUTOMAT (Gacha, Kuscheltiere bleiben fuer immer) ----------
-// Ein Zug pro Klick (keine 10er-Zuege). Mit Gutschein kostenlos, sonst Mondblueten: jeder bezahlte Zug x1,25 teurer.
+// Ein Zug pro Klick (keine 10er-Zuege). Mit Gutschein kostenlos, sonst Mondblueten:
+// der erste Zug kostet 1, jeder bezahlte Zug macht den naechsten um 1 teurer (mit Kuschel-Rabatt nur jeder 2.).
 
 function kuschelPreis() {
-    const faktor = metaLevel("kuschelrabatt") > 0 ? KUSCHEL_KONFIG.preisFaktorRabatt : KUSCHEL_KONFIG.preisFaktor;
-    return aufrunden(KUSCHEL_KONFIG.preis * Math.pow(faktor, meta.kuschelZuegeBezahlt));
+    const schritte = metaLevel("kuschelrabatt") > 0 ? Math.floor(meta.kuschelZuegeBezahlt / 2) : meta.kuschelZuegeBezahlt;
+    return KUSCHEL_KONFIG.preis + schritte;
 }
 
 function wuerfleKuschelRaritaet() {
@@ -289,8 +290,8 @@ function renderKuscheltiere() {
             kleinerKnopf("🎟️ Mit Gutschein ziehen (" + meta.gutscheine + ")", meta.gutscheine > 0, () => zieheKuschel(true), "knopf-gruen"),
             kleinerKnopf("Ziehen · " + zahl(preis) + " Mondblüten", meta.mondblueten >= preis, () => zieheKuschel(false), "knopf-lila")
         ]),
-        el("div", "kuschel-hinweis", "Jeder Zug mit Mondblüten macht den nächsten " +
-            (metaLevel("kuschelrabatt") > 0 ? "15" : "25") + "% teurer. Gutschein-Züge sind immer kostenlos.")
+        el("div", "kuschel-hinweis", (metaLevel("kuschelrabatt") > 0 ? "Jeder 2. Zug" : "Jeder Zug") +
+            " mit Mondblüten macht den nächsten um 1 teurer. Gutschein-Züge sind immer kostenlos.")
     ]);
     prestigeInhalt.appendChild(automat);
 

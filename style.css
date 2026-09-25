@@ -34,14 +34,15 @@
     --gruen-dunkel: #2f5a1a;
 
     /* Schriften: Titel im Pixel-Stil, Text und Zahlen gut lesbar */
-    --schrift-titel: "Pixelify Sans", "Courier New", monospace;
-    --schrift-text: "Sproutvale Ziffern", "Jersey 15", "Courier New", monospace;
+    --schrift-titel: "Fredoka", "Pixelify Sans", sans-serif;
+    --schrift-text: "Fredoka", "Jersey 15", sans-serif;
 }
 
 html, body {
     height: 100%;
     font-family: var(--schrift-text);
-    font-size: 22px;
+    font-size: 17px;
+    font-weight: 500;
     color: var(--text);
     background-color: #86c457;
     overflow: hidden;
@@ -7443,4 +7444,400 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border: 2px solid #fff4dc;
     border-radius: 50%;
     animation: neu-huepfen 1.4s ease-in-out infinite;
+}
+
+/* Ueberschriften etwas kraeftiger */
+h1, h2, h3,
+.segen-name,
+#plant-button-label,
+.stern-karte-name {
+    font-weight: 600;
+}
+
+/* Versionsnummer unten rechts im Hauptmenue */
+#menue-version {
+    position: absolute;
+    right: 16px;
+    bottom: 10px;
+    z-index: 1;
+    font-size: 0.85em;
+    color: #fff6dc;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+/* Feedback-Formular in den Einstellungen */
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.feedback-arten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+#feedback-text,
+#feedback-mail {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--text);
+    background-color: #fffaf0;
+    border: 3px solid var(--pergament-rand);
+    border-radius: 6px;
+    user-select: text;
+}
+
+#feedback-text {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.feedback-knoepfe {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ============================================================
+   MARKT: grosses Fenster mit Markise, Holzschildern als Reiter und Stand-Karten
+   ============================================================ */
+
+.panel.markt-fenster {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(1420px, calc(100% - 60px));
+    height: min(880px, calc(100% - 60px));
+    transform: translate(-50%, -50%);
+    z-index: 21;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 240, 200, 0.55), transparent 60%),
+        repeating-linear-gradient(90deg, #f3dfb4 0 46px, #ecd5a5 46px 48px);
+    border: 5px solid var(--holz-dunkel);
+    border-radius: 12px;
+    box-shadow: 0 0 0 100vmax rgba(30, 18, 6, 0.5), 0 14px 40px rgba(0, 0, 0, 0.5);
+    animation: markt-auf 0.2s ease-out;
+}
+
+@keyframes markt-auf {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.markt-markise {
+    flex: 0 0 34px;
+    background:
+        radial-gradient(circle at 24px 0, transparent 0 0, transparent 0) ,
+        repeating-linear-gradient(90deg, #d9483f 0 48px, #fff1d6 48px 96px);
+    border-bottom: 3px solid rgba(90, 30, 20, 0.55);
+    position: relative;
+}
+
+/* gewellter Rand der Markise */
+.markt-markise::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -12px;
+    height: 12px;
+    background: radial-gradient(circle at 24px 0, #d9483f 0 15px, transparent 16px) 0 0 / 96px 12px repeat-x,
+        radial-gradient(circle at 72px 0, #fff1d6 0 15px, transparent 16px) 0 0 / 96px 12px repeat-x;
+    filter: drop-shadow(0 2px 0 rgba(90, 30, 20, 0.35));
+}
+
+.markt-kopf {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px 10px;
+}
+
+.markt-kopf h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.9em;
+    color: var(--holz-dunkel);
+}
+
+.markt-gold {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 6px 16px;
+    font-size: 1.35em;
+    font-weight: 700;
+    color: #6b4210;
+    background: linear-gradient(#fff3b0, #ffd966);
+    border: 3px solid #b8862b;
+    border-radius: 20px;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6);
+}
+
+.markt-gold .icon {
+    width: 26px !important;
+    height: 26px !important;
+}
+
+.markt-koerper {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    gap: 16px;
+    padding: 6px 20px 20px;
+}
+
+/* Holzschilder als Reiter */
+.markt-reiter {
+    flex: 0 0 210px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 12px 4px 0;
+}
+
+.markt-reiter .reiter-knopf {
+    justify-content: flex-start;
+    padding: 10px 14px;
+    font-size: 1.05em;
+    text-align: left;
+    color: #fff6dc;
+    text-shadow: 1px 1px 0 var(--holz-dunkel);
+    background: repeating-linear-gradient(0deg, #9a6634 0 12px, #8a5a2c 12px 14px);
+    border: 3px solid var(--holz-dunkel);
+    border-radius: 6px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+    transition: transform 0.12s ease;
+}
+
+.markt-reiter .reiter-knopf:hover {
+    transform: translateX(4px);
+}
+
+.markt-reiter .reiter-knopf.aktiv {
+    color: #4a2f15;
+    text-shadow: none;
+    background: linear-gradient(#fff3b0, #ffd966);
+    border-color: #b8862b;
+    transform: translateX(8px);
+}
+
+.markt-inhalt {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 4px 8px 12px 4px;
+}
+
+.markt-raster {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 16px;
+}
+
+/* Stand-Karte */
+.markt-karte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px 16px 14px;
+    background: linear-gradient(#fffaf0, #fbefd6);
+    border: 3px solid #c9a46a;
+    border-radius: 10px;
+    box-shadow: 0 4px 0 rgba(90, 60, 20, 0.25);
+    overflow: hidden;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* kleine Markise oben auf jeder Karte */
+.markt-karte::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 10px;
+    background: repeating-linear-gradient(90deg, #d9483f 0 16px, #fff1d6 16px 32px);
+}
+
+.markt-karte:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 rgba(90, 60, 20, 0.2);
+}
+
+.markt-karte.leistbar {
+    border-color: #5f9e3c;
+    box-shadow: 0 4px 0 rgba(47, 90, 26, 0.35), 0 0 16px rgba(120, 220, 90, 0.55);
+}
+
+.markt-karte.leistbar::before {
+    background: repeating-linear-gradient(90deg, #5f9e3c 0 16px, #eaffd8 16px 32px);
+}
+
+.markt-karte.maximal {
+    border-color: #d4a017;
+    background: linear-gradient(#fff8d6, #ffeaa0);
+}
+
+.markt-karte.maximal::before {
+    background: repeating-linear-gradient(90deg, #e0a800 0 16px, #fff3b0 16px 32px);
+}
+
+.markt-karte.gesperrt {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0.75;
+    background: repeating-linear-gradient(45deg, #efe2c4 0 12px, #e8d9b6 12px 24px);
+    border-style: dashed;
+}
+
+.markt-karte.gesperrt::before {
+    background: repeating-linear-gradient(90deg, #9a8a70 0 16px, #d8ccb4 16px 32px);
+}
+
+.markt-gesperrt-bild {
+    font-size: 2.2em;
+}
+
+.markt-karte-kopf {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.markt-bildrahmen {
+    flex: 0 0 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle, #fff6dc, #f0d9a8);
+    border: 3px solid #c9a46a;
+    border-radius: 50%;
+}
+
+.markt-karte.leistbar .markt-bildrahmen {
+    border-color: #5f9e3c;
+    animation: markt-bild-wippen 1.6s ease-in-out infinite;
+}
+
+@keyframes markt-bild-wippen {
+    50% { transform: translateY(-3px) rotate(-4deg); }
+}
+
+.markt-karte-titel {
+    min-width: 0;
+}
+
+.markt-karte-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--holz-dunkel);
+    line-height: 1.15;
+}
+
+.markt-karte-stufe {
+    display: inline-block;
+    margin-top: 3px;
+    padding: 1px 8px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #fff6dc;
+    background-color: #8a5a2c;
+    border-radius: 10px;
+}
+
+.markt-karte-text {
+    font-size: 0.95em;
+    line-height: 1.35;
+    color: var(--text);
+}
+
+.markt-karte-zusatz {
+    font-size: 0.85em;
+    color: #b8862b;
+    font-weight: 600;
+}
+
+.markt-karte-jetzt {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    color: #2f5a1a;
+    background-color: rgba(95, 158, 60, 0.12);
+    border-radius: 6px;
+}
+
+.markt-karte .stern-punkte span {
+    background-color: #e3d2ad;
+    border-color: #b89a62;
+}
+
+.markt-karte .stern-punkte span.voll {
+    background-color: #5f9e3c;
+    border-color: #2f5a1a;
+}
+
+.markt-kaufen {
+    margin-top: auto;
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 1.05em;
+    font-weight: 700;
+}
+
+.markt-karte.leistbar .markt-kaufen {
+    color: #ffffff;
+    background: linear-gradient(#7cc04f, #5f9e3c);
+    border-color: #2f5a1a;
+}
+
+/* Kopf im Pflanzen-Reiter */
+.markt-pflanze-kopf {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, rgba(95, 158, 60, 0.18), rgba(95, 158, 60, 0.04));
+    border: 3px solid #a3c47a;
+    border-radius: 10px;
+}
+
+.markt-pflanze-bild {
+    width: 72px !important;
+    height: 72px !important;
+}
+
+.markt-pflanze-name {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--gruen-dunkel);
+}
+
+.markt-pflanze-werte {
+    font-size: 1.05em;
+}
+
+.markt-pflanze-eigenschaft {
+    margin-top: 2px;
+    font-size: 0.9em;
+    color: var(--text-leise);
+}
+
+.markt-inhalt > .panel-hinweis {
+    margin-bottom: 12px;
 }

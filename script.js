@@ -73,7 +73,7 @@ const MAX_FELDER = FELD_POSITIONEN.length;
 // "meta" ist immer der Fortschritt des Modus, der gerade laeuft. Der andere wartet in metaRuhend bzw. im Speicher.
 const META_SPEICHER_KEY = "sproutvale_meta";
 const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
-const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "erfolge"];
+const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "erfolge", "kaeufeUmzug"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
 let metaRuhend = null; // Fortschritt des Standard-Modus, waehrend die Sandbox laeuft
@@ -170,6 +170,7 @@ function geteiltVon(stand) {
 function speichereMeta() {
     if (speichernGesperrt) return;
     try {
+        speichereKaeufe(meta);
         if (metaProfil === "sandbox") {
             localStorage.setItem(SANDBOX_META_KEY, JSON.stringify(fortschrittVon(meta)));
             localStorage.setItem(META_SPEICHER_KEY, JSON.stringify({ ...metaRuhend, ...geteiltVon(meta) }));
@@ -201,7 +202,81 @@ function profilMondblueten(sandbox) {
     return ladeMeta(SANDBOX_META_KEY).mondblueten;
 }
 
-const meta = ladeMeta();
+// ---------- GEKAUFTE INHALTE (DLC) ----------
+// Stehen in einer eigenen Datei (kaeufe.dat) mit Pruefsumme. Wer den Spielstand von Hand aendert ("dlc": true),
+// bekommt dadurch nichts: beim Laden zaehlt nur, was in der Kauf-Datei steht und zur Pruefsumme passt.
+// Spaeter wird das zusaetzlich mit Steam abgeglichen.
+const KAEUFE_KEY = "sproutvale_kaeufe";
+
+function kaufPruefsumme(text) {
+    // cyrb53 mit festem Salz (kein echter Schutz, aber einfaches Umschreiben reicht nicht mehr)
+    const salz = "sv-" + text.length + "-bl00m";
+    let h1 = 0xdeadbeef ^ 0x5eed;
+    let h2 = 0x41c6ce57 ^ 0x5eed;
+    const eingabe = salz + text + salz;
+    for (let i = 0; i < eingabe.length; i++) {
+        const c = eingabe.charCodeAt(i);
+        h1 = Math.imul(h1 ^ c, 2654435761);
+        h2 = Math.imul(h2 ^ c, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+function dlcListen() {
+    return { haustier: HAUSTIER_SKINS, landschaft: HOF_THEMEN, deko: DEKO_OBJEKTE, musik: MUSIK_TITEL, samenladen: SAMENLADEN_SKINS,
+        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS };
+}
+
+function istDlcSchluessel(schluessel) {
+    const [kategorie, id] = schluessel.split(":");
+    const liste = dlcListen()[kategorie];
+    const eintrag = liste && liste.find(e => e.id === id);
+    return Boolean(eintrag && eintrag.quelle === "dlc");
+}
+
+function ladeKaeufe() {
+    try {
+        const roh = JSON.parse(localStorage.getItem(KAEUFE_KEY));
+        if (roh && typeof roh.daten === "string" && kaufPruefsumme(roh.daten) === roh.sig) {
+            const daten = JSON.parse(roh.daten);
+            return { dlc: Boolean(daten.dlc), einzeln: Array.isArray(daten.einzeln) ? daten.einzeln : [] };
+        }
+    } catch (fehler) {
+        console.warn("Kauf-Datei ungueltig", fehler);
+    }
+    return { dlc: false, einzeln: [] };
+}
+
+function speichereKaeufe(stand) {
+    const daten = JSON.stringify({ dlc: Boolean(stand.dlc), einzeln: Object.keys(stand.freigeschaltet).filter(istDlcSchluessel).sort() });
+    if (localStorage.getItem(KAEUFE_KEY) && ladeKaeufeText() === daten) return;
+    localStorage.setItem(KAEUFE_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+}
+
+function ladeKaeufeText() {
+    try { return JSON.parse(localStorage.getItem(KAEUFE_KEY)).daten; } catch (fehler) { return null; }
+}
+
+// Nur was in der Kauf-Datei steht, gilt als gekauft
+function uebernehmeKaeufe(stand) {
+    const kaeufe = ladeKaeufe();
+    // Umzug: gab es noch keine Kauf-Datei, werden die bisherigen Kaeufe einmal uebernommen
+    if (localStorage.getItem(KAEUFE_KEY) === null && !stand.kaeufeUmzug) {
+        stand.kaeufeUmzug = true;
+        speichereKaeufe(stand);
+        return stand;
+    }
+    stand.dlc = kaeufe.dlc;
+    Object.keys(stand.freigeschaltet).filter(istDlcSchluessel).forEach(schluessel => {
+        if (!kaeufe.einzeln.includes(schluessel)) delete stand.freigeschaltet[schluessel];
+    });
+    kaeufe.einzeln.forEach(schluessel => { stand.freigeschaltet[schluessel] = true; });
+    return stand;
+}
+
+const meta = uebernehmeKaeufe(ladeMeta());
 
 function metaLevel(id) {
     return meta.upgrades[id] || 0;
@@ -415,7 +490,7 @@ function glueckBonus() {
 }
 
 function klicksProSamen() {
-    const abzug = 3 * level("aussaat") + 2 * metaLevel("flinkeFinger") + aufrunden(tw("kraft")) + 4 * segen("flink") +
+    const abzug = 4 * level("aussaat") + 2 * metaLevel("flinkeFinger") + aufrunden(tw("kraft")) + 4 * segen("flink") +
         kuschel("frosch") + werkzeugWert("saatbeutel") + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, KONFIG.startKlicksProSamen - abzug);
     return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
@@ -453,7 +528,6 @@ function ueberflussChance(pflanze) { return 0.05 * pflanze.level.ueberfluss; }
 function sammelRadius() {
     let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, Math.min(level("radius"), 30)) *
         (1 + 0.04 * kuschel("igelchen"));
-    radius *= 1 + werkzeugWert("handschuhe");
     if (wetterIst("nebel") && !hatWerkzeug("strohhut")) radius *= 0.7;
     return radius;
 }
@@ -3206,6 +3280,41 @@ function kaufePflanzenUpgrade(pflanze, upgrade) {
     aktualisiereAlles();
 }
 
+// Eine Stand-Karte auf dem Markt: Symbol, Name, Stufe, Wirkung, "Du hast jetzt", Stufenpunkte, Kaufknopf
+function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten, onKauf, zusatz }) {
+    const istMax = lvl >= max;
+    const leistbar = !istMax && darfEinkaufen() && run.gold >= kosten;
+    const bild = pixelIcon(icon, 48);
+    const karte = el("div", "markt-karte" + (istMax ? " maximal" : "") + (leistbar ? " leistbar" : ""), null, [
+        el("div", "markt-karte-kopf", null, [
+            el("div", "markt-bildrahmen", null, [bild]),
+            el("div", "markt-karte-titel", null, [
+                el("div", "markt-karte-name", name),
+                el("div", "markt-karte-stufe", max === Infinity ? "Stufe " + lvl : max === 1 ? (lvl ? "Gekauft" : "Einmalig") : "Stufe " + lvl + " / " + max)
+            ])
+        ]),
+        el("div", "markt-karte-text", beschreibung),
+        zusatz ? el("div", "markt-karte-zusatz", zusatz) : null,
+        jetzt ? el("div", "markt-karte-jetzt", null, [el("span", null, "Du hast jetzt: "), el("b", null, jetzt)]) : null,
+        max > 1 && max <= 15 ? stufenPunkte(lvl, max) : null
+    ]);
+    const knopf = el("button", "knopf markt-kaufen", istMax ? "✔ Maximal" : "💰 " + zahl(kosten) + " Gold");
+    knopf.disabled = !leistbar;
+    knopf.addEventListener("click", onKauf);
+    karte.appendChild(knopf);
+    return karte;
+}
+
+function marktGesperrt(titel, text) {
+    return el("div", "markt-karte gesperrt", null, [
+        el("div", "markt-gesperrt-bild", "🔒"),
+        el("div", "markt-karte-name", titel),
+        el("div", "markt-karte-text", text)
+    ]);
+}
+
+const PFLANZEN_UPGRADE_ICONS = { ertrag: "💰", wachstum: "⏱️", pracht: "🎨", ueberfluss: "➕" };
+
 function renderShop() {
     // Waehrend eine Muenze fliegt oder die Huehner rennen, wird der Glueck-Reiter nicht neu aufgebaut
     if (glueckAnimation && aktiverShopReiter === "glueck" && !shopPanel.classList.contains("hidden")) return;
@@ -3220,24 +3329,31 @@ function renderShop() {
     });
 
     shopContent.innerHTML = "";
-    if (!darfEinkaufen()) shopContent.appendChild(erstelleHinweis("Einkaufen geht nur zwischen den Tagen."));
+    const goldAnzeige = $("markt-gold");
+    goldAnzeige.innerHTML = "";
+    goldAnzeige.append(spriteIcon("muenze"), " " + zahl(run.gold) + " Gold");
+    if (!darfEinkaufen()) shopContent.appendChild(erstelleHinweis("🌙 Einkaufen geht nur zwischen den Tagen."));
+    const raster = el("div", "markt-raster");
 
     if (aktiverShopReiter === "allgemein") {
-        const kosten = feldKosten();
-        const voll = run.felder.length >= MAX_FELDER;
-        shopContent.appendChild(erstelleKarte({
-            titel: "Neues Feld",
-            beschreibung: "Erweitert deinen Acker um ein Feld (geht auch über das + Schild).",
-            info: run.felder.length + " / " + MAX_FELDER + " Felder",
-            knopfText: voll ? "Maximal" : preisText(kosten, "gold"),
-            aktiv: !voll && darfEinkaufen() && run.gold >= kosten,
-            onKauf: kaufeFeld
+        raster.appendChild(marktKarte({
+            icon: "🌱", name: "Neues Feld", lvl: run.felder.length, max: MAX_FELDER,
+            beschreibung: "Erweitert deinen Acker um ein Feld. Geht auch über das + Schild auf dem Acker.",
+            jetzt: run.felder.length + " von " + MAX_FELDER + " Feldern",
+            kosten: feldKosten(), onKauf: kaufeFeld
         }));
-        SHOP_UPGRADES.filter(shopUpgradeFrei).forEach(def => shopContent.appendChild(upgradeKarte(def, "gold")));
+        SHOP_UPGRADES.filter(shopUpgradeFrei).forEach(def => raster.appendChild(marktKarte({
+            icon: def.icon, name: def.name, lvl: level(def.id), max: def.max,
+            beschreibung: (/Stufe/.test(def.beschreibung) || def.max === 1 ? "" : "Jede Stufe: ") + def.beschreibung,
+            jetzt: level(def.id) > 0 ? def.info() : null,
+            kosten: kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)),
+            onKauf: () => kaufeUpgrade(def, "gold")
+        })));
         const gesperrt = SHOP_UPGRADES.filter(def => !shopUpgradeFrei(def) && !istSandboxAus(def.id)).length;
         if (gesperrt > 0) {
-            shopContent.appendChild(erstelleHinweis("🔒 " + gesperrt + " weitere Upgrades schaltest du im Stellarium frei (Ast \"Hof\" und \"Helfer\")."));
+            raster.appendChild(marktGesperrt(gesperrt + " weitere Stände", "Schaltest du im Stellarium frei (Äste Hof und Helfer)."));
         }
+        shopContent.appendChild(raster);
         return;
     }
 
@@ -3247,36 +3363,39 @@ function renderShop() {
     }
 
     const pflanze = run.pflanzen.find(p => p.id === aktiverShopReiter);
-    shopContent.appendChild(erstelleHinweis(
-        pflanze.emoji + " " + pflanze.name + ": " + zahl(verkaufswert(pflanze)) + " Gold Grundwert, " +
-        sekText(basisStufenZeitSek(pflanze) * 3) + " bis zur Ernte" + (eigenschaftText(pflanze) ? ". " + eigenschaftText(pflanze) : "")
-    ));
+    // Kopf: die Pflanze mit ihren Werten
     const meister = meisterStufe(pflanze.id);
-    if (meister > 0) {
-        shopContent.appendChild(erstelleHinweis("🏅 Meisterschaft " + meister + ": für immer +" +
-            Math.round(MEISTER_BONUS * 100 * meister) + "% Wert (wächst mit jeder Ernte über alle Runs)"));
-    }
+    const kopfBild = spriteIcon(pflanze.id, true);
+    kopfBild.classList.add("markt-pflanze-bild");
+    shopContent.appendChild(el("div", "markt-pflanze-kopf", null, [
+        kopfBild,
+        el("div", null, null, [
+            el("div", "markt-pflanze-name", pflanze.name),
+            el("div", "markt-pflanze-werte", "💰 " + zahl(verkaufswert(pflanze)) + " Gold Grundwert · ⏱️ " +
+                sekText(basisStufenZeitSek(pflanze) * 3) + " bis zur Ernte"),
+            eigenschaftText(pflanze) ? el("div", "markt-pflanze-eigenschaft", eigenschaftText(pflanze)) : null,
+            meister > 0 ? el("div", "markt-pflanze-eigenschaft", "🏅 Meisterschaft " + meister + ": für immer +" +
+                Math.round(MEISTER_BONUS * 100 * meister) + "% Wert") : null
+        ])
+    ]));
 
     PFLANZEN_UPGRADES.forEach(upgrade => {
         if (!pflanzenUpgradeFrei(pflanze, upgrade)) return;
         const lvl = pflanze.level[upgrade.id];
-        const kosten = pflanzenUpgradeKosten(pflanze, upgrade);
-        const istMax = lvl >= upgrade.max;
-        let beschreibung = upgrade.beschreibung;
-        if (upgrade.id === "ertrag") beschreibung += " Nächste Verdopplung bei Stufe " + (Math.floor(lvl / 10) + 1) * 10 + ".";
-
-        shopContent.appendChild(erstelleKarte({
-            titel: upgrade.name + " (" + stufenText(lvl, upgrade.max) + ")",
-            beschreibung,
-            info: "Aktuell: " + upgrade.info(pflanze),
-            knopfText: istMax ? "Maximal" : preisText(kosten, "gold"),
-            aktiv: !istMax && darfEinkaufen() && run.gold >= kosten,
+        raster.appendChild(marktKarte({
+            icon: PFLANZEN_UPGRADE_ICONS[upgrade.id] || pflanze.emoji, name: upgrade.name, lvl, max: upgrade.max,
+            beschreibung: "Jede Stufe: " + upgrade.beschreibung,
+            zusatz: upgrade.id === "ertrag" ? "⭐ Stufe " + (Math.floor(lvl / 10) + 1) * 10 + " verdoppelt den Wert" : null,
+            jetzt: upgrade.info(pflanze),
+            kosten: pflanzenUpgradeKosten(pflanze, upgrade),
             onKauf: () => kaufePflanzenUpgrade(pflanze, upgrade)
         }));
     });
-    if (PFLANZEN_UPGRADES.some(u => !pflanzenUpgradeFrei(pflanze, u))) {
-        shopContent.appendChild(erstelleHinweis("🔒 Weitere Upgrades für " + pflanze.name + " schaltest du im Stellarium am Ast dieser Pflanze frei."));
+    const fehlend = PFLANZEN_UPGRADES.filter(u => !pflanzenUpgradeFrei(pflanze, u));
+    if (fehlend.length > 0) {
+        raster.appendChild(marktGesperrt(fehlend.map(u => u.name).join(", "), "Schaltest du im Stellarium am Ast von " + pflanze.name + " frei."));
     }
+    shopContent.appendChild(raster);
 }
 
 // ---------- STERNENBAUM (kostet Sternensamen) ----------
@@ -3322,7 +3441,7 @@ function knotenLeistbar(def) {
     return istKnotenOffen(def) && level(def.id) < def.max && darfEinkaufen() && run.skillpunkte >= knotenKosten(def);
 }
 
-// Ist das Marktplatz-Upgrade schon im Stellarium freigeschaltet?
+// Ist das Markt-Upgrade schon im Stellarium freigeschaltet?
 function shopUpgradeFrei(def) {
     if (istSandboxAus(def.id)) return false;
     return !def.knoten || level(def.knoten) > 0;
@@ -3340,7 +3459,7 @@ function schalteSternFrei(def) {
         neuePflanzeFeier(pflanze);
         Klang.segen();
     } else if (def.art === "shop" || def.art === "pflanzenShop") {
-        zeigeBanner(def.icon, "Neu auf dem Marktplatz: " + def.name, null, "#b8862b", 2200);
+        zeigeBanner(def.icon, "Neu auf dem Markt: " + def.name, null, "#b8862b", 2200);
     }
 }
 
@@ -3543,9 +3662,9 @@ function stufenPunkte(lvl, max) {
 function sternErklaerung(def) {
     const box = el("div", "stern-karte-text");
     if (def.markt) {
-        // Stern schaltet etwas auf dem Marktplatz frei: Name und Wirkung des Upgrades zeigen
+        // Stern schaltet etwas auf dem Markt frei: Name und Wirkung des Upgrades zeigen
         box.appendChild(el("div", "stern-markt", null, [
-            el("div", "stern-markt-titel", "🛒 Neu auf dem Marktplatz" + (def.marktReiter ? " (Reiter " + def.marktReiter + ")" : "")),
+            el("div", "stern-markt-titel", "🛒 Neu auf dem Markt" + (def.marktReiter ? " (Reiter " + def.marktReiter + ")" : "")),
             el("b", null, (def.markt.icon ? def.markt.icon + " " : "") + def.markt.name),
             el("div", null, (/Stufe/.test(def.markt.beschreibung) ? "" : "Jede Stufe: ") + def.markt.beschreibung),
             el("div", "stern-markt-hinweis", "Dort kaufst du es danach mit Gold, " +
@@ -3813,7 +3932,8 @@ function renderEinstellungen() {
         { id: "audio", text: "🎵 Klang" },
         { id: "anzeige", text: "👁️ Anzeige" },
         { id: "steuerung", text: "⌨️ Tasten" },
-        { id: "spielstand", text: "💾 Spielstand" }
+        { id: "spielstand", text: "💾 Spielstand" },
+        { id: "feedback", text: "💌 Feedback" }
     ].filter(Boolean);
     if (!reiter.some(r => r.id === aktiverEinstellungsReiter)) aktiverEinstellungsReiter = "audio";
     renderReiter($("einstellungen-reiter"), reiter, aktiverEinstellungsReiter, id => {
@@ -3886,7 +4006,8 @@ function loescheSpielstand() {
         ...leererMetaStand(),
         dlc: meta.dlc,
         freigeschaltet: { ...meta.freigeschaltet },
-        kosmetik: { ...meta.kosmetik }
+        kosmetik: { ...meta.kosmetik },
+        kaeufeUmzug: true
     };
     try {
         localStorage.setItem(META_SPEICHER_KEY, JSON.stringify(neuerStand));
@@ -3949,6 +4070,30 @@ if (window.sproutvaleDesktop && window.sproutvaleDesktop.speicher) {
     hinweis.textContent = "Dein Spielstand liegt in: " + window.sproutvaleDesktop.speicher.pfad() +
         ". Neue Version? Kopiere den Ordner \"save\" einfach neben die neue Sproutvale.exe.";
     $("speicher-oeffnen").addEventListener("click", () => window.sproutvaleDesktop.speicher.oeffnen());
+    $("import-zeile").classList.remove("versteckt");
+    $("spielstand-importieren").addEventListener("click", frageImport);
+}
+
+// Import: Ordner oeffnen, Dateien hineinkopieren, dann neu laden (die Dateien haben beim Start Vorrang)
+function frageImport() {
+    window.sproutvaleDesktop.speicher.oeffnen();
+    zeigePopup({
+        titel: "📥 Spielstand importieren",
+        breite: 560,
+        inhalt: el("div", "warn-inhalt", null, [
+            el("p", null, "1. Der Spielstand-Ordner hat sich gerade geöffnet."),
+            el("p", null, "2. Kopiere deine gesicherten Dateien hinein (fortschritt.json, run.json, sandbox.json, kaeufe.dat ...) und überschreibe die alten."),
+            el("p", null, "3. Klicke danach auf \"Jetzt laden\". Dein aktueller Stand wird dabei nicht mehr gespeichert.")
+        ]),
+        knoepfe: [
+            { text: "Abbrechen", klasse: "knopf" },
+            { text: "📂 Ordner öffnen", klasse: "knopf", bleibtOffen: true, aktion: () => window.sproutvaleDesktop.speicher.oeffnen() },
+            { text: "✅ Jetzt laden", klasse: "knopf-gruen", aktion: () => {
+                speichernGesperrt = true;
+                location.reload();
+            } }
+        ]
+    });
 }
 
 // Lautstaerke: Regler oder Klick aufs Symbol (stumm / wieder die vorige Lautstaerke)
@@ -4248,6 +4393,11 @@ function ladeRun(sandbox = false) {
     });
     Object.assign(neu, { phase: "vorTag", felder: [], zielFeld: null, samenUnterwegs: false, klickZaehler: 0, wetter: null });
     delete neu.lebenszeitSicherung; // aus alten Spielstaenden
+    // Werkzeuge, die es nicht mehr gibt (z.B. Gartenhandschuhe), fallen aus alten Spielstaenden heraus
+    neu.werkzeuge = (neu.werkzeuge || []).filter(id => WERKZEUG_NACH_ID[id]);
+    if (neu.haendler && neu.haendler.angebote) {
+        neu.haendler.angebote = neu.haendler.angebote.filter(a => a.art !== "werkzeug" || WERKZEUG_NACH_ID[a.id]);
+    }
 
     raeumeLootAuf();
     run = neu;
@@ -4393,3 +4543,57 @@ function hauptSchleife(jetzt) {
 
     requestAnimationFrame(hauptSchleife);
 }
+
+// ---------- FEEDBACK (Einstellungen, auch im Spiel) ----------
+// Ohne eigenen Server kann das Spiel keine E-Mail selbst verschicken. "Senden" oeffnet darum das E-Mail-Programm
+// mit fertigem Betreff "#12345 - Feedback - Sproutvale". Die Ticketnummer ist zufaellig (5 Ziffern).
+const FEEDBACK_MAIL = "venra.business@gmx.de";
+const FEEDBACK_ARTEN = [
+    { id: "fehler", text: "🐞 Fehler" },
+    { id: "idee", text: "💡 Idee" },
+    { id: "lob", text: "💖 Lob" },
+    { id: "sonstiges", text: "💬 Sonstiges" }
+];
+let feedbackArt = "fehler";
+
+function renderFeedbackArten() {
+    renderReiter($("feedback-arten"), FEEDBACK_ARTEN, feedbackArt, id => {
+        feedbackArt = id;
+        renderFeedbackArten();
+    });
+}
+renderFeedbackArten();
+
+function feedbackNachricht() {
+    const ticket = String(Math.floor(10000 + Math.random() * 90000));
+    const art = FEEDBACK_ARTEN.find(a => a.id === feedbackArt).text.replace(/^\S+ /, "");
+    const kontakt = $("feedback-mail").value.trim();
+    const betreff = "#" + ticket + " - Feedback - Sproutvale";
+    const text = "Art: " + art + "\n" +
+        "Version: " + SPIEL_VERSION + (window.sproutvaleDesktop ? " (Desktop)" : " (Browser)") + "\n" +
+        (run ? "Modus: " + (run.sandbox ? "Sandbox" : "Standard") + ", Tag " + run.tag + ", Rechnungen " + run.bezahlteRechnungen + "\n" : "") +
+        (kontakt ? "Kontakt: " + kontakt + "\n" : "") + "\n" + $("feedback-text").value.trim();
+    return { ticket, betreff, text };
+}
+
+$("feedback-senden").addEventListener("click", () => {
+    if ($("feedback-text").value.trim().length < 3) {
+        Klang.fehler();
+        zeigeToast("Schreib bitte erst ein paar Worte.");
+        return;
+    }
+    const n = feedbackNachricht();
+    window.open("mailto:" + FEEDBACK_MAIL + "?subject=" + encodeURIComponent(n.betreff) + "&body=" + encodeURIComponent(n.text));
+    $("feedback-info").textContent = "Ticket #" + n.ticket + ": Dein E-Mail-Programm sollte sich jetzt öffnen. Klappt das nicht, " +
+        "nutze „Text kopieren“ und schick den Text an " + FEEDBACK_MAIL + ".";
+    Klang.banner();
+});
+
+$("feedback-kopieren").addEventListener("click", () => {
+    const n = feedbackNachricht();
+    const alles = "An: " + FEEDBACK_MAIL + "\nBetreff: " + n.betreff + "\n\n" + n.text;
+    navigator.clipboard.writeText(alles).then(
+        () => { $("feedback-info").textContent = "Kopiert! Füge den Text in eine E-Mail an " + FEEDBACK_MAIL + " ein (Ticket #" + n.ticket + ")."; },
+        () => { $("feedback-info").textContent = "Kopieren ging nicht. Bitte schick deinen Text an " + FEEDBACK_MAIL + "."; }
+    );
+});

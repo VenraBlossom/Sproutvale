@@ -24,7 +24,7 @@
         <div id="wetter-ebene"></div>
 
         <div id="top-leiste">
-            <div class="stat" id="money-display" data-tipp="Gold: für den Marktplatz, die Felder und die Rechnungen"><img class="icon" data-sprite="muenze" alt=""><span>0</span></div>
+            <div class="stat" id="money-display" data-tipp="Gold: für den Markt, die Felder und die Rechnungen"><img class="icon" data-sprite="muenze" alt=""><span>0</span></div>
             <div class="stat" id="skillpoint-display" data-tipp="Sternensamen: für das Stellarium. Gibt es bei jeder Ernte und für jeden Klick auf den Samenladen."><img class="icon" data-sprite="sternensamen" alt=""><span>0</span></div>
             <div class="stat stat-klein" id="kalender-display"><img class="icon" data-sprite="kalender" alt=""><span>Tag 1</span></div>
             <div class="stat stat-klein" id="jahreszeit-uhr"><div class="uhr-scheibe"><div class="uhr-zeiger"></div></div><span></span></div>
@@ -44,7 +44,7 @@
             </div>
             <button class="knopf top-knopf" id="segen-button"><span>0</span></button>
             <button class="knopf top-knopf knopf-gelb versteckt" id="haendler-button" data-tipp="Wanderhändler: bleibt bis zum nächsten Tag">🧳</button>
-            <button class="knopf top-knopf" id="shop-button" data-tipp="Marktplatz (S)"><img class="icon" data-sprite="beutel" alt=""><span>Marktplatz</span></button>
+            <button class="knopf top-knopf" id="shop-button" data-tipp="Markt (S)"><img class="icon" data-sprite="beutel" alt=""><span>Markt</span></button>
             <button class="knopf top-knopf" id="skilltree-button" data-tipp="Stellarium (B)"><img class="icon" data-sprite="sternkarte" alt=""><span>Stellarium</span></button>
             <button class="knopf top-knopf" id="einstellungen-button" data-tipp="Einstellungen, Erfolge, Kodex und Statistik (Esc)"><img class="icon" data-sprite="zahnrad" alt=""><span class="neu-punkt versteckt">!</span></button>
         </div>
@@ -85,7 +85,7 @@
             </div>
             <div id="tages-karte-inhalt"></div>
             <div id="tages-karte-buttons">
-                <button class="knopf" id="karte-shop"><img class="icon" data-sprite="beutel" alt=""> Marktplatz</button>
+                <button class="knopf" id="karte-shop"><img class="icon" data-sprite="beutel" alt=""> Markt</button>
                 <button class="knopf" id="karte-skilltree"><img class="icon" data-sprite="sternkarte" alt=""> Stellarium</button>
                 <button class="knopf knopf-gelb versteckt" id="karte-haendler">🧳 Wanderhändler</button>
                 <button class="knopf knopf-lila" id="karte-prestige"><img class="icon" data-sprite="mondbluete" alt=""> Mondteich</button>
@@ -99,13 +99,17 @@
         </div>
     </div>
 
-    <div id="shop-panel" class="panel pergament hidden">
-        <div class="panel-header">
-            <h2><img class="icon icon-gross" data-sprite="beutel" alt=""> Marktplatz</h2>
+    <div id="shop-panel" class="panel markt-fenster hidden">
+        <div class="markt-markise"></div>
+        <div class="markt-kopf">
+            <h2><img class="icon icon-gross" data-sprite="beutel" alt=""> Markt</h2>
+            <div class="markt-gold" id="markt-gold"></div>
             <button class="knopf panel-schliessen">✕</button>
         </div>
-        <div class="panel-content" id="shop-content"></div>
-        <div class="panel-reiter" id="shop-reiter"></div>
+        <div class="markt-koerper">
+            <div class="markt-reiter" id="shop-reiter"></div>
+            <div class="markt-inhalt" id="shop-content"></div>
+        </div>
     </div>
 
 
@@ -227,6 +231,21 @@
                 <div class="statistik-rahmen" id="statistik-content"></div>
             </div>
 
+            <div class="einstellungs-seite" data-seite="feedback">
+                <div class="feedback-form">
+                    <p class="einstellung-hinweis">Fehler gefunden, eine Idee oder einfach Lob? Schreib es hier auf. „Senden“ öffnet dein
+                        E-Mail-Programm mit einer fertigen Nachricht an Venray Studios.</p>
+                    <div class="feedback-arten" id="feedback-arten"></div>
+                    <textarea id="feedback-text" maxlength="1500" placeholder="Was möchtest du uns sagen?"></textarea>
+                    <input type="email" id="feedback-mail" placeholder="Deine E-Mail für eine Antwort (freiwillig)">
+                    <div class="feedback-knoepfe">
+                        <button class="knopf" id="feedback-kopieren">📋 Text kopieren</button>
+                        <button class="knopf knopf-gruen" id="feedback-senden">💌 Senden</button>
+                    </div>
+                    <p class="einstellung-hinweis" id="feedback-info"></p>
+                </div>
+            </div>
+
             <div class="einstellungs-seite" data-seite="spielstand">
                 <div class="einstellung">
                     <span>📖 Tutorial</span>
@@ -235,6 +254,10 @@
                 <div class="einstellung versteckt" id="speicher-zeile">
                     <span>📂 Spielstand-Ordner</span>
                     <button class="knopf" id="speicher-oeffnen">Öffnen</button>
+                </div>
+                <div class="einstellung versteckt" id="import-zeile">
+                    <span>📥 Spielstand importieren</span>
+                    <button class="knopf" id="spielstand-importieren">Importieren</button>
                 </div>
                 <p class="einstellung-hinweis versteckt" id="speicher-hinweis"></p>
                 <div class="gefahren-zone" id="reset-zeile">
@@ -259,7 +282,7 @@
         <div id="menue-wolken"></div>
         <div id="menue-teilchen"></div>
         <div class="menue-inhalt" id="menue-start">
-            <img id="menue-logo" src="assets/Icon.png" alt="Sproutvale">
+            <img id="menue-logo" src="assets/Title.png" alt="Sproutvale">
             <div class="menue-knoepfe">
                 <button class="knopf knopf-gruen menue-knopf menue-haupt" id="menue-spielen">▶ Spielen</button>
                 <button class="knopf menue-knopf" id="menue-einstellungen">⚙️ Einstellungen</button>
@@ -273,6 +296,7 @@
             <button class="knopf menue-knopf" id="menue-zurueck">← Zurück</button>
         </div>
         <div class="menue-fuss">Sproutvale · Venray Studios</div>
+        <div id="menue-version"></div>
     </div>
 
     <div id="toasts"></div>
