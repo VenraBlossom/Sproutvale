@@ -9,25 +9,25 @@
 // ============================================================
 
 const TUTORIAL_SCHRITTE = [
-    { text: "Willkommen in Sproutvale! 🌱 Jeder Tag hat Energie. Ist sie leer, ist Feierabend. Starte deinen ersten Tag!",
+    { text: t("Willkommen in Sproutvale! 🌱 Jeder Tag hat Energie. Ist sie leer, ist Feierabend. Starte deinen ersten Tag!"),
         ziel: () => karteWeiter, wann: () => run.phase === "vorTag", weiterBei: "tagStart" },
-    { text: "Klick schnell auf den Samenladen! Jeder Klick bringt Fortschritt für einen Samen. Schnelle Klicks bauen eine Kombo auf.",
+    { text: t("Klick schnell auf den Samenladen! Jeder Klick bringt Fortschritt für einen Samen. Schnelle Klicks bauen eine Kombo auf."),
         ziel: () => plantButton, wann: () => run.phase === "tag", weiterBei: "samen" },
-    { text: "Der Samen wächst. Ist die Pflanze fertig, klick auf das Feld, um sie zu ernten.",
+    { text: t("Der Samen wächst. Ist die Pflanze fertig, klick auf das Feld, um sie zu ernten."),
         ziel: () => (run.felder.find(f => !f.leer) || run.felder[0]).el.feldDiv, wann: () => run.phase === "tag", weiterBei: "ernte" },
-    { text: "Fahr mit der Maus über die Saat und die Sternensaat, um sie einzusammeln. Was bei Feierabend noch liegt, verfällt!",
+    { text: t("Fahr mit der Maus über die Saat und die Sternensaat, um sie einzusammeln. Was bei Feierabend noch liegt, verfällt!"),
         ziel: () => moneyDisplay, wann: () => run.phase === "tag", weiterBei: "eingesammelt" },
-    { text: "Super! Ernte und sammle weiter, bis Feierabend ist. Je schneller du klickst, desto mehr schaffst du.",
+    { text: t("Super! Ernte und sammle weiter, bis Feierabend ist. Je schneller du klickst, desto mehr schaffst du."),
         ziel: () => energieFuellung.parentElement, wann: () => run.phase === "tag", weiterBei: "tagEnde" },
-    { text: "Feierabend! Auf dem Markt kaufst du mit Gold neue Felder und mehr Ertrag für deine Pflanzen.",
+    { text: t("Feierabend! Auf dem Markt kaufst du mit Gold neue Felder und mehr Ertrag für deine Pflanzen."),
         ziel: () => $("shop-button"), wann: () => run.phase === "vorTag", weiterBei: "panelOffen", bedingung: id => id === "shop-panel" },
-    { text: "Im Stellarium gibst du Sternensamen aus: für neue Pflanzen, mehr Gold, Helfer und weitere Markt-Upgrades. " +
-        "Kaufbare Sterne leuchten.",
+    { text: t("Im Stellarium gibst du Sternensamen aus: für neue Pflanzen, mehr Gold, Helfer und weitere Markt-Upgrades. ") +
+        t("Kaufbare Sterne leuchten."),
         ziel: () => $("skilltree-button"), wann: () => run.phase === "vorTag", weiterBei: "panelOffen", bedingung: id => id === "skilltree" },
-    { text: "Alle 5 Tage kommt eine Rechnung. Kannst du sie nicht bezahlen, endet der Run. Für bezahlte Rechnungen gibt es " +
-        "Mondblüten für dauerhafte Upgrades im Mondteich. Fahr über die Jahreszeiten-Uhr und den Kalender, um zu sehen, " +
-        "was gerade wirkt. Viel Spaß!",
-        ziel: () => rechnungDisplay, wann: () => run.phase === "vorTag", knopf: "Los geht's!" }
+    { text: t("Alle 5 Tage kommt eine Rechnung. Kannst du sie nicht bezahlen, endet der Run. Für bezahlte Rechnungen gibt es ") +
+        t("Mondblüten für dauerhafte Upgrades im Mondteich. Fahr über die Jahreszeiten-Uhr und den Kalender, um zu sehen, ") +
+        t("was gerade wirkt. Viel Spaß!"),
+        ziel: () => rechnungDisplay, wann: () => run.phase === "vorTag", knopf: t("Los geht's!") }
 ];
 
 const tutorialBlase = el("div", "tutorial-blase pergament versteckt");
@@ -79,7 +79,7 @@ function zeigeTutorial() {
         tutorialBlase.classList.add("versteckt");
         return;
     }
-    tutorialKopf.textContent = "📖 Tipp " + (meta.tutorial + 1) + " / " + TUTORIAL_SCHRITTE.length;
+    tutorialKopf.textContent = t("📖 Tipp ") + (meta.tutorial + 1) + " / " + TUTORIAL_SCHRITTE.length;
     tutorialText.textContent = schritt.text;
     tutorialKnoepfe.innerHTML = "";
     if (schritt.knopf) {
@@ -87,7 +87,7 @@ function zeigeTutorial() {
         knopf.addEventListener("click", tutorialWeiter);
         tutorialKnoepfe.appendChild(knopf);
     }
-    const ueberspringen = el("button", "knopf tutorial-ueberspringen", "⏭ Tutorial überspringen");
+    const ueberspringen = el("button", "knopf tutorial-ueberspringen", t("⏭ Tutorial überspringen"));
     ueberspringen.addEventListener("click", beendeTutorial);
     tutorialKnoepfe.appendChild(ueberspringen);
     tutorialBlase.classList.remove("versteckt");

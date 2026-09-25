@@ -19,43 +19,43 @@ function wechslePanel(panel) {
     else schliessePanels();
 }
 
-registriereTaste("s", "Markt öffnen/schließen", () => wechslePanel(shopPanel));
-registriereTaste("b", "Stellarium öffnen/schließen", () => {
+registriereTaste("s", t("Markt öffnen/schließen"), () => wechslePanel(shopPanel));
+registriereTaste("b", t("Stellarium öffnen/schließen"), () => {
     if (!imSpiel()) return false;
     if (skilltreeFenster.classList.contains("versteckt")) oeffneSkilltree();
     else schliessePanels();
 });
-registriereTaste("e", "Erfolge", () => {
+registriereTaste("e", t("Erfolge"), () => {
     if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
     oeffneEinstellungsReiter("erfolge");
 });
-registriereTaste("i", "Statistik", () => {
+registriereTaste("i", t("Statistik"), () => {
     if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
     if (!run) return false;
     oeffneStatistik();
 });
-registriereTaste("k", "Kodex", () => {
+registriereTaste("k", t("Kodex"), () => {
     if (!imSpiel() && einstellungenFenster.classList.contains("versteckt")) return false;
     oeffneKodex();
 });
-registriereTaste("h", "Haus (Kosmetik)", () => {
+registriereTaste("h", t("Haus (Kosmetik)"), () => {
     if (!imSpiel()) return false;
     oeffneHaus();
 });
-registriereTaste("m", "Mondteich (vor Tag 1 und nach einem Run)", () => {
+registriereTaste("m", t("Mondteich (vor Tag 1 und nach einem Run)"), () => {
     if (!imSpiel()) return false;
     versucheMondteich();
 });
-registriereTaste("space", "Tag starten", () => {
+registriereTaste("space", t("Tag starten"), () => {
     if (!imSpiel() || run.phase !== "vorTag" || kartenHalter.classList.contains("versteckt")) return false;
     if (!prestigeShop.classList.contains("versteckt")) return false;
     starteTag();
-}, "Leertaste");
-registriereTaste("f11", "Vollbild an/aus", () => {
+}, t("Leertaste"));
+registriereTaste("f11", t("Vollbild an/aus"), () => {
     if (window.sproutvaleDesktop) return false; // die Desktop-App kuemmert sich selbst um F11
     wechsleVollbild();
 }, "F11");
-registriereTaste("escape", "Fenster schließen / Einstellungen", () => {
+registriereTaste("escape", t("Fenster schließen / Einstellungen"), () => {
     if (!einstellungenFenster.classList.contains("versteckt")) {
         einstellungenFenster.classList.add("versteckt");
         return;
@@ -175,3 +175,22 @@ zeigeHauptmenue();
 requestAnimationFrame(hauptSchleife);
 
 $("menue-version").textContent = SPIEL_VERSION;
+
+// Sprache waehlen: speichern und neu laden (alle Texte werden beim Start uebersetzt)
+(function spracheWahl() {
+    const wahl = $("sprache-wahl");
+    SPRACHEN.forEach(s => {
+        const option = document.createElement("option");
+        option.value = s.id;
+        option.textContent = s.name;
+        wahl.appendChild(option);
+    });
+    wahl.value = SPRACHE;
+    wahl.addEventListener("change", () => {
+        einstellungen.sprache = wahl.value;
+        speichereEinstellungen();
+        speichereRun();
+        speichereMeta();
+        location.reload();
+    });
+})();

@@ -61,8 +61,8 @@ function zeigeWetter() {
 
     wetterAnzeige.innerHTML = "";
     wetterAnzeige.append(pixelIcon(wetter.symbol, 32), el("span", null, wetter.name));
-    setzeTipp(wetterAnzeige, "## " + wetter.symbol + " " + wetter.name + (wetter.gut ? " (gutes Wetter)" : " (schlechtes Wetter)") + "\n" +
-        wetterText(wetter) + "\nGilt für den ganzen Tag.");
+    setzeTipp(wetterAnzeige, "## " + wetter.symbol + " " + wetter.name + (wetter.gut ? t(" (gutes Wetter)") : t(" (schlechtes Wetter)")) + "\n" +
+        wetterText(wetter) + t("\nGilt für den ganzen Tag."));
 
     if (wetter.id === "regen" || wetter.id === "gewitter") {
         const tropfen = wetter.id === "gewitter" ? 90 : 60;
@@ -101,7 +101,7 @@ function gewitterTick(dtMs) {
     const { x, y } = feldMitte(feld);
     Klang.blitzEinschlag();
     partikel(x, y, ["#fff6a0", "#ffffff", "#9fd8ff"], 18, 80);
-    zeigeSchwebeText(x, y - 30, "⚡ Blitz!", "#2f7fcf", false);
+    zeigeSchwebeText(x, y - 30, t("⚡ Blitz!"), "#2f7fcf", false);
 }
 
 // ---------- KRAEHEN ----------
@@ -175,12 +175,12 @@ function kraeheKommt() {
         eintrag.gelandet = true;
         setzeSpriteBild(kraehe, "kraehe", 4);
         kraehe.classList.add("gelandet");
-        setzeTipp(kraehe, "Krähe! Klick sie weg, bevor sie die Pflanze stiehlt.");
+        setzeTipp(kraehe, t("Krähe! Klick sie weg, bevor sie die Pflanze stiehlt."));
         // Die Vogelscheuche verscheucht jeden Tag die erste Kraehe von allein
         if (level("vogelscheuche") > 0 && tagesPlan.kraehenHeute === 1) {
             setTimeout(() => {
                 if (eintrag.weg) return;
-                zeigeSchwebeText(eintrag.x, eintrag.y - 30, "🧑‍🌾 Vogelscheuche!", "#8a5a2b", false);
+                zeigeSchwebeText(eintrag.x, eintrag.y - 30, t("🧑‍🌾 Vogelscheuche!"), "#8a5a2b", false);
                 verscheucheKraehe(eintrag);
             }, 700);
         }
@@ -245,7 +245,7 @@ function kraehenTick(dtMs) {
         feld.kraehe = null;
         run.statistik.gestohlen += 1;
         const { x, y } = feldMitte(feld);
-        zeigeSchwebeText(x, y - 20, "🐦 geklaut!", "#6b3f1d", false);
+        zeigeSchwebeText(x, y - 20, t("🐦 geklaut!"), "#6b3f1d", false);
         Klang.kraehe();
         leereFeld(feld);
         fliegeKraeheWeg(k);
@@ -268,7 +268,7 @@ function goldregenTick() {
     run.gesamt.goldregen += 1;
     meta.lebenszeit.goldregen += 1;
     const k = GOLDREGEN_KONFIG;
-    zeigeBanner("🌧️", "Goldregen!", "Schnell, sammel die Saat ein!", "#d49a00", 3000);
+    zeigeBanner("🌧️", t("Goldregen!"), t("Schnell, sammel die Saat ein!"), "#d49a00", 3000);
     Klang.goldregen();
     const acker = fieldGrid.getBoundingClientRect();
     const oben = topBar.getBoundingClientRect().bottom;
@@ -308,7 +308,7 @@ function waehleBossRegel() {
     if (run.bossRegel) {
         const regel = BOSS_NACH_ID[run.bossRegel];
         setTimeout(() => {
-            zeigeBanner("🏦", "Kredit-Auflage: " + regel.name, regel.text + " Gilt, bis der Kredit abbezahlt ist.", "#b8232a", 5000);
+            zeigeBanner("🏦", t("Kredit-Auflage: ") + regel.name, regel.text + t(" Gilt, bis der Kredit abbezahlt ist."), "#b8232a", 5000);
             Klang.boss();
         }, 600);
     }
@@ -351,7 +351,7 @@ function haendlerKommt() {
     }
     run.haendler = { angebote };
     Klang.haendler();
-    zeigeBanner("🧳", "Ein Wanderhändler ist da!", "Er bleibt bis zum nächsten Tag", "#b8862b", 3200);
+    zeigeBanner("🧳", t("Ein Wanderhändler ist da!"), t("Er bleibt bis zum nächsten Tag"), "#b8862b", 3200);
 }
 
 function haendlerEintrag(angebot) {
@@ -393,7 +393,7 @@ function wendeWareAn(id) {
     if (id === "sternenbeutel") {
         const menge = 20 + 2 * run.statistik.sternensamen;
         gibSternensamen(menge);
-        zeigeToast("👝 +" + zahl(menge) + " Sternensamen");
+        zeigeToast("👝 +" + zahl(menge) + t(" Sternensamen"));
     } else if (id === "goldsamen") {
         run.naechsterTag.goldeneSamen += 1;
     } else if (id === "elixier") {
@@ -426,12 +426,12 @@ function frageWerkzeugVerkauf(id) {
     }
     const w = WERKZEUG_NACH_ID[id];
     zeigePopup({
-        titel: w.symbol + " " + w.name + " verkaufen?",
-        inhalt: "Stufe " + werkzeugStufe(id) + ": " + werkzeugText(id),
+        titel: w.symbol + " " + w.name + t(" verkaufen?"),
+        inhalt: t("Stufe ") + werkzeugStufe(id) + ": " + werkzeugText(id),
         breite: 520,
         knoepfe: [
-            { text: "Behalten" },
-            { text: "Verkaufen · +" + zahl(verkaufsWert(id)) + " Gold", klasse: "knopf-rot", aktion: () => verkaufeWerkzeug(id) }
+            { text: t("Behalten") },
+            { text: t("Verkaufen · +") + zahl(verkaufsWert(id)) + t(" Gold"), klasse: "knopf-rot", aktion: () => verkaufeWerkzeug(id) }
         ]
     });
 }
@@ -444,8 +444,8 @@ function oeffneHaendler() {
     const inhalt = el("div", "haendler-inhalt");
     inhalt.appendChild(el("div", "haendler-gruss", null, [
         pixelIcon("🧳", 64),
-        el("div", null, run.haendler.gekauft ? "\"Gute Wahl! Den Rest packe ich wieder ein. Bis zum nächsten Mal!\""
-            : "\"Grüß dich! Du darfst dir EINE meiner Waren aussuchen. Werkzeuge helfen dir bis zum Ende dieses Runs.\"")
+        el("div", null, run.haendler.gekauft ? t("\"Gute Wahl! Den Rest packe ich wieder ein. Bis zum nächsten Mal!\"")
+            : t("\"Grüß dich! Du darfst dir EINE meiner Waren aussuchen. Werkzeuge helfen dir bis zum Ende dieses Runs.\""))
     ]));
     const raster = el("div", "haendler-raster");
     run.haendler.angebote.forEach(angebot => {
@@ -453,24 +453,24 @@ function oeffneHaendler() {
         const werkzeug = angebot.art === "werkzeug";
         const stufe = angebot.stufe || 1;
         const weg = run.haendler.gekauft && !angebot.gekauft;
-        const karte = el("div", "haendler-karte" + (angebot.gekauft ? " gekauft" : "") + (weg ? " weg" : ""), null, [
+        const karte = el("div", "haendler-karte" + (angebot.gekauft ? t(" gekauft") : "") + (weg ? t(" weg") : ""), null, [
             pixelIcon(eintrag.symbol, 64),
             el("div", "haendler-name", eintrag.name),
-            el("div", "haendler-art", werkzeug ? "🧰 Werkzeug · Stufe " + stufe : "📦 Ware"),
+            el("div", "haendler-art", werkzeug ? t("🧰 Werkzeug · Stufe ") + stufe : t("📦 Ware")),
             el("div", "haendler-text", werkzeug ? werkzeugText(angebot.id, stufe) : eintrag.text)
         ]);
-        const knopf = el("button", "knopf upgrade-buy-button", angebot.gekauft ? "✔ Gekauft" : weg ? "🔒 Weg" : zahl(angebot.preis) + " Gold");
+        const knopf = el("button", "knopf upgrade-buy-button", angebot.gekauft ? t("✔ Gekauft") : weg ? t("🔒 Weg") : zahl(angebot.preis) + t(" Gold"));
         knopf.disabled = angebot.gekauft || weg || !darfEinkaufen() || run.gold < angebot.preis;
         knopf.addEventListener("click", () => kaufeAngebot(angebot));
         karte.appendChild(knopf);
         raster.appendChild(karte);
     });
     inhalt.appendChild(raster);
-    inhalt.appendChild(el("div", "panel-hinweis", "Nur 1 Kauf pro Besuch. 🧰 Werkzeug-Plätze: " + run.werkzeuge.length + " / " + werkzeugPlaetze() +
-        "  ·  Du hast " + zahl(run.gold) + " Gold. Werkzeuge verkaufst du mit Rechtsklick in der Leiste (40% zurück). " +
-        "Je später du ein Werkzeug kaufst, desto höher seine Stufe und desto stärker wirkt es."));
+    inhalt.appendChild(el("div", "panel-hinweis", t("Nur 1 Kauf pro Besuch. 🧰 Werkzeug-Plätze: ") + run.werkzeuge.length + " / " + werkzeugPlaetze() +
+        t("  ·  Du hast ") + zahl(run.gold) + t(" Gold. Werkzeuge verkaufst du mit Rechtsklick in der Leiste (40% zurück). ") +
+        t("Je später du ein Werkzeug kaufst, desto höher seine Stufe und desto stärker wirkt es.")));
     haendlerSchliessen = zeigePopup({
-        titel: "🧳 Wanderhändler",
+        titel: t("🧳 Wanderhändler"),
         inhalt,
         farbe: "#b8862b",
         breite: 1000,
@@ -501,20 +501,20 @@ function renderWerkzeugLeiste() {
     werkzeugLeiste.innerHTML = "";
     for (let i = 0; i < werkzeugPlaetze(); i++) {
         const id = run.werkzeuge[i];
-        const platz = el("div", "werkzeug-platz" + (id ? "" : " leer"));
+        const platz = el("div", "werkzeug-platz" + (id ? "" : t(" leer")));
         if (id) {
             const w = WERKZEUG_NACH_ID[id];
             platz.appendChild(pixelIcon(w.symbol, 32));
             platz.appendChild(el("span", "werkzeug-stufe", String(werkzeugStufe(id))));
-            setzeTipp(platz, "## " + w.symbol + " " + w.name + " · Stufe " + werkzeugStufe(id) + "\n" + werkzeugText(id) +
-                "\nRechtsklick: verkaufen (+" + zahl(verkaufsWert(id)) + " Gold)");
+            setzeTipp(platz, "## " + w.symbol + " " + w.name + t(" · Stufe ") + werkzeugStufe(id) + "\n" + werkzeugText(id) +
+                t("\nRechtsklick: verkaufen (+") + zahl(verkaufsWert(id)) + t(" Gold)"));
             platz.addEventListener("contextmenu", event => {
                 event.preventDefault();
                 frageWerkzeugVerkauf(id);
             });
         }
-        if (!id) setzeTipp(platz, "Freier Werkzeug-Platz. Werkzeuge kaufst du beim Wanderhändler." +
-            (werkzeugPlaetze() < 3 ? "\nMehr Plätze gibt die Tarotkarte \"Der Gehängte\"." : ""));
+        if (!id) setzeTipp(platz, t("Freier Werkzeug-Platz. Werkzeuge kaufst du beim Wanderhändler.") +
+            (werkzeugPlaetze() < 3 ? t("\nMehr Plätze gibt die Tarotkarte \"Der Gehängte\".") : ""));
         werkzeugLeiste.appendChild(platz);
     }
 }
@@ -576,10 +576,10 @@ registriereHaken("runEnde", () => {
 registriereHaken("karteZusatz", teile => {
     if (run.bossRegel) {
         const regel = BOSS_NACH_ID[run.bossRegel];
-        teile.push(`<p class="karte-boss">🏦 Kredit-Auflage bis zur Rückzahlung: <b>${regel.name}</b>. ${regel.text}</p>`);
+        teile.push(`<p class="karte-boss">🏦 ${t("Kredit-Auflage bis zur Rückzahlung:")} <b>${regel.name}</b>. ${regel.text}</p>`);
     }
     if (run.haendler && run.karte.modus !== "runEnde") {
-        teile.push(`<p class="karte-haendler-text">🧳 Ein Wanderhändler wartet auf dich.</p>`);
+        teile.push(`<p class="karte-haendler-text">🧳 ${t("Ein Wanderhändler wartet auf dich.")}</p>`);
     }
 });
 
@@ -604,10 +604,10 @@ const uhrZeiger = jahreszeitUhr.querySelector(".uhr-zeiger");
 function jahreszeitEffekte(z) {
     const prozent = (faktor, name) => (faktor > 1 ? "+" : "-") + Math.round(Math.abs(faktor - 1) * 100) + "% " + name;
     const teile = [];
-    if (z.wachstum) teile.push(prozent(z.wachstum, "Wachstum"));
-    if (z.energie) teile.push(prozent(z.energie, "Energie"));
-    if (z.gold) teile.push(prozent(z.gold, "Gold"));
-    if (z.sterne) teile.push(prozent(z.sterne, "Sternensamen aus Ernten"));
+    if (z.wachstum) teile.push(prozent(z.wachstum, t("Wachstum")));
+    if (z.energie) teile.push(prozent(z.energie, t("Energie")));
+    if (z.gold) teile.push(prozent(z.gold, t("Gold")));
+    if (z.sterne) teile.push(prozent(z.sterne, t("Sternensamen aus Ernten")));
     return teile.join(", ");
 }
 
@@ -622,10 +622,10 @@ function jahreszeitWetterText(z) {
         else seltener.push(name);
     });
     const teile = [];
-    if (oefter.length) teile.push("öfter " + oefter.join(", "));
-    if (seltener.length) teile.push("seltener " + seltener.join(", "));
-    if (nie.length) teile.push("nie " + nie.join(", "));
-    return teile.length ? "Wetter: " + teile.join("; ") : "";
+    if (oefter.length) teile.push(t("öfter ") + oefter.join(", "));
+    if (seltener.length) teile.push(t("seltener ") + seltener.join(", "));
+    if (nie.length) teile.push(t("nie ") + nie.join(", "));
+    return teile.length ? t("Wetter: ") + teile.join("; ") : "";
 }
 
 function jahreszeitTipp() {
@@ -633,12 +633,12 @@ function jahreszeitTipp() {
     const z = jahreszeit();
     const rest = jahreszeitRestTage();
     const zeilen = [
-        "## " + z.symbol + " " + z.name + " · " + (rest === 1 ? "letzter Tag" : "noch " + rest + " Tage"),
+        "## " + z.symbol + " " + z.name + " · " + (rest === 1 ? t("letzter Tag") : tf("noch {0}", rest + t(" Tage"))),
         jahreszeitEffekte(z),
         jahreszeitWetterText(z)
     ];
-    if (segen("saisonkind") > 0) zeilen.push("🍂 Kind der Jahreszeiten: alle Effekte doppelt so stark");
-    zeilen.push("", "## Das Jahr (jede Jahreszeit " + JAHRESZEITEN_KONFIG.tageProJahreszeit + " Tage)");
+    if (segen("saisonkind") > 0) zeilen.push(t("🍂 Kind der Jahreszeiten: alle Effekte doppelt so stark"));
+    zeilen.push("", tf("## Das Jahr (jede Jahreszeit {0} Tage)", JAHRESZEITEN_KONFIG.tageProJahreszeit));
     JAHRESZEITEN.forEach((jz, i) => {
         const zeile = jz.symbol + " " + jz.name + ": " + jahreszeitEffekte(i === index ? z : jahreszeitFuer(i));
         zeilen.push(i === index ? "> " + zeile : zeile);
@@ -667,7 +667,7 @@ registriereHaken("tagStart", () => {
     const z = jahreszeit();
     meta.kodex.jahreszeiten = meta.kodex.jahreszeiten || {};
     meta.kodex.jahreszeiten[z.id] = (meta.kodex.jahreszeiten[z.id] || 0) + 1;
-    zeigeBanner(z.symbol, z.name + " beginnt!", z.text, z.farbe, 4000);
+    zeigeBanner(z.symbol, z.name + t(" beginnt!"), z.text, z.farbe, 4000);
 });
 
 // Zeile auf der Tageskarte: welche Jahreszeit der naechste Tag hat
@@ -677,7 +677,7 @@ registriereHaken("karteZusatz", teile => {
     const neu = (run.tag - 1) % JAHRESZEITEN_KONFIG.tageProJahreszeit === 0 && run.tag > 1;
     const rest = jahreszeitRestTage();
     teile.push(`<p class="karte-jahreszeit" style="--jz-farbe:${z.farbe}">${z.symbol} ` +
-        (neu ? `<b>Ab morgen: ${z.name}!</b> ` : `<b>${z.name}</b> (noch ${rest === 1 ? "1 Tag" : rest + " Tage"}): `) + `${z.text}</p>`);
+        (neu ? `<b>${t("Ab morgen:")} ${z.name}!</b> ` : `<b>${z.name}</b> (${tf("noch {0}", rest === 1 ? t("1 Tag") : rest + t(" Tage"))}): `) + `${z.text}</p>`);
 });
 
 // ---------- JAHRESZEITEN-TEILCHEN ----------

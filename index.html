@@ -181,6 +181,10 @@
             </div>
 
             <div class="einstellungs-seite" data-seite="anzeige">
+                <div class="einstellung">
+                    <span>🌍 Sprache / Language</span>
+                    <select id="sprache-wahl"></select>
+                </div>
                 <label class="einstellung schalter-zeile">
                     <span>📳 Bildschirm-Wackeln</span>
                     <input type="checkbox" data-option="wackeln">
@@ -205,12 +209,6 @@
                     <span>🖥️ Vollbild</span>
                     <button class="knopf" id="vollbild-knopf">An / Aus (F11)</button>
                 </div>
-                <label class="einstellung">
-                    <span>🌍 Sprache</span>
-                    <select id="sprache-auswahl" disabled>
-                        <option value="de">Deutsch (weitere folgen)</option>
-                    </select>
-                </label>
             </div>
 
             <div class="einstellungs-seite" data-seite="steuerung">
@@ -308,6 +306,8 @@
 
     <!-- Reihenfolge wichtig: Grafiken, Daten, Klang, Oberflaechen-Bausteine, Kern, Zusatz-Systeme, zuletzt der Start -->
     <script src="speicher.js"></script>
+    <script src="i18n.js"></script>
+    <script src="sprache-en.js"></script>
     <script src="sprites.js"></script>
     <script src="daten.js"></script>
     <script src="audio.js"></script>

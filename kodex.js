@@ -17,12 +17,12 @@ function kodexEintraege(reiter) {
                 const naechste = MEISTER_SCHWELLEN[stufe];
                 return {
                     bild: { sprite: p.id }, name: p.name, anzahl: k.pflanzen[p.id] || 0,
-                    text: "Grundwert " + zahl(p.verkaufswert) + " Gold, " + sekText(p.sekProStufe * 3) + " bis zur Ernte." +
+                    text: t("Grundwert ") + zahl(p.verkaufswert) + t(" Gold, ") + sekText(p.sekProStufe * 3) + t(" bis zur Ernte.") +
                         (p.eigenschaftText ? " " + p.eigenschaftText : ""),
                     zaehler: "geerntet",
-                    extra: "🏅 Meisterschaft " + stufe + "/" + MEISTER_SCHWELLEN.length +
-                        (stufe > 0 ? " (+" + Math.round(MEISTER_BONUS * 100 * stufe) + "% Wert)" : "") +
-                        (naechste ? " · nächste bei " + zahl(naechste) : " · Maximum!")
+                    extra: t("🏅 Meisterschaft ") + stufe + "/" + MEISTER_SCHWELLEN.length +
+                        (stufe > 0 ? " (+" + Math.round(MEISTER_BONUS * 100 * stufe) + t("% Wert)") : "") +
+                        (naechste ? t(" · nächste bei ") + zahl(naechste) : t(" · Maximum!"))
                 };
             });
         case "varianten":
@@ -31,7 +31,7 @@ function kodexEintraege(reiter) {
             return WETTER.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.wetter[w.id] || 0, text: w.text, zaehler: "erlebt" }));
         case "werkzeuge":
             return WERKZEUGE.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.werkzeuge[w.id] || 0,
-                text: "Stufe 1: " + w.text(werkzeugWertFuer(w, 1)) + " Stufe 5: " + w.text(werkzeugWertFuer(w, 5)), zaehler: "gekauft" }));
+                text: t("Stufe 1: ") + w.text(werkzeugWertFuer(w, 1)) + t(" Stufe 5: ") + w.text(werkzeugWertFuer(w, 5)), zaehler: "gekauft" }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
                 text: z.text, zaehler: "erlebt" }));
@@ -40,24 +40,24 @@ function kodexEintraege(reiter) {
         default: {
             const l = meta.lebenszeit;
             return [
-                { bild: { sprite: "kraehe" }, name: "Krähe", anzahl: l.kraehen, text: "Stiehlt Pflanzen, wenn du sie nicht wegklickst. Die Vogelscheuche hilft.", zaehler: "verscheucht" },
-                { bild: { emoji: "🌠" }, name: "Sternschnuppe", anzahl: l.sterne, text: "Fang sie für doppeltes Gold.", zaehler: "gefangen" },
-                { bild: { emoji: "🪲" }, name: "Glühwürmchen", anzahl: l.gluehwuermchen, text: "Kommen am Abend und verlängern den Tag.", zaehler: "gefangen" },
-                { bild: { emoji: "🌧️" }, name: "Goldregen", anzahl: l.goldregen, text: "Ganz selten regnet es goldene Saat.", zaehler: "erlebt" },
-                { bild: { emoji: "🐾" }, name: "Streicheleinheiten", anzahl: l.streicheln, text: "Dein Begleiter freut sich über jede.", zaehler: "gestreichelt" }
+                { bild: { sprite: "kraehe" }, name: t("Krähe"), anzahl: l.kraehen, text: t("Stiehlt Pflanzen, wenn du sie nicht wegklickst. Die Vogelscheuche hilft."), zaehler: "verscheucht" },
+                { bild: { emoji: "🌠" }, name: t("Sternschnuppe"), anzahl: l.sterne, text: t("Fang sie für doppeltes Gold."), zaehler: "gefangen" },
+                { bild: { emoji: "🪲" }, name: t("Glühwürmchen"), anzahl: l.gluehwuermchen, text: t("Kommen am Abend und verlängern den Tag."), zaehler: "gefangen" },
+                { bild: { emoji: "🌧️" }, name: t("Goldregen"), anzahl: l.goldregen, text: t("Ganz selten regnet es goldene Saat."), zaehler: "erlebt" },
+                { bild: { emoji: "🐾" }, name: t("Streicheleinheiten"), anzahl: l.streicheln, text: t("Dein Begleiter freut sich über jede."), zaehler: "gestreichelt" }
             ];
         }
     }
 }
 
 const KODEX_REITER = [
-    { id: "pflanzen", text: "🌱 Pflanzen" },
-    { id: "varianten", text: "✨ Spezialpflanzen" },
-    { id: "wetter", text: "🌦️ Wetter" },
-    { id: "jahreszeiten", text: "🍂 Jahreszeiten" },
-    { id: "werkzeuge", text: "🧰 Werkzeuge" },
-    { id: "boss", text: "🏦 Kredit-Auflagen" },
-    { id: "besucher", text: "🐦 Besucher" }
+    { id: "pflanzen", text: t("🌱 Pflanzen") },
+    { id: "varianten", text: t("✨ Spezialpflanzen") },
+    { id: "wetter", text: t("🌦️ Wetter") },
+    { id: "jahreszeiten", text: t("🍂 Jahreszeiten") },
+    { id: "werkzeuge", text: t("🧰 Werkzeuge") },
+    { id: "boss", text: t("🏦 Kredit-Auflagen") },
+    { id: "besucher", text: t("🐦 Besucher") }
 ];
 
 // Der Kodex steht in den Einstellungen (Reiter "Kodex")
@@ -90,8 +90,8 @@ function pruefeKodexBelohnungen() {
         if (entdeckt >= gesamt && gesamt > 0 && !meta.kodexBelohnt[r.id]) {
             meta.kodexBelohnt[r.id] = true;
             meta.gutscheine += KODEX_BELOHNUNG.gutscheineBereich;
-            zeigeBanner("📖", "Kodex vollständig: " + r.text.replace(/^\S+ /, ""),
-                "+" + KODEX_BELOHNUNG.gutscheineBereich + " 🎟️ und für immer +3% Gold", "#6b4220", 3600);
+            zeigeBanner("📖", t("Kodex vollständig: ") + r.text.replace(/^\S+ /, ""),
+                "+" + KODEX_BELOHNUNG.gutscheineBereich + t(" 🎟️ und für immer +3% Gold"), "#6b4220", 3600);
             Klang.jackpot();
             geaendert = true;
         }
@@ -103,7 +103,7 @@ function pruefeKodexBelohnungen() {
         const neu = stufe - meta.kodexStufe;
         meta.kodexStufe = stufe;
         meta.gutscheine += neu;
-        zeigeToast("📖 Kodex: " + summe + " Entdeckungen! +" + neu + " 🎟️ Kuschel-Gutschein");
+        zeigeToast("📖 Kodex: " + summe + t(" Entdeckungen! +") + neu + t(" 🎟️ Kuschel-Gutschein"));
         geaendert = true;
     }
     if (geaendert) speichereMeta();
@@ -121,15 +121,15 @@ function renderKodex(inhalt) {
     balken.firstChild.style.width = (aktuell.entdeckt / Math.max(1, aktuell.gesamt)) * 100 + "%";
     inhalt.appendChild(el("div", "kodex-belohnung", null, [
         el("div", "kodex-belohnung-zeile", null, [
-            el("b", null, "📖 " + alle + " Entdeckungen"),
-            el("span", null, "Nächster 🎟️ Gutschein bei " + naechste),
-            el("span", null, "Bereiche vollständig: " + kodexBereicheFertig() + " / " + KODEX_REITER.length +
-                " (+" + Math.round(kodexBereicheFertig() * KODEX_BELOHNUNG.goldBereich * 100) + "% Gold)")
+            el("b", null, "📖 " + alle + t(" Entdeckungen")),
+            el("span", null, t("Nächster 🎟️ Gutschein bei ") + naechste),
+            el("span", null, t("Bereiche vollständig: ") + kodexBereicheFertig() + " / " + KODEX_REITER.length +
+                " (+" + Math.round(kodexBereicheFertig() * KODEX_BELOHNUNG.goldBereich * 100) + t("% Gold)"))
         ]),
         balken,
-        el("div", "kodex-belohnung-text", fertig ? "✔ Dieser Bereich ist vollständig: Belohnung erhalten."
-            : "Vervollständige diesen Bereich (" + aktuell.entdeckt + " / " + aktuell.gesamt + ") für +" +
-            KODEX_BELOHNUNG.gutscheineBereich + " 🎟️ und für immer +3% Gold.")
+        el("div", "kodex-belohnung-text", fertig ? t("✔ Dieser Bereich ist vollständig: Belohnung erhalten.")
+            : t("Vervollständige diesen Bereich (") + aktuell.entdeckt + " / " + aktuell.gesamt + t(") für +") +
+            KODEX_BELOHNUNG.gutscheineBereich + t(" 🎟️ und für immer +3% Gold."))
     ]));
     const leiste = el("div", "haus-reiter");
     KODEX_REITER.forEach(r => {
@@ -158,11 +158,11 @@ function renderKodex(inhalt) {
             bild = pixelIcon(e.bild.emoji, 64);
         }
         bild.classList.add("kodex-bild");
-        const karte = el("div", "kodex-karte" + (entdeckt ? "" : " unbekannt"), null, [
+        const karte = el("div", "kodex-karte" + (entdeckt ? "" : t(" unbekannt")), null, [
             el("div", "kodex-bildrahmen", null, [bild]),
             el("div", "kodex-name", entdeckt ? e.name : "???"),
-            el("div", "kodex-text", entdeckt ? e.text : "Noch nicht entdeckt."),
-            el("div", "kodex-zahl", entdeckt ? zahl(e.anzahl) + "x " + e.zaehler : ""),
+            el("div", "kodex-text", entdeckt ? e.text : t("Noch nicht entdeckt.")),
+            el("div", "kodex-zahl", entdeckt ? zahl(e.anzahl) + t("x ") + e.zaehler : ""),
             entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null
         ]);
         raster.appendChild(karte);

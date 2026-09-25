@@ -82,7 +82,7 @@ function pruefeNeueKosmetik() {
         liste.filter(e => e.quelle === "erspielt" && !meta.freigeschaltet[kategorie + ":" + e.id]).forEach(e => {
             if (!istKosmetikFrei(e, kategorie)) return;
             neu = true;
-            zeigeBanner("🏡", "Neu im Haus: " + e.name, "Klick aufs Bauernhaus, um es auszuwählen", "#2e9e2e", 3600);
+            zeigeBanner("🏡", t("Neu im Haus: ") + e.name, t("Klick aufs Bauernhaus, um es auszuwählen"), "#2e9e2e", 3600);
             Klang.geschenk();
         });
     });
@@ -184,7 +184,7 @@ let teichEl = null;
 
 function erstelleTeich() {
     teichEl = hofSprite("teich", TEICH_X, "teich");
-    setzeTipp(teichEl, "Mondteich (M)");
+    setzeTipp(teichEl, t("Mondteich (M)"));
     teichEl.addEventListener("pointerdown", event => {
         if (event.button === 0) versucheMondteich();
     });
@@ -197,8 +197,8 @@ function versucheMondteich() {
         oeffnePrestigeShop();
     } else {
         Klang.fehler();
-        zeigeToast(run.sandbox ? "🌙 Der Mondteich öffnet sich vor Tag 1 und nach dem Sandbox-Prestige."
-            : "🌙 Der Mondteich öffnet sich vor Tag 1 und am Ende eines Runs.");
+        zeigeToast(run.sandbox ? t("🌙 Der Mondteich öffnet sich vor Tag 1 und nach dem Sandbox-Prestige.")
+            : t("🌙 Der Mondteich öffnet sich vor Tag 1 und am Ende eines Runs."));
     }
 }
 
@@ -655,7 +655,7 @@ function oeffneHaus(kategorie) {
     schliesseHaustierMenue();
     const inhalt = el("div", "haus-inhalt");
     hausSchliessen = zeigePopup({
-        titel: "🏡 Dein Bauernhaus",
+        titel: t("🏡 Dein Bauernhaus"),
         inhalt,
         klasse: "haus-popup",
         breite: 1080,
@@ -754,7 +754,7 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
             liste.splice(index, 1);
         } else if (liste.length >= DEKO_MAX) {
             Klang.fehler();
-            zeigeToast("Es passen höchstens " + DEKO_MAX + " Deko-Objekte in den Hof. Nimm zuerst eins weg.");
+            zeigeToast("Es passen höchstens " + DEKO_MAX + t(" Deko-Objekte in den Hof. Nimm zuerst eins weg."));
             return;
         } else {
             liste.push(eintrag.id);
@@ -800,7 +800,7 @@ function zeigeVorschauKurz(inhalt) {
         const rect = fieldGrid.getBoundingClientRect();
         for (let i = 0; i < 6; i++) {
             spawnLootKugel(rect.left + rect.width * (0.3 + Math.random() * 0.4), rect.top + rect.height * 0.5, 0, i % 4, "gold",
-                { anzeige: "Vorschau" });
+                { anzeige: t("Vorschau") });
         }
     }
     if (kosmetikVorschau && kosmetikVorschau.kategorie === "haustier") {
@@ -838,36 +838,36 @@ function renderHaus(inhalt) {
 
     const kategorie = aktiveKosmetikKategorie;
     const hinweise = {
-        haustier: "Dein Begleiter auf dem Hof. Rechtsklick auf ihn öffnet seine Aktionen.",
-        landschaft: "Das Aussehen deines Hofs und der Wiese.",
-        deko: "Bis zu " + DEKO_MAX + " Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.",
-        musik: "\"Automatisch\" wechselt mit der Tageszeit zwischen deinen Liedern. Klick auf ein fremdes Lied zum Probehören.",
-        samenladen: "Der Look deines Samenladens, manche mit Effekten.",
-        felder: "So sieht die Erde auf deinen Feldern aus.",
-        kugeln: "So sieht die Saat aus, die bei der Ernte fällt. Die Farbe des Edelsteins zeigt weiter die Rarität.",
-        rahmen: "Der Rahmen um deine Kuscheltiere im Mondteich.",
-        pflanzen: "Andere Blattfarben für alle deine Pflanzen."
+        haustier: t("Dein Begleiter auf dem Hof. Rechtsklick auf ihn öffnet seine Aktionen."),
+        landschaft: t("Das Aussehen deines Hofs und der Wiese."),
+        deko: t("Bis zu ") + DEKO_MAX + t(" Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen."),
+        musik: t("\"Automatisch\" wechselt mit der Tageszeit zwischen deinen Liedern. Klick auf ein fremdes Lied zum Probehören."),
+        samenladen: t("Der Look deines Samenladens, manche mit Effekten."),
+        felder: t("So sieht die Erde auf deinen Feldern aus."),
+        kugeln: t("So sieht die Saat aus, die bei der Ernte fällt. Die Farbe des Edelsteins zeigt weiter die Rarität."),
+        rahmen: t("Der Rahmen um deine Kuscheltiere im Mondteich."),
+        pflanzen: t("Andere Blattfarben für alle deine Pflanzen.")
     };
     inhalt.appendChild(el("div", "panel-hinweis", hinweise[kategorie]));
 
     // Vorschau-Leiste: was gerade anprobiert wird und was es kostet
     if (kosmetikVorschau && kosmetikVorschau.kategorie === kategorie) {
         const eintrag = KOSMETIK_LISTEN[kategorie].find(e => e.id === kosmetikVorschau.id);
-        const woher = eintrag.quelle === "dlc" ? "Bald im Steam-Shop: " + dlcPreisText(eintrag)
-            : "Freispielen: " + eintrag.bedingungText;
-        const ende = el("button", "knopf", "Vorschau beenden");
+        const woher = eintrag.quelle === "dlc" ? t("Bald im Steam-Shop: ") + dlcPreisText(eintrag)
+            : t("Freispielen: ") + eintrag.bedingungText;
+        const ende = el("button", "knopf", t("Vorschau beenden"));
         ende.addEventListener("click", () => {
             beendeKosmetikVorschau();
             renderHaus(inhalt);
         });
         const knoepfe = [ende];
         if (kategorie !== "musik" && kategorie !== "rahmen") {
-            const ansehen = el("button", "knopf knopf-lila", "👁 Ansehen");
+            const ansehen = el("button", "knopf knopf-lila", t("👁 Ansehen"));
             ansehen.addEventListener("click", () => zeigeVorschauKurz(inhalt));
             knoepfe.unshift(ansehen);
         }
         inhalt.appendChild(el("div", "haus-vorschau-leiste", null, [
-            el("span", null, "👀 Du probierst gerade " + eintrag.name + " an. " + woher),
+            el("span", null, t("👀 Du probierst gerade ") + eintrag.name + t(" an. ") + woher),
             el("div", "haus-vorschau-knoepfe", null, knoepfe)
         ]));
     }
@@ -890,11 +890,11 @@ function renderHaus(inhalt) {
         kachel.classList.add("selten-" + seltenheit.id);
 
         let status;
-        if (vorschau) status = "👀 Vorschau";
+        if (vorschau) status = t("👀 Vorschau");
         else if (!frei) status = eintrag.quelle === "dlc" ? "💝 " + dlcPreisText(eintrag) : "🔒 " + eintrag.bedingungText;
-        else if (kategorie === "deko") status = aktiv ? "✓ Steht im Hof" : "Aufstellen";
-        else status = aktiv ? "✓ Ausgewählt" : "Auswählen";
-        const knopfText = !frei ? (kategorie === "musik" ? "🎧 Probehören" : "👀 Anprobieren") : null;
+        else if (kategorie === "deko") status = aktiv ? t("✓ Steht im Hof") : t("Aufstellen");
+        else status = aktiv ? t("✓ Ausgewählt") : t("Auswählen");
+        const knopfText = !frei ? (kategorie === "musik" ? t("🎧 Probehören") : t("👀 Anprobieren")) : null;
 
         kachel.append(
             el("div", "haus-seltenheit", seltenheit.name),
@@ -911,9 +911,9 @@ function renderHaus(inhalt) {
     if (KOSMETIK_LISTEN[kategorie].some(e => e.quelle === "dlc" && !istKosmetikFrei(e, kategorie))) {
         const paket = DLC_PAKETE.unterstuetzer;
         inhalt.appendChild(el("div", "panel-hinweis leise",
-            "💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. " + paket.name + ": " + paket.inhalt +
-            ". Legendäre Inhalte mit Animationen gibt es einzeln für je " + euro(LEGENDAER_PREIS) +
-            ". Kaufen geht, sobald Sproutvale auf Steam ist."));
+            t("💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. ") + paket.name + ": " + paket.inhalt +
+            t(". Legendäre Inhalte mit Animationen gibt es einzeln für je ") + euro(LEGENDAER_PREIS) +
+            t(". Kaufen geht, sobald Sproutvale auf Steam ist.")));
     }
 }
 
@@ -942,7 +942,7 @@ function erstelleHaustier() {
     bild.style.width = HAUSTIER_BREITE * HOF_PIXEL + "px";
     bild.style.height = HAUSTIER_HOEHE * HOF_PIXEL + "px";
     huelle.appendChild(bild);
-    setzeTipp(huelle, "Streicheln (Linksklick) · Aktionen (Rechtsklick)");
+    setzeTipp(huelle, t("Streicheln (Linksklick) · Aktionen (Rechtsklick)"));
     huelle.style.left = haustier.x + "%";
     hofEbene.appendChild(huelle);
     haustier.el = huelle;
@@ -1227,7 +1227,7 @@ function oeffneHaustierMenue() {
         raster.appendChild(knopf);
     });
     menue.appendChild(raster);
-    const wechseln = el("button", "knopf haustier-wechseln", "🏡 Begleiter wechseln");
+    const wechseln = el("button", "knopf haustier-wechseln", t("🏡 Begleiter wechseln"));
     wechseln.addEventListener("click", () => oeffneHaus("haustier"));
     menue.appendChild(wechseln);
     document.body.appendChild(menue);

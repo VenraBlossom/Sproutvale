@@ -14,14 +14,14 @@ const EINSTELLUNGEN_KEY = "sproutvale_einstellungen";
 
 function ladeEinstellungen() {
     const standard = {
-        musik: 0.4, sfx: 0.6, sprache: "de",
+        musik: 0.4, sfx: 0.6, sprache: SPRACHE,
         wackeln: true, blitze: true, farbenblind: false, tipps: true, jahreszeitTeilchen: true, musikTitel: "auto"
     };
     try {
         const daten = JSON.parse(localStorage.getItem(EINSTELLUNGEN_KEY));
         if (daten) return { ...standard, ...daten };
     } catch (fehler) {
-        console.warn("Einstellungen konnten nicht geladen werden", fehler);
+        console.warn(t("Einstellungen konnten nicht geladen werden"), fehler);
     }
     return standard;
 }
@@ -30,7 +30,7 @@ function speichereEinstellungen() {
     try {
         localStorage.setItem(EINSTELLUNGEN_KEY, JSON.stringify(einstellungen));
     } catch (fehler) {
-        console.warn("Einstellungen konnten nicht gespeichert werden", fehler);
+        console.warn(t("Einstellungen konnten nicht gespeichert werden"), fehler);
     }
 }
 
@@ -53,7 +53,7 @@ const PAUSE = akkorde => akkorde.map(a => [a, [[0, 8]]]);
 
 const LIEDER = {
     sproutvale: {
-        name: "Sproutvale", tempo: 84, taktAchtel: 8, bass: "normal", schlagzeug: "sanft", begleitung: "zupfen",
+        name: t("Sproutvale"), tempo: 84, taktAchtel: 8, bass: "normal", schlagzeug: "sanft", begleitung: "zupfen",
         melodie: "zupfen", flaeche: 0.035, swing: 0,
         akkorde: {
             F: { bass: 41, toene: [53, 57, 60] }, C: { bass: 36, toene: [52, 55, 60] },
@@ -85,7 +85,7 @@ const LIEDER = {
         ablauf: ["p", "a", "b", "a", "p", "b", "a", "p"]
     },
     morgentau: {
-        name: "Morgentau", tempo: 96, taktAchtel: 8, bass: "normal", schlagzeug: "hell", begleitung: "arpeggio",
+        name: t("Morgentau"), tempo: 96, taktAchtel: 8, bass: "normal", schlagzeug: "hell", begleitung: "arpeggio",
         melodie: "zupfen", flaeche: 0.025, swing: 0,
         akkorde: {
             G: { bass: 43, toene: [55, 59, 62] }, D: { bass: 38, toene: [50, 54, 57] },
@@ -107,7 +107,7 @@ const LIEDER = {
         ablauf: ["p", "a", "a", "p"]
     },
     abendrot: {
-        name: "Abendrot", tempo: 70, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "arpeggio",
+        name: t("Abendrot"), tempo: 70, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "arpeggio",
         melodie: "zupfen", flaeche: 0.045, swing: 0,
         akkorde: {
             D: { bass: 38, toene: [50, 54, 57] }, Bm: { bass: 35, toene: [47, 50, 54] },
@@ -129,7 +129,7 @@ const LIEDER = {
         ablauf: ["p", "a", "a", "p"]
     },
     mondnacht: {
-        name: "Mondnacht", tempo: 60, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "keine",
+        name: t("Mondnacht"), tempo: 60, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "keine",
         melodie: "glocke", flaeche: 0.05, swing: 0,
         akkorde: {
             Am: { bass: 33, toene: [45, 48, 52] }, F: { bass: 29, toene: [41, 45, 48] },
@@ -151,7 +151,7 @@ const LIEDER = {
         ablauf: ["p", "a", "p", "a"]
     },
     mondteich: {
-        name: "Mondteich", tempo: 66, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "arpeggio",
+        name: t("Mondteich"), tempo: 66, taktAchtel: 8, bass: "lang", schlagzeug: "keins", begleitung: "arpeggio",
         melodie: "glocke", flaeche: 0.04, swing: 0,
         akkorde: {
             Fmaj7: { bass: 29, toene: [53, 57, 60, 64] }, Em7: { bass: 28, toene: [52, 55, 59, 62] },
@@ -172,7 +172,7 @@ const LIEDER = {
         ablauf: ["a"]
     },
     gluecksspiel: {
-        name: "Glücksspiel", tempo: 116, taktAchtel: 8, bass: "walking", schlagzeug: "swing", begleitung: "stabs",
+        name: t("Glücksspiel"), tempo: 116, taktAchtel: 8, bass: "walking", schlagzeug: "swing", begleitung: "stabs",
         melodie: "zupfen", flaeche: 0, swing: 0.16,
         akkorde: {
             C: { bass: 36, toene: [52, 55, 60] }, A7: { bass: 33, toene: [49, 52, 55, 57] },
@@ -193,7 +193,7 @@ const LIEDER = {
         ablauf: ["a"]
     },
     kirmes: {
-        name: "Kirmes", tempo: 126, taktAchtel: 8, bass: "oompah", schlagzeug: "oompah", begleitung: "stabs",
+        name: t("Kirmes"), tempo: 126, taktAchtel: 8, bass: "oompah", schlagzeug: "oompah", begleitung: "stabs",
         melodie: "zupfen", flaeche: 0, swing: 0,
         akkorde: {
             C: { bass: 36, toene: [52, 55, 60] }, F: { bass: 41, toene: [53, 57, 60] },
@@ -214,7 +214,7 @@ const LIEDER = {
         ablauf: ["a"]
     },
     winterzauber: {
-        name: "Winterzauber", tempo: 76, taktAchtel: 8, bass: "normal", schlagzeug: "schlitten", begleitung: "arpeggio",
+        name: t("Winterzauber"), tempo: 76, taktAchtel: 8, bass: "normal", schlagzeug: "schlitten", begleitung: "arpeggio",
         melodie: "glocke", flaeche: 0.04, swing: 0,
         akkorde: {
             Em: { bass: 40, toene: [52, 55, 59] }, C: { bass: 36, toene: [48, 52, 55] },
@@ -235,7 +235,7 @@ const LIEDER = {
         ablauf: ["a"]
     },
     sternenwalzer: {
-        name: "Sternenwalzer", tempo: 104, taktAchtel: 6, bass: "walzer", schlagzeug: "keins", begleitung: "walzer",
+        name: t("Sternenwalzer"), tempo: 104, taktAchtel: 6, bass: "walzer", schlagzeug: "keins", begleitung: "walzer",
         melodie: "glocke", flaeche: 0.02, swing: 0,
         akkorde: {
             F: { bass: 41, toene: [53, 57, 60] }, Dm: { bass: 38, toene: [50, 53, 57] },

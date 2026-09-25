@@ -14,7 +14,7 @@ let glueckUeberspringen = null; // beendet die laufende Animation sofort (Knopf 
 function zeigeUeberspringen(element) {
     const karte = element.closest(".spiel-karte");
     if (!karte) return;
-    const knopf = el("button", "knopf spiel-skip", "⏭ Überspringen");
+    const knopf = el("button", "knopf spiel-skip", t("⏭ Überspringen"));
     knopf.addEventListener("click", () => {
         if (glueckUeberspringen) glueckUeberspringen();
     });
@@ -47,8 +47,8 @@ function zaehleSieg() {
 
 function renderGluecksspiele() {
     const glueck = glueckBonus();
-    shopContent.appendChild(erstelleHinweis("🍀 Dein Glück: +" + prozentText(glueck) +
-        (glueck > 0 ? " (bessere Gewinnchancen)" : " (Glück bekommst du im Stellarium (Ast \"Glück\"), im Mondteich und von Kuscheltieren)")));
+    shopContent.appendChild(erstelleHinweis(t("🍀 Dein Glück: +") + prozentText(glueck) +
+        (glueck > 0 ? t(" (bessere Gewinnchancen)") : t(" (Glück bekommst du im Stellarium (Ast \"Glück\"), im Mondteich und von Kuscheltieren)"))));
     if (level("muenzwurf") > 0) renderMuenzwurf();
     if (level("gacha") > 0) renderGacha();
     if (level("rubbellos") > 0) renderRubbellos();
@@ -81,7 +81,7 @@ function einsatzKnoepfe(id, onWahl, rotAb = 1) {
     const rest = restSpiele(id);
     GLUECKSSPIEL[id].einsaetze.forEach(anteil => {
         const einsatz = Math.floor(run.gold * anteil);
-        const text = (anteil === 1 ? "Alles" : prozentText(anteil)) + " · " + zahl(einsatz) + " Gold";
+        const text = (anteil === 1 ? t("Alles") : prozentText(anteil)) + " · " + zahl(einsatz) + t(" Gold");
         const aktiv = darfEinkaufen() && !glueckAnimation && rest > 0 && einsatz >= 1;
         leiste.appendChild(kleinerKnopf(text, aktiv, () => onWahl(anteil), anteil >= rotAb ? "knopf-rot" : null));
     });
@@ -89,7 +89,7 @@ function einsatzKnoepfe(id, onWahl, rotAb = 1) {
 }
 
 function restText(id) {
-    return "Noch " + restSpiele(id) + " von " + spieleProPause(id) + " Spielen bis zum nächsten Tag";
+    return t("Noch ") + restSpiele(id) + t(" von ") + spieleProPause(id) + t(" Spielen bis zum nächsten Tag");
 }
 
 // ---------- GACHA-AUTOMAT ----------
@@ -121,11 +121,11 @@ function wendeGachaPreisAn(preis, kosten) {
     const moeglich = WERKZEUGE.filter(w => !hatWerkzeug(w.id) && !(run.sandbox && SANDBOX_AUS_WERKZEUGE.includes(w.id)));
     if (run.werkzeuge.length >= werkzeugPlaetze() || moeglich.length === 0) {
         run.gold += kosten;
-        return "Alle Werkzeug-Plätze sind voll: " + zahl(kosten) + " Gold zurück";
+        return t("Alle Werkzeug-Plätze sind voll: ") + zahl(kosten) + t(" Gold zurück");
     }
     const w = zufall(moeglich);
     gibWerkzeug(w.id, kosten);
-    return w.symbol + " " + w.name + " (Stufe " + werkzeugStufe(w.id) + "): " + werkzeugText(w.id);
+    return w.symbol + " " + w.name + t(" (Stufe ") + werkzeugStufe(w.id) + "): " + werkzeugText(w.id);
 }
 
 // Glueck macht seltene Preise etwas wahrscheinlicher
@@ -153,9 +153,9 @@ function renderGacha() {
     const kosten = gachaKosten();
     shopContent.appendChild(erstelleKarte({
         icon: "🎰",
-        titel: "Gacha-Automat",
-        beschreibung: "Teuer, aber jeder Preis gilt für den ganzen Run oder für immer. Jeder Zug in diesem Run wird teurer.",
-        info: "Züge in diesem Run: " + run.gachaZuege,
+        titel: t("Gacha-Automat"),
+        beschreibung: t("Teuer, aber jeder Preis gilt für den ganzen Run oder für immer. Jeder Zug in diesem Run wird teurer."),
+        info: t("Züge in diesem Run: ") + run.gachaZuege,
         knopfText: "🎰 " + preisText(kosten, "gold"),
         aktiv: darfEinkaufen() && run.gold >= kosten,
         onKauf: ziehGacha
@@ -172,8 +172,8 @@ function renderGacha() {
     // Was man in diesem Run schon gezogen hat
     const boni = GACHA_PREISE.filter(p => p.bonus && gachaBonus(p.bonus) > 0);
     if (boni.length > 0) {
-        shopContent.appendChild(erstelleHinweis("🎰 Deine Gacha-Boni in diesem Run: " +
-            boni.map(p => p.symbol + " " + p.text(Math.round(gachaBonus(p.bonus) * 1000) / 1000).replace(" (ganzer Run)", "")).join(" · ")));
+        shopContent.appendChild(erstelleHinweis(t("🎰 Deine Gacha-Boni in diesem Run: ") +
+            boni.map(p => p.symbol + " " + p.text(Math.round(gachaBonus(p.bonus) * 1000) / 1000).replace(t(" (ganzer Run)"), "")).join(" · ")));
     }
 
     const gesamt = GACHA_PREISE.reduce((summe, p) => summe + gachaGewicht(p), 0);
@@ -184,7 +184,7 @@ function renderGacha() {
         zeile.style.color = RARITAETEN[preis.raritaet].rand;
         liste.appendChild(zeile);
     });
-    shopContent.appendChild(erstelleHinweis("Mögliche Preise:"));
+    shopContent.appendChild(erstelleHinweis(t("Mögliche Preise:")));
     shopContent.appendChild(liste);
 }
 
@@ -196,8 +196,8 @@ function muenzwurfChance() {
 }
 
 function renderMuenzwurf() {
-    const karte = spielKarte("🪙 Münzwurf",
-        "Kopf: dein Einsatz verdoppelt sich. Zahl: dein Einsatz ist weg. Gewinnchance: " + prozentText(muenzwurfChance()) + ".",
+    const karte = spielKarte(t("🪙 Münzwurf"),
+        t("Kopf: dein Einsatz verdoppelt sich. Zahl: dein Einsatz ist weg. Gewinnchance: ") + prozentText(muenzwurfChance()) + ".",
         restText("muenzwurf"));
     const muenze = document.createElement("img");
     muenze.classList.add("wurf-muenze");
@@ -238,7 +238,7 @@ function wirfMuenze(anteil, muenzeEl) {
             run.gold -= einsatz;
             Klang.fehler();
         }
-        run.glueck.letzterWurf = { gewonnen, text: gewonnen ? "Kopf! +" + zahl(einsatz) + " Gold" : "Zahl … -" + zahl(einsatz) + " Gold" };
+        run.glueck.letzterWurf = { gewonnen, text: gewonnen ? t("Kopf! +") + zahl(einsatz) + t(" Gold") : t("Zahl … -") + zahl(einsatz) + t(" Gold") };
         aktualisiereAlles();
     };
     glueckUeberspringen = beende;
@@ -308,19 +308,19 @@ function werteLosAus() {
         const betrag = los.preis * los.gewinn.multi;
         run.gold += betrag;
         zaehleSieg();
-        los.text = "3x " + los.gewinn.symbol + " = x" + los.gewinn.multi + " · +" + zahl(betrag) + " Gold";
+        los.text = t("3x ") + los.gewinn.symbol + t(" = x") + los.gewinn.multi + " · +" + zahl(betrag) + t(" Gold");
         if (los.gewinn.multi >= 5) Klang.jackpot();
         else Klang.muenze(2);
     } else {
-        los.text = "Leider eine Niete.";
+        los.text = t("Leider eine Niete.");
         Klang.fehler();
     }
 }
 
 function renderRubbellos() {
     const k = GLUECKSSPIEL.rubbellos;
-    const tabelle = k.symbole.map(s => "3x" + s.symbol + " x" + s.multi).join("  ");
-    const karte = spielKarte("🎟️ Rubbellos", "Rubbel alle 9 Felder frei. 3 gleiche Symbole gewinnen: " + tabelle, restText("rubbellos"));
+    const tabelle = k.symbole.map(s => "3x" + s.symbol + t(" x") + s.multi).join("  ");
+    const karte = spielKarte(t("🎟️ Rubbellos"), t("Rubbel alle 9 Felder frei. 3 gleiche Symbole gewinnen: ") + tabelle, restText("rubbellos"));
 
     const los = run.glueck.los;
     const offenesLos = los && !los.fertig;
@@ -343,7 +343,7 @@ function renderRubbellos() {
     }
 
     if (offenesLos) {
-        karte.appendChild(el("div", "spiel-knoepfe", null, [kleinerKnopf("Alles aufrubbeln", true, rubbleAlles)]));
+        karte.appendChild(el("div", "spiel-knoepfe", null, [kleinerKnopf(t("Alles aufrubbeln"), true, rubbleAlles)]));
     } else {
         karte.appendChild(einsatzKnoepfe("rubbellos", kaufeLos, 2));
     }
@@ -363,8 +363,8 @@ function renderHuehnerrennen() {
     const rest = restSpiele("huehnerrennen");
     if (!k.einsaetze.includes(rennEinsatz)) rennEinsatz = k.einsaetze[0];
     const einsatz = Math.floor(run.gold * rennEinsatz);
-    const karte = spielKarte("🐔 Hühnerrennen",
-        "Wähl deinen Einsatz und setz auf ein Huhn. Gewinnt es, bekommst du Einsatz x Quote.", restText("huehnerrennen"));
+    const karte = spielKarte(t("🐔 Hühnerrennen"),
+        t("Wähl deinen Einsatz und setz auf ein Huhn. Gewinnt es, bekommst du Einsatz x Quote."), restText("huehnerrennen"));
 
     const wahl = el("div", "spiel-knoepfe");
     k.einsaetze.forEach(anteil => {
@@ -384,7 +384,7 @@ function renderHuehnerrennen() {
         bild.classList.add("renn-huhn");
         setzeSpriteBild(bild, "huhn_" + i, 3);
         huhnBilder.push(bild);
-        const knopf = kleinerKnopf(huhn.name + " x" + huhn.quote, darfEinkaufen() && rest > 0 && einsatz >= 1 && !glueckAnimation,
+        const knopf = kleinerKnopf(huhn.name + t(" x") + huhn.quote, darfEinkaufen() && rest > 0 && einsatz >= 1 && !glueckAnimation,
             () => starteRennen(i, huhnBilder));
         spur.append(bild, knopf);
         bahn.appendChild(spur);
@@ -432,10 +432,10 @@ function starteRennen(wahl, huhnBilder) {
             const betrag = einsatz * k.huehner[wahl].quote;
             run.gold += betrag;
             zaehleSieg();
-            run.glueck.letztesRennen = { gewonnen, text: name + " gewinnt! +" + zahl(betrag) + " Gold" };
+            run.glueck.letztesRennen = { gewonnen, text: name + t(" gewinnt! +") + zahl(betrag) + t(" Gold") };
             Klang.jackpot();
         } else {
-            run.glueck.letztesRennen = { gewonnen, text: name + " gewinnt. Dein Einsatz von " + zahl(einsatz) + " Gold ist weg." };
+            run.glueck.letztesRennen = { gewonnen, text: name + t(" gewinnt. Dein Einsatz von ") + zahl(einsatz) + t(" Gold ist weg.") };
             Klang.fehler();
         }
         aktualisiereAlles();
@@ -460,8 +460,8 @@ function plinkoWeg() {
 
 function renderPlinko() {
     const k = GLUECKSSPIEL.plinko;
-    const karte = spielKarte("🔻 Samen-Plinko",
-        "Lass einen Samen fallen. Er hüpft durch " + k.reihen + " Reihen Nägel und landet in einem Fach: Einsatz x Fach.",
+    const karte = spielKarte(t("🔻 Samen-Plinko"),
+        t("Lass einen Samen fallen. Er hüpft durch ") + k.reihen + t(" Reihen Nägel und landet in einem Fach: Einsatz x Fach."),
         restText("plinko"));
 
     const brett = el("div", "plinko-brett");
@@ -563,7 +563,7 @@ function lassePlinkoFallen(anteil, brett, samen) {
             } else {
                 Klang.fehler();
             }
-            run.glueck.letztesPlinko = { gewonnen, text: multiText(multi) + " · " + (betrag >= einsatz ? "+" + zahl(betrag - einsatz) : "-" + zahl(einsatz - betrag)) + " Gold" };
+            run.glueck.letztesPlinko = { gewonnen, text: multiText(multi) + " · " + (betrag >= einsatz ? "+" + zahl(betrag - einsatz) : "-" + zahl(einsatz - betrag)) + t(" Gold") };
             aktualisiereAlles();
         }, 350);
     }

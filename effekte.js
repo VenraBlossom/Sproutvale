@@ -112,7 +112,7 @@ let letzteJackpotFeier = 0;
 function jackpotFeier(x, y) {
     if (performance.now() - letzteJackpotFeier < 1500) return;
     letzteJackpotFeier = performance.now();
-    const schrift = el("div", "jackpot-schrift", "JACKPOT!");
+    const schrift = el("div", "jackpot-schrift", t("JACKPOT!"));
     document.body.appendChild(schrift);
     setTimeout(() => schrift.remove(), 1600);
     zeigeRing(x, y, 300, "#ffd93d", 700);
@@ -140,14 +140,14 @@ function zeigeTitel(text, klasse) {
 
 registriereHaken("tagStart", () => {
     const z = jahreszeit();
-    zeigeTitel("☀️ Tag " + run.tag, "titel-tag");
+    zeigeTitel(t("☀️ Tag ") + run.tag, "titel-tag");
     setTimeout(() => {
         if (run.phase === "tag") partikel(window.innerWidth / 2, window.innerHeight * 0.35, ["#ffe89a", "#ffffff", z.farbe], 30, 160);
     }, 150);
 });
 
 registriereHaken("tagEnde", () => {
-    if (!run.sandbox) zeigeTitel("🌙 Feierabend!", "titel-abend");
+    if (!run.sandbox) zeigeTitel(t("🌙 Feierabend!"), "titel-abend");
 });
 
 // ---------- SAMEN: das Feld federt beim Landen ----------
@@ -212,7 +212,7 @@ function sammelKette(x, y) {
         kette.el = el("div", "sammel-kette");
         document.body.appendChild(kette.el);
     }
-    kette.el.textContent = "Kette x" + kette.anzahl;
+    kette.el.textContent = t("Kette x") + kette.anzahl;
     kette.el.style.left = x + "px";
     kette.el.style.top = y - 50 + "px";
     kette.el.style.setProperty("--kette", Math.min(1, kette.anzahl / 50));
@@ -250,7 +250,7 @@ function sternGekauft(def) {
     zeigeRing(x, y, rect.width * 2.4, "#ffe89a", 550);
     partikel(x, y, ["#ffe89a", "#ffffff", "#8fa2f0"], 22, 90);
     const stufe = level(def.id);
-    const text = el("div", "stern-aufstieg", def.max > 1 ? "Stufe " + stufe + "!" : "✔ Freigeschaltet!");
+    const text = el("div", "stern-aufstieg", def.max > 1 ? t("Stufe ") + stufe + "!" : t("✔ Freigeschaltet!"));
     text.style.left = x + "px";
     text.style.top = rect.top - 10 + "px";
     document.body.appendChild(text);
@@ -260,7 +260,7 @@ function sternGekauft(def) {
 // ---------- RECHNUNG BEZAHLT: Stempel und goldener Regen ----------
 
 registriereHaken("rechnungBezahlt", (nummer, warBoss) => {
-    const stempel = el("div", "bezahlt-stempel" + (warBoss ? " kredit" : ""), warBoss ? "✔ KREDIT ABBEZAHLT" : "✔ BEZAHLT");
+    const stempel = el("div", "bezahlt-stempel" + (warBoss ? " kredit" : ""), warBoss ? t("✔ KREDIT ABBEZAHLT") : t("✔ BEZAHLT"));
     document.body.appendChild(stempel);
     setTimeout(() => stempel.remove(), 1900);
     wackleBildschirm(8);
@@ -282,7 +282,7 @@ function neuePflanzeFeier(pflanze) {
     const bild = document.createElement("img");
     bild.alt = "";
     setzeSpriteBild(bild, pflanze.id, 10);
-    buehne.append(el("div", "neue-pflanze-strahlen"), bild, el("div", "neue-pflanze-text", "Neu: " + pflanze.name + "!"));
+    buehne.append(el("div", "neue-pflanze-strahlen"), bild, el("div", "neue-pflanze-text", t("Neu: ") + pflanze.name + "!"));
     document.body.appendChild(buehne);
     setTimeout(() => buehne.remove(), 2400);
 }
