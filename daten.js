@@ -276,7 +276,16 @@ const SHOP_UPGRADES = [
         info: () => gluehwuermchenEnergie() + " Energie pro Glühwürmchen" },
     { id: "marktschreier", knoten: "s_marktschreier", icon: "📣", name: "Marktschreier", basiskosten: 80, faktor: 1.55, max: Infinity,
         beschreibung: "+3% Gold aus allen Ernten. Unendlich oft kaufbar.",
-        info: () => "+" + prozentText(0.03 * level("marktschreier")) + " Gold" }
+        info: () => "+" + prozentText(0.03 * level("marktschreier")) + " Gold" },
+    { id: "regentonne", knoten: "s_regentonne", icon: "🛢️", name: "Regentonne", basiskosten: 2000, faktor: 2.4, max: 5,
+        beschreibung: "Bewässerte Felder wachsen noch 15% schneller.",
+        info: () => "+" + 15 * level("regentonne") + "% Tempo auf bewässerten Feldern" },
+    { id: "vogelhaus", knoten: "s_vogelhaus", icon: "🏠", name: "Vogelhäuschen", basiskosten: 1500, faktor: 2.2, max: 5,
+        beschreibung: "Sternschnuppen kommen 12% öfter.",
+        info: () => "+" + 12 * level("vogelhaus") + "% Sternschnuppen" },
+    { id: "saatsortiment", knoten: "s_saatsortiment", icon: "🎒", name: "Saatgut-Sortiment", basiskosten: 5000, faktor: 2.6, max: 5,
+        beschreibung: "Alle Spezialpflanzen erscheinen 10% öfter.",
+        info: () => "+" + 10 * level("saatsortiment") + "% Spezialpflanzen" }
 ];
 
 // ---------- STERNENBAUM (kostet Sternensamen) ----------
@@ -378,6 +387,43 @@ const SKILLS = [
     stern("midas", "ernte", "👑", [1400, -220], "ernterausch", "Midas' Berührung", 2500, 1, 1,
         "Jeder legendäre Jackpot lässt zusätzlich eine Sternensaat mit 50 Sternensamen fallen.",
         () => (level("midas") > 0 ? "Aktiv" : "Nicht aktiv")),
+
+    // ----- Neue Sterne am Rand der Aeste -----
+    stern("jackpotjaeger", "ernte", "🎰", [1620, -220], "midas", "Jackpot-Jäger", 25000, 4, 3,
+        "Legendäre Jackpots sind pro Stufe noch einmal so viel wert (Stufe 1 = doppelt, Stufe 3 = vierfach).",
+        () => "x" + (1 + level("jackpotjaeger")) + " Jackpot-Wert"),
+    stern("goldschauer", "ernte", "🌦️", [1620, 0], "sternengold", "Goldschauer", 3000, 2.5, 3,
+        "Der seltene Goldregen kommt pro Stufe 50% öfter.",
+        () => "+" + 50 * level("goldschauer") + "% Goldregen"),
+    stern("schnuppenfaenger", "helfer", "🌠", [-960, 660], "magnetfeld", "Sternschnuppen-Fänger", 800, 2, 5,
+        "Der Bonus einer gefangenen Sternschnuppe (doppeltes Gold) hält pro Stufe 3 Sekunden länger.",
+        () => "+" + 3 * level("schnuppenfaenger") + " Sek. Sternschnuppen-Bonus"),
+    stern("kombovirtuose", "helfer", "🎼", [-740, -440], "s_kuhglocke", "Kombo-Virtuose", 3000, 3, 2,
+        "Auf der höchsten Kombo-Stufe (ab 150) zählt jeder Klick pro Stufe einmal mehr (x5 wird x6, dann x7).",
+        () => "Höchste Kombo: x" + (5 + level("kombovirtuose"))),
+
+    // ----- Jahreszeiten (unten rechts): jede Jahreszeit bekommt einen eigenen Stern -----
+    stern("jahresrad", "jahreszeit", "🎡", [800, 720], "s_kasse", "Jahresrad", 300, 2.2, 4,
+        "Alle guten Effekte der Jahreszeiten werden um 25% pro Stufe stärker (z.B. Frühling +20% Wachstum wird zu +25%).",
+        () => "+" + 25 * level("jahresrad") + "% Jahreszeit-Effekte"),
+    stern("bluetenzauber", "jahreszeit", "🌸", [1020, 580], "jahresrad", "Blütenzauber", 400, 2, 3,
+        "Im Frühling: +4% Chance auf grüne und +1% auf lila Saat pro Stufe.",
+        () => "+" + 4 * level("bluetenzauber") + "% grüne Saat im Frühling"),
+    stern("sonnenernte", "jahreszeit", "🌻", [1020, 860], "jahresrad", "Sonnenernte", 400, 2, 3,
+        "Im Sommer: +20% Gold aus allen Ernten pro Stufe.",
+        () => "+" + 20 * level("sonnenernte") + "% Gold im Sommer"),
+    stern("erntedank", "jahreszeit", "🍁", [1240, 580], "bluetenzauber", "Erntedank", 600, 2, 3,
+        "Im Herbst: jede Sternensaat ist 25% pro Stufe mehr wert.",
+        () => "+" + 25 * level("erntedank") + "% Sternensaat im Herbst"),
+    stern("frostschutz", "jahreszeit", "🧣", [1240, 860], "sonnenernte", "Frostschutz", 500, 2.5, 2,
+        "Stufe 1: Im Winter wachsen Pflanzen nicht mehr langsamer. Stufe 2: im Winter sogar 10% schneller.",
+        () => level("frostschutz") >= 2 ? "Winter: +10% Wachstum" : level("frostschutz") ? "Winter: normales Wachstum" : "Winter: -15% Wachstum"),
+    stern("saisonfest", "jahreszeit", "🎊", [1460, 720], "erntedank", "Saisonfest", 2000, 1, 1,
+        "Der erste Tag jeder Jahreszeit ist ein Festtag: x1,5 Gold aus allen Ernten.",
+        () => (level("saisonfest") > 0 ? "Aktiv" : "Nicht aktiv")),
+    stern("sternenkalender", "jahreszeit", "📅", [1460, 960], "frostschutz", "Sternenkalender", 1500, 1, 1,
+        "Bei jedem Wechsel der Jahreszeit bekommst du Sternensamen geschenkt (mehr, je besser deine beste Pflanze ist).",
+        () => (level("sternenkalender") > 0 ? "Aktiv" : "Nicht aktiv")),
 
     // ----- Helfer (links) -----
     stern("radius", "helfer", "🖐️", [-520, -220], "kombo", "Breiter Cursor", 150, 1.35, 30,
@@ -487,6 +533,9 @@ const SKILLS = [
         "Ernten im letzten Drittel des Tages geben 15% mehr Gold.",
         () => "+" + prozentText(0.15 * level("abendsonne")) + " Gold am Abend"),
     shopStern("s_marktschreier", "hof", [0, 1180], "s_duengerabo", 5000),
+    shopStern("s_regentonne", "hof", [220, 1400], "wurmhumus", 2500),
+    shopStern("s_vogelhaus", "hof", [-220, 1620], "s_laterne", 1800),
+    shopStern("s_saatsortiment", "hof", [0, 1620], "vorratskammer", 4000),
     stern("lagerhaus", "hof", "🏚️", [440, 1180], "zinsen", "Lagerhaus", 2500, 2.3, 4,
         "Zinsen dürfen 25% der nächsten Rechnung mehr betragen.",
         () => "Zinsen bis " + prozentText(zinsDeckelAnteil()) + " der Rechnung"),
@@ -614,7 +663,11 @@ const STERN_KURZ = {
     nachtwache: "Glühwürmchen: mehr Energie", gewaechshaus: "Bewässert: mehr Gold", wurmhumus: "Gedüngt: x3 statt x2 Gold",
     vorratskammer: "Liegende Saat wird eingesammelt", erntefest: "Rechnungstag: mehr Gold",
     muenzwurf: "Glücksspiel: Münzwurf", gacha: "Glücksspiel: Gacha-Automat", rubbellos: "Glücksspiel: Rubbellose",
-    huehnerrennen: "Glücksspiel: Hühnerrennen", plinko: "Glücksspiel: Samen-Plinko"
+    huehnerrennen: "Glücksspiel: Hühnerrennen", plinko: "Glücksspiel: Samen-Plinko",
+    jahresrad: "Jahreszeiten stärker", bluetenzauber: "Frühling: bunte Saat", sonnenernte: "Sommer: mehr Gold",
+    erntedank: "Herbst: mehr Sternensaat", frostschutz: "Winter ohne Malus", saisonfest: "1. Tag der Jahreszeit x1,5",
+    sternenkalender: "Geschenk beim Jahreszeitwechsel", jackpotjaeger: "Jackpots mehr wert", goldschauer: "Öfter Goldregen",
+    schnuppenfaenger: "Sternschnuppen-Bonus länger", kombovirtuose: "Höchste Kombo stärker"
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -639,7 +692,12 @@ const STERN_WIRKUNG = {
     fruehaufsteher: s => s + " Samen", duengen: s => s + " Felder 🪱", morgentau: s => "+" + 25 * s + "% Wachstum",
     doppelwurf: s => "+" + 10 * s + "% Doppelwurf", zinsen: s => 2 * s + "% Zinsen", wetterfrosch: s => "+" + 30 * s + "% Wetter",
     abendsonne: s => "+" + 15 * s + "% Gold", lagerhaus: s => "+" + 25 * s + "% Deckel", nachtwache: s => "+" + 50 * s + "% Energie",
-    gewaechshaus: s => "+" + 50 * s + "% Gold", erntefest: s => "+" + 100 * s + "% Gold"
+    gewaechshaus: s => "+" + 50 * s + "% Gold", erntefest: s => "+" + 100 * s + "% Gold",
+    jahresrad: s => "+" + 25 * s + "% Jahreszeit-Effekte", bluetenzauber: s => "+" + 4 * s + "% grüne Saat",
+    sonnenernte: s => "+" + 20 * s + "% Gold im Sommer", erntedank: s => "+" + 25 * s + "% Sternensaat im Herbst",
+    frostschutz: s => (s >= 2 ? "+10% Wachstum im Winter" : "kein Winter-Malus"),
+    jackpotjaeger: s => "x" + (1 + s) + " Jackpot", goldschauer: s => "+" + 50 * s + "% Goldregen",
+    schnuppenfaenger: s => "+" + 3 * s + " Sek. Bonus", kombovirtuose: s => "Kombo bis x" + (5 + s)
 };
 
 SKILLS.forEach(def => {
@@ -1290,7 +1348,19 @@ const KUGEL_SKINS = [
     { id: "regenbogen", name: "Regenbogenmünzen", quelle: "dlc", paket: "einzeln", farben: { Y: "#ff9a9a", y: "#e0507a", k: "#5a1a3a" },
         klasse: "muenzen-regenbogen", funken: ["#ff6a6a", "#ffd93d", "#a3dc6f", "#5aa9e6", "#b48cff"] },
     { id: "feuer", name: "Feuermünzen", quelle: "dlc", paket: "einzeln", farben: { Y: "#ffd060", y: "#ff6a2a", k: "#5a1a08" },
-        klasse: "muenzen-feuer", funken: ["#ffd060", "#ff8a2a", "#ff4a1a"] }
+        klasse: "muenzen-feuer", funken: ["#ffd060", "#ff8a2a", "#ff4a1a"] },
+    // Saat in anderen Formen (keine runde Muenze). Die Seltenheit zeigt der farbige Kern (Z), beim Kristall der ganze Stein.
+    { id: "blatt", name: "Blattsaat", quelle: "erspielt", bedingungText: "Ernte insgesamt 25.000 Pflanzen",
+        bedingung: () => meta.lebenszeit.ernten >= 25000, form: "blatt", farben: { Y: "#8fdc5c", y: "#4f9e2c", k: "#1f4a12", w: "#e8ffd0" } },
+    { id: "eichel", name: "Eichelsaat", quelle: "erspielt", bedingungText: "Streichle deinen Begleiter 2.000-mal",
+        bedingung: () => meta.lebenszeit.streicheln >= 2000, form: "eichel", farben: { Y: "#d8a060", y: "#9a6430", k: "#3a2410", w: "#ffe8c8" } },
+    { id: "herz", name: "Herzsaat", quelle: "dlc", paket: "unterstuetzer", form: "herz",
+        farben: { Y: "#ff9ab8", y: "#d0507a", k: "#5a1a30", w: "#ffe6ee" } },
+    { id: "kristall", name: "Kristallsaat", quelle: "dlc", paket: "einzeln", form: "kristall", klasse: "muenzen-kristall",
+        farben: { k: "#1d2a4a", w: "#ffffff", Y: "#e8eef8", y: "#a8b4c8" },
+        raritaetFarben: [{ Y: "#e8eef8", y: "#a8b4c8" }, { Y: "#9af09a", y: "#2e9e2e" }, { Y: "#9ad6ff", y: "#2f7fcf" },
+            { Y: "#d6a8ff", y: "#7c2fc2" }, { Y: "#fff0a0", y: "#e0a800" }],
+        funken: ["#ffffff", "#9ad6ff", "#d6a8ff"] }
 ];
 
 // Rahmen der Kuscheltier-Karten im Mondteich

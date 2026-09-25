@@ -65,8 +65,72 @@ function oeffneKodex() {
     oeffneEinstellungsReiter("kodex");
 }
 
+// ---------- KODEX-BELOHNUNGEN ----------
+// Alle 10 Entdeckungen: 1 Kuschel-Gutschein. Ein ganzer Bereich vollstaendig: 2 Gutscheine und fuer immer +3% Gold.
+const KODEX_BELOHNUNG = { alleEntdeckungen: 10, gutscheineBereich: 2, goldBereich: 0.03 };
+
+function kodexStand(reiterId) {
+    const eintraege = kodexEintraege(reiterId);
+    return { entdeckt: eintraege.filter(e => e.anzahl > 0).length, gesamt: eintraege.length };
+}
+
+// Wie viele Bereiche fuer immer vollstaendig sind (fuer den Gold-Bonus)
+function kodexBereicheFertig() {
+    return Object.keys(meta.kodexBelohnt || {}).length;
+}
+
+function pruefeKodexBelohnungen() {
+    if (!meta || !run) return;
+    if (!meta.kodexBelohnt) meta.kodexBelohnt = {};
+    let geaendert = false;
+    let summe = 0;
+    KODEX_REITER.forEach(r => {
+        const { entdeckt, gesamt } = kodexStand(r.id);
+        summe += entdeckt;
+        if (entdeckt >= gesamt && gesamt > 0 && !meta.kodexBelohnt[r.id]) {
+            meta.kodexBelohnt[r.id] = true;
+            meta.gutscheine += KODEX_BELOHNUNG.gutscheineBereich;
+            zeigeBanner("📖", "Kodex vollständig: " + r.text.replace(/^\S+ /, ""),
+                "+" + KODEX_BELOHNUNG.gutscheineBereich + " 🎟️ und für immer +3% Gold", "#6b4220", 3600);
+            Klang.jackpot();
+            geaendert = true;
+        }
+    });
+    // Gutschein alle 10 Entdeckungen (zaehlt ab jetzt, bereits entdecktes zaehlt beim ersten Mal mit)
+    const stufe = Math.floor(summe / KODEX_BELOHNUNG.alleEntdeckungen);
+    if (meta.kodexStufe === undefined) meta.kodexStufe = 0;
+    if (stufe > meta.kodexStufe) {
+        const neu = stufe - meta.kodexStufe;
+        meta.kodexStufe = stufe;
+        meta.gutscheine += neu;
+        zeigeToast("📖 Kodex: " + summe + " Entdeckungen! +" + neu + " 🎟️ Kuschel-Gutschein");
+        geaendert = true;
+    }
+    if (geaendert) speichereMeta();
+}
+setInterval(pruefeKodexBelohnungen, 2500);
+
 function renderKodex(inhalt) {
     inhalt.innerHTML = "";
+    // Fortschritt und Belohnungen oben
+    const alle = KODEX_REITER.reduce((summe, r) => summe + kodexStand(r.id).entdeckt, 0);
+    const naechste = (Math.floor(alle / KODEX_BELOHNUNG.alleEntdeckungen) + 1) * KODEX_BELOHNUNG.alleEntdeckungen;
+    const aktuell = kodexStand(aktiverKodexReiter);
+    const fertig = meta.kodexBelohnt && meta.kodexBelohnt[aktiverKodexReiter];
+    const balken = el("div", "kodex-balken", null, [el("div")]);
+    balken.firstChild.style.width = (aktuell.entdeckt / Math.max(1, aktuell.gesamt)) * 100 + "%";
+    inhalt.appendChild(el("div", "kodex-belohnung", null, [
+        el("div", "kodex-belohnung-zeile", null, [
+            el("b", null, "📖 " + alle + " Entdeckungen"),
+            el("span", null, "Nächster 🎟️ Gutschein bei " + naechste),
+            el("span", null, "Bereiche vollständig: " + kodexBereicheFertig() + " / " + KODEX_REITER.length +
+                " (+" + Math.round(kodexBereicheFertig() * KODEX_BELOHNUNG.goldBereich * 100) + "% Gold)")
+        ]),
+        balken,
+        el("div", "kodex-belohnung-text", fertig ? "✔ Dieser Bereich ist vollständig: Belohnung erhalten."
+            : "Vervollständige diesen Bereich (" + aktuell.entdeckt + " / " + aktuell.gesamt + ") für +" +
+            KODEX_BELOHNUNG.gutscheineBereich + " 🎟️ und für immer +3% Gold.")
+    ]));
     const leiste = el("div", "haus-reiter");
     KODEX_REITER.forEach(r => {
         const eintraege = kodexEintraege(r.id);

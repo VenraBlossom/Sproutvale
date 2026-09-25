@@ -2113,3 +2113,62 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height }
     };
 }
+
+// ---------- SAAT IN ANDEREN FORMEN (Kosmetik "Saat") ----------
+// k = Rand, Y = Farbe, y = Schatten, w = Glanz, Z = Kern in der Farbe der Seltenheit
+SPRITE_PIXEL.form_blatt = [
+    "........kkk.",
+    "......kkYYk.",
+    "....kkYYYYk.",
+    "...kYYYwYyk.",
+    "..kYYwYZYyk.",
+    "..kYwYZZYyk.",
+    ".kYYYZZYyk..",
+    ".kYYZZYyk...",
+    ".kYZYyyk....",
+    ".kZkkkk.....",
+    "kZk.........",
+    "kk.........."
+];
+SPRITE_PIXEL.form_herz = [
+    "..kk....kk..",
+    ".kYYk..kYYk.",
+    "kYwYYkkYYYyk",
+    "kYwYYYYYYYyk",
+    "kYYYYZZYYYyk",
+    "kYYYZZZZYYyk",
+    ".kYYZZZZYyk.",
+    "..kYYZZYyk..",
+    "...kYYYyk...",
+    "....kYyk....",
+    ".....kk.....",
+    "............"
+];
+SPRITE_PIXEL.form_eichel = [
+    ".....kk.....",
+    "..kkkyykkk..",
+    ".kyYyYyYyyk.",
+    ".kyyyyyyyyk.",
+    ".kkkkkkkkkk.",
+    "..kYwYYYYk..",
+    "..kwYZZYyk..",
+    "..kYZZZZyk..",
+    "..kYYZZYyk..",
+    "...kYYYyk...",
+    "....kyyk....",
+    ".....kk....."
+];
+SPRITE_PIXEL.form_kristall = [
+    "...kkkkkk...",
+    "..kwwYYYyk..",
+    ".kwwYYYYyyk.",
+    "kkkkkkkkkkkk",
+    "kYwYYZZYYyyk",
+    ".kYwYZZYyyk.",
+    "..kYYZZYyk..",
+    "...kYYYyk...",
+    "....kYyk....",
+    ".....kk.....",
+    "............",
+    "............"
+];

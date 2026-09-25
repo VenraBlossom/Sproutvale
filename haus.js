@@ -705,7 +705,9 @@ function kosmetikBild(kategorie, eintrag) {
             return bild;
         }
         case "kugeln":
-            setzeSpriteBild(bild, spriteVariante("muenze_vorschau_" + eintrag.id, "muenze", { ...eintrag.farben, Z: eintrag.farben.y || "#d9a82a" }), 5);
+            setzeSpriteBild(bild, spriteVariante("muenze_vorschau_" + eintrag.id, eintrag.form ? "form_" + eintrag.form : "muenze",
+                eintrag.raritaetFarben ? { ...eintrag.farben, ...eintrag.raritaetFarben[3], Z: "#9a4fe0" }
+                    : { ...eintrag.farben, Z: eintrag.form ? "#3fbf3f" : eintrag.farben.y || "#d9a82a" }), 5);
             if (eintrag.klasse) bild.classList.add("vorschau-" + eintrag.klasse);
             return bild;
         case "samenladen": {

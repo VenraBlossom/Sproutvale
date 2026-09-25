@@ -7841,3 +7841,67 @@ h1, h2, h3,
 .markt-inhalt > .panel-hinweis {
     margin-bottom: 12px;
 }
+
+/* Jahreszeiten-Ast im Stellarium */
+.stern.gekauft.ast-jahreszeit { border-color: #ff9ad5; }
+
+/* Kodex: Fortschritt und Belohnungen */
+.kodex-belohnung {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(224, 168, 0, 0.18), rgba(224, 168, 0, 0.05));
+    border: 2px solid #d4a017;
+    border-radius: 8px;
+}
+
+.kodex-belohnung-zeile {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    align-items: baseline;
+}
+
+.kodex-belohnung-text {
+    font-size: 0.9em;
+    color: var(--text-leise);
+}
+
+.kodex-balken {
+    height: 12px;
+    background-color: #e8d9b6;
+    border: 2px solid #b89a62;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.kodex-balken > div {
+    height: 100%;
+    background: linear-gradient(90deg, #7cc04f, #e0a800);
+    transition: width 0.3s;
+}
+
+/* Legendaere Kristallsaat: schimmert und funkelt */
+body.muenzen-kristall .loot-kugel:not(.loot-stern) {
+    animation: kristall-schimmer 2.2s ease-in-out infinite;
+}
+
+body.muenzen-kristall .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, kristall-schimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes kristall-schimmer {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6)) brightness(1); }
+    50% { filter: drop-shadow(0 0 9px rgba(180, 220, 255, 1)) brightness(1.25); }
+}
+
+.vorschau-muenzen-kristall {
+    animation: kristall-schimmer 2.2s ease-in-out infinite;
+}
+
+/* Markt geschlossen: wirklich weg (sonst gewinnt display: flex) */
+.panel.markt-fenster.hidden {
+    display: none;
+}

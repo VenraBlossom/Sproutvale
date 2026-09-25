@@ -538,7 +538,7 @@ registriereHaken("tagStart", () => {
     tagesPlan.ms = 0;
     tagesPlan.blitzMs = 5000;
     planeKraehen();
-    tagesPlan.goldregen = Math.random() < GOLDREGEN_KONFIG.chance ? tagesDauerMs() * (0.2 + Math.random() * 0.5) : null;
+    tagesPlan.goldregen = Math.random() < GOLDREGEN_KONFIG.chance * (1 + 0.5 * level("goldschauer")) ? tagesDauerMs() * (0.2 + Math.random() * 0.5) : null;
     zeigeWetter();
     if (haendlerSchliessen) haendlerSchliessen();
 });

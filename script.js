@@ -509,9 +509,10 @@ function energieMax() {
 
 // [Gewoehnlich, Ungewoehnlich, Selten, Episch, Legendaer]
 function raritaetsChancen() {
-    const gruen = 0.20 + 0.03 * level("gruen") + tw("hohepriesterin") + 0.02 * kuschel("kueken");
+    const fruehling = run && jahreszeit().id === "fruehling" ? level("bluetenzauber") : 0;
+    const gruen = 0.20 + 0.03 * level("gruen") + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
-    const lila = 0.04 + 0.01 * level("lila") + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache");
+    const lila = 0.04 + 0.01 * level("lila") + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
     const gelb = 0.01 + 0.005 * level("gelb") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
@@ -570,15 +571,19 @@ function goldMulti() {
     const summe = 1 + 0.15 * metaLevel("ertrag") + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
-        0.25 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold");
+        0.25 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") +
+        (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
+    const z = jahreszeit();
     return summe * Math.pow(2, level("goldmarie")) * Math.pow(1.1, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
-        (jahreszeit().gold || 1);
+        (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
+        (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) *
-        (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1);
+        (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
+        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1);
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -590,7 +595,7 @@ function variantenChance(variante) {
     const skill = SKILLS.find(s => s.variante === variante);
     const tarot = variante.tarotBonus ? variante.tarotBonus.chance * tarotFaktor(variante.tarotBonus.karte) : 0;
     if (run.sandbox && variante.energieBonus) return 0; // Blitzpflanzen geben nur Energie
-    let chance = (skill.chanceProStufe * level(skill.id) + tarot) * (1 + 0.1 * kuschel("oktopus"));
+    let chance = (skill.chanceProStufe * level(skill.id) + tarot) * (1 + 0.1 * kuschel("oktopus")) * (1 + 0.1 * level("saatsortiment"));
     if (variante.id === "blitz" && wetterIst("gewitter")) chance *= 3;
     return chance;
 }
@@ -715,11 +720,22 @@ function jahreszeitFuer(index) {
 }
 
 function jahreszeit(tag) {
-    const z = jahreszeitFuer(jahreszeitIndex(tag));
-    if (!run || segen("saisonkind") <= 0) return z;
+    let z = jahreszeitFuer(jahreszeitIndex(tag));
+    if (!run) return z;
+    // Frostschutz (Stellarium): kein Winter-Malus, Stufe 2 sogar +10%
+    if (z.id === "winter" && level("frostschutz") > 0) z = { ...z, wachstum: level("frostschutz") >= 2 ? 1.1 : 1 };
     // Segen "Kind der Jahreszeiten": jeder Effekt doppelt so stark (0,85 wird 0,7, 1,2 wird 1,4)
-    const doppelt = wert => (wert === undefined ? undefined : 1 + (wert - 1) * 2);
-    return { ...z, wachstum: doppelt(z.wachstum), energie: doppelt(z.energie), gold: doppelt(z.gold), sterne: doppelt(z.sterne) };
+    // Jahresrad (Stellarium): nur die guten Effekte +25% pro Stufe
+    const saison = segen("saisonkind") > 0 ? 2 : 1;
+    const rad = 1 + 0.25 * level("jahresrad");
+    if (saison === 1 && rad === 1) return z;
+    const verstaerkt = wert => (wert === undefined ? undefined : 1 + (wert - 1) * saison * (wert > 1 ? rad : 1));
+    return { ...z, wachstum: verstaerkt(z.wachstum), energie: verstaerkt(z.energie), gold: verstaerkt(z.gold), sterne: verstaerkt(z.sterne) };
+}
+
+// Erster Tag einer Jahreszeit (Saisonfest, Sternenkalender)
+function istErsterJahreszeitTag() {
+    return run && (run.tag - 1) % JAHRESZEITEN_KONFIG.tageProJahreszeit === 0;
 }
 
 // Wie viele Tage die aktuelle Jahreszeit noch dauert (der laufende Tag zaehlt mit)
@@ -800,7 +816,7 @@ function istSandboxAus(id) {
 function stufenZeitSek(feld) {
     let tempo = feld.variante && feld.variante.tempo || 1;
     const bewaessert = feld.bewaessert || (pflanzenBonus(feld.pflanze, "reis") && !bossIst("duerre"));
-    if (bewaessert) tempo *= feld.pflanze.eigenschaft === "wasser" ? 3 : 2;
+    if (bewaessert) tempo *= (feld.pflanze.eigenschaft === "wasser" ? 3 : 2) * (1 + 0.15 * level("regentonne"));
     if (pflanzenBonus(feld.pflanze, "karotte")) tempo *= 1.5;
     if (tagesAnteil() < 0.2) tempo *= 1 + 0.25 * level("morgentau");
     if (feld.pflanze.eigenschaft === "nacht" && istNacht()) tempo *= 2;
@@ -814,6 +830,8 @@ function komboMultiplikator() {
     KONFIG.komboStufen.forEach(stufe => {
         if (kombo.zaehler >= stufe.ab) multi = stufe.multi;
     });
+    const hoechste = KONFIG.komboStufen[KONFIG.komboStufen.length - 1];
+    if (kombo.zaehler >= hoechste.ab) multi += level("kombovirtuose");
     return multi;
 }
 
@@ -831,7 +849,7 @@ function wuerfleRaritaetIndex() {
 // Multiplikator einer Münz-Farbe (mit Edelsteinschleifer, Geizige Kundschaft, Schildkroete)
 function raritaetsMulti(index) {
     if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen"));
-    return RARITAETEN[index].multi * (1 + edelsteinBonus());
+    return RARITAETEN[index].multi * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? 1 + level("jackpotjaeger") : 1);
 }
 
 function wuerfleVariante() {
@@ -1003,6 +1021,12 @@ function muenzeSprite(raritaet) {
     const skin = gewaehlteKosmetik("kugeln");
     const fb = einstellungen.farbenblind;
     const name = "muenze_" + raritaet + "_" + skin.id + (fb ? "_fb" : "");
+    // Saat in eigener Form (Blatt, Herz, Eichel, Kristall). Im Farbenblind-Modus bleiben die Formen fuer die Seltenheit.
+    if (skin.form && !fb) {
+        const farben = skin.raritaetFarben ? { ...skin.farben, ...skin.raritaetFarben[raritaet] } : { ...skin.farben };
+        farben.Z = raritaet === JACKPOT_INDEX ? "#ffd93d" : raritaet === 0 ? (skin.farben.y || "#d9a82a") : EDELSTEIN_FARBEN[raritaet];
+        return spriteVariante(name, "form_" + skin.form, farben);
+    }
     if (raritaet === JACKPOT_INDEX) return spriteVariante(name, "muenze_stern", { ...skin.farben });
     const farben = { ...skin.farben, Z: raritaet === 0 ? (skin.farben.y || "#d9a82a") : EDELSTEIN_FARBEN[raritaet] };
     return spriteVariante(name, fb ? "muenze_form_" + raritaet : "muenze", farben);
@@ -1915,7 +1939,7 @@ function aktualisiereHelfer(dtMs) {
 }
 
 function sternschnuppeTempo() {
-    return (1 + 0.3 * segen("sternenstaub")) * (hatWerkzeug("fernrohr") ? 2 : 1) * (wetterIst("sternennacht") ? 3 : 1);
+    return (1 + 0.3 * segen("sternenstaub") + 0.12 * level("vogelhaus")) * (hatWerkzeug("fernrohr") ? 2 : 1) * (wetterIst("sternennacht") ? 3 : 1);
 }
 
 function neuerSternTimerMs() {
@@ -2211,7 +2235,7 @@ function lassVerfallen(loot) {
 // Leuchtender Kopf mit Schweif, der in Flugrichtung zeigt und Funken hinter sich laesst.
 
 function sternschnuppeSek() {
-    return KONFIG.sternschnuppeBuffSek + 3 * segen("sternenstaub") + kuschel("schaf") + werkzeugWert("fernrohr");
+    return KONFIG.sternschnuppeBuffSek + 3 * segen("sternenstaub") + kuschel("schaf") + werkzeugWert("fernrohr") + 3 * level("schnuppenfaenger");
 }
 
 function spawnSternschnuppe() {
@@ -3644,7 +3668,8 @@ function renderSkilltree() {
 }
 
 const AST_NAMEN = {
-    pflanzen: "🌱 Pflanzen", ernte: "🍀 Ernte", hof: "🏡 Hof", helfer: "🐿️ Helfer", glueck: "🎲 Glück", besondere: "✨ Spezialpflanzen"
+    pflanzen: "🌱 Pflanzen", ernte: "🍀 Ernte", hof: "🏡 Hof", helfer: "🐿️ Helfer", glueck: "🎲 Glück", besondere: "✨ Spezialpflanzen",
+    jahreszeit: "🎡 Jahreszeiten"
 };
 
 // Stufen als kleine Punkte (bis 10 Stufen), sonst als Zahl
@@ -4596,4 +4621,17 @@ $("feedback-kopieren").addEventListener("click", () => {
         () => { $("feedback-info").textContent = "Kopiert! Füge den Text in eine E-Mail an " + FEEDBACK_MAIL + " ein (Ticket #" + n.ticket + ")."; },
         () => { $("feedback-info").textContent = "Kopieren ging nicht. Bitte schick deinen Text an " + FEEDBACK_MAIL + "."; }
     );
+});
+
+// ---------- JAHRESZEITEN-AST: Sternenkalender und Saisonfest ----------
+registriereHaken("tagStart", () => {
+    if (!run || run.tag <= 1 || !istErsterJahreszeitTag()) return;
+    const z = jahreszeit();
+    if (level("saisonfest") > 0) zeigeBanner(z.symbol, "Saisonfest: " + z.name + " beginnt!", "Heute x1,5 Gold", z.farbe || "#e0a800", 2600);
+    if (level("sternenkalender") > 0) {
+        const geschenk = Math.round(60 * Math.pow(1.6, bestePflanze().index));
+        gibSternensamen(geschenk);
+        zeigeToast("📅 Sternenkalender: +" + zahl(geschenk) + " Sternensamen zum " + z.name + "!");
+        aktualisiereTopBar();
+    }
 });
