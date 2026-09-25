@@ -546,32 +546,64 @@ img.icon {
     background: linear-gradient(#ffe98a, #f0b82e);
 }
 
-.feld-variante {
-    position: absolute;
-    top: 5%;
-    left: 6%;
-    font-size: 1.25em;
-    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
-}
-
+/* Ebenen ueber der Erde: feld-marker zeigt Wasser und Duenger, feld-variante die Spezialpflanze (ohne Symbole) */
+.feld-variante,
 .feld-marker {
     position: absolute;
-    top: 5%;
-    right: 6%;
-    font-size: 1.1em;
+    inset: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    pointer-events: none;
 }
 
+.feld-marker::before,
+.feld-marker::after,
+.feld-variante::before,
+.feld-variante::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Bewaessert: dunklere, nasse Erde mit glaenzenden Pfuetzen */
 .feld-bewaessert {
     background-image: var(--erde-nass);
-    box-shadow: inset 0 0 0 3px #5fb3e6, inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 3px 0 rgba(30, 50, 10, 0.45);
 }
 
-.feld-geduengt {
-    box-shadow: inset 0 0 0 3px #d9a05b, inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 3px 0 rgba(30, 50, 10, 0.45);
+.feld-bewaessert .feld-marker::before {
+    opacity: 1;
+    background:
+        radial-gradient(ellipse 18% 9% at 26% 72%, rgba(170, 215, 255, 0.55), transparent),
+        radial-gradient(ellipse 12% 6% at 74% 28%, rgba(170, 215, 255, 0.5), transparent),
+        radial-gradient(ellipse 10% 5% at 64% 82%, rgba(170, 215, 255, 0.45), transparent),
+        rgba(10, 25, 55, 0.38);
+    animation: nass-glanz 3s ease-in-out infinite;
 }
 
-.feld-bewaessert.feld-geduengt {
-    box-shadow: inset 0 0 0 3px #5fb3e6, inset 0 0 0 6px #d9a05b, 0 3px 0 rgba(30, 50, 10, 0.45);
+@keyframes nass-glanz {
+    50% { filter: brightness(1.35); }
+}
+
+/* Geduengt: dunkle Kruemel und kleine goldene Naehrstoff-Funken */
+.feld-geduengt .feld-marker::after {
+    opacity: 1;
+    background:
+        radial-gradient(circle at 18% 24%, #fff0a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 80% 62%, #fff0a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 44% 86%, #fff0a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 30% 45%, #2e1808 0 3px, transparent 4px),
+        radial-gradient(circle at 70% 20%, #2e1808 0 3px, transparent 4px),
+        radial-gradient(circle at 58% 55%, #3a2010 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 14% 78%, #3a2010 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 86% 88%, #2e1808 0 3px, transparent 4px),
+        rgba(120, 80, 20, 0.14);
+    animation: duenger-funkeln 2.2s ease-in-out infinite;
+}
+
+@keyframes duenger-funkeln {
+    50% { filter: brightness(1.4) saturate(1.3); }
 }
 
 /* Feld, das gerade vom Samenladen bepflanzt wird */
@@ -615,7 +647,7 @@ img.icon {
     75% { transform: rotate(4deg) scale(0.96); }
 }
 
-/* Spezialpflanzen: Farbfilter auf dem Sprite (spaeter durch eigene Sprites ersetzbar) */
+/* Spezialpflanzen: Farbfilter auf dem Sprite und eine eigene Animation im Feld (feld-variante, ohne Symbol) */
 .v-geist .feld-sprite { opacity: 0.6; filter: hue-rotate(180deg) brightness(1.3); }
 .v-blitz .feld-sprite { filter: drop-shadow(0 0 4px #ffe066) brightness(1.15); }
 .v-pilz .feld-sprite { filter: hue-rotate(250deg) saturate(0.8); }
@@ -6215,4 +6247,217 @@ body[data-fieber="5"] #fieber-rahmen {
     28% { transform: translate(-50%, -50%) scale(1); }
     80% { opacity: 1; }
     100% { transform: translate(-50%, -60%) scale(0.95); opacity: 0; }
+}
+
+/* ---------- SPEZIALPFLANZEN SIEHT MAN AM FELD ---------- */
+
+/* Geist: Nebelschwaden steigen auf, die Pflanze schwebt */
+.v-geist .feld-variante::before {
+    opacity: 1;
+    background:
+        radial-gradient(ellipse 30% 18% at 30% 80%, rgba(220, 235, 255, 0.45), transparent),
+        radial-gradient(ellipse 26% 16% at 72% 70%, rgba(220, 235, 255, 0.4), transparent);
+    animation: geist-nebel 3s ease-in-out infinite;
+}
+
+.v-geist .feld-sprite {
+    animation: geist-schweben 2.4s ease-in-out infinite;
+}
+
+@keyframes geist-nebel {
+    0% { transform: translateY(10%); opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-25%); opacity: 0; }
+}
+
+/* Blitz: kleine Blitze zucken ueber das Feld */
+.v-blitz .feld-variante::before,
+.v-blitz .feld-variante::after {
+    inset: auto;
+    width: 22%;
+    height: 42%;
+    background: #fff27a;
+    filter: drop-shadow(0 0 4px #ffe066);
+    clip-path: polygon(55% 0, 20% 55%, 45% 55%, 30% 100%, 80% 40%, 55% 40%, 70% 0);
+    animation: blitz-zucken 2.6s steps(1) infinite;
+}
+
+.v-blitz .feld-variante::before {
+    left: 10%;
+    top: 8%;
+}
+
+.v-blitz .feld-variante::after {
+    right: 10%;
+    top: 30%;
+    animation-delay: -1.3s;
+    transform: scaleX(-1);
+}
+
+@keyframes blitz-zucken {
+    0%, 8%, 14%, 100% { opacity: 0; }
+    4%, 11% { opacity: 1; }
+}
+
+
+/* Sporen: lila Punkte steigen auf */
+.v-pilz .feld-variante::before {
+    opacity: 1;
+    background:
+        radial-gradient(circle at 20% 80%, #d4b0ff 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 90%, #b48cff 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 78% 75%, #d4b0ff 0 2px, transparent 3px),
+        radial-gradient(circle at 36% 60%, #e8d4ff 0 1.5px, transparent 2.5px);
+    animation: sporen-steigen 2.4s linear infinite;
+}
+
+@keyframes sporen-steigen {
+    0% { transform: translateY(15%); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateY(-45%); opacity: 0; }
+}
+
+/* Magnet: rot-blaue Feldlinien pulsieren */
+.v-magnet .feld-variante::before {
+    opacity: 1;
+    inset: 12%;
+    border: 3px dashed rgba(217, 83, 79, 0.8);
+    border-radius: 50%;
+    animation: magnet-drehen 3s linear infinite;
+}
+
+.v-magnet .feld-variante::after {
+    opacity: 1;
+    inset: 24%;
+    border: 3px dashed rgba(90, 169, 230, 0.8);
+    border-radius: 50%;
+    animation: magnet-drehen 2s linear infinite reverse;
+}
+
+@keyframes magnet-drehen {
+    to { transform: rotate(360deg); }
+}
+
+/* Glut: glimmender Boden und aufsteigende Funken */
+.v-feuer .feld-variante::before {
+    opacity: 1;
+    background: radial-gradient(ellipse 70% 35% at 50% 100%, rgba(255, 110, 30, 0.55), transparent);
+    animation: glut-flackern 0.5s steps(2) infinite;
+}
+
+.v-feuer .feld-variante::after {
+    opacity: 1;
+    background:
+        radial-gradient(circle at 30% 80%, #ffd060 0 2px, transparent 3px),
+        radial-gradient(circle at 64% 90%, #ff8a2a 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, #ffd060 0 1.5px, transparent 2.5px);
+    animation: sporen-steigen 1.6s linear infinite;
+}
+
+@keyframes glut-flackern {
+    50% { opacity: 0.6; }
+}
+
+/* Honig: goldene Tropfen laufen vom oberen Rand */
+.v-honig .feld-sprite {
+    filter: sepia(0.6) saturate(1.6) hue-rotate(-10deg) drop-shadow(0 0 3px #f0b82e);
+}
+
+.v-honig .feld-variante::before {
+    opacity: 1;
+    background:
+        radial-gradient(ellipse 5% 12% at 22% 0, #f0b82e 0 60%, transparent 62%),
+        radial-gradient(ellipse 4% 18% at 58% 0, #f0b82e 0 60%, transparent 62%),
+        radial-gradient(ellipse 5% 9% at 84% 0, #f0b82e 0 60%, transparent 62%),
+        linear-gradient(rgba(240, 184, 46, 0.5) 0 5%, transparent 5%);
+}
+
+.v-honig .feld-variante::after {
+    opacity: 1;
+    inset: auto;
+    left: 57%;
+    top: 12%;
+    width: 7px;
+    height: 9px;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    background: #f0b82e;
+    animation: honig-tropfen 2.2s ease-in infinite;
+}
+
+@keyframes honig-tropfen {
+    0% { transform: translateY(0) scale(0.4); opacity: 1; }
+    60% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(300%); opacity: 0; }
+}
+
+/* Kristall: ein Glanz laeuft schraeg ueber das Feld */
+.v-kristall .feld-variante::before {
+    opacity: 1;
+    background: linear-gradient(115deg, transparent 35%, rgba(200, 240, 255, 0.6) 50%, transparent 65%);
+    background-size: 250% 100%;
+    animation: glanz 2.4s linear infinite;
+}
+
+.v-kristall .feld-variante::after {
+    opacity: 1;
+    box-shadow: inset 0 0 0 3px rgba(159, 232, 255, 0.8), inset 0 0 14px rgba(159, 232, 255, 0.5);
+}
+
+/* Frost: Eisrand und Glitzern */
+.v-frost .feld-variante::before {
+    opacity: 1;
+    box-shadow: inset 0 0 0 4px rgba(230, 245, 255, 0.85), inset 0 0 18px rgba(200, 235, 255, 0.7);
+    background: rgba(200, 230, 255, 0.15);
+}
+
+.v-frost .feld-variante::after {
+    opacity: 1;
+    background:
+        radial-gradient(circle at 16% 20%, #ffffff 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 84% 34%, #ffffff 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 70% 84%, #ffffff 0 1.5px, transparent 2.5px);
+    animation: funkeln 1.6s ease-in-out infinite;
+}
+
+/* Sternenpflanze: Sterne funkeln um die Pflanze */
+.v-sternpflanze .feld-sprite {
+    filter: drop-shadow(0 0 5px #8fa2f0) brightness(1.1);
+}
+
+.v-sternpflanze .feld-variante::before {
+    opacity: 1;
+    background:
+        radial-gradient(circle at 18% 22%, #fff6a0 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 18%, #ffffff 0 2px, transparent 3px),
+        radial-gradient(circle at 76% 76%, #fff6a0 0 2px, transparent 3px),
+        radial-gradient(circle at 24% 70%, #ffffff 0 1.5px, transparent 2.5px),
+        rgba(40, 50, 120, 0.2);
+    animation: funkeln 1.3s ease-in-out infinite;
+}
+
+/* Regenbogen: bunter Rand, der seine Farben wechselt */
+.v-regenbogen .feld-variante::before {
+    opacity: 1;
+    box-shadow: inset 0 0 0 4px #ff6a6a;
+    animation: regenbogen-rand 2s linear infinite;
+}
+
+@keyframes regenbogen-rand {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
+}
+
+/* Gold: goldener Schimmer und Glanz */
+.v-golden .feld-variante::before {
+    opacity: 1;
+    background: radial-gradient(ellipse at 50% 55%, rgba(255, 217, 61, 0.35), transparent 70%);
+    box-shadow: inset 0 0 0 3px rgba(255, 217, 61, 0.9);
+    animation: funkeln 1.8s ease-in-out infinite;
+}
+
+.v-golden .feld-variante::after {
+    opacity: 1;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 246, 180, 0.7) 50%, transparent 65%);
+    background-size: 250% 100%;
+    animation: glanz 2s linear infinite;
 }

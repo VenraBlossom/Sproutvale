@@ -1187,7 +1187,7 @@ function klickFeld(feld) {
 
     if (feld.ernteKlicksRest > 1) {
         feld.ernteKlicksRest -= 1;
-        feld.el.nameEl.textContent = "💎 " + feld.ernteKlicksRest;
+        feld.el.nameEl.textContent = "Noch " + feld.ernteKlicksRest + "x";
         const { x, y } = feldMitte(feld);
         partikel(x, y, ["#9fe8ff", "#ffffff", "#5aa9e6"], 6, 45);
         Klang.klick(40);
@@ -1273,7 +1273,7 @@ function leereFeld(feld) {
 }
 
 function aktualisiereFeldMarker(feld) {
-    feld.el.markerEl.textContent = (feld.bewaessert ? "💧" : "") + (feld.geduengt ? "🪱" : "");
+    // Kein Symbol mehr: Wasser und Duenger sieht man am Feld selbst (Ebene feld-marker, style.css)
     feld.el.feldDiv.classList.toggle("feld-bewaessert", feld.bewaessert);
     feld.el.feldDiv.classList.toggle("feld-geduengt", feld.geduengt);
 }
@@ -1305,7 +1305,6 @@ function pflanzeSamen(feld) {
     });
     feld.el.feldDiv.classList.remove("feld-leer", "feld-ziel");
     setzeVariantenKlasse(feld, variante);
-    feld.el.varianteEl.textContent = variante ? variante.badge : "";
     setzeTipp(feld.el.feldDiv, feldTipp(feld));
     feld.el.nameEl.textContent = pflanze.name;
     feld.el.balkenInnen.style.width = "0%";
@@ -1337,7 +1336,7 @@ function wachseEineStufe(feld) {
         feld.fortschrittMs = 0;
         feld.el.feldDiv.classList.add("feld-fertig");
         feld.el.balkenInnen.style.width = "100%";
-        if (feld.ernteKlicksRest > 0) feld.el.nameEl.textContent = "💎 " + feld.ernteKlicksRest;
+        if (feld.ernteKlicksRest > 0) feld.el.nameEl.textContent = "Noch " + feld.ernteKlicksRest + "x";
     }
     zeigeFeldSprite(feld);
 }
@@ -4038,9 +4037,8 @@ function stelleFeldWiederHer(feld, stand) {
     feld.el.feldDiv.classList.remove("feld-leer", "feld-ziel");
     feld.el.feldDiv.classList.toggle("feld-fertig", feld.fertig);
     setzeVariantenKlasse(feld, variante);
-    feld.el.varianteEl.textContent = variante ? variante.badge : "";
     setzeTipp(feld.el.feldDiv, feldTipp(feld));
-    feld.el.nameEl.textContent = feld.fertig && feld.ernteKlicksRest > 0 ? "💎 " + feld.ernteKlicksRest : pflanze.name;
+    feld.el.nameEl.textContent = feld.fertig && feld.ernteKlicksRest > 0 ? "Noch " + feld.ernteKlicksRest + "x" : pflanze.name;
     feld.el.balkenInnen.style.width = feld.fertig ? "100%" : (feld.stufe / 3) * 100 + "%";
     zeigeFeldSprite(feld);
 }
