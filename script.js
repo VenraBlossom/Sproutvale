@@ -279,7 +279,7 @@ function erstelleRunZustand(sandbox = false) {
         mondphase: sandbox ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0),
         phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
         tag: 1,
-        gold: 5 * metaLevel("startgold") + 5 * kuschel("hase"),
+        gold: 10 * metaLevel("startgold") + 5 * kuschel("hase"),
         skillpunkte: 25 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
         energie: 0,
         tagesMaxEnergie: 0,
@@ -493,7 +493,7 @@ function klickGold() {
 }
 
 function goldMulti() {
-    const summe = 1 + 0.10 * metaLevel("ertrag") + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + 0.15 * metaLevel("ertrag") + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         0.25 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold");
@@ -699,7 +699,7 @@ function sandboxTageszeit() {
 // Sandbox: alles, was nur mit Energie oder Rechnungen zu tun hat, gibt es dort nicht.
 // Sterne davon sind automatisch voll (damit der Weg dahinter frei ist), wirken aber nicht.
 const SANDBOX_AUS_STERNE = ["s_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
-    "v_blitz", "pb_sonnenblume", "pb_kaffee"];
+    "v_blitz", "pb_sonnenblume"];
 const SANDBOX_AUS_SHOP = ["energie", "laterne"];
 const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule"];
 const SANDBOX_AUS_WERKZEUGE = ["sparstrumpf", "taschenuhr", "laterne"];
@@ -1495,8 +1495,13 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         Klang.ernte(pflanze.index);
         partikel(x, y, ["#6cc24a", "#3f8a32", "#a3dc6f", "#8f6139"], 12, 55);
     }
-    const energie = pflanze.eigenschaft === "wachmacher" ? (pflanzenBonus(pflanze, "kaffee") ? 6 : 3)
-        : pflanzenBonus(pflanze, "sonnenblume") ? 2 : 0;
+    // Kaffee gibt nur noch 1 Energie (im spaeten Spiel gab es sonst zu viel Energie)
+    const energie = pflanze.eigenschaft === "wachmacher" ? 1 : pflanzenBonus(pflanze, "sonnenblume") ? 2 : 0;
+    // Espresso: Gratis-Klicks auf den Samenladen
+    if (pflanzenBonus(pflanze, "kaffee") && run.phase === "tag" && !run.samenUnterwegs) {
+        run.klickZaehler = Math.min(klicksProSamen() - 1, run.klickZaehler + 5);
+        aktualisiereKnopfAnzeige();
+    }
     if (energie > 0 && run.phase === "tag" && !run.sandbox) {
         const plus = gibEnergie(energie);
         if (plus > 0 && !direkt) zeigeSchwebeText(x + 20, y - 20, "+" + Math.round(plus) + " ⚡", "#c9a400", false);
@@ -3001,6 +3006,17 @@ function karteZusatzHtml() {
 function aktivTipp() {
     const z = jahreszeit();
     const zeilen = ["## " + (run.sandbox ? "Sandbox · " : "") + "Tag " + run.tag + " · " + z.symbol + " " + z.name];
+    if (!run.sandbox && run.phase !== "runEnde") {
+        const r = naechsteRechnung();
+        const fehlt = Math.max(0, r.betrag - run.gold);
+        if (r.tageBis <= 1) {
+            zeilen.push("> ⚠️ " + (run.phase === "tag" ? "Heute" : "Nach dem nächsten Tag") + " ist Zahltag: " + zahl(r.betrag) + " Gold" +
+                (fehlt > 0 ? " (es fehlen noch " + zahl(fehlt) + ")" : " (hast du schon)"));
+        } else {
+            zeilen.push("🧾 " + (r.boss ? "Kredit" : "Rechnung") + ": " + zahl(r.betrag) + " Gold am Ende von Tag " + r.tag +
+                " (noch " + r.tageBis + (r.tageBis === 1 ? " Tag)" : " Tage)"));
+        }
+    }
     if (run.phase === "tag") {
         const anteil = tagesAnteil();
         const zeit = anteil < 0.2 || anteil > 1.2 ? "🌅 Morgen" : anteil < 0.66 ? "☀️ Tag" : anteil < 0.85 ? "🌇 Abend" : "🌙 Nacht";
@@ -3037,6 +3053,7 @@ function aktualisiereTopBar() {
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     kalenderDisplay.querySelector("span").textContent = (run.sandbox ? "Sandbox · " : "") + "Tag " + run.tag;
     setzeTipp(kalenderDisplay, aktivTipp());
+    kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
     if (run.sandbox) {
         rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(run.gesamt.gold) + " / " +
             zahl(meilensteinSchwelle(run.meilensteineGemeldet + 1)) + " Gold";

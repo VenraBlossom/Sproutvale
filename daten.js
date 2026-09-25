@@ -92,7 +92,7 @@ const KONFIG = {
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
     rechnungFaktorenStart: [20, 15, 23], // die ersten Spruenge sind sanfter: 30, 600, 9.000, 207.000, 5,4 Mio. ...
     sternensamenProErnte: 5,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
-    sternensamenPflanzenFaktor: 1.15, // ... und jede hoehere Pflanze gibt 15% mehr (Kuerbis ~11, Mondlilie ~35)
+    sternensamenPflanzenFaktor: 1.07, // ... und jede hoehere Pflanze gibt 7% mehr (Kuerbis ~7,5, Mondlilie ~13)
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen
     basisSammelRadius: 8,             // Radius um den Mauszeiger in Pixeln
     sammelRadiusFaktor: 1.10,         // jede Stufe "Breiter Cursor" = +10%
@@ -157,8 +157,8 @@ const PFLANZEN_VORLAGEN = [
         eigenschaft: "riesig", eigenschaftText: "25% Chance auf eine Riesenmelone mit doppeltem Wert." },
     { id: "reis", name: "Reis", emoji: "🍚", sekProStufe: 7.5, verkaufswert: 19000, unlockKosten: 18500, bonusName: "Reisterrassen", bonusText: "Reis zählt immer als bewässert.",
         eigenschaft: "wasser", eigenschaftText: "Wasserpflanze: wächst auf bewässerten Feldern 3-mal statt 2-mal so schnell." },
-    { id: "kaffee", name: "Kaffee", emoji: "☕", sekProStufe: 8, verkaufswert: 47000, unlockKosten: 32000, bonusName: "Espresso", bonusText: "Kaffee-Ernten geben +6 statt +3 Energie.",
-        eigenschaft: "wachmacher", eigenschaftText: "Wachmacher: jede Ernte gibt +3 Energie." },
+    { id: "kaffee", name: "Kaffee", emoji: "☕", sekProStufe: 8, verkaufswert: 47000, unlockKosten: 32000, bonusName: "Espresso", bonusText: "Jede Kaffee-Ernte gibt dem Samenladen 5 Gratis-Klicks.",
+        eigenschaft: "wachmacher", eigenschaftText: "Wachmacher: jede Ernte gibt +1 Energie." },
     { id: "riesenpilz", name: "Riesenpilz", emoji: "🍄", sekProStufe: 8.5, verkaufswert: 118000, unlockKosten: 56000, bonusName: "Pilzsporen", bonusText: "20% Chance, dass ein Riesenpilz beim Ernten 2 neue Samen verteilt.",
         eigenschaft: "nacht", eigenschaftText: "Nachtgewächs: wächst am Abend und in der Nacht doppelt so schnell." },
     { id: "eisblume", name: "Eisblume", emoji: "❄️", sekProStufe: 9, verkaufswert: 295000, unlockKosten: 99000, bonusName: "Diamantfrost", bonusText: "Saaten von Eisblumen sind mindestens selten.",
@@ -1328,20 +1328,20 @@ const HAUS_BEREICH = { x: 5, breite: 8 };
 // darum sind die ersten Stufen guenstig und die starken Upgrades deutlich teurer.
 
 const META_UPGRADES = [
-    { id: "startgold", name: "Startkapital", basiskosten: 1, faktor: 1.6, max: 10,
-        beschreibung: "+5 Gold zu Beginn jedes Runs.", info: lvl => "+" + 5 * lvl + " Gold" },
-    { id: "startsp", name: "Bauernweisheit", basiskosten: 2, faktor: 1.7, max: 10,
+    { id: "startgold", name: "Startkapital", basiskosten: 1, faktor: 1.5, max: 10,
+        beschreibung: "+10 Gold zu Beginn jedes Runs.", info: lvl => "+" + 10 * lvl + " Gold" },
+    { id: "startsp", name: "Bauernweisheit", basiskosten: 2, faktor: 1.5, max: 10,
         beschreibung: "+25 Sternensamen zu Beginn jedes Runs.", info: lvl => "+" + 25 * lvl + " Sternensamen" },
     { id: "startfelder", name: "Vorbereiteter Boden", basiskosten: 3, faktor: 2, max: 4,
         beschreibung: "+1 Feld zu Beginn jedes Runs.", info: lvl => "+" + lvl + " Felder" },
-    { id: "ausdauer", name: "Ausdauer", basiskosten: 4, faktor: 2, max: 4,
+    { id: "ausdauer", name: "Ausdauer", basiskosten: 6, faktor: 2.4, max: 4,
         beschreibung: "+25 Energie pro Tag.", info: lvl => "+" + 25 * lvl + " Energie" },
     { id: "flinkeFinger", name: "Flinke Finger", basiskosten: 3, faktor: 1.8, max: 5,
         beschreibung: "-2 Klicks pro Samen.", info: lvl => "-" + 2 * lvl + " Klicks" },
     { id: "verhandlung", name: "Verhandlungsgeschick", basiskosten: 5, faktor: 2.1, max: 5,
         beschreibung: "Rechnungen kosten 4% weniger.", info: lvl => "-" + 4 * lvl + "% Rechnungen" },
-    { id: "ertrag", name: "Fruchtbarer Hof", basiskosten: 4, faktor: 1.8, max: 10,
-        beschreibung: "+10% Gold aus allen Ernten.", info: lvl => "+" + 10 * lvl + "% Gold" },
+    { id: "ertrag", name: "Fruchtbarer Hof", basiskosten: 4, faktor: 1.45, max: 10,
+        beschreibung: "+15% Gold aus allen Ernten.", info: lvl => "+" + 15 * lvl + "% Gold" },
     { id: "saatvorrat", name: "Saatgut-Vorrat", basiskosten: 20, faktor: 2.5, max: 3,
         beschreibung: "Jeder Run startet mit einer weiteren freigeschalteten Pflanze.",
         info: lvl => lvl + " Pflanzen zusätzlich freigeschaltet" },
