@@ -7841,3 +7841,8 @@ h1, h2, h3,
 .markt-inhalt > .panel-hinweis {
     margin-bottom: 12px;
 }
+
+/* Markt geschlossen: wirklich weg (sonst gewinnt display: flex) */
+.panel.markt-fenster.hidden {
+    display: none;
+}
