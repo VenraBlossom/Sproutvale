@@ -83,7 +83,7 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Alpha 0.2.1";
+const SPIEL_VERSION = "Alpha 0.3.0";
 
 const KONFIG = {
     startKlicksProSamen: 40,
@@ -800,7 +800,12 @@ const SEGEN = [
     { id: "riesenwuchs", badge: "🥕", name: "Riesenwuchs", text: "10% Chance, dass eine Ernte doppelt so viel wert ist." },
     { id: "morgenstund", badge: "🌅", name: "Morgenstund", text: "In der ersten Hälfte des Tages gibt es 20% mehr Gold." },
     { id: "sparsam", badge: "📐", name: "Sparsamer Bauer", text: "Neue Felder kosten 15% weniger." },
-    { id: "kraehenkoenig", badge: "👑", name: "Krähenkönig", text: "Verscheuchte Krähen lassen 5-mal so viele Sternensamen fallen." }
+    { id: "kraehenkoenig", badge: "👑", name: "Krähenkönig", text: "Verscheuchte Krähen lassen 5-mal so viele Sternensamen fallen." },
+    { id: "sternenhunger", badge: "🌌", name: "Sternenhunger", text: "Jede Sternensaat ist 25% mehr wert." },
+    { id: "jackpotfieber", badge: "🎰", name: "Jackpotfieber", text: "+1% Chance auf legendäre Jackpots." },
+    { id: "gluehfreund", badge: "🪲", name: "Glühwürmchen-Freund", text: "Glühwürmchen geben doppelt so viele Sternensamen." },
+    { id: "gutesaat", badge: "🌾", name: "Gute Saat", text: "Gewöhnliche Saat ist 50% mehr wert." },
+    { id: "komborausch", badge: "🎵", name: "Kombo-Rausch", text: "Jeder 4. Klick zählt für die Kombo doppelt." }
 ];
 const SEGEN_NACH_ID = Object.fromEntries(SEGEN.map(s => [s.id, s]));
 
@@ -1050,7 +1055,19 @@ const ERFOLG_KETTEN = [
         ziele: [1, 3, 5] },
     { id: "streicheln", icon: "🐾", text: z => "Streichle deinen Begleiter " + zahl(z) + "-mal",
         wert: () => meta.lebenszeit.streicheln,
-        ziele: [1, 333] }
+        ziele: [1, 333, 3333, 33333] },
+    { id: "kodex", icon: "📖", text: z => "Entdecke " + z + " Einträge im Kodex",
+        wert: () => (typeof kodexEntdeckt === "function" ? kodexEntdeckt() : 0),
+        ziele: [10, 25, 50, 80] },
+    { id: "sternensamen", icon: "✨", text: z => "Sammle insgesamt " + zahl(z) + " Sternensamen",
+        wert: () => meta.lebenszeit.sternensamen,
+        ziele: [1000, 50000, 1000000] },
+    { id: "tage", icon: "📅", text: z => "Spiele insgesamt " + zahl(z) + " Tage",
+        wert: () => meta.lebenszeit.tage,
+        ziele: [10, 100, 500] },
+    { id: "stellarium", icon: "🌌", text: z => "Kaufe " + z + " Sterne in einem einzigen Run",
+        wert: () => (run ? SKILLS.filter(d => level(d.id) > 0 && d.id !== "p_weizen").length : 0),
+        ziele: [25, 60, 120] }
 ];
 
 // ---------- HOF: BEGLEITER (intern "haustier") ----------
@@ -1331,7 +1348,13 @@ const FELD_SKINS = [
     { id: "lava", name: "Lavaboden", quelle: "dlc", paket: "einzeln", farben: { B: "#3a2a2a", b: "#2a1a1a", c: "#ff6a2a" },
         klasse: "felder-lava", teilchen: ["#ff6a2a", "#ffd060", "#ff4a1a"] },
     { id: "sternenboden", name: "Sternenboden", quelle: "dlc", paket: "einzeln", farben: { B: "#1d2560", b: "#141a42", c: "#fff6a0" },
-        klasse: "felder-sterne", teilchen: ["#fff6a0", "#ffffff", "#8fa2f0"] }
+        klasse: "felder-sterne", teilchen: ["#fff6a0", "#ffffff", "#8fa2f0"] },
+    { id: "schnee", name: "Schneebeet", quelle: "erspielt", bedingungText: "Erlebe 20 Winter",
+        bedingung: () => ((meta.kodex.jahreszeiten || {}).winter || 0) >= 20, farben: { B: "#e8f2fa", b: "#b8cde0", c: "#ffffff" } },
+    { id: "pilzbeet", name: "Pilzbeet", quelle: "dlc", paket: "unterstuetzer", farben: { B: "#5a3e4a", b: "#3e2834", c: "#7a5a6a" },
+        klasse: "felder-pilze" },
+    { id: "regenbogen", name: "Regenbogenbeet", quelle: "dlc", paket: "einzeln", farben: { B: "#6a4a3a", b: "#4a3024", c: "#8a6a5a" },
+        klasse: "felder-regenbogen", teilchen: ["#ff6a6a", "#ffd93d", "#a3dc6f", "#5aa9e6", "#b48cff"] }
 ];
 
 // Muenzen: Farben der Goldmuenze. klasse = zusaetzlicher Look (style.css)
@@ -1350,8 +1373,8 @@ const KUGEL_SKINS = [
     { id: "feuer", name: "Feuermünzen", quelle: "dlc", paket: "einzeln", farben: { Y: "#ffd060", y: "#ff6a2a", k: "#5a1a08" },
         klasse: "muenzen-feuer", funken: ["#ffd060", "#ff8a2a", "#ff4a1a"] },
     // Saat in anderen Formen (keine runde Muenze). Die Seltenheit zeigt der farbige Kern (Z), beim Kristall der ganze Stein.
-    { id: "blatt", name: "Blattsaat", quelle: "erspielt", bedingungText: "Ernte insgesamt 25.000 Pflanzen",
-        bedingung: () => meta.lebenszeit.ernten >= 25000, form: "blatt", farben: { Y: "#8fdc5c", y: "#4f9e2c", k: "#1f4a12", w: "#e8ffd0" } },
+    { id: "blatt", name: "Blattsaat", quelle: "erspielt", bedingungText: "Ernte insgesamt 5.000 Spezialpflanzen",
+        bedingung: () => meta.lebenszeit.spezial >= 5000, form: "blatt", farben: { Y: "#8fdc5c", y: "#4f9e2c", k: "#1f4a12", w: "#e8ffd0" } },
     { id: "eichel", name: "Eichelsaat", quelle: "erspielt", bedingungText: "Streichle deinen Begleiter 2.000-mal",
         bedingung: () => meta.lebenszeit.streicheln >= 2000, form: "eichel", farben: { Y: "#d8a060", y: "#9a6430", k: "#3a2410", w: "#ffe8c8" } },
     { id: "herz", name: "Herzsaat", quelle: "dlc", paket: "unterstuetzer", form: "herz",

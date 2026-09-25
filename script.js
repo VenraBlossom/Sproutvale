@@ -513,7 +513,7 @@ function raritaetsChancen() {
     const gruen = 0.20 + 0.03 * level("gruen") + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
     const lila = 0.04 + 0.01 * level("lila") + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
-    const gelb = 0.01 + 0.005 * level("gelb") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
+    const gelb = 0.01 + 0.005 * level("gelb") + 0.01 * segen("jackpotfieber") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
@@ -583,7 +583,7 @@ function goldMulti() {
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
-        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1);
+        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -848,7 +848,7 @@ function wuerfleRaritaetIndex() {
 
 // Multiplikator einer Münz-Farbe (mit Edelsteinschleifer, Geizige Kundschaft, Schildkroete)
 function raritaetsMulti(index) {
-    if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen"));
+    if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen") + 0.5 * segen("gutesaat"));
     return RARITAETEN[index].multi * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? 1 + level("jackpotjaeger") : 1);
 }
 
@@ -1714,7 +1714,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     if (!vonHelfer) {
         // Loewe (Kuscheltier): jede neue Kombo startet hoeher
         if (kombo.zaehler === 0 && kuschel("loewe") > 0) kombo.zaehler = 10 * kuschel("loewe");
-        kombo.zaehler += 1;
+        kombo.zaehler += 1 + (run.gesamt.klicks % 4 === 3 ? segen("komborausch") : 0);
         kombo.letzterKlick = performance.now();
         run.gesamt.maxKombo = Math.max(run.gesamt.maxKombo, kombo.zaehler);
         run.gesamt.klicks += 1;
@@ -2323,7 +2323,7 @@ function spawnGluehwuermchen() {
         el.remove();
         // Energie (ausser in der Sandbox) und immer auch Sternensamen, damit sie bei voller Energie nicht nutzlos sind
         const plus = run.sandbox ? 0 : gibEnergie(gluehwuermchenEnergie());
-        const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne);
+        const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne * (1 + segen("gluehfreund")));
         gibSternensamen(sterne);
         aktualisiereTopBar();
         run.statistik.gluehwuermchen += 1;
