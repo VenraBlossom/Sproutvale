@@ -84,7 +84,7 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = t("Alpha 0.3.0");
+const SPIEL_VERSION = "Alpha 0.4.0";
 
 const KONFIG = {
     startKlicksProSamen: 40,
@@ -284,6 +284,15 @@ const SHOP_UPGRADES = [
     { id: "vogelhaus", knoten: "s_vogelhaus", icon: "🏠", name: t("Vogelhäuschen"), basiskosten: 1500, faktor: 2.2, max: 5,
         beschreibung: t("Sternschnuppen kommen 12% öfter."),
         info: () => "+" + 12 * level("vogelhaus") + t("% Sternschnuppen") },
+    { id: "saatband", knoten: "s_saatband", icon: "🎀", name: t("Saatband"), basiskosten: 1200, faktor: 2.2, max: 5,
+        beschreibung: t("+5% Chance, dass ein Samen einen zweiten mitbringt."),
+        info: () => "+" + 5 * level("saatband") + t("% Doppelwurf") },
+    { id: "sternenkiste", knoten: "s_sternenkiste", icon: "🧺", name: t("Sternenkiste"), basiskosten: 3000, faktor: 1.6, max: Infinity,
+        beschreibung: t("+4% Sternensamen aus Ernten. Unendlich oft kaufbar: So wird Gold zu Sternensamen."),
+        info: () => "+" + 4 * level("sternenkiste") + t("% Sternensamen") },
+    { id: "obstkorb", knoten: "s_obstkorb", icon: "🍎", name: t("Obstkorb"), basiskosten: 6000, faktor: 2.3, max: 5,
+        beschreibung: t("+3% Chance auf eine zusätzliche Saat pro Ernte."),
+        info: () => "+" + 3 * level("obstkorb") + t("% Chance") },
     { id: "saatsortiment", knoten: "s_saatsortiment", icon: "🎒", name: t("Saatgut-Sortiment"), basiskosten: 5000, faktor: 2.6, max: 5,
         beschreibung: t("Alle Spezialpflanzen erscheinen 10% öfter."),
         info: () => "+" + 10 * level("saatsortiment") + t("% Spezialpflanzen") }
@@ -402,6 +411,30 @@ const SKILLS = [
     stern("kombovirtuose", "helfer", "🎼", [-740, -440], "s_kuhglocke", t("Kombo-Virtuose"), 3000, 3, 2,
         t("Auf der höchsten Kombo-Stufe (ab 150) zählt jeder Klick pro Stufe einmal mehr (x5 wird x6, dann x7)."),
         () => t("Höchste Kombo: x") + (5 + level("kombovirtuose"))),
+
+    // ----- Himmel (oben rechts): Sterne rund um Sternensamen -----
+    stern("sternbild", "ernte", "✴️", [960, -880], "sternenquelle", t("Sternbild"), 2000, 1, 1,
+        t("Für je 10 gekaufte Sterne im Stellarium gibt es +1% Gold aus allen Ernten."),
+        () => "+" + Math.floor(gekaufteSterne() / 10) + t("% Gold")),
+    stern("kometenregen", "ernte", "☄️", [1180, -880], "sternbild", t("Kometenregen"), 3000, 2.2, 3,
+        t("Jede gefangene Sternschnuppe schenkt dir Sternensamen (mehr, je besser deine beste Pflanze ist)."),
+        () => (level("kometenregen") > 0 ? "+" + zahl(kometenSterne()) + t(" Sternensamen pro Sternschnuppe") : t("Nicht aktiv"))),
+    stern("polarstern", "ernte", "⭐", [1180, -1100], "kometenregen", t("Polarstern"), 6000, 1, 1,
+        t("Die erste Ernte jedes Tages lässt ein großes Sternensamen-Geschenk fallen."),
+        () => (level("polarstern") > 0 ? "+" + zahl(polarsternSterne()) + t(" Sternensamen am Morgen") : t("Nicht aktiv"))),
+    stern("mondsichel", "ernte", "🌙", [960, -1100], "sternbild", t("Mondsichel"), 2500, 2, 3,
+        t("Ernten am Abend und in der Nacht geben 25% mehr Sternensaat pro Stufe."),
+        () => "+" + 25 * level("mondsichel") + t("% Sternensaat nachts")),
+    stern("milchstrasse", "ernte", "🌌", [1400, -880], "kometenregen", t("Milchstraße"), 8000, 2.5, 5,
+        t("+5% Chance pro Stufe, dass eine Ernte eine zweite Sternensaat fallen lässt."),
+        () => "+" + 5 * level("milchstrasse") + t("% zweite Sternensaat")),
+    shopStern("s_sternenkiste", "ernte", [1400, -1100], "milchstrasse", 6000),
+    stern("bienenkoenigin", "helfer", "👑", [-1180, 440], "biene", t("Bienenkönigin"), 4000, 2.5, 3,
+        t("Stufe 2 der Bienen: Sie kommen pro Stufe 50% öfter."),
+        () => "+" + 50 * level("bienenkoenigin") + t("% Bienen"), { vorMax: true, abzeichen: "Ⅱ" }),
+    stern("spielerglueck", "glueck", "🎲", [-1840, -220], "plinko", t("Spielerglück"), 3000, 2.2, 5,
+        t("+4% Glück bei allen Glücksspielen pro Stufe."),
+        () => "+" + 4 * level("spielerglueck") + t("% Glück")),
 
     // ----- Jahreszeiten (unten rechts): jede Jahreszeit bekommt einen eigenen Stern -----
     stern("jahresrad", "jahreszeit", "🎡", [800, 720], "s_kasse", t("Jahresrad"), 300, 2.2, 4,
@@ -537,6 +570,8 @@ const SKILLS = [
     shopStern("s_regentonne", "hof", [220, 1400], "wurmhumus", 2500),
     shopStern("s_vogelhaus", "hof", [-220, 1620], "s_laterne", 1800),
     shopStern("s_saatsortiment", "hof", [0, 1620], "vorratskammer", 4000),
+    shopStern("s_saatband", "hof", [-440, 1620], "nachtwache", 1500),
+    shopStern("s_obstkorb", "hof", [220, 1620], "s_regentonne", 5000),
     stern("lagerhaus", "hof", "🏚️", [440, 1180], "zinsen", t("Lagerhaus"), 2500, 2.3, 4,
         t("Zinsen dürfen 25% der nächsten Rechnung mehr betragen."),
         () => t("Zinsen bis ") + prozentText(zinsDeckelAnteil()) + t(" der Rechnung")),
@@ -668,7 +703,10 @@ const STERN_KURZ = {
     jahresrad: t("Jahreszeiten stärker"), bluetenzauber: t("Frühling: bunte Saat"), sonnenernte: t("Sommer: mehr Gold"),
     erntedank: t("Herbst: mehr Sternensaat"), frostschutz: t("Winter ohne Malus"), saisonfest: t("1. Tag der Jahreszeit x1,5"),
     sternenkalender: t("Geschenk beim Jahreszeitwechsel"), jackpotjaeger: t("Jackpots mehr wert"), goldschauer: t("Öfter Goldregen"),
-    schnuppenfaenger: t("Sternschnuppen-Bonus länger"), kombovirtuose: t("Höchste Kombo stärker")
+    schnuppenfaenger: t("Sternschnuppen-Bonus länger"), kombovirtuose: t("Höchste Kombo stärker"),
+    sternbild: t("+1% Gold je 10 Sterne"), kometenregen: t("Sternschnuppen geben Sternensamen"), polarstern: t("Morgen-Geschenk"),
+    mondsichel: t("Nachts mehr Sternensaat"), milchstrasse: t("Zweite Sternensaat"), bienenkoenigin: t("Bienen öfter"),
+    spielerglueck: t("Mehr Glück beim Spielen")
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -1312,6 +1350,13 @@ const SAMENLADEN_SKINS = [
         klasse: "laden-gold", funken: ["#ffd93d", "#fff3b0", "#ffffff"] },
     { id: "kirschbluete", name: t("Kirschblüte"), quelle: "dlc", paket: "unterstuetzer", markise: ["#ff8fb8", "#fff0f6"], holz: ["#c98a8a", "#a86a6a"],
         klasse: "laden-blueten", funken: ["#ffc2da", "#ff8fb8", "#ffffff"] },
+    { id: "wiese", name: t("Wiesenstand"), quelle: "erspielt", bedingungText: t("Ernte insgesamt 100.000 Pflanzen"),
+        bedingung: () => meta.lebenszeit.ernten >= 100000, markise: ["#7cbf4d", "#fff6a0"], holz: ["#9a7a4a", "#7a5a30"],
+        funken: ["#a3dc6f", "#fff6a0", "#ffffff"] },
+    { id: "honig", name: t("Honigstand"), quelle: "dlc", paket: "unterstuetzer", markise: ["#f5c542", "#fff5d6"], holz: ["#c98a3a", "#a86a2a"],
+        funken: ["#ffd93d", "#f5a623", "#fff5d6"] },
+    { id: "eisdiele", name: t("Eisdiele"), quelle: "dlc", paket: "unterstuetzer", markise: ["#9fe0ff", "#ffd6ea"], holz: ["#f3e6d0", "#d8c8b0"],
+        funken: ["#ffb3d9", "#9fe0ff", "#fff6a0"] },
     { id: "mitternacht", name: t("Mitternacht"), quelle: "dlc", paket: "unterstuetzer", markise: ["#3a2a7a", "#c9b0f5"], holz: ["#4a3a5a", "#3a2a4a"],
         klasse: "laden-mitternacht", funken: ["#c9b0f5", "#8fa2f0", "#ffffff"] },
     { id: "lebkuchen", name: t("Lebkuchenhaus"), quelle: "dlc", paket: "unterstuetzer", markise: ["#fff6f0", "#8a4a22"], holz: ["#a8602a", "#8a4a1a"],
@@ -1397,7 +1442,11 @@ const RAHMEN_SKINS = [
     { id: "eis", name: t("Eisrahmen"), quelle: "dlc", paket: "unterstuetzer", css: "rahmen-eis" },
     { id: "sterne", name: t("Sternenrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-sterne" },
     { id: "regenbogen", name: t("Regenbogenrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-regenbogen" },
-    { id: "feuer", name: t("Flammenrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-feuer" }
+    { id: "feuer", name: t("Flammenrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-feuer" },
+    { id: "blaetter", name: t("Blätterrahmen"), quelle: "erspielt", bedingungText: t("Bringe eine Pflanze auf Meisterschaft 3"),
+        bedingung: () => PFLANZEN_VORLAGEN.some(p => meisterStufe(p.id) >= 3), css: "rahmen-blaetter" },
+    { id: "herz", name: t("Herzrahmen"), quelle: "dlc", paket: "unterstuetzer", css: "rahmen-herz" },
+    { id: "kosmos", name: t("Kosmosrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-kosmos" }
 ];
 
 // Pflanzen-Looks: tauschen die Blattfarben (G hell, g mittel, d dunkel) aller Pflanzen-Sprites aus.
@@ -1411,7 +1460,13 @@ const PFLANZEN_SKINS = [
     { id: "sternenpflanzen", name: t("Sternenpflanzen"), quelle: "dlc", paket: "einzeln", farben: { G: "#9fb0ff", g: "#5a6ad8", d: "#2a3590" },
         klasse: "pflanzen-sterne", teilchen: ["#fff6a0", "#9fb0ff", "#ffffff"] },
     { id: "kristall", name: t("Kristallpflanzen"), quelle: "dlc", paket: "einzeln", farben: { G: "#bff0ff", g: "#7ac8e8", d: "#3a88b8" },
-        klasse: "pflanzen-kristall", teilchen: ["#bff0ff", "#ffffff", "#9fe8ff"] }
+        klasse: "pflanzen-kristall", teilchen: ["#bff0ff", "#ffffff", "#9fe8ff"] },
+    { id: "kirschbluete", name: t("Kirschblütenblätter"), quelle: "erspielt", bedingungText: t("Erlebe 20 Frühlinge"),
+        bedingung: () => ((meta.kodex.jahreszeiten || {}).fruehling || 0) >= 20, farben: { G: "#ffc2dc", g: "#8fcf5c", d: "#4f8a32" } },
+    { id: "goldblatt", name: t("Goldblätter"), quelle: "erspielt", bedingungText: t("Sammle 500 legendäre Jackpots"),
+        bedingung: () => meta.lebenszeit.jackpots >= 500, farben: { G: "#ffe08a", g: "#d9a82a", d: "#8a6010" } },
+    { id: "glut", name: t("Glutblätter"), quelle: "dlc", paket: "einzeln", farben: { G: "#ffb060", g: "#e8432a", d: "#5a1a08" },
+        klasse: "pflanzen-glut", teilchen: ["#ffb060", "#ff6a2a", "#ffd060"] }
 ];
 
 // Der Mondteich im Hof (x in Prozent). Klick darauf oeffnet den Mondteich-Shop.

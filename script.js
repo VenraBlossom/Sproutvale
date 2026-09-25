@@ -95,7 +95,7 @@ function leereKosmetik() {
 }
 
 function leererKodex() {
-    return { pflanzen: {}, varianten: {}, wetter: {}, werkzeuge: {}, boss: {}, jahreszeiten: {} };
+    return { pflanzen: {}, varianten: {}, wetter: {}, werkzeuge: {}, boss: {}, jahreszeiten: {}, segen: {} };
 }
 
 function leererMetaStand() {
@@ -486,7 +486,7 @@ function istNacht() {
 function glueckBonus() {
     return 0.03 * level("glueckstraehne") + 0.02 * metaLevel("gluecksbringer") +
         0.05 * segen("glueckskind") + werkzeugWert("gluecksmuenze") + 0.04 * kuschel("panda") +
-        0.05 * kuschel("manta") + 0.03 * sfLevel("glueckstern");
+        0.05 * kuschel("manta") + 0.03 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
 }
 
 function klicksProSamen() {
@@ -522,7 +522,7 @@ function helferKlicksProSek() { return level("eichhoernchen") + 2 * level("eichh
 function edelsteinBonus() { return 0.1 * level("edelstein"); }
 function sternensamenProKlick() { return KONFIG.sternensamenProKlick + level("sternenklick") + segen("klingeling"); }
 function spatzIntervallSek() { return level("saatspatz") > 0 ? 20 / level("saatspatz") : Infinity; }
-function bienenIntervallSek() { return level("biene") > 0 ? 12 / level("biene") : Infinity; }
+function bienenIntervallSek() { return level("biene") > 0 ? 12 / level("biene") / (1 + 0.5 * level("bienenkoenigin")) : Infinity; }
 function magnetStaerke() { return 40 * level("magnetfeld"); }
 function ueberflussChance(pflanze) { return 0.05 * pflanze.level.ueberfluss; }
 
@@ -550,11 +550,25 @@ function anzahlGeduengt() {
 }
 
 function doppelwurfChance() {
-    return 0.10 * level("doppelwurf") + tw("liebenden") + 0.03 * kuschel("hummel") + werkzeugWert("vogelnest");
+    return 0.10 * level("doppelwurf") + tw("liebenden") + 0.03 * kuschel("hummel") + werkzeugWert("vogelnest") + 0.05 * level("saatband");
 }
 function zinsDeckelAnteil() { return KONFIG.zinsDeckel + 0.25 * level("lagerhaus"); }
 function zinsSatz() { return 0.02 * level("zinsen") + 0.005 * kuschel("kuh") + werkzeugWert("sparstrumpf"); }
-function extraKugelChance() { return 0.08 * segen("erntesegen") + werkzeugWert("flechtkorb"); }
+function extraKugelChance() { return 0.08 * segen("erntesegen") + werkzeugWert("flechtkorb") + 0.03 * level("obstkorb"); }
+
+// ---------- Himmels-Ast ----------
+function gekaufteSterne() {
+    return SKILLS.filter(d => level(d.id) > 0 && d.id !== "p_weizen").length;
+}
+function kometenSterne() {
+    return Math.round(20 * level("kometenregen") * Math.pow(1.5, bestePflanze().index));
+}
+function polarsternSterne() {
+    return Math.round(150 * Math.pow(1.6, bestePflanze().index));
+}
+function istNachts() {
+    return run.phase === "tag" && tagesAnteil() >= 0.8;
+}
 
 function gluehwuermchenEnergie() {
     const basis = (KONFIG.gluehwuermchenEnergie + 2 * level("laterne") + 2 * kuschel("ente")) * (1 + 0.5 * level("nachtwache"));
@@ -568,7 +582,7 @@ function klickGold() {
 }
 
 function goldMulti() {
-    const summe = 1 + 0.15 * metaLevel("ertrag") + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + 0.15 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         0.25 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") +
@@ -583,7 +597,8 @@ function goldMulti() {
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
-        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger"));
+        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
+        (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1);
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -1579,7 +1594,17 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     if (!direkt && sichel) zeigeSchwebeText(x, y - 40, "🪓 x" + zahl(Math.round(sichel * 10) / 10) + "!", "#e08a00", true);
 
     // Jede Ernte laesst Sternensamen fallen (Punkte fuer das Stellarium)
-    const sternKugeln = (variante && variante.sterne) || 1;
+    let sternKugeln = (variante && variante.sterne) || 1;
+    if (Math.random() < 0.05 * level("milchstrasse")) sternKugeln += 1;
+    // Polarstern: die erste Ernte des Tages bringt ein grosses Geschenk
+    if (level("polarstern") > 0 && run.phase === "tag" && !run.polarsternHeute) {
+        run.polarsternHeute = true;
+        if (direkt) gibSternensamen(polarsternSterne());
+        else {
+            spawnLootKugel(x, y, polarsternSterne(), null, "stern");
+            zeigeSchwebeText(x, y - 40, t("⭐ Polarstern!"), "#8fa2f0", true);
+        }
+    }
     for (let i = 0; i < sternKugeln; i++) {
         const extra = werkzeugWert("wuenschelrute") + (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
         const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index);
@@ -2275,6 +2300,11 @@ function spawnSternschnuppe() {
             if (loot.gelandet) partikel(loot.x, loot.y, ["#ffe89a", "#ffffff"], 4, 25);
         });
         zeigeSchwebeText(x, y, t("x2 Gold!"), "#e0a800", true);
+        if (level("kometenregen") > 0) {
+            gibSternensamen(kometenSterne());
+            zeigeSchwebeText(x, y + 30, "+" + zahl(kometenSterne()) + " ✨", "#8fa2f0", true);
+            aktualisiereTopBar();
+        }
         partikel(x, y, ["#ffe89a", "#ffffff", "#ffd93d"], 24, 110);
         zeigeBanner("🌠", t("Sternschnuppe gefangen!"), sek + t(" Sekunden doppeltes Gold") +
             (liegend.length > 0 ? t(", dazu ") + liegend.length + (liegend.length === 1 ? t(" liegende Saat") : t(" liegende Saaten")) + t(" x2") : ""),
@@ -2658,6 +2688,8 @@ function zeigeSegenAuswahl(auswahl) {
 function waehleSegen(id, karte) {
     if (!run.segenAuswahl || performance.now() < segenSperreBis) return;
     run.segen[id] = segen(id) + 1;
+    if (!meta.kodex.segen) meta.kodex.segen = {};
+    meta.kodex.segen[id] = (meta.kodex.segen[id] || 0) + 1;
     run.segenAuswahl = null;
     run.segenAusstehend = false;
     run.segenBoss = false;
@@ -2727,6 +2759,7 @@ function starteTag(fortsetzen = false) {
     run.bienenMs = 0;
     run.statistik = neueTagesStatistik();
     run.streichelHeute = 0;
+    run.polarsternHeute = false;
     run.nachrichten = [];
     run.klickZaehler = 0;
     run.zielFeld = null;
@@ -4625,7 +4658,7 @@ $("feedback-kopieren").addEventListener("click", () => {
 registriereHaken("tagStart", () => {
     if (!run || run.tag <= 1 || !istErsterJahreszeitTag()) return;
     const z = jahreszeit();
-    if (level("saisonfest") > 0) zeigeBanner(z.symbol, t("Saisonfest: ") + z.name + t(" beginnt!"), t("Heute x1,5 Gold"), z.farbe || "#e0a800", 2600);
+    if (level("saisonfest") > 0) zeigeToast(t("🎊 Saisonfest: heute x1,5 Gold!"));
     if (level("sternenkalender") > 0) {
         const geschenk = Math.round(60 * Math.pow(1.6, bestePflanze().index));
         gibSternensamen(geschenk);

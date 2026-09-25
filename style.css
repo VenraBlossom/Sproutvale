@@ -7952,3 +7952,39 @@ body.felder-regenbogen .feld:not(.kauf-kachel)::after {
 @keyframes vorschau-regenbogen {
     to { filter: hue-rotate(360deg); }
 }
+
+/* ---------- Neue Kuschel-Rahmen ---------- */
+.rahmen-blaetter {
+    border-color: #5f9e3c !important;
+    border-style: dashed !important;
+    box-shadow: inset 0 0 0 3px #a3dc6f !important;
+}
+
+.rahmen-herz {
+    border-color: #e0507a !important;
+    box-shadow: inset 0 0 0 2px #ffd6ea, 0 0 10px rgba(255, 143, 177, 0.7) !important;
+}
+
+/* legendaer: ein langsam drehender Sternennebel */
+.rahmen-kosmos {
+    border-color: #8fa2f0 !important;
+    background-image: radial-gradient(circle at 20% 30%, rgba(255, 246, 160, 0.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 75% 65%, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 50% 50%, rgba(143, 162, 240, 0.25), rgba(29, 37, 96, 0.25)) !important;
+    animation: kosmos-rahmen 4s ease-in-out infinite !important;
+}
+
+@keyframes kosmos-rahmen {
+    0%, 100% { box-shadow: 0 0 8px rgba(143, 162, 240, 0.8), inset 0 0 6px rgba(200, 176, 245, 0.6); }
+    50% { box-shadow: 0 0 18px rgba(200, 176, 245, 1), inset 0 0 12px rgba(143, 162, 240, 0.9); }
+}
+
+/* ---------- Glutblaetter (legendaerer Pflanzen-Look): glimmen und flackern ---------- */
+body.pflanzen-glut .feld-sprite:not([hidden]) {
+    animation: glut-glimmen 1.8s ease-in-out infinite;
+}
+
+@keyframes glut-glimmen {
+    0%, 100% { filter: drop-shadow(0 0 3px #ff6a2a) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)); }
+    50% { filter: drop-shadow(0 0 8px #ffb060) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.15); }
+}

@@ -35,6 +35,8 @@ function kodexEintraege(reiter) {
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
                 text: z.text, zaehler: "erlebt" }));
+        case "segen":
+            return SEGEN.map(s => ({ bild: { emoji: s.badge }, name: s.name, anzahl: (k.segen || {})[s.id] || 0, text: s.text, zaehler: t("gewählt") }));
         case "boss":
             return BOSS_REGELN.map(b => ({ bild: { emoji: b.symbol }, name: b.name, anzahl: k.boss[b.id] || 0, text: b.text, zaehler: "besiegt" }));
         default: {
@@ -56,6 +58,7 @@ const KODEX_REITER = [
     { id: "wetter", text: t("🌦️ Wetter") },
     { id: "jahreszeiten", text: t("🍂 Jahreszeiten") },
     { id: "werkzeuge", text: t("🧰 Werkzeuge") },
+    { id: "segen", text: t("🙏 Segen") },
     { id: "boss", text: t("🏦 Kredit-Auflagen") },
     { id: "besucher", text: t("🐦 Besucher") }
 ];
