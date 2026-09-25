@@ -1,0 +1,11 @@
+# Wird beim Bauen erzeugt oder ist nur fuer diesen PC
+desktop-app/node_modules/
+desktop-app/dist/
+desktop-app/dist-release/
+desktop-app/build/
+Sproutvale.lnk
+save/
+.claude/
+
+# Test-Dateien (beginnen mit _), z.B. der Balancing-Bot
+_*.js

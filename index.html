@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sproutvale</title>
+    <link rel="icon" href="Icon.png">
+    <!-- Pixel-Schriften liegen lokal im Ordner fonts (funktioniert auch ohne Internet) -->
+    <link rel="stylesheet" href="fonts/schriften.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Kopfbereich: Himmel (Tageszeit), Sonne/Mond, Wolken, Hof-Landschaft, Haustier und Deko, oben die Holzleiste -->
+    <header id="top-bar">
+        <div id="himmel"></div>
+        <div id="himmel-sterne"></div>
+        <img id="sonne" class="himmelskoerper" data-sprite="sonne" alt="">
+        <img id="mond" class="himmelskoerper" data-sprite="mond" alt="">
+        <div id="wolken"></div>
+        <div id="landschaft"></div>
+        <div id="fenster-lichter"></div>
+        <div id="haus-klickflaeche" data-tipp="Haus: Begleiter, Landschaft, Deko, Musik und mehr"></div>
+        <div id="hof-ebene"></div>
+        <div id="wetter-ebene"></div>
+
+        <div id="top-leiste">
+            <div class="stat" id="money-display" data-tipp="Gold: für den Marktplatz, die Felder und die Rechnungen"><img class="icon" data-sprite="muenze" alt=""><span>0</span></div>
+            <div class="stat" id="skillpoint-display" data-tipp="Sternensamen: für das Stellarium. Gibt es bei jeder Ernte und für jeden Klick auf den Samenladen."><img class="icon" data-sprite="sternensamen" alt=""><span>0</span></div>
+            <div class="stat stat-klein" id="kalender-display"><img class="icon" data-sprite="kalender" alt=""><span>Tag 1</span></div>
+            <div class="stat stat-klein" id="jahreszeit-uhr"><div class="uhr-scheibe"><div class="uhr-zeiger"></div></div><span></span></div>
+            <div class="stat stat-klein" id="rechnung-display" data-tipp="Nächste Rechnung. Jede 3. ist ein Kredit mit Auflage."><img class="icon" data-sprite="rechnung" alt=""><span></span></div>
+            <!-- Werkzeuge vom Wanderhaendler (1 Platz, mehr durch die Tarotkarte "Der Gehaengte") -->
+            <div id="werkzeug-leiste"></div>
+            <div class="stat stat-klein versteckt" id="wetter-anzeige"></div>
+            <div class="stat stat-klein versteckt" id="buff-anzeige"></div>
+            <div id="energie-box" data-tipp="Energie = Tageszeit. Ist sie leer, ist Feierabend.">
+                <img class="icon" data-sprite="blitz" alt="">
+                <div id="energie-balken"><div id="energie-fuellung"></div></div>
+                <span id="energie-text">150</span>
+                <button class="knopf top-knopf versteckt" id="neuanfang-knopf">🌙 Neuanfang</button>
+            </div>
+            <button class="knopf top-knopf" id="erfolge-button" data-tipp="Erfolge (E)"><img class="icon" data-sprite="pokal" alt=""><span>0/0</span></button>
+            <button class="knopf top-knopf" id="statistik-button" data-tipp="Statistik (I)"><img class="icon" data-sprite="diagramm" alt=""></button>
+            <button class="knopf top-knopf" id="kodex-button" data-tipp="Kodex: alles, was du entdeckt hast (K)"><img class="icon" data-sprite="buch" alt=""></button>
+            <button class="knopf top-knopf knopf-gelb versteckt" id="haendler-button" data-tipp="Wanderhändler: bleibt bis zum nächsten Tag">🧳</button>
+            <button class="knopf top-knopf" id="shop-button" data-tipp="Marktplatz (S)"><img class="icon" data-sprite="beutel" alt=""><span>Marktplatz</span></button>
+            <button class="knopf top-knopf" id="skilltree-button" data-tipp="Stellarium (B)"><img class="icon" data-sprite="sternkarte" alt=""><span>Stellarium</span></button>
+            <button class="knopf top-knopf" id="einstellungen-button" data-tipp="Einstellungen (Esc)"><img class="icon" data-sprite="zahnrad" alt=""></button>
+        </div>
+    </header>
+
+
+    <!-- Nacht: verdunkelt Hof und Acker passend zur Tageszeit -->
+    <div id="nacht-schleier"></div>
+    <!-- Wetter ueber dem Acker (Regen, Nebel, Hitze) -->
+    <div id="wetter-schleier"></div>
+    <!-- Jahreszeit: Kirschblueten, Pusteblumen, Laub oder Schnee ueber dem ganzen Hof und Acker -->
+    <div id="jahreszeit-ebene"></div>
+
+    <!-- Acker: links und rechts je 6 Spalten Felder, in der Mitte der Weg mit dem Samenladen -->
+    <main id="field-grid">
+        <div id="weg"></div>
+        <div id="marktstand">
+            <div id="kombo-anzeige" class="versteckt">
+                <span id="kombo-text"></span>
+                <div id="kombo-balken"><div id="kombo-fuellung"></div></div>
+            </div>
+            <button id="plant-button" data-zustand="geschlossen">
+                <span class="markise"></span>
+                <img id="plant-button-bild" alt="" draggable="false">
+                <span id="plant-button-label">Geschlossen</span>
+                <span id="plant-button-counter">0 / 40</span>
+                <span id="plant-button-fortschritt"></span>
+            </button>
+        </div>
+    </main>
+
+    <!-- Tageskarte wie ein Bestellzettel: faehrt aus dem Kopfbereich herunter, hochgeschoben bleibt nur die Lasche sichtbar -->
+    <div id="karten-halter" class="versteckt">
+        <div id="karten-schieber">
+        <div id="tages-karte" class="pergament">
+            <div class="karte-kopf">
+                <h2 id="tages-karte-titel"></h2>
+            </div>
+            <div id="tages-karte-inhalt"></div>
+            <div id="tages-karte-buttons">
+                <button class="knopf" id="karte-shop"><img class="icon" data-sprite="beutel" alt=""> Marktplatz</button>
+                <button class="knopf" id="karte-skilltree"><img class="icon" data-sprite="sternkarte" alt=""> Stellarium</button>
+                <button class="knopf knopf-gelb versteckt" id="karte-haendler">🧳 Wanderhändler</button>
+                <button class="knopf knopf-lila" id="karte-prestige"><img class="icon" data-sprite="mondbluete" alt=""> Mondteich</button>
+                <button class="knopf knopf-gruen haupt-knopf" id="karte-weiter">Tag starten</button>
+            </div>
+            <div id="karte-fuss">
+                <button class="knopf karte-aufgeben" id="karte-aufgeben">🏳️ Run beenden</button>
+            </div>
+        </div>
+        <button id="karte-pfeil">▲</button>
+        </div>
+    </div>
+
+    <div id="shop-panel" class="panel pergament hidden">
+        <div class="panel-header">
+            <h2><img class="icon icon-gross" data-sprite="beutel" alt=""> Marktplatz</h2>
+            <button class="knopf panel-schliessen">✕</button>
+        </div>
+        <div class="panel-content" id="shop-content"></div>
+        <div class="panel-reiter" id="shop-reiter"></div>
+    </div>
+
+    <div id="erfolge-panel" class="panel pergament hidden">
+        <div class="panel-header">
+            <h2><img class="icon icon-gross" data-sprite="pokal" alt=""> Erfolge</h2>
+            <button class="knopf panel-schliessen">✕</button>
+        </div>
+        <div class="panel-content" id="erfolge-content"></div>
+    </div>
+
+    <div id="statistik-panel" class="panel pergament hidden">
+        <div class="panel-header">
+            <h2><img class="icon icon-gross" data-sprite="diagramm" alt=""> Statistik</h2>
+            <button class="knopf panel-schliessen">✕</button>
+        </div>
+        <div class="panel-reiter oben" id="statistik-reiter"></div>
+        <div class="panel-content" id="statistik-content"></div>
+    </div>
+
+    <!-- Stellarium: ein grosser Skilltree, verschiebbar und zoombar -->
+    <div id="skilltree-fenster" class="versteckt">
+        <div class="sternbild-fenster">
+            <div class="sternbild-kopf">
+                <h2 id="sternbild-titel">Stellarium</h2>
+                <div id="sternbild-sp"></div>
+                <button class="knopf knopf-gruen" id="baum-naechster" data-tipp="Springt nacheinander zu allen Sternen, die du dir gerade leisten kannst">⭐ Kaufbar</button>
+                <button class="knopf" id="baum-mitte" data-tipp="Ansicht zurück zum Weizen in der Mitte">🎯 Zur Mitte</button>
+                <button class="knopf baum-hilfe" id="baum-hilfe" data-tipp="Hilfe zum Stellarium">?</button>
+                <button class="knopf panel-schliessen">✕</button>
+            </div>
+            <div class="sternbild-hauptteil">
+                <div id="sternbild-himmel">
+                    <div id="himmel-punkte"></div>
+                    <div id="baum-welt">
+                        <svg id="sternbild-linien"></svg>
+                        <div id="sternbild-knoten"></div>
+                    </div>
+                </div>
+                <div id="sternbild-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="prestige-shop" class="versteckt">
+        <div class="prestige-fenster">
+            <div class="prestige-kopf">
+                <h2><img class="icon icon-gross" data-sprite="mondbluete" alt=""> Mondteich</h2>
+                <div id="prestige-guthaben"></div>
+            </div>
+            <div id="prestige-info"></div>
+            <div class="prestige-reiter" id="prestige-reiter"></div>
+            <div id="prestige-inhalt"></div>
+            <div class="prestige-fuss">
+                <button id="prestige-weiter" class="knopf knopf-gruen haupt-knopf">Neuen Run starten</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pflicht-Auswahl nach jeder bezahlten Rechnung -->
+    <div id="segen-fenster" class="overlay versteckt">
+        <div class="segen-rahmen pergament">
+            <h2>🧾 Rechnung bezahlt!</h2>
+            <p>Wähle einen Segen. Er gilt für den ganzen Run.</p>
+            <div id="segen-karten"></div>
+        </div>
+    </div>
+
+    <div id="einstellungen-fenster" class="overlay versteckt">
+        <div class="einstellungen-rahmen pergament">
+            <h2><img class="icon icon-gross" data-sprite="zahnrad" alt=""> Einstellungen</h2>
+            <div class="einstellungen-reiter" id="einstellungen-reiter"></div>
+
+            <div class="einstellungs-seite" data-seite="audio">
+                <!-- Klick auf das Symbol schaltet stumm bzw. wieder laut -->
+                <div class="einstellung">
+                    <span><button class="stumm-knopf" id="musik-stumm" data-tipp="Musik stumm schalten">🎵</button> Musik</span>
+                    <input type="range" id="regler-musik" min="0" max="100">
+                </div>
+                <div class="einstellung">
+                    <span><button class="stumm-knopf" id="sfx-stumm" data-tipp="Soundeffekte stumm schalten">🔊</button> Soundeffekte</span>
+                    <input type="range" id="regler-sfx" min="0" max="100">
+                </div>
+                <p class="einstellung-hinweis">Welches Lied läuft, wählst du im Haus (Klick aufs Bauernhaus im Hof).</p>
+            </div>
+
+            <div class="einstellungs-seite" data-seite="anzeige">
+                <label class="einstellung schalter-zeile">
+                    <span>📳 Bildschirm-Wackeln</span>
+                    <input type="checkbox" data-option="wackeln">
+                </label>
+                <label class="einstellung schalter-zeile">
+                    <span>⚡ Blitze und helles Aufleuchten</span>
+                    <input type="checkbox" data-option="blitze">
+                </label>
+                <label class="einstellung schalter-zeile">
+                    <span>🎨 Farbenblind-Modus (Formen auf der Saat)</span>
+                    <input type="checkbox" data-option="farbenblind">
+                </label>
+                <label class="einstellung schalter-zeile">
+                    <span>💬 Hinweise beim Drüberfahren</span>
+                    <input type="checkbox" data-option="tipps">
+                </label>
+                <label class="einstellung schalter-zeile">
+                    <span>🍂 Jahreszeiten-Teilchen (Blüten, Laub, Schnee)</span>
+                    <input type="checkbox" data-option="jahreszeitTeilchen">
+                </label>
+                <div class="einstellung">
+                    <span>🖥️ Vollbild</span>
+                    <button class="knopf" id="vollbild-knopf">An / Aus (F11)</button>
+                </div>
+                <label class="einstellung">
+                    <span>🌍 Sprache</span>
+                    <select id="sprache-auswahl" disabled>
+                        <option value="de">Deutsch (weitere folgen)</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="einstellungs-seite" data-seite="steuerung">
+                <div id="tasten-liste"></div>
+                <p class="einstellung-hinweis">Rechtsklick auf deinen Begleiter: Aktionen. Klick aufs Haus: Kosmetik. Klick auf den Teich: Mondteich.</p>
+            </div>
+
+            <div class="einstellungs-seite" data-seite="spielstand">
+                <div class="einstellung">
+                    <span>📖 Tutorial</span>
+                    <button class="knopf" id="tutorial-neu">Neu starten</button>
+                </div>
+                <div class="einstellung versteckt" id="speicher-zeile">
+                    <span>📂 Spielstand-Ordner</span>
+                    <button class="knopf" id="speicher-oeffnen">Öffnen</button>
+                </div>
+                <p class="einstellung-hinweis versteckt" id="speicher-hinweis"></p>
+                <div class="gefahren-zone" id="reset-zeile">
+                    <div class="gefahren-titel">⚠️ Alles löschen</div>
+                    <p>Löscht allen Fortschritt: beide Spielstände, Mondblüten, Kuscheltiere, Erfolge und Statistik.</p>
+                    <p class="gefahren-klein">Bleibt erhalten: Unterstützer-Inhalte, deine Kosmetik und deine Einstellungen.</p>
+                    <button class="knopf knopf-rot" id="spielstand-loeschen">🗑️ Alles löschen</button>
+                </div>
+                <p class="einstellung-hinweis">Einen einzelnen Spielstand löschst du im Hauptmenü unter „Spielen“.
+                    Alles löschen geht nur über die Einstellungen im Hauptmenü.</p>
+            </div>
+
+            <div class="einstellungen-knoepfe">
+                <button class="knopf" id="einstellungen-hauptmenue">🏠 Hauptmenü</button>
+                <button class="knopf knopf-gruen" id="einstellungen-schliessen">Zurück zum Spiel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hauptmenue: Startseite und Auswahl des Spielmodus (Standard oder Sandbox, jeder mit eigenem Spielstand) -->
+    <div id="hauptmenue">
+        <div id="menue-wolken"></div>
+        <div id="menue-teilchen"></div>
+        <div class="menue-inhalt" id="menue-start">
+            <img id="menue-logo" src="Icon.png" alt="Sproutvale">
+            <div class="menue-knoepfe">
+                <button class="knopf knopf-gruen menue-knopf menue-haupt" id="menue-spielen">▶ Spielen</button>
+                <button class="knopf menue-knopf" id="menue-einstellungen">⚙️ Einstellungen</button>
+                <button class="knopf menue-knopf" id="menue-beenden">🚪 Beenden</button>
+            </div>
+        </div>
+        <div class="menue-inhalt versteckt" id="menue-modi">
+            <div class="menue-schild">Wähle deinen Spielmodus</div>
+            <div id="menue-guthaben"></div>
+            <div class="modus-reihe" id="modus-reihe"></div>
+            <button class="knopf menue-knopf" id="menue-zurueck">← Zurück</button>
+        </div>
+        <div class="menue-fuss">Sproutvale · Venray Studios</div>
+    </div>
+
+    <div id="toasts"></div>
+
+    <!-- Ebene fuer fliegende Saaten, Loot, Partikel, Schwebetexte, Sternschnuppen, Gluehwuermchen und den Sammelradius -->
+    <div id="fx-layer">
+        <div id="sammel-ring" class="versteckt"></div>
+    </div>
+
+    <!-- Reihenfolge wichtig: Grafiken, Daten, Klang, Oberflaechen-Bausteine, Kern, Zusatz-Systeme, zuletzt der Start -->
+    <script src="speicher.js"></script>
+    <script src="sprites.js"></script>
+    <script src="daten.js"></script>
+    <script src="audio.js"></script>
+    <script src="ui.js"></script>
+    <script src="script.js"></script>
+    <script src="haus.js"></script>
+    <script src="glueck.js"></script>
+    <script src="mondteich.js"></script>
+    <script src="ereignisse.js"></script>
+    <script src="helfer.js"></script>
+    <script src="effekte.js"></script>
+    <script src="kodex.js"></script>
+    <script src="tutorial.js"></script>
+    <script src="start.js"></script>
+</body>
+</html>
