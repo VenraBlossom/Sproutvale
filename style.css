@@ -10570,3 +10570,22 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     from { transform: translateY(-14px) rotate(-8deg); opacity: 0; }
     to { transform: none; opacity: 1; }
 }
+
+/* Einstellungen: alle Reiter gleich gross (das Fenster springt nicht mehr), die Seite scrollt innen */
+.einstellungen-rahmen,
+.einstellungen-rahmen.breit {
+    width: min(1000px, calc(100% - 40px));
+    height: min(720px, calc(100vh - 60px));
+    display: flex;
+    flex-direction: column;
+    transition: none;
+}
+.einstellungen-rahmen > .einstellungs-seite:not(.versteckt) {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+.einstellungen-rahmen.breit .statistik-rahmen {
+    max-height: none;
+}
