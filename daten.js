@@ -1754,7 +1754,7 @@ const KUSCHELTIERE = [
     { id: "phoenix", symbol: "🔥", name: t("Phönix Glut"), raritaet: 4,
         text: s => "+" + 5 * s + t("% Gold aus allen Ernten und 4 Segen zur Auswahl.") },
     { id: "greif", symbol: "🦅", name: t("Greif Sturm"), raritaet: 4,
-        text: s => t("Alles beim Wanderhändler ist ") + 5 * s + t("% billiger.") },
+        text: s => t("Alles beim Wanderhändler ist ") + 15 * s + t("% billiger.") },
     { id: "pfau", symbol: "🦚", name: t("Pfau Prunk"), raritaet: 4,
         text: s => t("Legendäre Saaten sind ") + 20 * s + t("% mehr wert.") },
     // Mythisch

@@ -344,7 +344,7 @@ function haendlerChance() {
 // Preise richten sich nach der naechsten Rechnung (in der Sandbox nach dem naechsten Meilenstein)
 function haendlerBasis() {
     const nummer = run.sandbox ? run.meilensteine : run.bezahlteRechnungen;
-    return rechnungsBetrag(nummer) * (1 - 0.05 * kuschel("greif")) * (1 - Math.min(0.5, werkzeugWert("kompass")));
+    return rechnungsBetrag(nummer) * (1 - 0.15 * kuschel("greif")) * (1 - Math.min(0.5, werkzeugWert("kompass")));
 }
 
 function werkzeugPreis(werkzeug) {
