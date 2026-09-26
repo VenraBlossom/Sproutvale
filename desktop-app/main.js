@@ -32,60 +32,110 @@ const ORDNER = spielOrdner();
 let fenster = null;
 
 // ---------- SPIELSTAND-ORDNER "save" ----------
-// Liegt neben der Sproutvale.exe (Entwickler-Version: im Projektordner). Wer eine neue Version herunterlaedt,
-// kopiert einfach diesen Ordner hinein. Darf dort nicht geschrieben werden (z.B. unter "Programme"),
-// wird der Benutzerordner genommen. Die Dateien sind lesbares JSON (Tag, Gold, Mondblueten ...).
+// Liegt im Benutzerordner (Windows: %APPDATA%\Sproutvale\save), getrennt vom Spielordner. Eine neue Version
+// findet den Spielstand automatisch, man muss nichts kopieren. Die Dateien sind lesbares JSON.
+// Endlos hat 3 Speicherstaende: persistedsavefile_1.json bis _3.json. Darin stehen Fortschritt und Hof zusammen.
 
+// Schluessel im Spiel -> [Datei, Teil in der Datei (leer = die ganze Datei)]
 const SPEICHER_DATEIEN = {
-    sproutvale_meta: "fortschritt.json",
-    sproutvale_meta_sandbox: "sandbox-fortschritt.json",
-    sproutvale_run: "run.json",
-    sproutvale_sandbox: "sandbox.json",
-    sproutvale_einstellungen: "einstellungen.json",
-    sproutvale_kaeufe: "kaeufe.dat" // gekaufte Inhalte mit Pruefsumme (Hand-Aenderungen gelten nicht)
+    sproutvale_meta: ["fortschritt.json"],
+    sproutvale_run: ["run.json"],
+    sproutvale_einstellungen: ["einstellungen.json"],
+    sproutvale_kaeufe: ["kaeufe.dat"], // gekaufte Inhalte mit Pruefsumme (Hand-Aenderungen gelten nicht)
+    sproutvale_meta_sandbox: ["persistedsavefile_1.json", "fortschritt"],
+    sproutvale_sandbox: ["persistedsavefile_1.json", "run"],
+    sproutvale_meta_sandbox_2: ["persistedsavefile_2.json", "fortschritt"],
+    sproutvale_sandbox_2: ["persistedsavefile_2.json", "run"],
+    sproutvale_meta_sandbox_3: ["persistedsavefile_3.json", "fortschritt"],
+    sproutvale_sandbox_3: ["persistedsavefile_3.json", "run"]
 };
 
-function findeSpeicherOrdner() {
-    const kandidaten = [
-        app.isPackaged ? path.join(path.dirname(process.execPath), "save") : path.join(ORDNER, "save"),
-        path.join(app.getPath("userData"), "save")
-    ];
-    for (const ordner of kandidaten) {
-        try {
-            fs.mkdirSync(ordner, { recursive: true });
-            fs.accessSync(ordner, fs.constants.W_OK);
-            return ordner;
-        } catch (fehler) {
-            console.warn("Spielstand-Ordner nicht beschreibbar:", ordner);
-        }
-    }
-    return kandidaten[kandidaten.length - 1];
+const SPEICHER_ORDNER = path.join(app.getPath("userData"), "save");
+try {
+    fs.mkdirSync(SPEICHER_ORDNER, { recursive: true });
+} catch (fehler) {
+    console.warn("Spielstand-Ordner konnte nicht angelegt werden:", fehler.message);
 }
 
-const SPEICHER_ORDNER = findeSpeicherOrdner();
+function schreibeSicher(ziel, inhalt) {
+    // erst in eine Zwischendatei, dann umbenennen: so ist die Datei nie halb geschrieben
+    fs.writeFileSync(ziel + ".tmp", inhalt, "utf8");
+    fs.renameSync(ziel + ".tmp", ziel);
+}
+
+function liesJson(pfad) {
+    try {
+        return fs.existsSync(pfad) ? JSON.parse(fs.readFileSync(pfad, "utf8")) : null;
+    } catch (fehler) {
+        console.warn("Spielstand-Datei nicht lesbar:", pfad);
+        return null;
+    }
+}
+
+// Umzug: Bis Alpha 0.6.1 lag der Ordner "save" neben der .exe (bzw. im Projektordner). Ist der neue Ordner
+// noch leer, werden die alten Dateien einmal hierher kopiert.
+(function zieheAltenSpielstandUm() {
+    const alt = app.isPackaged ? path.join(path.dirname(process.execPath), "save") : path.join(ORDNER, "save");
+    try {
+        if (path.resolve(alt) === path.resolve(SPEICHER_ORDNER) || !fs.existsSync(alt)) return;
+        const schonDa = fs.readdirSync(SPEICHER_ORDNER).some(datei => /\.(json|dat)$/.test(datei));
+        if (schonDa) return;
+        fs.readdirSync(alt).filter(datei => /\.(json|dat)$/.test(datei)).forEach(datei => {
+            fs.copyFileSync(path.join(alt, datei), path.join(SPEICHER_ORDNER, datei));
+        });
+    } catch (fehler) {
+        console.warn("Alter Spielstand konnte nicht uebernommen werden:", fehler.message);
+    }
+})();
+
+// Alte Dateinamen: sandbox.json + sandbox-fortschritt.json werden zu persistedsavefile_1.json
+(function wandleAlteNamenUm() {
+    const altRun = path.join(SPEICHER_ORDNER, "sandbox.json");
+    const altFortschritt = path.join(SPEICHER_ORDNER, "sandbox-fortschritt.json");
+    const ziel = path.join(SPEICHER_ORDNER, "persistedsavefile_1.json");
+    try {
+        if (fs.existsSync(ziel) || (!fs.existsSync(altRun) && !fs.existsSync(altFortschritt))) return;
+        const inhalt = {};
+        const fortschritt = liesJson(altFortschritt);
+        const run = liesJson(altRun);
+        if (fortschritt) inhalt.fortschritt = fortschritt;
+        if (run) inhalt.run = run;
+        schreibeSicher(ziel, JSON.stringify(inhalt, null, 2));
+        fs.rmSync(altRun, { force: true });
+        fs.rmSync(altFortschritt, { force: true });
+    } catch (fehler) {
+        console.warn("Alte Endlos-Dateien konnten nicht umgewandelt werden:", fehler.message);
+    }
+})();
 
 try {
-    const liesmich = path.join(SPEICHER_ORDNER, "LIESMICH.txt");
-    if (!fs.existsSync(liesmich)) {
-        fs.writeFileSync(liesmich, "Das ist dein Sproutvale-Spielstand.\r\n\r\n" +
-            "Neue Version heruntergeladen? Kopiere diesen ganzen Ordner \"save\" in den Ordner der neuen Version\r\n" +
-            "(neben die Sproutvale.exe). Beim naechsten Start ist alles wieder da.\r\n\r\n" +
-            "fortschritt.json         = Mondblueten, Upgrades, Kuscheltiere, Erfolge (Standard)\r\n" +
-            "run.json                 = der laufende Run (Tag, Gold, Felder ...)\r\n" +
-            "sandbox.json             = die laufende Sandbox\r\n" +
-            "sandbox-fortschritt.json = Fortschritt der Sandbox\r\n" +
-            "einstellungen.json       = Klang, Anzeige ...\r\n", "utf8");
-    }
+    fs.writeFileSync(path.join(SPEICHER_ORDNER, "LIESMICH.txt"), "Das ist dein Sproutvale-Spielstand.\r\n\r\n" +
+        "Er liegt hier im Benutzerordner und bleibt bei jeder neuen Version automatisch erhalten.\r\n" +
+        "Du musst nichts kopieren. Zum Sichern kannst du diesen Ordner einfach irgendwo hin kopieren.\r\n\r\n" +
+        "fortschritt.json          = Story: Mondblueten, Upgrades, Kuscheltiere, Erfolge\r\n" +
+        "run.json                  = Story: der laufende Run (Tag, Gold, Felder ...)\r\n" +
+        "persistedsavefile_1.json  = Endlos, Speicherstand 1 (Fortschritt und Hof)\r\n" +
+        "persistedsavefile_2.json  = Endlos, Speicherstand 2\r\n" +
+        "persistedsavefile_3.json  = Endlos, Speicherstand 3\r\n" +
+        "einstellungen.json        = Klang, Anzeige ...\r\n" +
+        "kaeufe.dat                = gekaufte Inhalte\r\n", "utf8");
 } catch (fehler) {
     console.warn("LIESMICH konnte nicht geschrieben werden:", fehler.message);
 }
 
 ipcMain.on("speicher-lesen", event => {
     const daten = {};
-    Object.entries(SPEICHER_DATEIEN).forEach(([schluessel, datei]) => {
+    const dateiCache = {};
+    Object.entries(SPEICHER_DATEIEN).forEach(([schluessel, [datei, teil]]) => {
         const pfad = path.join(SPEICHER_ORDNER, datei);
         try {
-            if (fs.existsSync(pfad)) daten[schluessel] = fs.readFileSync(pfad, "utf8");
+            if (teil) {
+                if (!(datei in dateiCache)) dateiCache[datei] = liesJson(pfad);
+                const inhalt = dateiCache[datei];
+                if (inhalt && inhalt[teil] !== undefined) daten[schluessel] = JSON.stringify(inhalt[teil]);
+            } else if (fs.existsSync(pfad)) {
+                daten[schluessel] = fs.readFileSync(pfad, "utf8");
+            }
         } catch (fehler) {
             console.warn("Spielstand-Datei nicht lesbar:", pfad);
         }
@@ -94,29 +144,48 @@ ipcMain.on("speicher-lesen", event => {
 });
 
 ipcMain.on("speicher-schreiben", (_event, schluessel, text) => {
-    const datei = SPEICHER_DATEIEN[schluessel];
-    if (!datei) return;
-    let inhalt = text;
-    try {
-        inhalt = JSON.stringify(JSON.parse(text), null, 2); // schoen eingerueckt, damit man die Zahlen lesen kann
-    } catch (fehler) {
-        // kein JSON: so speichern, wie es ist
-    }
+    const eintrag = SPEICHER_DATEIEN[schluessel];
+    if (!eintrag) return;
+    const [datei, teil] = eintrag;
     const ziel = path.join(SPEICHER_ORDNER, datei);
     try {
-        // erst in eine Zwischendatei, dann umbenennen: so ist die Datei nie halb geschrieben
-        fs.writeFileSync(ziel + ".tmp", inhalt, "utf8");
-        fs.renameSync(ziel + ".tmp", ziel);
+        if (teil) {
+            const inhalt = liesJson(ziel) || {};
+            try {
+                inhalt[teil] = JSON.parse(text);
+            } catch (fehler) {
+                inhalt[teil] = text;
+            }
+            schreibeSicher(ziel, JSON.stringify(inhalt, null, 2));
+            return;
+        }
+        let inhalt = text;
+        try {
+            inhalt = JSON.stringify(JSON.parse(text), null, 2); // schoen eingerueckt, damit man die Zahlen lesen kann
+        } catch (fehler) {
+            // kein JSON: so speichern, wie es ist
+        }
+        schreibeSicher(ziel, inhalt);
     } catch (fehler) {
         console.warn("Spielstand konnte nicht gespeichert werden:", fehler.message);
     }
 });
 
 ipcMain.on("speicher-loeschen", (_event, schluessel) => {
-    const datei = SPEICHER_DATEIEN[schluessel];
-    if (!datei) return;
+    const eintrag = SPEICHER_DATEIEN[schluessel];
+    if (!eintrag) return;
+    const [datei, teil] = eintrag;
+    const ziel = path.join(SPEICHER_ORDNER, datei);
     try {
-        fs.rmSync(path.join(SPEICHER_ORDNER, datei), { force: true });
+        if (teil) {
+            const inhalt = liesJson(ziel);
+            if (!inhalt) return;
+            delete inhalt[teil];
+            if (Object.keys(inhalt).length === 0) fs.rmSync(ziel, { force: true });
+            else schreibeSicher(ziel, JSON.stringify(inhalt, null, 2));
+            return;
+        }
+        fs.rmSync(ziel, { force: true });
     } catch (fehler) {
         console.warn("Spielstand-Datei konnte nicht geloescht werden:", fehler.message);
     }

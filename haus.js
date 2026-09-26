@@ -269,7 +269,7 @@ function versucheMondteich() {
         oeffnePrestigeShop();
     } else {
         Klang.fehler();
-        zeigeToast(run.sandbox ? t("🌙 Der Mondteich öffnet sich vor Tag 1 und nach dem Sandbox-Prestige.")
+        zeigeToast(run.sandbox ? t("🌙 Der Mondteich öffnet sich vor Tag 1 und nach einem Neuanfang.")
             : t("🌙 Der Mondteich öffnet sich vor Tag 1 und am Ende eines Runs."));
     }
 }

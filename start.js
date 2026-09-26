@@ -108,7 +108,7 @@ window.debug = {
         }));
         speichereMeta();
         wendeKosmetikAn();
-        zeigeToast("🎁 Alle Skins, DLCs und die Sandbox sind freigeschaltet.");
+        zeigeToast("🎁 Alle Skins, DLCs und Endlos sind freigeschaltet.");
     },
     // Alle Skins wieder sperren (zum Testen des Anprobierens)
     allesWeg() {

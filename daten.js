@@ -1054,7 +1054,7 @@ const ERFOLG_KETTEN = [
     { id: "rechnung", icon: "🧾", nurStandard: true, text: z => t("Bezahle ") + z + (z === 1 ? t(" Rechnung") : t(" Rechnungen")) + t(" in einem Run"),
         wert: (m, r) => Math.max(m.besterRun ? m.besterRun.rechnungen : 0, r && !r.sandbox ? r.bezahlteRechnungen : 0),
         ziele: [1, 3, 5, 8, 12, 16] },
-    { id: "meilenstein", icon: "🏁", nurSandbox: true, text: z => t("Erreiche ") + z + (z === 1 ? t(" Meilenstein") : t(" Meilensteine")) + t(" in einer Sandbox"),
+    { id: "meilenstein", icon: "🏁", nurSandbox: true, text: z => t("Erreiche ") + z + (z === 1 ? t(" Meilenstein") : t(" Meilensteine")) + t(" in Endlos"),
         wert: (m, r) => Math.max(m.lebenszeit.maxMeilensteine || 0, r && r.sandbox ? r.meilensteine : 0),
         ziele: [1, 3, 6, 10, 15] },
     { id: "boss", icon: "🏦", nurStandard: true, text: z => t("Zahle ") + z + (z === 1 ? t(" Kredit") : t(" Kredite")) + t(" ab"),
@@ -1266,7 +1266,7 @@ const HAUSTIER_AKTIONEN = [
 const DLC_PAKETE = {
     unterstuetzer: {
         name: t("Unterstützer-Paket"), preis: 7.99,
-        inhalt: t("Sandbox-Modus sofort und alle epischen Inhalte: Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, ") +
+        inhalt: t("Endlos sofort und alle epischen Inhalte: Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, ") +
             t("Münzen, Kuschel-Rahmen und Pflanzen-Looks")
     }
 };

@@ -73,11 +73,25 @@ const MAX_FELDER = FELD_POSITIONEN.length;
 // "meta" ist immer der Fortschritt des Modus, der gerade laeuft. Der andere wartet in metaRuhend bzw. im Speicher.
 const META_SPEICHER_KEY = "sproutvale_meta";
 const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
-// Erfolge gehoeren NICHT dazu: Standard und Sandbox haben getrennte Erfolge und Gutscheine
-const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug"];
+// Endlos (intern "sandbox") hat 3 Speicherstaende. Jeder ist ein eigenes Spiel mit eigenem Fortschritt
+// (Mondblueten, Upgrades, Kuscheltiere, Erfolge, Statistik) und eigenem laufenden Hof.
+const ENDLOS_SLOTS = 3;
+// Erfolge gehoeren NICHT dazu: Story und jeder Endlos-Speicherstand haben getrennte Erfolge und Gutscheine
+const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
-let metaRuhend = null; // Fortschritt des Standard-Modus, waehrend die Sandbox laeuft
+let metaSlot = 0; // welcher Endlos-Speicherstand gerade in "meta" geladen ist (0 = Story)
+let metaRuhend = null; // Fortschritt von Story, waehrend Endlos laeuft
+
+// Gewaehlter Endlos-Speicherstand (1 bis 3)
+function endlosSlot() {
+    return klemme(Math.round(meta.endlosSlot || 1), 1, ENDLOS_SLOTS);
+}
+
+// Speicher-Schluessel fuer den Fortschritt eines Endlos-Speicherstands (Nr. 1 behaelt den alten Namen)
+function endlosMetaKey(slot) {
+    return slot > 1 ? SANDBOX_META_KEY + "_" + slot : SANDBOX_META_KEY;
+}
 
 function leereLebenszeit() {
     return {
@@ -184,7 +198,7 @@ function speichereMeta() {
     try {
         speichereKaeufe(meta);
         if (metaProfil === "sandbox") {
-            localStorage.setItem(SANDBOX_META_KEY, JSON.stringify(fortschrittVon(meta)));
+            localStorage.setItem(endlosMetaKey(metaSlot || 1), JSON.stringify(fortschrittVon(meta)));
             localStorage.setItem(META_SPEICHER_KEY, JSON.stringify({ ...metaRuhend, ...geteiltVon(meta) }));
         } else {
             localStorage.setItem(META_SPEICHER_KEY, JSON.stringify(meta));
@@ -194,24 +208,32 @@ function speichereMeta() {
     }
 }
 
-// Tauscht den Fortschritt aus, wenn zwischen Standard und Sandbox gewechselt wird
+// Tauscht den Fortschritt aus, wenn zwischen Story und Endlos (oder zwischen zwei Endlos-Speicherstaenden) gewechselt wird
 function wechsleMetaProfil(sandbox) {
-    const ziel = sandbox ? "sandbox" : "standard";
-    if (metaProfil === ziel) return;
+    const slot = sandbox ? endlosSlot() : 0;
+    if ((metaProfil === "sandbox") === sandbox && metaSlot === slot) return;
     speichereMeta();
     const bisher = fortschrittVon(meta);
-    const neu = ziel === "sandbox" ? fortschrittVon(ladeMeta(SANDBOX_META_KEY)) : metaRuhend;
+    const neu = sandbox ? fortschrittVon(ladeMeta(endlosMetaKey(slot))) : metaRuhend;
     Object.keys(bisher).forEach(schluessel => delete meta[schluessel]);
     Object.assign(meta, neu);
-    metaRuhend = ziel === "sandbox" ? bisher : null;
-    metaProfil = ziel;
+    // Story wartet in metaRuhend, solange irgendein Endlos-Speicherstand laeuft
+    if (metaProfil === "standard") metaRuhend = bisher;
+    else if (!sandbox) metaRuhend = null;
+    metaProfil = sandbox ? "sandbox" : "standard";
+    metaSlot = slot;
+}
+
+// Fortschritt eines Endlos-Speicherstands (auch wenn er gerade nicht geladen ist)
+function endlosMeta(slot) {
+    return metaProfil === "sandbox" && metaSlot === slot ? meta : ladeMeta(endlosMetaKey(slot));
 }
 
 // Mondblueten eines Modus (auch wenn er gerade nicht laeuft), z.B. fuer das Hauptmenue
 function profilMondblueten(sandbox) {
-    if ((metaProfil === "sandbox") === sandbox) return meta.mondblueten;
-    if (!sandbox) return metaRuhend ? metaRuhend.mondblueten : meta.mondblueten;
-    return ladeMeta(SANDBOX_META_KEY).mondblueten;
+    if (sandbox) return endlosMeta(endlosSlot()).mondblueten;
+    if (metaProfil === "standard") return meta.mondblueten;
+    return metaRuhend ? metaRuhend.mondblueten : meta.mondblueten;
 }
 
 // ---------- GEKAUFTE INHALTE (DLC) ----------
@@ -899,6 +921,7 @@ function bestePflanze() {
 
 // In der Sandbox kann man jederzeit einkaufen (es gibt dort keine Pausen zwischen den Tagen)
 function darfEinkaufen() {
+    if (run.rechnungOffen) return false;
     if (run.sandbox) return run.phase !== "runEnde" && !run.segenAuswahl;
     return run.phase === "vorTag" && !run.segenAuswahl;
 }
@@ -2684,9 +2707,9 @@ function holeErfolgAb(kette, knopf) {
 let erfolgeAnsicht = null;
 
 function erfolgsProfil(sandbox) {
-    const aktiv = (metaProfil === "sandbox") === sandbox;
+    const aktiv = sandbox ? metaProfil === "sandbox" && metaSlot === endlosSlot() : metaProfil === "standard";
     if (aktiv) return { m: meta, r: run && run.sandbox === sandbox ? run : null, aktiv: true };
-    const m = sandbox ? ladeMeta(SANDBOX_META_KEY) : metaRuhend || meta;
+    const m = sandbox ? endlosMeta(endlosSlot()) : metaRuhend || meta;
     return { m, r: null, aktiv: false };
 }
 
@@ -2705,7 +2728,7 @@ function renderErfolge() {
     // Im Hauptmenue: Reiter Standard / Sandbox (getrennte Fortschritte)
     if (imMenue) {
         const leiste = el("div", "haus-reiter erfolg-modi");
-        [["standard", t("🌾 Standard")], ["sandbox", t("🏖️ Sandbox")]].forEach(([id, name]) => {
+        [["standard", t("🌾 Story")], ["sandbox", t("♾️ Endlos")]].forEach(([id, name]) => {
             const knopf = el("button", "knopf reiter-knopf", name);
             knopf.classList.toggle("aktiv", id === erfolgeAnsicht);
             knopf.addEventListener("click", () => {
@@ -2731,7 +2754,7 @@ function renderErfolge() {
         erfolgeContent.appendChild(alle);
     }
     erfolgeContent.appendChild(erstelleHinweis(
-        "🏆 " + fertig + t(" von ") + alle + t(" Stufen geschafft") + (sandbox ? t(" (Sandbox)") : t(" (Standard)")) +
+        "🏆 " + fertig + t(" von ") + alle + t(" Stufen geschafft") + (sandbox ? t(" (Endlos)") : t(" (Story)")) +
         t(". Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.") +
         (offen > 0 && !aktiv ? t(" Abholen kannst du sie, wenn du in diesem Modus spielst.") : "")));
 
@@ -2843,7 +2866,7 @@ function renderStatistik() {
     if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "statistik") return;
     // Die Sandbox hat eigene Zahlen (getrennt vom Standard-Modus) und keinen "besten Run"
     const reiter = run.sandbox
-        ? [{ id: "aktuell", text: t("Diese Sandbox") }, { id: "gesamt", text: t("Sandbox gesamt") }]
+        ? [{ id: "aktuell", text: t("Dieser Spielstand") }, { id: "gesamt", text: t("Endlos gesamt") }]
         : [{ id: "aktuell", text: t("Aktueller Run") }, { id: "bester", text: t("Bester Run") }, { id: "gesamt", text: t("Gesamt") }];
     if (!reiter.some(r => r.id === aktiverStatistikReiter)) aktiverStatistikReiter = "aktuell";
     renderReiter(statistikReiter, reiter, aktiverStatistikReiter, id => {
@@ -2861,7 +2884,7 @@ function renderStatistik() {
     }
 
     const tabelle = el("div", "statistik-tabelle");
-    if (run.sandbox) statistikContent.appendChild(erstelleHinweis(t("🏖️ Nur Zahlen aus der Sandbox. Erfolge gibt es hier keine.")));
+    if (run.sandbox) statistikContent.appendChild(erstelleHinweis(t("♾️ Nur Zahlen aus Endlos.")));
     STATISTIK_ZEILEN.forEach(([schluessel, name, nameGesamt]) => {
         let titel = istGesamt ? nameGesamt || name : name;
         if (run.sandbox && schluessel === "rechnungen") titel = istGesamt ? null : t("🏁 Meilensteine");
@@ -2882,7 +2905,7 @@ segenKnopf.prepend(pixelIcon("🙏", 28, "icon"));
 function segenText() {
     const liste = Object.entries(run.segen).filter(([, stufe]) => stufe > 0);
     if (liste.length === 0) return t("## 🙏 Deine Segen") + "\n" + t("Noch keine. Segen bekommst du nach jeder bezahlten Rechnung") +
-        (run.sandbox ? t(" (Sandbox: für jeden Meilenstein).") : ".");
+        (run.sandbox ? t(" (Endlos: für jeden Meilenstein).") : ".");
     return t("## 🙏 Deine Segen") + "\n" + liste.map(([id, stufe]) => {
         const s = SEGEN_NACH_ID[id];
         return s ? s.badge + " " + s.name + (stufe > 1 ? t(" x") + stufe : "") + ": " + s.text : "";
@@ -3008,7 +3031,7 @@ function verteileFeldEffekte() {
 
 // fortsetzen = true: eine gespeicherte Sandbox laeuft weiter (ohne Start-Klang)
 function starteTag(fortsetzen = false) {
-    if (run.phase !== "vorTag" || (run.segenAuswahl && !run.sandbox)) return;
+    if (run.phase !== "vorTag" || (run.segenAuswahl && !run.sandbox) || run.rechnungOffen) return;
 
     run.phase = "tag";
     run.tagesBoni = run.naechsterTag;
@@ -3047,7 +3070,7 @@ function starteTag(fortsetzen = false) {
     kartenHalter.classList.add("versteckt");
     if (!fortsetzen) Klang.tagStart();
     haken("tagStart");
-    meldeAnDesktop("status", (run.sandbox ? t("Sandbox · ") : "") + t("Tag ") + run.tag + " · " + run.bezahlteRechnungen + t(" Rechnungen bezahlt"));
+    meldeAnDesktop("status", (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag + " · " + run.bezahlteRechnungen + t(" Rechnungen bezahlt"));
     aktualisiereAlles();
 }
 
@@ -3212,14 +3235,66 @@ function beendeTag() {
 
     aktualisiereLebenszeitMaxima();
     Klang.feierabend();
+    // Rechnung faellig und genug Gold: der Spieler entscheidet (bezahlen oder den Run beenden).
+    // Reicht das Gold nicht, endet der Run wie gewohnt (bzw. greift die Gerechtigkeit).
+    const faellig = faelligeRechnung();
+    if (faellig > 0 && run.gold >= faellig) {
+        run.rechnungOffen = true;
+        speichereMeta();
+        aktualisiereAlles();
+        zeigeRechnungsFrage();
+        return;
+    }
     if (!bezahleRechnungen()) return;
+    schliesseFeierabendAb();
+}
 
+function schliesseFeierabendAb() {
     run.tag += 1;
     haken("pauseStart"); // z.B. kommt der Wanderhaendler
     speichereMeta();
     zeigeTagesKarte("feierabend");
     if (run.segenAusstehend) zeigeSegenAuswahl();
     aktualisiereAlles();
+}
+
+// Betrag, der heute Abend faellig ist (0 = keine Rechnung)
+function faelligeRechnung() {
+    if (run.sandbox) return 0;
+    return run.gnadenRechnung || (run.tag % KONFIG.tageProRechnung === 0 ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
+}
+
+// "Rechnung bezahlen" ist kurz gesperrt, damit man nicht aus Versehen weiterklickt
+const RECHNUNG_SPERRE_MS = 1200;
+
+function zeigeRechnungsFrage() {
+    const faellig = faelligeRechnung();
+    if (!run.rechnungOffen || faellig <= 0) return;
+    const kredit = !run.gnadenRechnung && istBossRechnung(run.bezahlteRechnungen);
+    Klang.rechnung();
+    zeigePopup({
+        titel: kredit ? t("🏦 Der Kredit ist fällig!") : t("🧾 Die Rechnung ist fällig!"),
+        farbe: "#6b4220",
+        breite: 540,
+        schliessbar: false,
+        klasse: "rechnung-frage",
+        inhalt: el("div", null, null, [
+            el("p", "rechnung-betrag", zahl(faellig) + t(" Gold")),
+            el("p", null, t("Du hast ") + zahl(run.gold) + t(" Gold. Bezahlst du, geht es mit der Segen-Auswahl weiter.")),
+            el("p", "rechnung-klein", t("Oder du beendest den Run jetzt und bekommst +") + zahl(mondbluetenJetzt()) + t(" Mondblüten."))
+        ]),
+        knoepfe: [
+            { text: t("🏳️ Run beenden"), klasse: "knopf-rot", aktion: () => {
+                run.rechnungOffen = false;
+                run.tag += 1; // der heutige Tag zaehlt als gespielt
+                beendeRun(0, true);
+            } },
+            { text: kredit ? t("🏦 Kredit bezahlen") : t("🧾 Rechnung bezahlen"), klasse: "knopf-gruen", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
+                run.rechnungOffen = false;
+                if (bezahleRechnungen()) schliesseFeierabendAb();
+            } }
+        ]
+    });
 }
 
 function beendeRun(offenerBetrag, freiwillig) {
@@ -3251,6 +3326,7 @@ function starteNeuenRun(sandbox = false) {
 
     wechsleMetaProfil(sandbox);
     run = erstelleRunZustand(sandbox);
+    run.slot = sandbox ? endlosSlot() : 0;
     meta.letzterModus = sandbox ? "sandbox" : "standard";
     aktiverShopReiter = "allgemein";
     kombo.zaehler = 0;
@@ -3311,9 +3387,9 @@ function renderTagesKarte() {
     let html = "";
 
     if (modus === "start") {
-        tagesKarteTitel.textContent = run.sandbox ? t("Sandbox · Tag 1") : t("Tag 1");
+        tagesKarteTitel.textContent = run.sandbox ? t("Endlos · Tag 1") : t("Tag 1");
         if (run.sandbox) {
-            html += `<p class="karte-meta">${t("Sandbox: keine Rechnungen, keine Energie, unendliche Entwicklung. Statt Rechnungen gibt es Meilensteine für verdientes Gold: Jeder bringt einen Segen. Mit dem Sandbox-Prestige fängst du neu an und bekommst Mondblüten für deine Meilensteine. Erfolge gibt es hier keine.")}</p>`;
+            html += `<p class="karte-meta">${t("Endlos: keine Rechnungen, keine Energie, unendliche Entwicklung. Statt Rechnungen gibt es Meilensteine für verdientes Gold: Jeder bringt einen Segen. Mit einem Neuanfang fängst du neu an und bekommst Mondblüten für deine Meilensteine. Es gibt eigene Erfolge und 3 Speicherstände.")}</p>`;
         } else if (run.mondphase > 0) {
             const phase = MONDPHASEN[run.mondphase];
             html += `<p class="karte-meta">${phase.symbol} ${t("Mondphase")} ${phase.name}: +${Math.round(MONDPHASE_BONUS * 100 * run.mondphase)}% ` +
@@ -3343,7 +3419,7 @@ function renderTagesKarte() {
         if (run.sandbox) {
             html += `<p>${t("Du fängst nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")} ${t("neu an und hast")} ${zahl(run.gesamt.gold)} ${t("Gold verdient.")}</p>`;
         } else if (daten.freiwillig) {
-            html += `<p>${run.sandbox ? t("Du hast die Sandbox beendet nach") : t("Du hast den Run beendet nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")}.</p>`;
+            html += `<p>${run.sandbox ? t("Du hast in Endlos neu angefangen nach") : t("Du hast den Run beendet nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")}.</p>`;
         } else {
             html += `<p>${t("Die Rechnung über")} <b>${zahl(daten.offenerBetrag)} Gold</b> ${t("konnte nicht bezahlt werden. Du hattest")} ${zahl(run.gold)} Gold.</p>`;
         }
@@ -3362,7 +3438,7 @@ function renderTagesKarte() {
 
         if (run.sandbox) {
             html += `<p class="karte-rechnung">🏁 ${t("Nächster Meilenstein")} (${run.meilensteine + 1}): <b>${zahl(run.gesamt.gold)} / ` +
-                `${zahl(meilensteinSchwelle(run.meilensteine + 1))} Gold</b> ${t("verdient. Sandbox-Prestige jetzt:")} ` +
+                `${zahl(meilensteinSchwelle(run.meilensteine + 1))} Gold</b> ${t("verdient. Neuanfang jetzt:")} ` +
                 `+${zahl(sandboxMondblueten())} ${t("Mondblüten.")}</p>`;
         } else {
             const rechnung = naechsteRechnung();
@@ -3403,7 +3479,7 @@ function karteZusatzHtml() {
 // Hover ueber dem Kalender: alles, was im Moment wirkt (Tageszeit, Wetter, Boss-Regel, Mondphase, Segen, Werkzeuge)
 function aktivTipp() {
     const z = jahreszeit();
-    const zeilen = ["## " + (run.sandbox ? t("Sandbox · ") : "") + t("Tag ") + run.tag + " · " + z.symbol + " " + z.name];
+    const zeilen = ["## " + (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag + " · " + z.symbol + " " + z.name];
     if (!run.sandbox && run.phase !== "runEnde") {
         const r = naechsteRechnung();
         const fehlt = Math.max(0, r.betrag - run.gold);
@@ -3449,14 +3525,14 @@ function aktivTipp() {
 function aktualisiereTopBar() {
     zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
-    kalenderDisplay.querySelector("span").textContent = (run.sandbox ? t("Sandbox · ") : "") + t("Tag ") + run.tag;
+    kalenderDisplay.querySelector("span").textContent = (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag;
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
     if (run.sandbox) {
         rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(run.gesamt.gold) + " / " +
             zahl(meilensteinSchwelle(run.meilensteineGemeldet + 1)) + t(" Gold");
-        setzeTipp(rechnungDisplay, t("Nächster Meilenstein: so viel Gold musst du in dieser Sandbox insgesamt verdienen. ") +
-            t("Jeder Meilenstein bringt einen Segen und beim Sandbox-Prestige Mondblüten."));
+        setzeTipp(rechnungDisplay, t("Nächster Meilenstein: so viel Gold musst du in diesem Spielstand insgesamt verdienen. ") +
+            t("Jeder Meilenstein bringt einen Segen und beim Neuanfang Mondblüten."));
         rechnungDisplay.classList.remove("boss");
     } else {
         const rechnung = naechsteRechnung();
@@ -3477,7 +3553,7 @@ function aktualisiereEnergieAnzeige() {
     if (run.sandbox) {
         neuanfangKnopf.textContent = t("🌙 Neuanfang · +") + zahl(mondbluetenJetzt());
         setzeTipp(energieBox, null);
-        setzeTipp(neuanfangKnopf, t("Sandbox-Prestige: Fang von vorn an und bekomm Mondblüten für deine ") + run.meilensteine +
+        setzeTipp(neuanfangKnopf, t("Neuanfang: Fang von vorn an und bekomm Mondblüten für deine ") + run.meilensteine +
             t(" Meilensteine (die Hälfte von dem, was so viele Rechnungen bringen würden)."));
         return;
     }
@@ -3886,7 +3962,7 @@ $("baum-hilfe").addEventListener("click", () => {
         t("🖱️ Ziehen verschiebt den Baum, das Mausrad zoomt. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst."),
         t("Ⅱ Sterne mit Ⅱ kommen erst, wenn der Stern davor ganz ausgebaut ist: viel teurer, viel stärker."),
         t("🟢 Grüne Sterne sind schon erledigt, weil eine Tarotkarte oder der Mondteich dasselbe dauerhaft macht."),
-        t("💡 Kaufen geht nur zwischen den Tagen (in der Sandbox jederzeit).")
+        t("💡 Kaufen geht nur zwischen den Tagen (in Endlos jederzeit).")
     ];
     zeigePopup({ titel: t("✨ So funktioniert das Stellarium"), breite: 560, inhalt: el("div", "hilfe-liste", null, punkte.map(p => el("p", null, p))) });
 });
@@ -4100,7 +4176,7 @@ function menueSeiteModiOffen() {
 
 // Kurzer Stand eines Modus fuer die Karte im Hauptmenue (laufender Run oder gespeicherter Spielstand)
 function modusStand(sandbox) {
-    const live = run && run.sandbox === sandbox && run.phase !== "runEnde";
+    const live = run && run.sandbox === sandbox && (!sandbox || (run.slot || 1) === endlosSlot()) && run.phase !== "runEnde";
     const daten = live ? null : leseRunSpeicher(sandbox);
     const r = live ? run : daten && daten.run;
     if (!r) return null;
@@ -4114,7 +4190,7 @@ function modusStand(sandbox) {
 }
 
 function modusInfoText(sandbox, stand) {
-    if (!stand) return sandbox ? t("Noch keine Sandbox gespeichert. Sie beginnt bei Tag 1.") : t("Noch kein Run gespeichert. Er beginnt bei Tag 1.");
+    if (!stand) return sandbox ? t("Noch nichts gespeichert. Endlos beginnt bei Tag 1.") : t("Noch kein Run gespeichert. Er beginnt bei Tag 1.");
     const r = stand.r;
     const z = JAHRESZEITEN[jahreszeitIndex(r.tag)];
     const zeilen = [
@@ -4147,20 +4223,22 @@ function renderModusKarten() {
     const reihe = $("modus-reihe");
     reihe.innerHTML = "";
     [
-        { sandbox: false, symbol: "🌾", name: "Standard", text: t("Alle 5 Tage kommt eine Rechnung. Bezahlst du sie, ") +
+        { sandbox: false, symbol: "🌾", name: t("Story"), text: t("Alle 5 Tage kommt eine Rechnung. Bezahlst du sie, ") +
             t("bekommst du einen Segen. Am Ende gibt es Mondblüten für dauerhafte Upgrades.") },
-        { sandbox: true, symbol: "🏖️", name: t("Sandbox"), text: t("Keine Rechnungen, keine Energie. Tag und Nacht laufen einfach weiter ") +
+        { sandbox: true, symbol: "♾️", name: t("Endlos"), text: t("Keine Rechnungen, keine Energie. Tag und Nacht laufen einfach weiter ") +
             t("und du kannst jederzeit einkaufen. Meilensteine geben Segen.") }
     ].forEach(modus => {
         const frei = !modus.sandbox || hatSandbox();
         const stand = frei ? modusStand(modus.sandbox) : null;
         const aktiv = run && run.sandbox === modus.sandbox && run.phase !== "runEnde";
-        const karte = el("button", "modus-karte" + (frei ? "" : t(" gesperrt")) + (aktiv ? t(" zuletzt") : ""));
+        const karte = el("button", "modus-karte" + (frei ? "" : " gesperrt") + (aktiv ? " zuletzt" : ""));
         karte.dataset.modus = modus.sandbox ? "sandbox" : "standard";
+        karte.style.setProperty("--zuletzt-text", JSON.stringify(t("Zuletzt gespielt")));
         const info = el("span", "modus-info", "i");
         setzeTipp(info, modusInfoText(modus.sandbox, stand));
         let statusText;
         if (!frei) statusText = t("🔒 Im Mondteich für ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten oder mit dem Unterstützer-Paket");
+        else if (modus.sandbox) statusText = t("Speicherstand ") + endlosSlot() + " · " + (stand && !stand.neu ? t("Tag ") + stand.r.tag : t("Neuer Anfang"));
         else if (!stand || stand.neu) statusText = t("Neuer Anfang");
         else statusText = t("Tag ") + stand.r.tag + " · " + (modus.sandbox ? (stand.r.meilensteine || 0) + t(" Meilensteine")
             : stand.r.bezahlteRechnungen + (stand.r.bezahlteRechnungen === 1 ? t(" Rechnung") : t(" Rechnungen")));
@@ -4176,12 +4254,16 @@ function renderModusKarten() {
         ].filter(Boolean));
         karte.addEventListener("click", event => {
             if (event.target === info) return;
-            spieleModus(modus.sandbox);
+            if (modus.sandbox && frei) zeigeEndlosSlots();
+            else spieleModus(modus.sandbox);
         });
 
-        const reset = el("button", "knopf modus-reset", t("🗑️ Spielstand löschen"));
-        reset.disabled = !frei || !stand || stand.neu;
-        reset.addEventListener("click", () => frageModusReset(modus.sandbox));
+        // Story: Spielstand loeschen. Endlos: die Speicherstaende (jeder mit eigenem Loeschen-Knopf)
+        const reset = modus.sandbox
+            ? el("button", "knopf modus-reset modus-slots", t("💾 Speicherstände"))
+            : el("button", "knopf modus-reset", t("🗑️ Spielstand löschen"));
+        reset.disabled = modus.sandbox ? !frei : !stand || stand.neu;
+        reset.addEventListener("click", () => (modus.sandbox ? zeigeEndlosSlots() : frageModusReset(false)));
         reihe.appendChild(el("div", "modus-spalte", null, [karte, reset]));
     });
 }
@@ -4189,23 +4271,25 @@ function renderModusKarten() {
 function spieleModus(sandbox) {
     if (sandbox && !hatSandbox()) {
         Klang.fehler();
-        zeigeToast("🔒 Die Sandbox kaufst du im Mondteich (Reiter Spielmodi) für " + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten."));
+        zeigeToast(t("🔒 Endlos kaufst du im Mondteich (Reiter Spielmodi) für ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten."));
         return;
     }
     wechsleZuModus(sandbox);
     Klang.start();
     hauptmenue.classList.add("versteckt");
     aktualisiereAlles();
+    // Offene Rechnung aus dem letzten Feierabend (Spiel wurde waehrend der Frage geschlossen)
+    if (run.rechnungOffen) zeigeRechnungsFrage();
 }
 
 function frageModusReset(sandbox) {
-    const name = sandbox ? t("deine Sandbox") : t("deinen Run");
+    const name = sandbox ? t("deinen Spielstand in Endlos") : t("deinen Run");
     zeigePopup({
         titel: sandbox ? t("🏖️ Sandbox zurücksetzen?") : t("🌾 Run zurücksetzen?"),
         inhalt: t("Willst du ") + name + t(" wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine ") +
-            t("(dafür ") + (sandbox ? t("den Neuanfang in der Sandbox") : t("\"Run jetzt beenden\" auf der Tageskarte")) + t(" nutzen). ") +
+            t("(dafür ") + (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")) + t(" nutzen). ") +
             (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). ") +
-                t("Der Standard-Modus, Erfolge und Kosmetik bleiben.")
+                t("Story, Erfolge und Kosmetik bleiben.")
                 : t("Mondblüten, Upgrades, Kuscheltiere, Erfolge und Kosmetik bleiben.")),
         breite: 560,
         knoepfe: [
@@ -4301,6 +4385,10 @@ function renderEinstellungen() {
     document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
         ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
+    // Endlos: von Hand speichern (gespeichert wird ausserdem automatisch)
+    const endlosAktiv = run && run.sandbox && run.phase !== "runEnde";
+    $("endlos-speichern-zeile").classList.toggle("versteckt", !endlosAktiv);
+    if (endlosAktiv) $("endlos-speichern-text").textContent = t("💾 Endlos speichern (Speicherstand ") + (run.slot || 1) + ")";
     if (run) renderStatistik();
     renderErfolge();
     if (aktiverEinstellungsReiter === "kodex") renderKodex($("kodex-seite"));
@@ -4359,8 +4447,10 @@ function loescheSpielstand() {
     try {
         localStorage.setItem(META_SPEICHER_KEY, JSON.stringify(neuerStand));
         localStorage.removeItem(RUN_SPEICHER_KEY);
-        localStorage.removeItem(SANDBOX_SPEICHER_KEY);
-        localStorage.removeItem(SANDBOX_META_KEY);
+        for (let slot = 1; slot <= ENDLOS_SLOTS; slot++) {
+            localStorage.removeItem(runSpeicherKey(true, slot));
+            localStorage.removeItem(endlosMetaKey(slot));
+        }
     } catch (fehler) {
         console.warn(t("Spielstand konnte nicht geloescht werden"), fehler);
     }
@@ -4408,6 +4498,12 @@ $("einstellungen-button").addEventListener("click", () => oeffneEinstellungen(fa
 einstellungenSchliessen.addEventListener("click", () => einstellungenFenster.classList.add("versteckt"));
 einstellungenHauptmenue.addEventListener("click", zeigeHauptmenue);
 spielstandLoeschen.addEventListener("click", frageAllesLoeschen);
+$("endlos-speichern").addEventListener("click", () => {
+    speichereRun();
+    speichereMeta();
+    Klang.kaufen();
+    zeigeToast(t("💾 Gespeichert: Endlos, Speicherstand ") + (run.slot || 1));
+});
 
 // Desktop-App: Spielstand-Ordner "save" anzeigen und oeffnen
 if (window.sproutvaleDesktop && window.sproutvaleDesktop.speicher) {
@@ -4415,7 +4511,7 @@ if (window.sproutvaleDesktop && window.sproutvaleDesktop.speicher) {
     const hinweis = $("speicher-hinweis");
     hinweis.classList.remove("versteckt");
     hinweis.textContent = t("Dein Spielstand liegt in: ") + window.sproutvaleDesktop.speicher.pfad() +
-        t(". Neue Version? Kopiere den Ordner \"save\" einfach neben die neue Sproutvale.exe.");
+        t(". Er bleibt bei neuen Versionen automatisch erhalten, du musst nichts kopieren.");
     $("speicher-oeffnen").addEventListener("click", () => window.sproutvaleDesktop.speicher.oeffnen());
 }
 
@@ -4435,7 +4531,21 @@ $("import-dateien").addEventListener("change", async event => {
     event.target.value = "";
     const gefunden = [];
     for (const datei of dateien) {
-        const schluessel = IMPORT_DATEIEN[datei.name.toLowerCase()];
+        const name = datei.name.toLowerCase();
+        const endlos = name.match(/^persistedsavefile_([1-3])\.json$/);
+        if (endlos) {
+            // Endlos-Speicherstand: Fortschritt und Hof stehen zusammen in einer Datei
+            try {
+                const inhalt = JSON.parse(await datei.text());
+                const slot = Number(endlos[1]);
+                if (inhalt.fortschritt) gefunden.push({ name: datei.name, schluessel: endlosMetaKey(slot), text: JSON.stringify(inhalt.fortschritt) });
+                if (inhalt.run) gefunden.push({ name: datei.name + " (Hof)", schluessel: runSpeicherKey(true, slot), text: JSON.stringify(inhalt.run) });
+            } catch (fehler) {
+                console.warn("Datei ist kein gueltiger Spielstand", datei.name);
+            }
+            continue;
+        }
+        const schluessel = IMPORT_DATEIEN[name];
         if (!schluessel) continue;
         const text = await datei.text();
         try {
@@ -4447,7 +4557,7 @@ $("import-dateien").addEventListener("change", async event => {
     }
     if (gefunden.length === 0) {
         Klang.fehler();
-        zeigeToast(t("Keine passende Spielstand-Datei gefunden (fortschritt.json, run.json, sandbox.json, kaeufe.dat …)."));
+        zeigeToast(t("Keine passende Spielstand-Datei gefunden (fortschritt.json, run.json, persistedsavefile_1.json, kaeufe.dat …)."));
         return;
     }
     zeigePopup({
@@ -4665,8 +4775,9 @@ const RUN_SPEICHER_VERSION = 1;
 let runSpeicherTimer = null;
 let letzteSandboxSicherung = 0;
 
-function runSpeicherKey(sandbox) {
-    return sandbox ? SANDBOX_SPEICHER_KEY : RUN_SPEICHER_KEY;
+function runSpeicherKey(sandbox, slot = endlosSlot()) {
+    if (!sandbox) return RUN_SPEICHER_KEY;
+    return slot > 1 ? SANDBOX_SPEICHER_KEY + "_" + slot : SANDBOX_SPEICHER_KEY;
 }
 
 // Was auf einem Feld waechst (nur fuer die Sandbox)
@@ -4708,24 +4819,24 @@ function speichereRun() {
         run: { ...rest, pflanzen: pflanzen.map(p => ({ id: p.id, freigeschaltet: p.freigeschaltet, level: p.level })) }
     };
     try {
-        localStorage.setItem(runSpeicherKey(run.sandbox), JSON.stringify(daten));
+        localStorage.setItem(runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
         if (run.sandbox) letzteSandboxSicherung = performance.now();
     } catch (fehler) {
         console.warn(t("Run konnte nicht gespeichert werden"), fehler);
     }
 }
 
-function loescheRunSpeicher(sandbox = run && run.sandbox) {
+function loescheRunSpeicher(sandbox = run && run.sandbox, slot = run && run.sandbox ? run.slot || 1 : endlosSlot()) {
     try {
-        localStorage.removeItem(runSpeicherKey(Boolean(sandbox)));
+        localStorage.removeItem(runSpeicherKey(Boolean(sandbox), slot));
     } catch (fehler) {
         console.warn(t("Run-Spielstand konnte nicht geloescht werden"), fehler);
     }
 }
 
-function leseRunSpeicher(sandbox) {
+function leseRunSpeicher(sandbox, slot = endlosSlot()) {
     try {
-        const daten = JSON.parse(localStorage.getItem(runSpeicherKey(sandbox)));
+        const daten = JSON.parse(localStorage.getItem(runSpeicherKey(sandbox, slot)));
         if (daten && daten.version === RUN_SPEICHER_VERSION && daten.run) return daten;
     } catch (fehler) {
         console.warn(t("Run-Spielstand ist kaputt und wird ignoriert"), fehler);
@@ -4741,7 +4852,7 @@ function ladeRun(sandbox = false) {
     const { pflanzen, ...rest } = daten.run;
     wechsleMetaProfil(sandbox);
     const neu = erstelleRunZustand(sandbox);
-    Object.assign(neu, rest, { sandbox });
+    Object.assign(neu, rest, { sandbox, slot: sandbox ? endlosSlot() : 0 });
     neu.level = { ...erstelleRunZustand(sandbox).level, ...rest.level };
     (pflanzen || []).forEach(gespeichert => {
         const pflanze = neu.pflanzen.find(p => p.id === gespeichert.id);
@@ -4806,7 +4917,7 @@ function legeRunBeiseite() {
 
 // Wechselt zwischen normalem Run und Sandbox. Jeder Modus macht dort weiter, wo man aufgehoert hat.
 function wechsleZuModus(sandbox) {
-    if (run && run.sandbox === sandbox) return;
+    if (run && run.sandbox === sandbox && (!sandbox || run.slot === endlosSlot())) return;
     legeRunBeiseite();
     if (!ladeRun(sandbox)) starteNeuenRun(sandbox);
     speichereMeta();
@@ -4814,27 +4925,111 @@ function wechsleZuModus(sandbox) {
 
 // Spielstand eines Modus loeschen (Hauptmenue > Spielen). Meta-Fortschritt bleibt.
 // Standard: nur der laufende Run. Sandbox: Run und der ganze Sandbox-Fortschritt (eigene Mondblueten, Kuscheltiere ...).
-function setzeModusZurueck(sandbox) {
-    const aktiv = run && run.sandbox === sandbox;
+function setzeModusZurueck(sandbox, slot = endlosSlot()) {
+    const aktiv = run && run.sandbox === sandbox && (!sandbox || (run.slot || 1) === slot);
     if (aktiv) {
         speichernGesperrt = true;
         legeRunBeiseite();
         speichernGesperrt = false;
     }
-    loescheRunSpeicher(sandbox);
+    loescheRunSpeicher(sandbox, slot);
     if (sandbox) {
-        if (metaProfil === "sandbox") {
+        if (metaProfil === "sandbox" && metaSlot === slot) {
             Object.keys(fortschrittVon(meta)).forEach(schluessel => delete meta[schluessel]);
             Object.assign(meta, fortschrittVon(leererMetaStand()));
         }
         try {
-            localStorage.removeItem(SANDBOX_META_KEY);
+            localStorage.removeItem(endlosMetaKey(slot));
         } catch (fehler) {
-            console.warn(t("Sandbox-Fortschritt konnte nicht geloescht werden"), fehler);
+            console.warn("Endlos-Speicherstand konnte nicht geloescht werden", fehler);
         }
     }
-    if (aktiv) starteNeuenRun(sandbox);
+    if (aktiv) {
+        // Ein geloeschter Endlos-Speicherstand: zurueck zu Story (dort geht es weiter)
+        if (sandbox) {
+            speichernGesperrt = true;
+            if (!ladeRun(false)) starteNeuenRun(false);
+            speichernGesperrt = false;
+        } else {
+            starteNeuenRun(false);
+        }
+    }
     speichereMeta();
+}
+
+// ---------- ENDLOS: 3 SPEICHERSTAENDE ----------
+
+function endlosSlotStand(slot) {
+    const live = run && run.sandbox && (run.slot || 1) === slot && run.phase !== "runEnde";
+    const daten = live ? null : leseRunSpeicher(true, slot);
+    const r = live ? run : daten && daten.run;
+    const m = endlosMeta(slot);
+    const leer = !r && !(m.lebenszeit && m.lebenszeit.tage) && !m.mondblueten;
+    return { r, m, leer };
+}
+
+function waehleEndlosSlot(slot) {
+    meta.endlosSlot = slot;
+    speichereMeta();
+    spieleModus(true);
+}
+
+function zeigeEndlosSlots() {
+    const liste = el("div", "endlos-slots");
+    let schliesse = () => {};
+    for (let slot = 1; slot <= ENDLOS_SLOTS; slot++) {
+        const { r, m, leer } = endlosSlotStand(slot);
+        const info = leer ? t("Leer")
+            : (r ? t("Tag ") + r.tag + " · " + (r.meilensteine || 0) + t(" Meilensteine") : t("Neuer Anfang")) +
+                " · " + zahl(m.mondblueten || 0) + t(" Mondblüten");
+        const zeile = el("div", "endlos-slot" + (slot === endlosSlot() ? " aktiv" : ""), null, [
+            el("div", "endlos-slot-text", null, [el("b", null, t("Speicherstand ") + slot), el("span", null, info)])
+        ]);
+        const los = el("button", "knopf knopf-gruen", leer ? t("+ Neues Spiel") : t("▶ Weiterspielen"));
+        los.addEventListener("click", () => {
+            schliesse();
+            waehleEndlosSlot(slot);
+        });
+        zeile.appendChild(los);
+        if (!leer) {
+            const weg = el("button", "knopf knopf-rot endlos-slot-loeschen", "🗑️");
+            setzeTipp(weg, t("Speicherstand löschen"));
+            weg.addEventListener("click", () => {
+                schliesse();
+                frageSlotLoeschen(slot);
+            });
+            zeile.appendChild(weg);
+        }
+        liste.appendChild(zeile);
+    }
+    schliesse = zeigePopup({
+        titel: t("♾️ Endlos: Speicherstand wählen"),
+        breite: 600,
+        inhalt: el("div", null, null, [
+            el("p", "endlos-slots-hinweis", t("Jeder Speicherstand ist ein eigenes Spiel mit eigenen Mondblüten, Upgrades, Kuscheltieren und Erfolgen.")),
+            liste
+        ])
+    });
+}
+
+function frageSlotLoeschen(slot) {
+    zeigePopup({
+        titel: t("🗑️ Speicherstand ") + slot + t(" löschen?"),
+        farbe: "#b8232a",
+        breite: 520,
+        inhalt: t("Der ganze Speicherstand wird gelöscht: Hof, Mondblüten, Upgrades, Kuscheltiere und Erfolge dieses Speicherstands. ") +
+            t("Story, die anderen Speicherstände und deine Kosmetik bleiben."),
+        knoepfe: [
+            { text: t("Abbrechen"), aktion: zeigeEndlosSlots },
+            { text: t("Löschen"), klasse: "knopf-rot", aktion: () => {
+                setzeModusZurueck(true, slot);
+                Klang.reset();
+                renderModusKarten();
+                zeigeToast(t("♾️ Speicherstand ") + slot + t(" gelöscht"));
+                zeigeEndlosSlots();
+            } }
+        ]
+    });
 }
 
 // Nach jeder Aenderung zwischen den Tagen kurz warten und dann speichern. Die Sandbox hoechstens alle 5 Sekunden.
@@ -4845,7 +5040,7 @@ registriereHaken("anzeige", () => {
     clearTimeout(runSpeicherTimer);
     runSpeicherTimer = setTimeout(speichereRun, 300);
 });
-registriereHaken("runEnde", () => loescheRunSpeicher(run.sandbox));
+registriereHaken("runEnde", () => loescheRunSpeicher(run.sandbox, run.slot || 1));
 // Die Sandbox zusaetzlich alle 20 Sekunden sichern (falls das Spiel abstuerzt)
 setInterval(() => {
     if (run && run.sandbox && run.phase === "tag" && !spielPausiert()) speichereRun();

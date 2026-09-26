@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld("sproutvaleDesktop", {
         erfolg: id => ipcRenderer.send("steam-erfolg", String(id)),
         status: text => ipcRenderer.send("steam-status", String(text))
     },
-    // Spielstand als Dateien im Ordner "save" neben der .exe (zum Kopieren in eine neue Version)
+    // Spielstand als Dateien im Ordner "save" im Benutzerordner (%APPDATA%/Sproutvale/save), bleibt bei neuen Versionen erhalten
     speicher: {
         lesen: () => ipcRenderer.sendSync("speicher-lesen"),
         schreiben: (schluessel, text) => ipcRenderer.send("speicher-schreiben", String(schluessel), String(text)),

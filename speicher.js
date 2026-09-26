@@ -3,10 +3,10 @@
 // ============================================================
 // SPROUTVALE: Spielstand als Dateien (nur in der Desktop-App)
 // Wird als ERSTE Datei geladen, noch bevor das Spiel seinen Spielstand liest.
-// 1) Beim Start: Dateien aus dem Ordner "save" (neben der .exe) haben Vorrang und werden ins Spiel geladen.
+// 1) Beim Start: Dateien aus dem Ordner "save" haben Vorrang und werden ins Spiel geladen.
 //    Gibt es noch keine Dateien, werden die bisherigen Daten des Spiels einmal als Dateien angelegt.
 // 2) Danach wird jede Aenderung am Spielstand zusaetzlich in die Dateien geschrieben.
-// So kann man bei einer neuen Version einfach den Ordner "save" hinueberkopieren.
+// Der Ordner liegt im Benutzerordner (%APPDATA%/Sproutvale/save) und bleibt bei neuen Versionen erhalten.
 // Im Browser (ohne Desktop-App) passiert hier nichts.
 // ============================================================
 
@@ -26,8 +26,9 @@
     const leeren = Storage.prototype.clear;
 
     // Dateien -> Spiel (Dateien gewinnen), fehlende Dateien aus den bisherigen Daten anlegen
-    ["sproutvale_meta", "sproutvale_meta_sandbox", "sproutvale_run", "sproutvale_sandbox", "sproutvale_einstellungen",
-        "sproutvale_kaeufe"].forEach(schluessel => {
+    ["sproutvale_meta", "sproutvale_run", "sproutvale_einstellungen", "sproutvale_kaeufe",
+        "sproutvale_meta_sandbox", "sproutvale_sandbox", "sproutvale_meta_sandbox_2", "sproutvale_sandbox_2",
+        "sproutvale_meta_sandbox_3", "sproutvale_sandbox_3"].forEach(schluessel => {
         if (dateien[schluessel] !== undefined) {
             setzen.call(localStorage, schluessel, dateien[schluessel]);
         } else {

@@ -31,7 +31,7 @@ function kaufeMetaUpgrade(def) {
 
 function renderMetaUpgrades() {
     prestigeInfo.textContent = (run.sandbox
-        ? t("🏖️ Sandbox-Mondteich: eigener Fortschritt, getrennt vom Standard-Modus. Mondblüten gibt es beim Neuanfang für Meilensteine")
+        ? t("♾️ Mondteich von Endlos: eigener Fortschritt, getrennt von Story. Mondblüten gibt es beim Neuanfang für Meilensteine")
         : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 1, 2. = 4, 3. = 9 …)")) +
         (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(Math.pow(2, meta.sternenfaelle)) + "." : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
@@ -382,7 +382,7 @@ function frageSternenfall() {
         breite: 620,
         inhalt: el("div", "sternenfall-frage", null, [
             el("p", null, t("Du verlierst: alle Mondblüten und alle dauerhaften Upgrades im Mondteich.")),
-            el("p", null, t("Du behältst: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik und die Sandbox.")),
+            el("p", null, t("Du behältst: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik und Endlos.")),
             el("p", null, t("Du bekommst: ") + splitter + t(" Sternensplitter und alle zukünftigen Mondblüten zählen doppelt (x") +
                 zahl(Math.pow(2, meta.sternenfaelle + 1)) + ").")
         ]),
@@ -459,7 +459,7 @@ function kaufeSandbox() {
     meta.sandbox = true;
     speichereMeta();
     Klang.jackpot();
-    zeigeBanner("🏖️", t("Sandbox freigeschaltet!"), t("Keine Rechnungen, unendliche Entwicklung"), "#2e9e2e", 3500);
+    zeigeBanner("♾️", t("Endlos freigeschaltet!"), t("Keine Rechnungen, unendliche Entwicklung"), "#2e9e2e", 3500);
     renderPrestigeShop();
 }
 
@@ -517,15 +517,15 @@ function renderSpielmodi() {
     }));
     const frei = hatSandbox();
     prestigeInhalt.appendChild(erstelleKarte({
-        icon: "🏖️",
-        titel: t("Sandbox"),
+        icon: "♾️",
+        titel: t("Endlos"),
         beschreibung: t("Keine Rechnungen, unendliche Entwicklung: Bau deinen Hof so groß, wie du willst. ") +
             t("Keine Energie: Tag und Nacht laufen einfach weiter, einkaufen kannst du jederzeit. Statt Rechnungen gibt es ") +
             t("Meilensteine für verdientes Gold (je 1 Segen). Mit dem Neuanfang fängst du von vorn an und bekommst die Hälfte der ") +
             t("Mondblüten, die die Meilensteine als Rechnungen bringen würden. Keine Erfolge. Eigener Spielstand, wählbar im Hauptmenü. ") +
             t("Mit dem Unterstützer-Paket ist sie später sofort frei."),
         info: frei ? t("Freigeschaltet") : t("Einmalig ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten"),
-        knopfText: frei ? (run.sandbox ? t("Neue Sandbox starten") : t("Zur Sandbox")) : zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten"),
+        knopfText: frei ? (run.sandbox ? t("Endlos neu starten") : t("Zu Endlos")) : zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten"),
         aktiv: frei || meta.mondblueten >= SANDBOX_KONFIG.preis,
         onKauf: () => (!frei ? kaufeSandbox() : run.sandbox ? starteNeuenRun(true) : wechsleZuModus(true))
     }));
@@ -542,7 +542,7 @@ function renderPrestigeShop() {
     if (meta.sternenfaelle > 0 || meta.sternensplitter > 0) {
         prestigeGuthaben.appendChild(el("span", "guthaben-teil", null, [pixelIcon("💠", 32), el("span", null, zahl(meta.sternensplitter) + t(" Sternensplitter"))]));
     }
-    prestigeWeiter.textContent = run.phase !== "runEnde" ? t("Übernehmen") : run.sandbox ? t("Neue Sandbox starten") : t("Neuen Run starten");
+    prestigeWeiter.textContent = run.phase !== "runEnde" ? t("Übernehmen") : run.sandbox ? t("Endlos neu starten") : t("Neuen Run starten");
 
     renderReiter(prestigeReiter, [
         { id: "upgrades", text: t("🏆 Upgrades") },

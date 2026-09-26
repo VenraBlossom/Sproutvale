@@ -94,6 +94,16 @@ function zeigePopup(optionen) {
             if (k.klasse) knopf.classList.add(k.klasse);
             knopf.textContent = k.text;
             if (k.deaktiviert) knopf.disabled = true;
+            // kurz gesperrt, damit man nicht aus Versehen draufklickt (mit kleinem Ladebalken)
+            if (k.sperreMs) {
+                knopf.disabled = true;
+                knopf.classList.add("knopf-gesperrt-zeit");
+                knopf.style.setProperty("--sperre", k.sperreMs + "ms");
+                setTimeout(() => {
+                    knopf.disabled = false;
+                    knopf.classList.remove("knopf-gesperrt-zeit");
+                }, k.sperreMs);
+            }
             knopf.addEventListener("click", () => {
                 if (k.aktion) k.aktion();
                 if (!k.bleibtOffen) schliesse();

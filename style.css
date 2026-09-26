@@ -4267,7 +4267,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
 }
 
 .modus-karte.zuletzt::before {
-    content: "Zuletzt gespielt";
+    content: var(--zuletzt-text, "Zuletzt gespielt");
     position: absolute;
     top: -14px;
     left: 50%;
@@ -10066,4 +10066,87 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     background: #ffd84a;
     border: 2px solid #2a1d5a;
     border-radius: 50%;
+}
+
+/* ---------- Endlos: Speicherstaende ---------- */
+.endlos-slots-hinweis {
+    margin: 0 0 10px;
+}
+
+.endlos-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.endlos-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 246, 216, 0.6);
+    border: 3px solid #b8905a;
+    border-radius: 6px;
+}
+
+.endlos-slot.aktiv {
+    border-color: #2e9e2e;
+    box-shadow: 0 0 8px rgba(46, 158, 46, 0.5);
+}
+
+.endlos-slot-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.endlos-slot-loeschen {
+    min-width: 0;
+    padding: 6px 10px;
+}
+
+/* ---------- Rechnung faellig ---------- */
+.rechnung-frage .rechnung-betrag {
+    font-size: 1.8em;
+    font-weight: 700;
+    text-align: center;
+    color: #6b4220;
+    margin: 4px 0 8px;
+}
+
+.rechnung-frage .rechnung-klein {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Knopf kurz gesperrt: ein Balken fuellt sich, dann ist er klickbar */
+.knopf.knopf-gesperrt-zeit {
+    position: relative;
+    overflow: hidden;
+}
+
+.knopf.knopf-gesperrt-zeit::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 100%;
+    background: #fff6a0;
+    transform-origin: left;
+    animation: sperre-balken var(--sperre) linear forwards;
+}
+
+@keyframes sperre-balken {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* Endlos: Knopf "Speicherstaende" in Holzfarbe (nicht rot wie Loeschen) */
+.knopf.modus-reset.modus-slots {
+    color: #fff6dc;
+    background: linear-gradient(#b87a3e, #8a5a2c);
+    border-color: #3e2412;
+    box-shadow: inset 0 2px 0 #d9a066, inset 0 -3px 0 #6b4220, 0 3px 0 #2e1a09;
+    text-shadow: 1px 1px 0 #3e2412;
 }
