@@ -378,9 +378,7 @@ function erstelleRunZustand(sandbox = false) {
         rechnungsRabatt: 0,
         gnadenRechnung: 0,
         gnadenGenutzt: 0,
-        gachaZuege: 0,
         glueck: neuerGlueckZustand(),
-        letzterGachaZug: null,
         samenGesamt: 0,
         ernteZaehler: 0,
         goldBuffMs: 0,
@@ -466,9 +464,7 @@ function werkzeugStufe(id) {
 
 // Wert eines Werkzeugs auf einer Stufe (ohne Besitz-Pruefung)
 function werkzeugWertFuer(w, stufe) {
-    const faktor = w.abStufe2 ? stufe - 1 : 1 + WERKZEUG_STUFEN_BONUS * (stufe - 1);
-    const wert = w.wert * faktor;
-    return w.ganz ? Math.round(wert) : wert;
+    return w.wert * (1 + WERKZEUG_STUFEN_BONUS * (stufe - 1));
 }
 
 // Wert eines Werkzeugs, das man besitzt (0, wenn nicht)
@@ -510,7 +506,8 @@ function klicksProSamen() {
 // Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
 function energieMax() {
     let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") + 25 * metaLevel("ausdauer") +
-        aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy") + werkzeugWert("taschenuhr");
+        aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
+    energie *= 1 + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     energie *= 1 + 0.03 * kuschel("faultier");
     if (bossIst("kurzeTage")) energie *= 0.8;
@@ -554,11 +551,11 @@ function komboFensterMs() {
 }
 
 function anzahlBewaessert() {
-    return level("giessen") + aufrunden(tw("herrscherin")) + level("sprinkler") + werkzeugWert("giesskanne") + gachaBonus("felder") + kuschel("delfin");
+    return level("giessen") + aufrunden(tw("herrscherin")) + level("sprinkler") + gachaBonus("felder") + kuschel("delfin");
 }
 
 function anzahlGeduengt() {
-    return level("duengen") + level("duengerabo") + werkzeugWert("zaubererde") + gachaBonus("felder");
+    return level("duengen") + level("duengerabo") + gachaBonus("felder");
 }
 
 function doppelwurfChance() {
@@ -607,7 +604,7 @@ function goldMulti() {
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
 function sternWertMulti() {
-    return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) *
+    return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1);
@@ -854,7 +851,8 @@ function stufenZeitSek(feld) {
     return basisStufenZeitSek(feld.pflanze) / tempo;
 }
 
-function komboMultiplikator() {
+// Kombo-Stufe (x1 bis x5, ganze Zahl) fuer Anzeige, Farben und Musik
+function komboStufe() {
     let multi = 1;
     KONFIG.komboStufen.forEach(stufe => {
         if (kombo.zaehler >= stufe.ab) multi = stufe.multi;
@@ -862,6 +860,11 @@ function komboMultiplikator() {
     const hoechste = KONFIG.komboStufen[KONFIG.komboStufen.length - 1];
     if (kombo.zaehler >= hoechste.ab) multi += level("kombovirtuose");
     return multi;
+}
+
+// So viele Klicks zaehlt ein Klick auf den Samenladen (Honigwabe: jede Stufe ueber x1 zaehlt etwas mehr)
+function komboMultiplikator() {
+    return 1 + (komboStufe() - 1) * (1 + werkzeugWert("honigwabe"));
 }
 
 function wuerfleRaritaetIndex() {
@@ -1624,7 +1627,7 @@ function berechneErnte(feld) {
 
     // Goldene Sichel: jede 10. Ernte bringt 10-fach Gold
     run.ernteZaehler += 1;
-    const sichel = hatWerkzeug("sichel") && run.ernteZaehler % 10 === 0 ? werkzeugWert("sichel") : 0;
+    const sichel = hatWerkzeug("sichel") && run.ernteZaehler % 10 === 0 ? 1 + werkzeugWert("sichel") : 0;
     const mondschein = istNacht() ? 1 + 0.2 * segen("mondschein") + 0.05 * kuschel("flamingo") : 1;
     const nebel = wetterIst("nebel") ? 1.2 : 1;
     const abend = tagesAnteil() > 2 / 3 ? 1 + 0.15 * level("abendsonne") : 1;
@@ -1727,7 +1730,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         }
     }
     for (let i = 0; i < sternKugeln; i++) {
-        const extra = werkzeugWert("wuenschelrute") + (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
+        const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
         const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index);
         const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
@@ -1758,7 +1761,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
 // Eigene Boni der Pflanzen (Bonus-Sterne im Stellarium), die nach der Ernte wirken
 function wendePflanzenBonusAn(pflanze, x, y) {
     if (hatWerkzeug("honigwabe")) {
-        kombo.zaehler += werkzeugWert("honigwabe");
+        kombo.zaehler += 1;
         kombo.letzterKlick = performance.now();
         run.gesamt.maxKombo = Math.max(run.gesamt.maxKombo, kombo.zaehler);
         pruefeKomboStufe();
@@ -1963,7 +1966,7 @@ function drueckeKnopf(x, y) {
 const KOMBO_FARBEN = ["", "#2e9e2e", "#2e9e2e", "#7c2fc2", "#e08a00", "#d9452c"];
 
 function pruefeKomboStufe() {
-    const multi = komboMultiplikator();
+    const multi = komboStufe();
     if (multi > kombo.letzteStufe) {
         const rect = plantButton.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
@@ -2028,7 +2031,7 @@ function aktualisiereKombo(jetzt) {
         } else {
             kombo.zaehler = 0;
         }
-        kombo.letzteStufe = komboMultiplikator();
+        kombo.letzteStufe = komboStufe();
     }
 
     if (kombo.zaehler < 2 || run.phase !== "tag") {
@@ -2036,7 +2039,7 @@ function aktualisiereKombo(jetzt) {
         return;
     }
 
-    const multi = komboMultiplikator();
+    const multi = komboStufe();
     komboAnzeige.classList.remove("versteckt");
     komboAnzeige.dataset.stufe = multi;
     komboText.textContent = t("Kombo ") + kombo.zaehler + t("  ·  x") + multi;
@@ -2085,7 +2088,7 @@ function aktualisiereHelfer(dtMs) {
 }
 
 function sternschnuppeTempo() {
-    return (1 + 0.3 * segen("sternenstaub") + 0.12 * level("vogelhaus")) * (hatWerkzeug("fernrohr") ? 2 : 1) * (wetterIst("sternennacht") ? 3 : 1);
+    return (1 + 0.3 * segen("sternenstaub") + 0.12 * level("vogelhaus")) * (1 + werkzeugWert("fernrohr")) * (wetterIst("sternennacht") ? 3 : 1);
 }
 
 function neuerSternTimerMs() {
@@ -2396,7 +2399,7 @@ function lassVerfallen(loot) {
 // Leuchtender Kopf mit Schweif, der in Flugrichtung zeigt und Funken hinter sich laesst.
 
 function sternschnuppeSek() {
-    return KONFIG.sternschnuppeBuffSek + 3 * segen("sternenstaub") + kuschel("schaf") + werkzeugWert("fernrohr") + 3 * level("schnuppenfaenger");
+    return KONFIG.sternschnuppeBuffSek + 3 * segen("sternenstaub") + kuschel("schaf") + 3 * level("schnuppenfaenger");
 }
 
 function spawnSternschnuppe() {
@@ -2939,8 +2942,8 @@ function aktualisiereEnergie(dtMs) {
 function verteileFeldEffekte() {
     const duerre = bossIst("duerre");
     run.felder.forEach(feld => {
-        feld.bewaessert = !duerre && (wetterIst("regen") || Math.random() < 0.08 * segen("regenwolke"));
-        feld.geduengt = Math.random() < 0.08 * segen("kompost");
+        feld.bewaessert = !duerre && (wetterIst("regen") || Math.random() < 0.08 * segen("regenwolke") + werkzeugWert("giesskanne"));
+        feld.geduengt = Math.random() < 0.08 * segen("kompost") + werkzeugWert("zaubererde");
     });
     if (!duerre) mische(run.felder).slice(0, anzahlBewaessert()).forEach(feld => { feld.bewaessert = true; });
     mische(run.felder).slice(0, anzahlGeduengt() + run.tagesBoni.extraDuenger).forEach(feld => { feld.geduengt = true; });
@@ -4462,7 +4465,7 @@ function gewuenschtesLied() {
 function aktualisiereMusik() {
     Klang.waehleLied(gewuenschtesLied());
     // Bei hoher Kombo wird die Musik etwas schneller
-    const multi = run.phase === "tag" ? komboMultiplikator() : 1;
+    const multi = run.phase === "tag" ? komboStufe() : 1;
     Klang.setzeTempoFaktor(1 + 0.04 * (multi - 1));
 }
 

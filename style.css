@@ -9761,3 +9761,55 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     0% { filter: brightness(1.6) drop-shadow(0 0 8px #ffd93d); transform: scale(1.12); }
     100% { filter: none; transform: none; }
 }
+
+/* Kodex: Werkzeug anklicken zeigt die Steigerung pro Stufe */
+.kodex-karte.klickbar {
+    cursor: pointer;
+}
+
+.kodex-detail {
+    margin-top: 4px;
+    padding: 3px 6px;
+    background: rgba(107, 66, 32, 0.12);
+    border-radius: 4px;
+    font-weight: 700;
+    color: #6b4220;
+}
+
+/* ---------- Slotmaschine ---------- */
+.slot-maschine {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px auto;
+    padding: 10px 14px;
+    width: fit-content;
+    background: linear-gradient(#b8232a, #8f1f2a);
+    border: 4px solid #5a1010;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 3px #ffd84a, 0 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.slot-walze {
+    width: 56px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(#e8e0cc, #fffaf0 30%, #fffaf0 70%, #e8e0cc);
+    border: 3px solid #5a1010;
+    border-radius: 6px;
+}
+
+.slot-walze.dreht img {
+    filter: blur(1px);
+    transform: translateY(3px);
+}
+
+.slot-maschine.gewonnen {
+    animation: slot-gewinn 0.4s steps(2) 6;
+}
+
+@keyframes slot-gewinn {
+    0% { box-shadow: inset 0 0 0 3px #ffd84a, 0 0 18px #ffd84a; }
+    100% { box-shadow: inset 0 0 0 3px #fff6d8, 0 4px 0 rgba(0, 0, 0, 0.3); }
+}

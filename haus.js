@@ -140,7 +140,7 @@ function wendeKosmetikAn() {
     }
 
     const geldIcon = moneyDisplay.querySelector("img");
-    if (geldIcon) setzeSpriteBild(geldIcon, muenzeSprite(0), 2);
+    if (geldIcon) setzeSpriteBild(geldIcon, "muenze_0", 2); // Muenz-Looks gibt es nur fuer die Saat im Spiel
     document.body.classList.toggle("farbenblind", Boolean(einstellungen.farbenblind));
 
     haustier.letzteUrl = "";

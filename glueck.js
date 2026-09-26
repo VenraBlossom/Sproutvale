@@ -1,7 +1,7 @@
 "use strict";
 
 // ============================================================
-// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Gacha-Automat, Rubbellose, Huehnerrennen, Samen-Plinko)
+// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Slotmaschine, Rubbellose, Huehnerrennen, Samen-Plinko)
 // Werden im Stellarium (Ast "Glueck") freigeschaltet. Jedes Spiel darf zwischen zwei Tagen nur ein paar Mal gespielt
 // werden (GLUECKSSPIEL.xyz.proPause + Stammkunde). Glueck (glueckBonus() in script.js) verbessert alle Chancen.
 // Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
@@ -23,8 +23,8 @@ function zeigeUeberspringen(element) {
 
 function neuerGlueckZustand() {
     return {
-        muenzwurf: 0, rubbellos: 0, huehnerrennen: 0, plinko: 0,
-        los: null, letzterWurf: null, letztesRennen: null, letztesPlinko: null
+        muenzwurf: 0, slot: 0, rubbellos: 0, huehnerrennen: 0, plinko: 0,
+        los: null, letzterWurf: null, letzterSlot: null, letztesRennen: null, letztesPlinko: null
     };
 }
 
@@ -37,7 +37,7 @@ function spieleProPause(id) {
 }
 
 function restSpiele(id) {
-    return spieleProPause(id) - run.glueck[id];
+    return spieleProPause(id) - (run.glueck[id] || 0);
 }
 
 function zaehleSieg() {
@@ -50,7 +50,7 @@ function renderGluecksspiele() {
     shopContent.appendChild(erstelleHinweis(t("🍀 Dein Glück: +") + prozentText(glueck) +
         (glueck > 0 ? t(" (bessere Gewinnchancen)") : t(" (Glück bekommst du im Stellarium (Ast \"Glück\"), im Mondteich und von Kuscheltieren)"))));
     if (level("muenzwurf") > 0) renderMuenzwurf();
-    if (level("gacha") > 0) renderGacha();
+    if (level("gacha") > 0) renderSlot();
     if (level("rubbellos") > 0) renderRubbellos();
     if (level("huehnerrennen") > 0) renderHuehnerrennen();
     if (level("plinko") > 0) renderPlinko();
@@ -92,100 +92,118 @@ function restText(id) {
     return t("Noch ") + restSpiele(id) + t(" von ") + spieleProPause(id) + t(" Spielen bis zum nächsten Tag");
 }
 
-// ---------- GACHA-AUTOMAT ----------
-// Jeder Preis gilt fuer den ganzen Run (oder fuer immer). Darum ist der Automat teuer.
-
-function gachaKosten() {
-    const nummer = run.sandbox ? run.meilensteine : run.bezahlteRechnungen;
-    const basis = Math.max(GACHA_KONFIG.mindestPreis, rechnungsBetrag(nummer) * GACHA_KONFIG.anteil);
-    return aufrunden(basis * Math.pow(GACHA_KONFIG.faktor, run.gachaZuege) * (1 - 0.1 * level("gluecksrabatt")));
-}
-
-// Bonus aus Gacha-Preisen in diesem Run (0, wenn keiner gezogen wurde)
+// Boni aus dem alten Gacha-Automaten (nur noch in alten Run-Spielstaenden vorhanden)
 function gachaBonus(id) {
     return (run.gachaBoni && run.gachaBoni[id]) || 0;
 }
 
-function wendeGachaPreisAn(preis, kosten) {
-    run.gachaBoni = run.gachaBoni || {};
-    if (preis.bonus) {
-        run.gachaBoni[preis.bonus] = gachaBonus(preis.bonus) + preis.wert;
-        return preis.text(preis.wert);
-    }
-    if (preis.gutschein) {
-        meta.gutscheine += 1;
-        speichereMeta();
-        return preis.text();
-    }
-    // Werkzeug: nur eins, das man noch nicht hat. Sind alle Plaetze voll, gibt es das Gold zurueck.
-    const moeglich = WERKZEUGE.filter(w => !hatWerkzeug(w.id) && !(run.sandbox && SANDBOX_AUS_WERKZEUGE.includes(w.id)));
-    if (run.werkzeuge.length >= werkzeugPlaetze() || moeglich.length === 0) {
-        run.gold += kosten;
-        return t("Alle Werkzeug-Plätze sind voll: ") + zahl(kosten) + t(" Gold zurück");
-    }
-    const w = zufall(moeglich);
-    gibWerkzeug(w.id, kosten);
-    return w.symbol + " " + w.name + t(" (Stufe ") + werkzeugStufe(w.id) + "): " + werkzeugText(w.id);
+// ---------- SLOTMASCHINE: 3 Walzen, 3 gleiche Symbole gewinnen ----------
+// Das Ergebnis steht beim Drehen schon fest (wie beim Rubbellos), die Walzen halten nacheinander an.
+
+function setzeWalze(walze, symbol) {
+    walze.innerHTML = "";
+    walze.appendChild(pixelIcon(symbol, 40));
 }
 
-// Glueck macht seltene Preise etwas wahrscheinlicher
-function gachaGewicht(preis) {
-    return preis.gewicht * (1 + glueckBonus() * preis.raritaet);
-}
-
-function ziehGacha() {
-    const kosten = gachaKosten();
-    if (!darfEinkaufen() || run.gold < kosten) return;
-    run.gold -= kosten;
-    run.gachaZuege += 1;
-    const preis = gewichteterZufall(GACHA_PREISE, gachaGewicht);
-    run.letzterGachaZug = { name: preis.symbol + " " + preis.name, text: wendeGachaPreisAn(preis, kosten), raritaet: preis.raritaet };
-    if (preis.raritaet >= 2) {
-        Klang.jackpot();
-        zaehleSieg();
-    } else {
-        Klang.kaufen();
-    }
-    aktualisiereAlles();
-}
-
-function renderGacha() {
-    const kosten = gachaKosten();
-    shopContent.appendChild(erstelleKarte({
-        icon: "🎰",
-        titel: t("Gacha-Automat"),
-        beschreibung: t("Teuer, aber jeder Preis gilt für den ganzen Run oder für immer. Jeder Zug in diesem Run wird teurer."),
-        info: t("Züge in diesem Run: ") + run.gachaZuege,
-        knopfText: "🎰 " + preisText(kosten, "gold"),
-        aktiv: darfEinkaufen() && run.gold >= kosten,
-        onKauf: ziehGacha
-    }));
-
-    if (run.letzterGachaZug) {
-        const zug = run.letzterGachaZug;
-        const ergebnis = el("div", "gacha-ergebnis", null, [el("b", null, zug.name), el("div", null, zug.text)]);
-        ergebnis.style.borderColor = RARITAETEN[zug.raritaet].rand;
-        ergebnis.firstChild.style.color = RARITAETEN[zug.raritaet].rand;
-        shopContent.appendChild(ergebnis);
-    }
-
-    // Was man in diesem Run schon gezogen hat
-    const boni = GACHA_PREISE.filter(p => p.bonus && gachaBonus(p.bonus) > 0);
-    if (boni.length > 0) {
-        shopContent.appendChild(erstelleHinweis(t("🎰 Deine Gacha-Boni in diesem Run: ") +
-            boni.map(p => p.symbol + " " + p.text(Math.round(gachaBonus(p.bonus) * 1000) / 1000).replace(t(" (ganzer Run)"), "")).join(" · ")));
-    }
-
-    const gesamt = GACHA_PREISE.reduce((summe, p) => summe + gachaGewicht(p), 0);
-    const liste = el("div", "gacha-liste");
-    GACHA_PREISE.forEach(preis => {
-        const zeile = el("div", null, preis.symbol + " " + preis.name + ": " + (preis.bonus ? preis.text(preis.wert) : preis.text()) +
-            "  ·  " + prozentText(gachaGewicht(preis) / gesamt));
-        zeile.style.color = RARITAETEN[preis.raritaet].rand;
-        liste.appendChild(zeile);
+function renderSlot() {
+    const k = GLUECKSSPIEL.slot;
+    const tabelle = k.symbole.map(s => "3x" + s.symbol + " x" + s.multi).join("  ");
+    const karte = spielKarte(t("🎰 Slotmaschine"),
+        t("Setz einen Teil deines Goldes und dreh die Walzen. 3 gleiche Symbole gewinnen: ") + tabelle, restText("slot"));
+    const letzter = run.glueck.letzterSlot;
+    const walzen = (letzter ? letzter.walzen : ["🌟", "🌟", "🌟"]).map(symbol => {
+        const walze = el("div", "slot-walze");
+        setzeWalze(walze, symbol);
+        return walze;
     });
-    shopContent.appendChild(erstelleHinweis(t("Mögliche Preise:")));
-    shopContent.appendChild(liste);
+    const maschine = el("div", "slot-maschine", null, walzen);
+    if (letzter && letzter.gewonnen) maschine.classList.add("gewonnen");
+    karte.appendChild(maschine);
+    karte.appendChild(einsatzKnoepfe("slot", anteil => dreheSlot(anteil, maschine, walzen), 2));
+    if (letzter) spielErgebnis(karte, letzter.text, letzter.gewonnen);
+}
+
+function dreheSlot(anteil, maschine, walzenEls) {
+    const k = GLUECKSSPIEL.slot;
+    const einsatz = Math.floor(run.gold * anteil);
+    if (!darfEinkaufen() || glueckAnimation || einsatz < 1 || restSpiele("slot") <= 0) return;
+    run.gold -= einsatz;
+    run.glueck.slot = (run.glueck.slot || 0) + 1;
+    glueckAnimation = true;
+    shopContent.querySelectorAll(".spiel-knopf").forEach(knopf => { knopf.disabled = true; });
+    zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
+    maschine.classList.remove("gewonnen");
+
+    const faktor = 1 + glueckBonus();
+    let wurf = Math.random();
+    let gewinn = null;
+    for (const s of [...k.symbole].reverse()) {
+        const chance = s.chance * faktor;
+        if (wurf < chance) {
+            gewinn = s;
+            break;
+        }
+        wurf -= chance;
+    }
+    const alle = k.symbole.map(s => s.symbol);
+    let walzen;
+    if (gewinn) {
+        walzen = [gewinn.symbol, gewinn.symbol, gewinn.symbol];
+    } else {
+        // Niete: oft zwei gleiche (Beinahe-Gewinn), nie drei gleiche
+        const a = zufall(alle);
+        const anders = zufall(alle.filter(s => s !== a));
+        walzen = Math.random() < 0.45 ? mische([a, a, anders]) : [a, anders, zufall(alle.filter(s => s !== a))];
+    }
+
+    Klang.kaufen();
+    const stopp = [650, 1050, 1450];
+    let start = performance.now();
+    const gestoppt = [false, false, false];
+    glueckUeberspringen = () => { start = -Infinity; };
+    zeigeUeberspringen(maschine);
+
+    function dreh() {
+        const vergangen = performance.now() - start;
+        walzenEls.forEach((walze, i) => {
+            if (gestoppt[i]) return;
+            if (vergangen < stopp[i]) {
+                setzeWalze(walze, zufall(alle));
+                walze.classList.add("dreht");
+            } else {
+                gestoppt[i] = true;
+                walze.classList.remove("dreht");
+                setzeWalze(walze, walzen[i]);
+                Klang.klick(30 + i * 12);
+            }
+        });
+        if (gestoppt.every(Boolean)) {
+            setTimeout(beende, 150);
+            return;
+        }
+        setTimeout(dreh, 70);
+    }
+
+    function beende() {
+        glueckUeberspringen = null;
+        glueckAnimation = false;
+        const rect = maschine.getBoundingClientRect();
+        if (gewinn) {
+            const betrag = Math.floor(einsatz * gewinn.multi * (1 + 0.1 * level("gluecksrabatt")));
+            run.gold += betrag;
+            zaehleSieg();
+            maschine.classList.add("gewonnen");
+            if (gewinn.multi >= 10) Klang.jackpot();
+            else Klang.muenze(3);
+            partikel(rect.left + rect.width / 2, rect.top + rect.height / 2, ["#ffd93d", "#ffffff", "#ff8fb1"], gewinn.multi >= 10 ? 30 : 16, 100);
+            run.glueck.letzterSlot = { walzen, gewonnen: true, text: t("3x ") + gewinn.symbol + t(" = x") + gewinn.multi + " · +" + zahl(betrag) + t(" Gold") };
+        } else {
+            Klang.fehler();
+            run.glueck.letzterSlot = { walzen, gewonnen: false, text: t("Leider nichts. -") + zahl(einsatz) + t(" Gold") };
+        }
+        aktualisiereAlles();
+    }
+    dreh();
 }
 
 // ---------- MUENZWURF: Kopf = Einsatz verdoppelt, Zahl = Einsatz weg ----------
@@ -201,7 +219,8 @@ function renderMuenzwurf() {
         restText("muenzwurf"));
     const muenze = document.createElement("img");
     muenze.classList.add("wurf-muenze");
-    setzeSpriteBild(muenze, muenzeSprite(0), 5);
+    const wurf0 = run.glueck.letzterWurf;
+    setzeSpriteBild(muenze, wurf0 && !wurf0.gewonnen ? "muenze_zahl" : "muenze_kopf", 5);
     karte.appendChild(muenze);
     karte.appendChild(einsatzKnoepfe("muenzwurf", anteil => wirfMuenze(anteil, muenze), 1));
     const wurf = run.glueck.letzterWurf;
@@ -220,10 +239,18 @@ function wirfMuenze(anteil, muenzeEl) {
         { duration: 900, easing: "ease-in-out" }
     );
     let fertig = false;
+    // Waehrend die Muenze fliegt, wechseln sich Kopf und Zahl ab
+    let seite = 0;
+    const wechsel = setInterval(() => {
+        seite = 1 - seite;
+        muenzeEl.src = spriteUrl(seite ? "muenze_zahl" : "muenze_kopf");
+    }, 100);
     // setTimeout statt onfinish: laeuft auch, wenn der Browser Animationen im Hintergrund anhaelt
     const beende = () => {
         if (fertig) return;
         fertig = true;
+        clearInterval(wechsel);
+        muenzeEl.src = spriteUrl(gewonnen ? "muenze_kopf" : "muenze_zahl");
         flug.cancel();
         glueckUeberspringen = null;
         glueckAnimation = false;

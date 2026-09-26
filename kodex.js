@@ -31,7 +31,8 @@ function kodexEintraege(reiter) {
             return WETTER.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.wetter[w.id] || 0, text: w.text, zaehler: t("erlebt") }));
         case "werkzeuge":
             return WERKZEUGE.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.werkzeuge[w.id] || 0,
-                text: t("Stufe 1: ") + w.text(werkzeugWertFuer(w, 1)) + t(" Stufe 5: ") + w.text(werkzeugWertFuer(w, 5)), zaehler: t("gekauft") }));
+                text: w.text(w.wert), zaehler: t("gekauft"),
+                detail: w.kurz(w.wert) + " (" + w.kurz(w.wert * WERKZEUG_STUFEN_BONUS) + t(" pro Stufe") + ")" }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
                 text: z.text, ohneZaehler: true }));
@@ -167,8 +168,17 @@ function renderKodex(inhalt) {
             el("div", "kodex-name", entdeckt ? e.name : "???"),
             el("div", "kodex-text", entdeckt ? e.text : t("Noch nicht entdeckt.")),
             el("div", "kodex-zahl", entdeckt && !e.ohneZaehler ? zahl(e.anzahl) + t("x ") + e.zaehler : ""),
-            entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null
+            entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null,
+            entdeckt && e.detail ? el("div", "kodex-detail versteckt", e.detail) : null
         ]);
+        // Werkzeuge: Klick zeigt, wie viel jede Stufe dazugibt
+        if (entdeckt && e.detail) {
+            karte.classList.add("klickbar");
+            karte.addEventListener("click", () => {
+                karte.querySelector(".kodex-detail").classList.toggle("versteckt");
+                Klang.klick(10);
+            });
+        }
         raster.appendChild(karte);
     });
     inhalt.appendChild(raster);

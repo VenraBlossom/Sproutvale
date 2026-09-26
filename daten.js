@@ -511,8 +511,8 @@ const SKILLS = [
     // ----- Glueck (links aussen, haengt am Helfer-Ast) -----
     spielStern("muenzwurf", "🪙", [-960, 0], "haustiertraining", t("Münzwurf"), 200,
         t("Schaltet den Münzwurf auf dem Markt frei: Setz einen Teil deines Goldes. Kopf = doppelt, Zahl = weg.")),
-    spielStern("gacha", "🎰", [-1180, 0], "muenzwurf", t("Gacha-Automat"), 500,
-        t("Schaltet den Gacha-Automaten auf dem Markt frei: Gold einwerfen, zufällige Belohnung ziehen.")),
+    spielStern("gacha", "🎰", [-1180, 0], "muenzwurf", t("Slotmaschine"), 500,
+        t("Schaltet die Slotmaschine auf dem Markt frei: Setz einen Teil deines Goldes, 3 gleiche Symbole gewinnen.")),
     spielStern("rubbellos", "🎟️", [-1400, 0], "gacha", t("Rubbellose"), 1200,
         t("Schaltet Rubbellose auf dem Markt frei: 9 Felder aufrubbeln, 3 gleiche Symbole gewinnen.")),
     spielStern("huehnerrennen", "🐔", [-1620, 0], "rubbellos", t("Hühnerrennen"), 2500,
@@ -522,11 +522,11 @@ const SKILLS = [
     stern("glueckstraehne", "glueck", "🍀", [-960, -220], "muenzwurf", t("Glückssträhne"), 400, 2, 5,
         t("+3% Glück bei allen Glücksspielen (mehr Gewinnchance)."),
         () => "+" + prozentText(glueckBonus()) + t(" Glück")),
-    stern("gluecksrabatt", "glueck", "🏷️", [-1180, -220], "gacha", t("Stammtisch-Rabatt"), 800, 2, 5,
-        t("Der Gacha-Automat ist 10% billiger."),
-        () => "-" + prozentText(0.1 * level("gluecksrabatt")) + t(" Gacha-Preis")),
+    stern("gluecksrabatt", "glueck", "🏷️", [-1180, -220], "gacha", t("Goldene Walzen"), 800, 2, 5,
+        t("Gewinne an der Slotmaschine sind 10% höher."),
+        () => "+" + prozentText(0.1 * level("gluecksrabatt")) + t(" Slot-Gewinne")),
     stern("stammkunde", "glueck", "🎫", [-1400, -220], "rubbellos", t("Stammkunde"), 1500, 2.5, 3,
-        t("+1 Spiel pro Pause bei Münzwurf, Rubbellos, Hühnerrennen und Plinko."),
+        t("+1 Spiel pro Pause bei Münzwurf, Slotmaschine, Rubbellos, Hühnerrennen und Plinko."),
         () => "+" + level("stammkunde") + t(" Spiele pro Pause")),
     stern("haendlerfreund", "glueck", "🧳", [-1620, -220], "huehnerrennen", t("Händlerfreund"), 2000, 2.5, 2,
         t("Der Wanderhändler kommt öfter vorbei."),
@@ -699,14 +699,14 @@ const STERN_KURZ = {
     igel: t("Igel sammeln Saat ein"), saatspatz: t("Spatz pflanzt Samen"), gluehglas: t("Mehr Glühwürmchen"),
     biene: t("Bienen lassen Pflanzen wachsen"), magnetfeld: t("Saat rollt zum Cursor"), eichhoernchen2: t("Mehr Eichhörnchen-Klicks"),
     erntehase: t("Hase erntet für dich"), sternhoernchen: t("Eichhörnchen geben Sternensamen"), helferlohn: t("Eichhörnchen-Klicks x2"),
-    glueckstraehne: t("Mehr Glück beim Spielen"), gluecksrabatt: t("Gacha billiger"), stammkunde: t("Mehr Spiele pro Pause"),
+    glueckstraehne: t("Mehr Glück beim Spielen"), gluecksrabatt: t("Höhere Slot-Gewinne"), stammkunde: t("Mehr Spiele pro Pause"),
     haendlerfreund: t("Händler kommt öfter"), giessen: t("Felder bewässern (x2 Tempo)"), feldvermessung: t("Felder billiger"),
     sonnenuhr: t("Mehr Energie"), fruehaufsteher: t("Samen zum Tagesstart"), duengen: t("Felder düngen (x2 Gold)"),
     morgentau: t("Morgens schneller wachsen"), doppelwurf: t("Zweiter Samen"), zinsen: t("Zinsen bei Feierabend"),
     wetterfrosch: t("Mehr gutes Wetter"), abendsonne: t("Abends mehr Gold"), lagerhaus: t("Höhere Zinsen erlaubt"),
     nachtwache: t("Glühwürmchen: mehr Energie"), gewaechshaus: t("Bewässert: mehr Gold"), wurmhumus: t("Gedüngt: x3 statt x2 Gold"),
     vorratskammer: t("Liegende Saat wird eingesammelt"), erntefest: t("Rechnungstag: mehr Gold"),
-    muenzwurf: t("Glücksspiel: Münzwurf"), gacha: t("Glücksspiel: Gacha-Automat"), rubbellos: t("Glücksspiel: Rubbellose"),
+    muenzwurf: t("Glücksspiel: Münzwurf"), gacha: t("Glücksspiel: Slotmaschine"), rubbellos: t("Glücksspiel: Rubbellose"),
     huehnerrennen: t("Glücksspiel: Hühnerrennen"), plinko: t("Glücksspiel: Samen-Plinko"),
     jahresrad: t("Jahreszeiten stärker"), bluetenzauber: t("Frühling: bunte Saat"), sonnenernte: t("Sommer: mehr Gold"),
     erntedank: t("Herbst: mehr Sternensaat"), frostschutz: t("Winter ohne Malus"), saisonfest: t("1. Tag der Jahreszeit x1,5"),
@@ -733,7 +733,7 @@ const STERN_WIRKUNG = {
     igel: s => Math.min(4, 1 + Math.floor((s - 1) / 5)) + t(" Igel · Tempo ") + (90 + 14 * s),
     saatspatz: s => t("alle ") + sekText(20 / s), gluehglas: s => "+" + 25 * s + t("% Glühwürmchen"),
     biene: s => t("alle ") + sekText(12 / s), magnetfeld: s => 40 * s + t(" Pixel/Sek."), erntehase: s => t("alle ") + sekText(12 / s),
-    glueckstraehne: s => "+" + 3 * s + t("% Glück"), gluecksrabatt: s => "-" + 10 * s + t("% Preis"), stammkunde: s => "+" + s + t(" Spiele"),
+    glueckstraehne: s => "+" + 3 * s + t("% Glück"), gluecksrabatt: s => "+" + 10 * s + t("% Slot-Gewinne"), stammkunde: s => "+" + s + t(" Spiele"),
     haendlerfreund: s => "+" + 50 * s + t("% Chance"), giessen: s => s + t(" Felder 💧"),
     feldvermessung: s => "-" + Math.round((1 - Math.pow(0.92, s)) * 100) + t("% Feldpreis"), sonnenuhr: s => "+" + 10 * s + t(" Energie"),
     fruehaufsteher: s => s + t(" Samen"), duengen: s => s + t(" Felder 🪱"), morgentau: s => "+" + 25 * s + t("% Wachstum"),
@@ -789,36 +789,21 @@ const GLUECKSSPIEL = {
             { name: t("Rudi"), quote: 4, farbe: "#c9661c" },
             { name: t("Flitzi"), quote: 8, farbe: "#6b3f1d" }
         ] },
+    // Slotmaschine: 3 Walzen, nur 3 gleiche Symbole gewinnen (Einsatz x multi). chance = Wahrscheinlichkeit fuer genau
+    // diesen Gewinn, sonst Niete (oft mit 2 gleichen Symbolen, Beinahe-Gewinn). Erwartungswert ca. 0,87, Gewinn in ca. 23% der Drehs.
+    slot: { proPause: 3, einsaetze: [0.05, 0.1, 0.25],
+        symbole: [
+            { symbol: "🌾", multi: 2, chance: 0.12 },
+            { symbol: "🥕", multi: 3, chance: 0.06 },
+            { symbol: "🍓", multi: 5, chance: 0.03 },
+            { symbol: "🎃", multi: 10, chance: 0.012 },
+            { symbol: "🌻", multi: 25, chance: 0.004 },
+            { symbol: "🌟", multi: 100, chance: 0.0008 }
+        ] },
     // Plinko: 8 Reihen Naegel, der Samen faellt in eines von 9 Faechern (Erwartungswert ca. 0,94)
     plinko: { proPause: 3, einsaetze: [0.05, 0.1, 0.25], reihen: 8,
         faecher: [8, 3, 1.3, 0.6, 0.3, 0.6, 1.3, 3, 8] }
 };
-
-// ---------- GACHA-AUTOMAT (auf dem Markt, mit Gold) ----------
-// Teuer, dafuer gilt jeder Preis fuer den ganzen Run (run.gachaBoni) oder sogar fuer immer (Kuschel-Gutschein).
-// Kosten: GACHA_KONFIG.anteil der naechsten Rechnung (Sandbox: des naechsten Meilensteins), jeder Zug im Run x faktor.
-// raritaet = Farbe des Preises (Index in RARITAETEN). bonus/wert = was in run.gachaBoni dazukommt.
-
-const GACHA_KONFIG = { anteil: 0.75, faktor: 1.6, mindestPreis: 20 };
-
-const GACHA_PREISE = [
-    { name: t("Gewürzmischung"), symbol: "🧂", gewicht: 30, raritaet: 0, bonus: "gold", wert: 0.08,
-        text: w => "+" + prozentText(w) + t(" Gold aus allen Ernten (ganzer Run)") },
-    { name: t("Große Samentüte"), symbol: "🛍️", gewicht: 26, raritaet: 0, bonus: "klicks", wert: 1,
-        text: w => "-" + w + t(" Klick pro Samen (ganzer Run)") },
-    { name: t("Wachstumselixier"), symbol: "🧪", gewicht: 18, raritaet: 1, bonus: "wachstum", wert: 0.06,
-        text: w => t("Pflanzen wachsen ") + prozentText(w) + t(" schneller (ganzer Run)") },
-    { name: t("Sternenstaub-Dose"), symbol: "✨", gewicht: 15, raritaet: 1, bonus: "sterne", wert: 0.12,
-        text: w => "+" + prozentText(w) + t(" Sternensamen aus Ernten (ganzer Run)") },
-    { name: t("Glücksklee"), symbol: "☘️", gewicht: 8, raritaet: 2, bonus: "glueck", wert: 0.04,
-        text: w => "+" + prozentText(w) + t(" Chance, dass eine Saat doppelt zählt (ganzer Run)") },
-    { name: t("Zufälliges Werkzeug"), symbol: "🧰", gewicht: 4, raritaet: 3, werkzeug: true,
-        text: () => t("Ein zufälliges Werkzeug auf der aktuellen Stufe (bei vollen Plätzen: Gold zurück)") },
-    { name: t("Kuschel-Gutschein"), symbol: "🎟️", gewicht: 3, raritaet: 3, gutschein: true,
-        text: () => t("Ein Gutschein für den Kuschel-Automaten im Mondteich (bleibt für immer)") },
-    { name: t("Goldene Gießkanne"), symbol: "🏆", gewicht: 1, raritaet: 4, bonus: "felder", wert: 1,
-        text: w => "+" + w + t(" bewässertes und +") + w + t(" gedüngtes Feld an jedem Tag (ganzer Run)") }
-];
 
 // ---------- SEGEN: nach jeder bezahlten Rechnung 1 von 3 waehlen, gilt fuer den ganzen Run ----------
 // Mehrfach waehlbar, die Wirkung stapelt sich. Die Effekte stehen in script.js (segen("id") = Stufe).
@@ -981,43 +966,63 @@ const HAENDLER_KONFIG = {
 const WERKZEUG_STUFEN_BONUS = 0.25;
 const werkzeugZahl = w => zahl(Math.round(w * 10) / 10);
 
+// Jedes Werkzeug wirkt mit einem Prozentwert (wert = Anteil, 0.03 = 3%). kurz(w) = Effekt in einer Zeile fuer den Kodex.
+const werkzeugProzent = w => prozentText(w);
+
 const WERKZEUGE = [
-    { id: "sichel", name: t("Goldene Sichel"), symbol: "🪓", preis: 1.2, wert: 4, text: w => t("Jede 10. Ernte bringt ") + werkzeugZahl(w) + t("-fach Gold.") },
-    { id: "giesskanne", name: t("Silberne Gießkanne"), symbol: "🪣", preis: 0.7, wert: 2, ganz: true, text: w => "+" + w + t(" bewässerte Felder pro Tag.") },
-    { id: "taschenuhr", name: t("Alte Taschenuhr"), symbol: "🕰️", preis: 0.8, wert: 15, ganz: true, text: w => "+" + w + t(" Energie pro Tag.") },
+    { id: "sichel", name: t("Goldene Sichel"), symbol: "🪓", preis: 1.2, wert: 3,
+        text: w => t("Jede 10. Ernte bringt +") + werkzeugProzent(w) + t(" Gold."), kurz: w => "+" + werkzeugProzent(w) + t(" Gold (jede 10. Ernte)") },
+    { id: "giesskanne", name: t("Silberne Gießkanne"), symbol: "🪣", preis: 0.7, wert: 0.15,
+        text: w => "+" + werkzeugProzent(w) + t(" Chance pro Feld, jeden Tag bewässert zu sein."), kurz: w => "+" + werkzeugProzent(w) + t(" Bewässerung") },
+    { id: "taschenuhr", name: t("Alte Taschenuhr"), symbol: "🕰️", preis: 0.8, wert: 0.1,
+        text: w => "+" + werkzeugProzent(w) + t(" Energie pro Tag."), kurz: w => "+" + werkzeugProzent(w) + t(" Energie") },
     { id: "gluecksmuenze", name: t("Glücksmünze"), symbol: "🪙", preis: 0.9, wert: 0.06,
-        text: w => "+" + prozentText(w) + t(" Glück bei Glücksspielen und +") + prozentText(w / 10) + t(" Chance auf legendäre Saaten.") },
-    { id: "saatbeutel", name: t("Großer Saatbeutel"), symbol: "🎒", preis: 0.7, wert: 3, ganz: true, text: w => "-" + w + t(" Klicks pro Samen.") },
-    { id: "flechtkorb", name: t("Flechtkorb"), symbol: "🧺", preis: 1.0, wert: 0.12, text: w => prozentText(w) + t(" Chance auf eine zusätzliche Saat pro Ernte.") },
+        text: w => "+" + werkzeugProzent(w) + t(" Glück bei Glücksspielen und +") + prozentText(w / 10) + t(" Chance auf Goldene Saat."),
+        kurz: w => "+" + werkzeugProzent(w) + t(" Glück") },
+    { id: "saatbeutel", name: t("Großer Saatbeutel"), symbol: "🎒", preis: 0.7, wert: 0.1,
+        text: w => "-" + werkzeugProzent(w) + t(" Klicks pro Samen."), kurz: w => "-" + werkzeugProzent(w) + t(" Klicks pro Samen") },
+    { id: "flechtkorb", name: t("Flechtkorb"), symbol: "🧺", preis: 1.0, wert: 0.12,
+        text: w => "+" + werkzeugProzent(w) + t(" Chance auf eine zusätzliche Saat pro Ernte."), kurz: w => "+" + werkzeugProzent(w) + t(" Extra-Saat") },
     { id: "laterne", name: t("Laterne"), symbol: "🏮", preis: 0.5, wert: 0.5,
-        text: w => t("Glühwürmchen kommen ") + werkzeugZahl(1 + w) + t("-mal so oft und geben ") + werkzeugZahl(1 + w) + t("-mal so viel Energie.") },
+        text: w => t("Glühwürmchen kommen +") + werkzeugProzent(w) + t(" öfter und geben +") + werkzeugProzent(w) + t(" Energie."),
+        kurz: w => "+" + werkzeugProzent(w) + t(" Glühwürmchen") },
     { id: "kompass", name: t("Kompass"), symbol: "🧭", preis: 0.6, wert: 0.1,
-        text: w => t("Der Wanderhändler kommt nach jedem Tag, und alles bei ihm ist ") + prozentText(Math.min(0.5, w)) + t(" billiger.") },
+        text: w => t("Der Wanderhändler kommt nach jedem Tag, und alles bei ihm ist ") + prozentText(Math.min(0.5, w)) + t(" billiger."),
+        kurz: w => "-" + prozentText(Math.min(0.5, w)) + t(" Händlerpreise") },
     { id: "feder", name: t("Krähenfeder"), symbol: "🪶", preis: 0.4, wert: 2,
-        text: w => t("Verscheuchte Krähen lassen Gold fallen (") + werkzeugZahl(w) + t("x der Wert deiner besten Pflanze).") },
+        text: w => t("Verscheuchte Krähen lassen Gold fallen: ") + werkzeugProzent(w) + t(" vom Wert deiner besten Pflanze."),
+        kurz: w => "+" + werkzeugProzent(w) + t(" Krähen-Gold") },
     { id: "sparstrumpf", name: t("Sparstrumpf"), symbol: "🧦", preis: 0.8, wert: 0.03,
-        text: w => "+" + prozentText(w) + t(" Zinsen bei Feierabend (höchstens die Hälfte der nächsten Rechnung).") },
-    { id: "kristallkugel", name: t("Kristallkugel"), symbol: "🔮", preis: 1.0, wert: 0.05, abStufe2: true,
-        text: w => t("Jeder Tag hat Wetter, und es ist immer gutes Wetter.") + (w > 0 ? t(" Außerdem +") + prozentText(w) + t(" Gold.") : "") },
+        text: w => "+" + werkzeugProzent(w) + t(" Zinsen bei Feierabend (höchstens die Hälfte der nächsten Rechnung)."),
+        kurz: w => "+" + werkzeugProzent(w) + t(" Zinsen") },
+    { id: "kristallkugel", name: t("Kristallkugel"), symbol: "🔮", preis: 1.0, wert: 0.05,
+        text: w => "+" + werkzeugProzent(w) + t(" Gold, und jeder Tag hat gutes Wetter."), kurz: w => "+" + werkzeugProzent(w) + t(" Gold") },
     { id: "honigtopf", name: t("Honigtopf"), symbol: "🍯", preis: 0.7, wert: 0.5,
-        text: w => t("Die Kombo bricht erst nach ") + werkzeugZahl(1 + w) + t("-mal so langer Pause ab.") },
-    { id: "fernrohr", name: t("Fernrohr"), symbol: "🔭", preis: 0.6, wert: 3, ganz: true,
-        text: w => t("Sternschnuppen kommen doppelt so oft und geben ") + w + t(" Sekunden länger doppeltes Gold.") },
-    { id: "wuenschelrute", name: t("Wünschelrute"), symbol: "🎋", preis: 1.1, wert: 3, ganz: true, text: w => "+" + w + t(" Sternensamen bei jeder Ernte.") },
+        text: w => "+" + werkzeugProzent(w) + t(" Zeit, bevor die Kombo abbricht."), kurz: w => "+" + werkzeugProzent(w) + t(" Kombo-Zeit") },
+    { id: "fernrohr", name: t("Fernrohr"), symbol: "🔭", preis: 0.6, wert: 1,
+        text: w => t("Sternschnuppen kommen +") + werkzeugProzent(w) + t(" öfter."), kurz: w => "+" + werkzeugProzent(w) + t(" Sternschnuppen") },
+    { id: "wuenschelrute", name: t("Wünschelrute"), symbol: "🎋", preis: 1.1, wert: 0.25,
+        text: w => "+" + werkzeugProzent(w) + t(" Sternensamen."), kurz: w => "+" + werkzeugProzent(w) + t(" Sternensamen") },
     { id: "hufeisen", name: t("Magnet-Hufeisen"), symbol: "🧲", preis: 0.9, wert: 0.5,
-        text: w => t("Gelandete Saaten werden alle ") + werkzeugZahl(2 / w) + t(" Sekunden automatisch eingesammelt.") },
-    { id: "zaubererde", name: t("Zaubererde"), symbol: "🧪", preis: 0.9, wert: 2, ganz: true, text: w => "+" + w + t(" gedüngte Felder pro Tag.") },
+        text: w => t("Gelandete Saaten werden automatisch eingesammelt, alle ") + werkzeugZahl(2 / w) + t(" Sekunden (+") +
+            werkzeugProzent(w) + t(" Einsammel-Tempo)."), kurz: w => "+" + werkzeugProzent(w) + t(" Einsammel-Tempo") },
+    { id: "zaubererde", name: t("Zaubererde"), symbol: "🧪", preis: 0.9, wert: 0.15,
+        text: w => "+" + werkzeugProzent(w) + t(" Chance pro Feld, jeden Tag gedüngt zu sein (doppeltes Gold)."), kurz: w => "+" + werkzeugProzent(w) + t(" Dünger") },
     { id: "strohhut", name: t("Strohhut"), symbol: "👒", preis: 0.7, wert: 0.05,
-        text: w => t("Hitzewelle und Nebel haben keine Nachteile, und du bekommst +") + prozentText(w) + t(" Gold.") },
-    { id: "sanduhr", name: t("Sanduhr"), symbol: "⏳", preis: 0.9, wert: 0.08, text: w => t("Alle Pflanzen wachsen ") + prozentText(w) + t(" schneller.") },
-    { id: "goldzahn", name: t("Goldzahn"), symbol: "🦷", preis: 0.8, wert: 0.5, text: w => t("Legendäre Jackpots sind ") + werkzeugZahl(1 + w) + t("-mal so viel wert.") },
+        text: w => "+" + werkzeugProzent(w) + t(" Gold, und Hitzewelle und Nebel haben keine Nachteile."), kurz: w => "+" + werkzeugProzent(w) + t(" Gold") },
+    { id: "sanduhr", name: t("Sanduhr"), symbol: "⏳", preis: 0.9, wert: 0.08,
+        text: w => t("Alle Pflanzen wachsen +") + werkzeugProzent(w) + t(" schneller."), kurz: w => "+" + werkzeugProzent(w) + t(" Wachstum") },
+    { id: "goldzahn", name: t("Goldzahn"), symbol: "🦷", preis: 0.8, wert: 0.5,
+        text: w => t("Goldene Saaten sind +") + werkzeugProzent(w) + t(" mehr wert."), kurz: w => "+" + werkzeugProzent(w) + t(" Goldene Saat") },
     { id: "kleeblatt", name: t("Vierblättriges Kleeblatt"), symbol: "☘️", preis: 0.9, wert: 0.06,
-        text: w => "+" + prozentText(w) + t(" Chance, dass eine Saat doppelt zählt.") },
-    { id: "wetterfahne", name: t("Wetterfahne"), symbol: "🚩", preis: 0.5, wert: 1, text: w => t("Wetter kommt ") + werkzeugZahl(1 + w) + t("-mal so oft.") },
+        text: w => "+" + werkzeugProzent(w) + t(" Chance, dass eine Saat doppelt zählt."), kurz: w => "+" + werkzeugProzent(w) + t(" doppelte Saat") },
+    { id: "wetterfahne", name: t("Wetterfahne"), symbol: "🚩", preis: 0.5, wert: 1,
+        text: w => t("Wetter kommt +") + werkzeugProzent(w) + t(" öfter."), kurz: w => "+" + werkzeugProzent(w) + t(" Wetter") },
     { id: "vogelnest", name: t("Vogelnest"), symbol: "🪺", preis: 0.7, wert: 0.1,
-        text: w => "+" + prozentText(w) + t(" Chance, dass ein Samen einen zweiten mitbringt.") },
-    { id: "honigwabe", name: t("Honigwabe"), symbol: "🐝", preis: 0.6, wert: 1, ganz: true,
-        text: w => t("Jede Ernte gibt +") + w + t(" Kombo und füllt die Kombo-Zeit auf.") }
+        text: w => "+" + werkzeugProzent(w) + t(" Chance, dass ein Samen einen zweiten mitbringt."), kurz: w => "+" + werkzeugProzent(w) + t(" zweiter Samen") },
+    { id: "honigwabe", name: t("Honigwabe"), symbol: "🐝", preis: 0.6, wert: 0.2,
+        text: w => t("Jede Ernte füllt die Kombo-Zeit auf, und Kombo-Stufen zählen +") + werkzeugProzent(w) + t(" mehr Klicks."),
+        kurz: w => "+" + werkzeugProzent(w) + t(" Kombo-Bonus") }
 ];
 const WERKZEUG_NACH_ID = Object.fromEntries(WERKZEUGE.map(w => [w.id, w]));
 

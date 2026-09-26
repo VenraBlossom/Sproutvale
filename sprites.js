@@ -412,6 +412,35 @@ const SPRITE_PIXEL = {
         "..kkyyyykk..",
         "....kkkk...."
     ],
+    // Muenzwurf: Kopf-Seite (Gesicht) und Zahl-Seite (eine 1)
+    muenze_kopf: [
+        "....kkkk....",
+        "..kkYYYYkk..",
+        ".kYwYYYYYyk.",
+        ".kYYYYYYYyk.",
+        "kYYYyYYyYYyk",
+        "kYYYyYYyYYyk",
+        "kYYYYYYYYYyk",
+        "kYYyYYYYyYyk",
+        ".kYYyyyyYyk.",
+        ".kyYYYYYyyk.",
+        "..kkyyyykk..",
+        "....kkkk...."
+    ],
+    muenze_zahl: [
+        "....kkkk....",
+        "..kkYYYYkk..",
+        ".kYwYYYYYyk.",
+        ".kYYYyyYYyk.",
+        "kYYYyyyYYYyk",
+        "kYYYYyyYYYyk",
+        "kYYYYyyYYYyk",
+        "kYYYYyyYYYyk",
+        ".kYYyyyyYyk.",
+        ".kyYYYYYyyk.",
+        "..kkyyyykk..",
+        "....kkkk...."
+    ],
     // Jackpot-Muenze mit funkelndem Stern
     muenze_stern: [
         "....kkkk....",
