@@ -3053,7 +3053,7 @@ function naechsterSandboxTag() {
     haken("tagVorbereiten"); // neues Wetter
     verteileFeldEffekte();
     haken("tagStart");
-    zeigeBanner("☀️", t("Tag ") + run.tag, t("Ein neuer Tag beginnt"), "#e0a800", 2600);
+    if (!imHauptmenue()) zeigeBanner("☀️", t("Tag ") + run.tag, t("Ein neuer Tag beginnt"), "#e0a800", 2600);
     Klang.tagStart();
     speichereRun();
     speichereMeta();
@@ -4028,6 +4028,11 @@ function renderSternDetails(def) {
 }
 
 // ---------- HAUPTMENUE UND EINSTELLUNGEN ----------
+
+// Ist gerade das Hauptmenue offen? (dann keine Spiel-Meldungen oben)
+function imHauptmenue() {
+    return !hauptmenue.classList.contains("versteckt");
+}
 
 function spielPausiert() {
     return !hauptmenue.classList.contains("versteckt") || !einstellungenFenster.classList.contains("versteckt") ||

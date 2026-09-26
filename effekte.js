@@ -139,6 +139,7 @@ function zeigeTitel(text, klasse) {
 }
 
 registriereHaken("tagStart", () => {
+    if (imHauptmenue()) return; // Spielstart: der Tag laeuft hinter dem Hauptmenue an, kein grosser Titel
     const z = jahreszeit();
     zeigeTitel(t("☀️ Tag ") + run.tag, "titel-tag");
     setTimeout(() => {

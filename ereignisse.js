@@ -688,6 +688,8 @@ registriereHaken("tagStart", () => {
     const z = jahreszeit();
     meta.kodex.jahreszeiten = meta.kodex.jahreszeiten || {};
     meta.kodex.jahreszeiten[z.id] = (meta.kodex.jahreszeiten[z.id] || 0) + 1;
+    // Laeuft der Tag nur im Hintergrund hinter dem Hauptmenue an, keine Meldung
+    if (imHauptmenue()) return;
     zeigeBanner(z.symbol, z.name + t(" beginnt!"), z.text, z.farbe, 4000);
 });
 
