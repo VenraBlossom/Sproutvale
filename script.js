@@ -1999,7 +1999,13 @@ function wirfZweitenSamen() {
     });
 }
 
+let letzterKnopfDruck = 0;
+
 function drueckeKnopf(x, y) {
+    // Sehr schnelle Klicks (Autoklicker): die Wirkung zaehlt, die Animation nur ab und zu
+    const jetzt = performance.now();
+    if (jetzt - letzterKnopfDruck < 45) return;
+    letzterKnopfDruck = jetzt;
     plantButton.animate(
         [{ transform: "scale(0.94)" }, { transform: "scale(1.02)" }, { transform: "scale(1)" }],
         { duration: 160, easing: "ease-out" }
@@ -2173,17 +2179,31 @@ function aktualisiereTimer(dtMs) {
 
     if (run.sandbox) pruefeMeilensteine();
     const buffs = [];
-    if (run.goldBuffMs > 0) buffs.push(t("🌠 x2 Gold ") + Math.ceil(run.goldBuffMs / 1000) + "s");
-    if (run.rauschMs > 0) buffs.push(t("🔥 x3 Gold ") + Math.ceil(run.rauschMs / 1000) + "s");
+    const tipp = [];
+    if (run.goldBuffMs > 0) {
+        buffs.push("🌠 " + Math.ceil(run.goldBuffMs / 1000) + "s");
+        tipp.push("## " + t("🌠 Sternschnuppe"), "= " + t("x2 Gold"), "- " + t("noch ") + Math.ceil(run.goldBuffMs / 1000) + t(" Sekunden"));
+    }
+    if (run.rauschMs > 0) {
+        buffs.push("🔥 " + Math.ceil(run.rauschMs / 1000) + "s");
+        tipp.push("## " + t("🔥 Goldrausch"), "= " + t("x3 Gold"), "- " + t("noch ") + Math.ceil(run.rauschMs / 1000) + t(" Sekunden"));
+    }
     buffAnzeige.classList.toggle("versteckt", buffs.length === 0);
-    if (buffs.length > 0) buffAnzeige.textContent = buffs.join("  ");
+    if (buffs.length > 0 && buffAnzeige.textContent !== buffs.join("  ")) buffAnzeige.textContent = buffs.join("  ");
+    setzeTipp(buffAnzeige, tipp.join("\n") || null);
     haken("tagTick", dtMs);
 }
 
 // ---------- EFFEKTE: PARTIKEL, WACKELN, SCHWEBETEXTE ----------
 
+// Obergrenze fuer Effekte auf dem Bildschirm (sonst ruckelt es bei Autoklickern)
+const FX_GRENZE = 350;
+
 function partikel(x, y, farben, anzahl, staerke) {
     if (x === undefined) return;
+    const frei = FX_GRENZE - fxLayer.childElementCount;
+    if (frei <= 0) return;
+    anzahl = Math.min(anzahl, frei);
     for (let i = 0; i < anzahl; i++) {
         const el = document.createElement("div");
         el.classList.add("partikel");
@@ -2217,6 +2237,7 @@ function wackleBildschirm(staerke) {
 }
 
 function zeigeSchwebeText(x, y, text, farbe, gross) {
+    if (!gross && fxLayer.querySelectorAll(".schwebe-text").length > 25) return;
     const el = document.createElement("div");
     el.classList.add("schwebe-text");
     if (gross) el.classList.add("schwebe-gross");
@@ -2254,6 +2275,11 @@ function zeigeToast(text) {
 // ---------- KUGELN: WURF ----------
 
 function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
+    // Zu viele fliegende Kugeln (Autoklicker): ohne Bild, aber mit derselben Flugzeit
+    if (!istSamen && fxLayer.querySelectorAll(".wurf-kugel").length > 24) {
+        setTimeout(onAnkunft, 350);
+        return;
+    }
     const kugel = document.createElement("div");
     kugel.classList.add("wurf-kugel");
     if (istSamen) kugel.classList.add("wurf-samen");
@@ -3507,22 +3533,37 @@ function aktivTipp() {
 function aktualisiereTopBar() {
     zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
-    kalenderDisplay.querySelector("span").textContent = (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag;
+    kalenderDisplay.querySelector("span").textContent = t("Tag ") + run.tag;
+    const gesamtSterne = run.gesamt.sternensamen || 0;
+    setzeTipp(moneyDisplay, "## " + t("🪙 Gold") + "\n= " + zahl(run.gold) + "\n" + t("Für den Markt, neue Felder und die Rechnungen.") +
+        (run.sandbox ? "" : "\n- " + t("Nächste Rechnung: ") + zahl(naechsteRechnung().betrag) + t(" Gold")) +
+        "\n- " + t("In diesem Run verdient: ") + zahl(run.gesamt.gold) + t(" Gold"));
+    setzeTipp(skillpointDisplay, "## " + t("✨ Sternensamen") + "\n= " + zahl(run.skillpunkte) + "\n" + t("Für das Stellarium.") +
+        "\n- " + t("Jede Ernte lässt Sternensaat fallen") + "\n- " + t("Jeder Klick auf den Samenladen: +") + sternensamenProKlick() +
+        "\n- " + t("In diesem Run gesammelt: ") + zahl(gesamtSterne));
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
     if (run.sandbox) {
-        rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(run.gesamt.gold) + " / " +
-            zahl(meilensteinSchwelle(run.meilensteineGemeldet + 1)) + t(" Gold");
-        setzeTipp(rechnungDisplay, t("Nächster Meilenstein: so viel Gold musst du in diesem Spielstand insgesamt verdienen. ") +
-            t("Jeder Meilenstein bringt einen Segen und beim Neuanfang Mondblüten."));
+        // Meilensteine erreicht man einfach (nichts wird abgezogen): angezeigt wird nur das naechste Ziel
+        const ziel = meilensteinSchwelle(run.meilensteine + 1);
+        rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(ziel) + t(" Gold");
+        setzeTipp(rechnungDisplay, "## " + t("🏁 Nächster Meilenstein") + "\n= " + zahl(ziel) + t(" Gold") + "\n" +
+            t("Erreichst du, sobald du in diesem Spielstand insgesamt so viel Gold verdient hast. Es wird nichts abgezogen.") +
+            "\n- " + t("Schon verdient: ") + zahl(run.gesamt.gold) + t(" Gold") +
+            "\n- " + t("Erreicht: ") + run.meilensteine + t(" Meilensteine") +
+            "\n" + t("Jeder Meilenstein bringt einen Segen und beim Neuanfang Mondblüten."));
         rechnungDisplay.classList.remove("boss");
     } else {
         const rechnung = naechsteRechnung();
-        rechnungDisplay.querySelector("span").textContent =
-            (run.gnadenRechnung ? "⚖️ " : rechnung.boss ? t("🏦 Kredit: ") : "") + zahl(rechnung.betrag) + t(" Gold in ") + tageText(rechnung.tageBis);
+        rechnungDisplay.querySelector("span").textContent = zahl(rechnung.betrag) + t(" Gold in ") + tageText(rechnung.tageBis);
         rechnungDisplay.classList.toggle("boss", rechnung.boss);
-        setzeTipp(rechnungDisplay, t("Nächste Rechnung. Jede 3. ist ein Kredit, den du abbezahlen musst: Bis dahin gilt eine ") +
-            t("Kredit-Auflage, dafür gibt es Sternensamen und einen zusätzlichen Segen zur Auswahl."));
+        const fehlt = Math.max(0, rechnung.betrag - run.gold);
+        setzeTipp(rechnungDisplay, "## " + (run.gnadenRechnung ? t("⚖️ Gnadenfrist") : rechnung.boss ? t("🏦 Nächster Kredit") : t("🧾 Nächste Rechnung")) +
+            "\n= " + zahl(rechnung.betrag) + t(" Gold") +
+            "\n- " + t("Fällig am Ende von Tag ") + rechnung.tag + " (" + tageText(rechnung.tageBis) + ")" +
+            "\n" + (fehlt > 0 ? "- " + t("Es fehlen noch ") + zahl(fehlt) + t(" Gold") : "> " + t("✔ Du hast genug Gold")) +
+            (rechnung.boss && run.bossRegel ? "\n- " + t("Kredit-Auflage: ") + BOSS_NACH_ID[run.bossRegel].name + ": " + BOSS_NACH_ID[run.bossRegel].text : "") +
+            "\n" + t("Jede 3. Rechnung ist ein Kredit: Bis dahin gilt eine Kredit-Auflage, dafür gibt es Sternensamen und einen Segen mehr zur Auswahl."));
     }
     aktualisiereEnergieAnzeige();
 }
@@ -3539,9 +3580,11 @@ function aktualisiereEnergieAnzeige() {
             t(" Meilensteine (die Hälfte von dem, was so viele Rechnungen bringen würden)."));
         return;
     }
-    setzeTipp(energieBox, t("Energie = Tageszeit. Ist sie leer, ist Feierabend."));
     const max = run.phase === "tag" ? run.tagesMaxEnergie : energieMax() + run.naechsterTag.energie;
     const wert = run.phase === "tag" ? run.energie : max;
+    setzeTipp(energieBox, "## " + t("⚡ Energie") + "\n= " + Math.ceil(wert) + " / " + Math.round(max) + "\n" +
+        t("Energie ist die Tageszeit. Ist sie leer, ist Feierabend.") + "\n- " + t("Glühwürmchen am Abend geben Energie zurück") +
+        "\n- " + t("Mehr Energie: Markt, Stellarium, Segen und Mondteich"));
     energieFuellung.style.width = Math.min(100, (wert / max) * 100) + "%";
     energieFuellung.classList.toggle("energie-knapp", run.phase === "tag" && wert <= 50);
     energieText.textContent = Math.ceil(wert);

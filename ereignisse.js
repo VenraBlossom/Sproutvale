@@ -60,9 +60,9 @@ function zeigeWetter() {
     if (!wetter) return;
 
     wetterAnzeige.innerHTML = "";
-    wetterAnzeige.append(pixelIcon(wetter.symbol, 32), el("span", null, wetter.name));
-    setzeTipp(wetterAnzeige, "## " + wetter.symbol + " " + wetter.name + (wetter.gut ? t(" (gutes Wetter)") : t(" (schlechtes Wetter)")) + "\n" +
-        wetterText(wetter) + t("\nGilt für den ganzen Tag."));
+    wetterAnzeige.append(pixelIcon(wetter.symbol, 32));
+    setzeTipp(wetterAnzeige, "## " + wetter.symbol + " " + wetter.name + "\n= " + (wetter.gut ? t("Gutes Wetter") : t("Schlechtes Wetter")) + "\n" +
+        wetterText(wetter) + "\n- " + t("Gilt für den ganzen Tag."));
 
     if (wetter.id === "regen" || wetter.id === "gewitter") {
         const tropfen = wetter.id === "gewitter" ? 90 : 60;
@@ -672,7 +672,7 @@ function renderJahreszeitUhr() {
     const tageImJahr = JAHRESZEITEN_KONFIG.tageProJahreszeit * JAHRESZEITEN.length;
     const position = ((run.tag - 1) % tageImJahr + tagesFortschritt()) / tageImJahr;
     uhrZeiger.style.setProperty("--winkel", position * 360 + "deg");
-    jahreszeitUhr.querySelector("span").textContent = z.symbol + " " + z.name;
+    jahreszeitUhr.querySelector("span").textContent = z.symbol;
     setzeTipp(jahreszeitUhr, jahreszeitTipp());
 }
 

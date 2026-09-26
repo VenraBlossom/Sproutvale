@@ -893,3 +893,29 @@ const Klang = {
 
 // Ton startet beim allerersten Klick irgendwo auf der Seite
 document.addEventListener("pointerdown", () => Klang.start(), { once: true });
+
+// Autoklicker sind erlaubt, sollen aber nicht laggen oder den Ton uebersteuern:
+// derselbe Effekt-Ton hoechstens alle 45 ms, insgesamt hoechstens 30 Effekt-Toene pro Sekunde.
+(function drossleToene() {
+    const intern = new Set(["start", "erzeugeHall", "erzeugeRauschen", "setzeLautstaerken", "verbinde", "zupfen", "glocke", "flaeche",
+        "bass", "kick", "rauschStoss", "plopp", "arpeggio", "glockenspiel", "bereit", "regen", "starteMusik", "waehleLied",
+        "setzeTempoFaktor", "planeMusik", "spieleTakt"]);
+    const zuletzt = {};
+    let fensterStart = 0;
+    let imFenster = 0;
+    Object.keys(Klang).forEach(name => {
+        const original = Klang[name];
+        if (typeof original !== "function" || intern.has(name)) return;
+        Klang[name] = function (...werte) {
+            const jetzt = performance.now();
+            if (jetzt - (zuletzt[name] || -1000) < 45) return undefined;
+            if (jetzt - fensterStart > 1000) {
+                fensterStart = jetzt;
+                imFenster = 0;
+            }
+            if (++imFenster > 30) return undefined;
+            zuletzt[name] = jetzt;
+            return original.apply(this, werte);
+        };
+    });
+})();

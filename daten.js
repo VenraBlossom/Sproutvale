@@ -89,7 +89,7 @@ const SPIEL_VERSION = "Alpha 0.6.1";
 const KONFIG = {
     startKlicksProSamen: 40,
     minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
-    klickWachstum: 0.02,              // ein Klick auf eine wachsende Pflanze: +2% ihrer ganzen Wachstumszeit (keine Boni darauf)
+    klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
     startEnergie: 150,
     energieProSek: 5,
     tageProRechnung: 5,

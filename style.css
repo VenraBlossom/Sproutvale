@@ -10128,3 +10128,78 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 0.85em;
     opacity: 0.8;
 }
+
+/* ---------- Obere Leiste: Anzeigen sind Knoepfe mit Infokarte ---------- */
+.info-knopf {
+    cursor: pointer;
+    transition: transform 0.08s, filter 0.08s;
+}
+
+.info-knopf:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+.info-knopf:active {
+    transform: translateY(1px);
+}
+
+/* Infokarte: Pergament mit Holzkopf, grosser Wert, Punkte */
+#tooltip.tipp-karte {
+    max-width: 360px;
+    min-width: 220px;
+    padding: 0 0 8px;
+    overflow: hidden;
+    background: linear-gradient(#fffaf0, #f6ead0);
+    border-radius: 8px;
+}
+
+#tooltip.tipp-karte .tipp-titel {
+    margin: 0 0 6px;
+    padding: 6px 12px;
+    color: #fff6dc;
+    font-weight: 700;
+    background: linear-gradient(#b87a3e, #8a5a2c);
+    border-bottom: 3px solid var(--holz-dunkel);
+    text-shadow: 1px 1px 0 #3e2412;
+}
+
+#tooltip.tipp-karte .tipp-titel:not(:first-child) {
+    margin-top: 8px;
+    border-top: 3px solid var(--holz-dunkel);
+}
+
+#tooltip.tipp-karte .tipp-zeile,
+#tooltip.tipp-karte .tipp-aktiv,
+#tooltip.tipp-karte .tipp-punkt,
+#tooltip.tipp-karte .tipp-wert {
+    padding: 0 12px;
+}
+
+.tipp-wert {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #6b4220;
+    margin: 0 0 4px;
+}
+
+.tipp-punkt {
+    position: relative;
+    padding-left: 26px !important;
+}
+
+.tipp-punkt::before {
+    content: "";
+    position: absolute;
+    left: 13px;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    background: #7cc04a;
+    box-shadow: 0 0 0 1px #3f7020;
+}
+
+/* Festgehalten (angeklickt): kleiner Rahmen, damit man sieht, dass sie offen bleibt */
+#tooltip.tipp-fest {
+    box-shadow: 0 0 0 2px var(--holz-dunkel), 0 0 0 5px #ffd93d, 0 6px 14px rgba(0, 0, 0, 0.3);
+}

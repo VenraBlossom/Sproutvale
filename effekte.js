@@ -52,7 +52,7 @@ registriereHaken("tagEnde", () => { document.body.dataset.fieber = 0; });
 
 function klickRing() {
     const rect = plantButton.getBoundingClientRect();
-    const multi = run.phase === "tag" ? komboMultiplikator() : 1;
+    const multi = run.phase === "tag" ? komboStufe() : 1;
     zeigeRing(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width * (1.1 + 0.12 * multi),
         KOMBO_FARBEN[multi] || "#ffe89a", 380);
 }

@@ -213,7 +213,7 @@ function setzeTipp(element, text) {
 }
 
 function zeigeTippFuer(ziel) {
-    if (!einstellungen.tipps || !ziel || !ziel.dataset.tipp) return;
+    if ((!einstellungen.tipps && tippFest !== ziel) || !ziel || !ziel.dataset.tipp) return;
     if (!tippEl) {
         tippEl = el("div");
         tippEl.id = "tooltip";
@@ -223,9 +223,14 @@ function zeigeTippFuer(ziel) {
     ziel.dataset.tipp.split("\n").forEach(zeile => {
         if (zeile.startsWith("## ")) tippEl.appendChild(el("div", "tipp-titel", zeile.slice(3)));
         else if (zeile.startsWith("> ")) tippEl.appendChild(el("div", "tipp-aktiv", zeile.slice(2)));
+        else if (zeile.startsWith("= ")) tippEl.appendChild(el("div", "tipp-wert", zeile.slice(2)));
+        else if (zeile.startsWith("- ")) tippEl.appendChild(el("div", "tipp-punkt", zeile.slice(2)));
         else tippEl.appendChild(el("div", "tipp-zeile", zeile || " "));
     });
     tippEl.classList.toggle("tipp-breit", ziel.dataset.tipp.length > 220);
+    // Infokarten der oberen Leiste haben einen eigenen, groesseren Look
+    tippEl.classList.toggle("tipp-karte", Boolean(ziel.closest("#top-leiste")));
+    tippEl.classList.toggle("tipp-fest", tippFest === ziel);
     tippEl.classList.add("sichtbar");
     const rect = ziel.getBoundingClientRect();
     const breite = tippEl.offsetWidth;
@@ -238,13 +243,18 @@ function zeigeTippFuer(ziel) {
     tippEl.style.top = y + "px";
 }
 
+// Infokarten in der oberen Leiste: anklicken haelt sie offen, bis man woanders hinklickt
+let tippFest = null;
+
 function versteckeTipp() {
     clearTimeout(tippTimer);
     tippZiel = null;
+    if (tippFest) return;
     if (tippEl) tippEl.classList.remove("sichtbar");
 }
 
 document.addEventListener("pointerover", event => {
+    if (tippFest) return;
     const ziel = event.target.closest ? event.target.closest("[data-tipp]") : null;
     if (ziel === tippZiel) return;
     versteckeTipp();
@@ -252,7 +262,29 @@ document.addEventListener("pointerover", event => {
     tippZiel = ziel;
     tippTimer = setTimeout(() => zeigeTippFuer(ziel), 350);
 });
-document.addEventListener("pointerdown", versteckeTipp);
+document.addEventListener("pointerdown", event => {
+    const info = event.target.closest ? event.target.closest(".info-knopf") : null;
+    if (info && info.dataset.tipp) {
+        const schonOffen = tippFest === info;
+        tippFest = null;
+        versteckeTipp();
+        if (!schonOffen) {
+            tippFest = info;
+            zeigeTippFuer(info);
+        }
+        return;
+    }
+    tippFest = null;
+    versteckeTipp();
+});
+// Offene Infokarte laufend aktualisieren (Zahlen aendern sich)
+setInterval(() => {
+    if (tippFest && tippFest.isConnected && tippEl && tippEl.classList.contains("sichtbar")) zeigeTippFuer(tippFest);
+    else if (tippFest && !tippFest.isConnected) {
+        tippFest = null;
+        versteckeTipp();
+    }
+}, 500);
 
 // ---------- ZAHLEN HOCHZAEHLEN ----------
 // Die Anzeige laeuft in ca. 0,35 Sekunden vom alten zum neuen Wert.
