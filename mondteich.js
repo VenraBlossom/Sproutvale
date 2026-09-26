@@ -370,7 +370,7 @@ function loeseSternenfallAus() {
     zeigeBanner("☄️", t("Sternenfall!"), "+" + splitter + t(" Sternensplitter · alle Mondblüten ab jetzt x") +
         zahl(Math.pow(2, meta.sternenfaelle)) + (geschenk ? " · +" + geschenk + t(" Gutscheine") : ""), "#7c4fb3", 4500);
     // Ein vorbereiteter Tag 1 wird mit den neuen Werten neu aufgebaut
-    if (run.phase === "vorTag" && run.tag === 1) starteNeuenRun(false);
+    if (run.phase === "vorTag" && run.tag === 1 && !run.koop) starteNeuenRun(false);
     oeffnePrestigeShop();
 }
 
@@ -468,8 +468,8 @@ function waehleMondphase(index) {
     if (index > (meta.mondphaseFrei || 0)) return;
     meta.mondphase = index;
     speichereMeta();
-    // Ein vorbereiteter Tag 1 uebernimmt die Phase sofort
-    if (run.phase === "vorTag" && run.tag === 1 && !run.sandbox) starteNeuenRun(false);
+    // Ein vorbereiteter Tag 1 uebernimmt die Phase sofort (im Duo nicht: dort waehlt der Host beim Start)
+    if (run.phase === "vorTag" && run.tag === 1 && !run.sandbox && !run.koop) starteNeuenRun(false);
     Klang.stern();
     oeffnePrestigeShop();
 }
@@ -507,6 +507,18 @@ function renderMondphasen() {
 
 function renderSpielmodi() {
     prestigeInfo.textContent = t("Spielmodi verändern die Regeln eines Runs.");
+    // Im Duo startet nur der Host neue Runs, und zwar aus der Lobby
+    if (run.koop) {
+        prestigeInhalt.appendChild(erstelleHinweis(t("👥 Im Duo startet der Host neue Runs in der Lobby. Die Mondphase des Hosts gilt für euch beide. ") +
+            t("Deine Auswahl hier gilt für deine Solo-Runs.")));
+        if (!run.sandbox) renderMondphasen();
+        if (neueMondphase()) {
+            meta.mondphaseGesehen = meta.mondphaseFrei || 0;
+            speichereMeta();
+            aktualisiereMondphaseHinweis();
+        }
+        return;
+    }
     if (!run.sandbox) renderMondphasen(); // Mondphasen gelten nur fuer normale Runs
     // Neue Mondphasen sind jetzt gesehen (das Ausrufezeichen verschwindet beim naechsten Oeffnen)
     if (neueMondphase()) {

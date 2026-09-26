@@ -4942,12 +4942,17 @@ function frageNeuanfang() {
             el("p", "neuanfang-klein", run.meilensteine === 0
                 ? t("Du hast noch keinen Meilenstein erreicht und bekommst darum noch nichts.")
                 : t("Für ") + run.meilensteine + (run.meilensteine === 1 ? t(" Meilenstein") : t(" Meilensteine")) +
-                  ". Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.")
+                  (run.koop ? t(". Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.")
+                      : t(". Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.")))
         ]),
         breite: 480,
         knoepfe: [
             { text: t("Weiterspielen") },
-            { text: t("Neuanfang wagen"), klasse: "knopf-lila", aktion: () => beendeRun(0, true) }
+            { text: t("Neuanfang wagen"), klasse: "knopf-lila", aktion: () => {
+                // Im Duo fangen beide neu an (jeder bekommt seine Mondblueten), danach geht es in die Lobby
+                if (run.koop) koopSende("ende");
+                beendeRun(0, true);
+            } }
         ]
     });
 }

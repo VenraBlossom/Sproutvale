@@ -457,6 +457,7 @@ function koopEmpfange(n) {
                 koop.gastPlatz = 0;
                 koop.keinPlatzGemeldet = false;
                 koop.partnerStand = n.hostDaten || null;
+                koop.startMondphase = Math.max(0, Math.min(MONDPHASEN.length - 1, Number(n.mondphase) || 0));
                 koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts", n.gastDaten || null);
             }
             break;
@@ -491,7 +492,8 @@ function koopEmpfange(n) {
             break;
         case "ende":
             if (koopAktiv() && run.phase !== "runEnde") {
-                zeigeToast(t("👥 Dein Mitspieler hat den Run beendet."));
+                zeigeToast(run.sandbox ? t("👥 Dein Mitspieler hat einen Neuanfang gestartet. Ihr fangt beide neu an.")
+                    : t("👥 Dein Mitspieler hat den Run beendet."));
                 koopBeendeRunLokal();
             }
             break;
@@ -527,7 +529,10 @@ function koopStarteSpiel() {
     koop.spielId = stand && stand.id ? stand.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     koop.partnerStand = stand ? stand.seiten[gastSeite] || null : null;
     const hostDaten = stand ? stand.seiten[hostSeite] || null : null;
-    koopSende("start", { sandbox: endlos, slot, kosmetik: { ...meta.kosmetik }, gastSeite, spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten });
+    // Story: die Mondphase des Hosts gilt fuer beide (sonst waeren die Rechnungen auf beiden Seiten verschieden)
+    koop.startMondphase = endlos ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0);
+    koopSende("start", { sandbox: endlos, slot, kosmetik: { ...meta.kosmetik }, gastSeite, spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten,
+        mondphase: koop.startMondphase });
     koopStarteEigenesSpiel(endlos, slot, { ...meta.kosmetik }, hostSeite, hostDaten);
 }
 
@@ -548,6 +553,7 @@ function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite, gespeichert = nul
     koop.ichBereit = false;
     run = erstelleRunZustand(endlos);
     run.koop = true;
+    run.mondphase = endlos ? 0 : koop.startMondphase || 0;
     run.koopSlot = slot;
     run.slot = 0;
     erstelleSlots();
