@@ -225,7 +225,7 @@ const VARIANTEN = [
         beschreibung: t("Die Rarität ihrer Saat wird 3-mal gewürfelt, die beste zählt."),
         raritaetsWuerfe: 3 },
     { id: "golden", titel: t("Goldene Pflanze"), praefix: t("Gold"), badge: "🌟",
-        beschreibung: t("Ihre Saat ist immer eine Goldene Saat."),
+        beschreibung: t("Ihre Saat ist immer eine legendäre Saat."),
         jackpot: true, chanceProStufe: 0.01, basiskosten: 3500, faktor: 2.2, tarotBonus: { karte: "stern", chance: 0.005 } }
 ];
 const VARIANTE_NACH_ID = Object.fromEntries(VARIANTEN.map(v => [v.id, v]));
@@ -352,8 +352,8 @@ const SKILLS = [
         t("+1% Chance auf epische Saaten (lila, x12,5 Gold)."),
         () => prozentText(raritaetsChancen()[3]) + t(" Chance auf Episch"), { vorMax: true }),
     stern("gelb", "ernte", "🟡", [960, 0], "lila", t("Goldrausch"), 2500, 2.2, 4,
-        t("+0,5% Chance auf Goldene Saat (gelb, x50 Gold)."),
-        () => prozentText(raritaetsChancen()[4]) + t(" Chance auf Legendär"), { vorMax: true }),
+        t("+0,5% Chance auf legendäre Saat (gelb, x50 Gold)."),
+        () => prozentText(raritaetsChancen()[4]) + t(" Chance auf legendäre Saat"), { vorMax: true }),
     stern("edelstein", "ernte", "💍", [1180, 0], "gelb", t("Edelsteinschleifer"), 5000, 2.3, 5,
         t("Alle Farb-Multiplikatoren (außer Gewöhnlich) werden um 10% stärker."),
         () => multiText(1 + edelsteinBonus()) + t(" auf die Farben")),
@@ -397,13 +397,13 @@ const SKILLS = [
         t("Stufe 2 vom Glückskleeblatt: +10% Chance, dass eine Saat doppelt zählt."),
         () => prozentText(glueckChance()) + t(" Chance auf doppeltes Gold"), { vorMax: true, abzeichen: "Ⅱ" }),
     stern("midas", "ernte", "👑", [1400, -220], "ernterausch", t("Midas' Berührung"), 2500, 1, 1,
-        t("Jede Goldene Saat lässt zusätzlich eine Sternensaat mit 50 Sternensamen fallen."),
+        t("Jede legendäre Saat lässt zusätzlich eine Sternensaat mit 50 Sternensamen fallen."),
         () => (level("midas") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
     // ----- Neue Sterne am Rand der Aeste -----
     stern("jackpotjaeger", "ernte", "🎰", [1620, -220], "midas", t("Goldgräber"), 25000, 4, 3,
-        t("Goldene Saaten sind pro Stufe noch einmal so viel wert (Stufe 1 = doppelt, Stufe 3 = vierfach)."),
-        () => "x" + (1 + level("jackpotjaeger")) + t(" Wert der Goldenen Saat")),
+        t("Legendäre Saaten sind pro Stufe noch einmal so viel wert (Stufe 1 = doppelt, Stufe 3 = vierfach)."),
+        () => "x" + (1 + level("jackpotjaeger")) + t(" Wert der legendären Saat")),
     stern("goldschauer", "ernte", "🌦️", [1620, 0], "sternengold", t("Goldschauer"), 3000, 2.5, 3,
         t("Der seltene Goldregen kommt pro Stufe 50% öfter."),
         () => "+" + 50 * level("goldschauer") + t("% Goldregen")),
@@ -689,12 +689,12 @@ const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 // ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
-    gelb: t("Mehr Goldene Saat (x50 Gold)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
+    gelb: t("Mehr legendäre Saat (x50 Gold)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
     schwereMuenzen: t("Gewöhnliche Saat mehr wert"), doppelernte: t("Doppelt so viel Saat"), fuellhorn: t("Mehr Gold"),
     goldmarie: t("Gold verdoppeln"), ernterausch: t("Jede 30. Ernte: 6 Sek. x3 Gold"), sternenstaub: t("Mehr Sternensamen"),
     sternenquelle: t("Sternensamen pro Ernte"), sternenflut: t("Sternensamen verdoppeln"), glueck2: t("Saat zählt doppelt"),
-    midas: t("Goldene Saat: +50 Sternensamen"), radius: t("Größerer Cursor"), vogelscheuche: t("Verscheucht die 1. Krähe"),
+    midas: t("Legendäre Saat: +50 Sternensamen"), radius: t("Größerer Cursor"), vogelscheuche: t("Verscheucht die 1. Krähe"),
     kombo: t("Mehr Zeit für die Kombo"), eichhoernchen: t("Klicken den Samenladen"), haustiertraining: t("Begleiter sammelt öfter"),
     igel: t("Igel sammeln Saat ein"), saatspatz: t("Spatz pflanzt Samen"), gluehglas: t("Mehr Glühwürmchen"),
     biene: t("Bienen lassen Pflanzen wachsen"), magnetfeld: t("Saat rollt zum Cursor"), eichhoernchen2: t("Mehr Eichhörnchen-Klicks"),
@@ -710,7 +710,7 @@ const STERN_KURZ = {
     huehnerrennen: t("Glücksspiel: Hühnerrennen"), plinko: t("Glücksspiel: Samen-Plinko"),
     jahresrad: t("Jahreszeiten stärker"), bluetenzauber: t("Frühling: bunte Saat"), sonnenernte: t("Sommer: mehr Gold"),
     erntedank: t("Herbst: mehr Sternensaat"), frostschutz: t("Winter ohne Malus"), saisonfest: t("1. Tag der Jahreszeit x1,5"),
-    sternenkalender: t("Geschenk beim Jahreszeitwechsel"), jackpotjaeger: t("Goldene Saat mehr wert"), goldschauer: t("Öfter Goldregen"),
+    sternenkalender: t("Geschenk beim Jahreszeitwechsel"), jackpotjaeger: t("Legendäre Saat mehr wert"), goldschauer: t("Öfter Goldregen"),
     schnuppenfaenger: t("Sternschnuppen-Bonus länger"), kombovirtuose: t("Höchste Kombo stärker"),
     sternbild: t("+1% Gold je 10 Sterne"), kometenregen: t("Sternschnuppen geben Sternensamen"), polarstern: t("Morgen-Geschenk"),
     mondsichel: t("Nachts mehr Sternensaat"), milchstrasse: t("Zweite Sternensaat"), bienenkoenigin: t("Bienen öfter"),
@@ -720,7 +720,7 @@ const STERN_KURZ = {
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
 const STERN_WIRKUNG = {
     gruen: s => "+" + 3 * s + t("% grüne Saat"), blau: s => "+" + 2 * s + t("% blaue Saat"), lila: s => "+" + s + t("% lila Saat"),
-    gelb: s => "+" + prozentText(0.005 * s) + t(" Goldene Saat"), edelstein: s => "+" + 10 * s + t("% Farb-Bonus"),
+    gelb: s => "+" + prozentText(0.005 * s) + t(" legendäre Saat"), edelstein: s => "+" + 10 * s + t("% Farb-Bonus"),
     sternengold: s => "+" + 4 * s + t("% Gold"), glueck: s => "+" + 5 * s + t("% Doppel-Saat"),
     sternensammler: s => "+" + 5 * s + t("% Doppel-Sternensaat"), sternenklick: s => "+" + s + t(" ✨ pro Klick"),
     schwereMuenzen: s => "+" + 20 * s + t("% Wert"), doppelernte: s => "+" + 3 * s + t("% Doppelernte"),
@@ -743,7 +743,7 @@ const STERN_WIRKUNG = {
     jahresrad: s => "+" + 25 * s + t("% Jahreszeit-Effekte"), bluetenzauber: s => "+" + 4 * s + t("% grüne Saat"),
     sonnenernte: s => "+" + 20 * s + t("% Gold im Sommer"), erntedank: s => "+" + 25 * s + t("% Sternensaat im Herbst"),
     frostschutz: s => (s >= 2 ? t("+10% Wachstum im Winter") : t("kein Winter-Malus")),
-    jackpotjaeger: s => "x" + (1 + s) + t(" Goldene Saat"), goldschauer: s => "+" + 50 * s + t("% Goldregen"),
+    jackpotjaeger: s => "x" + (1 + s) + t(" legendäre Saat"), goldschauer: s => "+" + 50 * s + t("% Goldregen"),
     schnuppenfaenger: s => "+" + 3 * s + t(" Sek. Bonus"), kombovirtuose: s => t("Kombo bis x") + (5 + s)
 };
 
@@ -834,7 +834,7 @@ const SEGEN = [
     { id: "sparsam", badge: "📐", name: t("Sparsamer Bauer"), text: t("Neue Felder kosten 15% weniger.") },
     { id: "kraehenkoenig", badge: "👑", name: t("Krähenkönig"), text: t("Verscheuchte Krähen lassen 5-mal so viele Sternensamen fallen.") },
     { id: "sternenhunger", badge: "🌌", name: t("Sternenhunger"), text: t("Jede Sternensaat ist 25% mehr wert.") },
-    { id: "jackpotfieber", badge: "🎰", name: t("Goldfieber"), text: t("+1% Chance auf Goldene Saat.") },
+    { id: "jackpotfieber", badge: "🎰", name: t("Goldfieber"), text: t("+1% Chance auf legendäre Saat.") },
     { id: "gluehfreund", badge: "🪲", name: t("Glühwürmchen-Freund"), text: t("Glühwürmchen geben doppelt so viele Sternensamen.") },
     { id: "gutesaat", badge: "🌾", name: t("Gute Saat"), text: t("Gewöhnliche Saat ist 50% mehr wert.") },
     { id: "komborausch", badge: "🎵", name: t("Kombo-Rausch"), text: t("Jeder 4. Klick zählt für die Kombo doppelt.") }
@@ -977,7 +977,7 @@ const WERKZEUGE = [
     { id: "taschenuhr", name: t("Alte Taschenuhr"), symbol: "🕰️", preis: 0.8, wert: 0.1,
         text: w => "+" + werkzeugProzent(w) + t(" Energie pro Tag."), kurz: w => "+" + werkzeugProzent(w) + t(" Energie") },
     { id: "gluecksmuenze", name: t("Glücksmünze"), symbol: "🪙", preis: 0.9, wert: 0.06,
-        text: w => "+" + werkzeugProzent(w) + t(" Glück bei Glücksspielen und +") + prozentText(w / 10) + t(" Chance auf Goldene Saat."),
+        text: w => "+" + werkzeugProzent(w) + t(" Glück bei Glücksspielen und +") + prozentText(w / 10) + t(" Chance auf legendäre Saat."),
         kurz: w => "+" + werkzeugProzent(w) + t(" Glück") },
     { id: "saatbeutel", name: t("Großer Saatbeutel"), symbol: "🎒", preis: 0.7, wert: 0.1,
         text: w => "-" + werkzeugProzent(w) + t(" Klicks pro Samen."), kurz: w => "-" + werkzeugProzent(w) + t(" Klicks pro Samen") },
@@ -1013,7 +1013,7 @@ const WERKZEUGE = [
     { id: "sanduhr", name: t("Sanduhr"), symbol: "⏳", preis: 0.9, wert: 0.08,
         text: w => t("Alle Pflanzen wachsen +") + werkzeugProzent(w) + t(" schneller."), kurz: w => "+" + werkzeugProzent(w) + t(" Wachstum") },
     { id: "goldzahn", name: t("Goldzahn"), symbol: "🦷", preis: 0.8, wert: 0.5,
-        text: w => t("Goldene Saaten sind +") + werkzeugProzent(w) + t(" mehr wert."), kurz: w => "+" + werkzeugProzent(w) + t(" Goldene Saat") },
+        text: w => t("Legendäre Saaten sind +") + werkzeugProzent(w) + t(" mehr wert."), kurz: w => "+" + werkzeugProzent(w) + t(" legendäre Saat") },
     { id: "kleeblatt", name: t("Vierblättriges Kleeblatt"), symbol: "☘️", preis: 0.9, wert: 0.06,
         text: w => "+" + werkzeugProzent(w) + t(" Chance, dass eine Saat doppelt zählt."), kurz: w => "+" + werkzeugProzent(w) + t(" doppelte Saat") },
     { id: "wetterfahne", name: t("Wetterfahne"), symbol: "🚩", preis: 0.5, wert: 1,
@@ -1063,7 +1063,7 @@ const ERFOLG_KETTEN = [
     { id: "kombo", icon: "🥁", text: z => t("Erreiche eine ") + z + t("er-Kombo"),
         wert: (m, r) => Math.max(m.lebenszeit.maxKombo, r ? r.gesamt.maxKombo : 0),
         ziele: [40, 80, 150, 300] },
-    { id: "jackpot", icon: "🌟", text: z => t("Sammle ") + z + (z === 1 ? t(" Goldene Saat") : t(" Goldene Saaten")) + t(" ein"),
+    { id: "jackpot", icon: "🌟", text: z => t("Sammle ") + z + (z === 1 ? t(" legendäre Saat") : t(" legendäre Saaten")) + t(" ein"),
         wert: m => m.lebenszeit.jackpots,
         ziele: [1, 10, 100] },
     { id: "spezial", icon: "✨", text: z => t("Ernte ") + zahl(z) + (z === 1 ? t(" Spezialpflanze") : t(" Spezialpflanzen")),
@@ -1461,7 +1461,7 @@ const FELD_SKINS = [
 // Muenzen: Farben der Goldmuenze. klasse = zusaetzlicher Look (style.css)
 const KUGEL_SKINS = [
     { id: "standard", name: t("Goldmünzen"), quelle: "frei", farben: {} },
-    { id: "bronze", name: t("Bronzemünzen"), quelle: "erspielt", bedingungText: t("Sammle 50 Goldene Saaten"),
+    { id: "bronze", name: t("Bronzemünzen"), quelle: "erspielt", bedingungText: t("Sammle 50 legendäre Saaten"),
         bedingung: () => meta.lebenszeit.jackpots >= 50, farben: { Y: "#e0a070", y: "#a86a3a", k: "#4a2a10" } },
     { id: "silber", name: t("Silbermünzen"), quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#e9e9ef", y: "#a9a9b6", k: "#4a4a5a" } },
     { id: "bluete", name: t("Blütenmünzen"), quelle: "dlc", paket: "unterstuetzer", farben: { Y: "#ffc2dc", y: "#e07aa8", k: "#7a2a48" } },
@@ -1539,7 +1539,7 @@ const PFLANZEN_SKINS = [
         klasse: "pflanzen-kristall", teilchen: ["#bff0ff", "#ffffff", "#9fe8ff"], effekt: "kristall" },
     { id: "kirschbluete", name: t("Kirschblütenblätter"), quelle: "erspielt", bedingungText: t("Erlebe 20 Frühlinge"),
         bedingung: () => ((meta.kodex.jahreszeiten || {}).fruehling || 0) >= 20, farben: { G: "#ffc2dc", g: "#8fcf5c", d: "#4f8a32" } },
-    { id: "goldblatt", name: t("Goldblätter"), quelle: "erspielt", bedingungText: t("Sammle 500 Goldene Saaten"),
+    { id: "goldblatt", name: t("Goldblätter"), quelle: "erspielt", bedingungText: t("Sammle 500 legendäre Saaten"),
         bedingung: () => meta.lebenszeit.jackpots >= 500, farben: { G: "#ffe08a", g: "#d9a82a", d: "#8a6010" } },
     { id: "glut", name: t("Glutblätter"), quelle: "dlc", paket: "einzeln", farben: { G: "#ffb060", g: "#e8432a", d: "#5a1a08" },
         klasse: "pflanzen-glut", teilchen: ["#ffb060", "#ff6a2a", "#ffd060"], effekt: "glut" }
@@ -1621,7 +1621,7 @@ const TAROT = [
     { id: "eremit", nummer: "IX", symbol: "🏮", name: t("Der Eremit"), wert: 2,
         text: f => t("Der Igel-Sammler startet jeden Run auf Stufe ") + aufrunden(2 * f) + "." },
     { id: "schicksal", nummer: "X", symbol: "🎡", name: t("Rad des Schicksals"), wert: 0.005,
-        text: f => "+" + prozentText(0.005 * f) + t(" Chance auf Goldene Saat.") },
+        text: f => "+" + prozentText(0.005 * f) + t(" Chance auf legendäre Saat.") },
     { id: "gerechtigkeit", nummer: "XI", symbol: "⚖️", name: t("Die Gerechtigkeit"), wert: 1,
         text: f => aufrunden(f) + t("-mal pro Run: Kannst du eine Rechnung nicht zahlen, bekommst du einen Tag Aufschub (+25%).") },
     { id: "gehaengte", nummer: "XII", symbol: "🙃", name: t("Der Gehängte"), wert: 1,
@@ -1748,7 +1748,7 @@ const KUSCHELTIERE = [
     { id: "greif", symbol: "🦅", name: t("Greif Sturm"), raritaet: 4,
         text: s => t("Alles beim Wanderhändler ist ") + 5 * s + t("% billiger.") },
     { id: "pfau", symbol: "🦚", name: t("Pfau Prunk"), raritaet: 4,
-        text: s => t("Goldene Saaten sind ") + 20 * s + t("% mehr wert.") },
+        text: s => t("Legendäre Saaten sind ") + 20 * s + t("% mehr wert.") },
     // Mythisch
     { id: "mondhase", symbol: "🌙", name: t("Mondhase Luna"), raritaet: 5,
         text: s => multiText(Math.pow(1.25, s)) + t(" Gold aus allen Ernten und +") + 10 * s + t("% Mondblüten am Run-Ende.") },

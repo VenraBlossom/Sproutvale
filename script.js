@@ -2746,7 +2746,7 @@ const STATISTIK_ZEILEN = [
     ["sternensamen", t("✨ Sternensamen erhalten")],
     ["ernten", t("🌾 Ernten")],
     ["spezial", t("✨ Spezialpflanzen geerntet")],
-    ["jackpots", t("🌟 Goldene Saaten eingesammelt")],
+    ["jackpots", t("🌟 Legendäre Saaten eingesammelt")],
     ["hoechsterGewinn", t("💎 Höchster Einzelgewinn")],
     ["maxKombo", t("🥁 Höchste Kombo")],
     ["klicks", t("👆 Klicks auf den Samenladen")],
