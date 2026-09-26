@@ -498,7 +498,7 @@ function glueckBonus() {
 }
 
 function klicksProSamen() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * segen("flink") + gachaBonus("klicks");
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, segen("flink")) + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
     return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
 }
@@ -2882,7 +2882,8 @@ let segenSperreBis = 0;
 
 // auswahl: gespeicherte Auswahl (nach dem Laden eines Spielstands), sonst wird neu gewuerfelt
 function zeigeSegenAuswahl(auswahl) {
-    const moeglich = SEGEN.filter(s => !run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id));
+    // Segen mit "max" (z.B. Flinke Haende) verschwinden aus der Auswahl, wenn man sie so oft hat
+    const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && segen(s.id) >= s.max));
     run.segenAuswahl = auswahl || mische(moeglich).slice(0, segenAuswahlAnzahl()).map(s => s.id);
     segenFenster.classList.remove("versteckt");
     segenSperreBis = performance.now() + SEGEN_SPERRE_MS;

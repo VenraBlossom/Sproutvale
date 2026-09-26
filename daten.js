@@ -806,7 +806,7 @@ const GLUECKSSPIEL = {
 };
 
 // ---------- SEGEN: nach jeder bezahlten Rechnung 1 von 3 waehlen, gilt fuer den ganzen Run ----------
-// Mehrfach waehlbar, die Wirkung stapelt sich. Die Effekte stehen in script.js (segen("id") = Stufe).
+// Mehrfach waehlbar, die Wirkung stapelt sich (max = hoechstens so oft). Die Effekte stehen in script.js (segen("id") = Stufe).
 
 const SEGEN = [
     { id: "sparfuchs", badge: "🐷", name: t("Sparfuchs"), text: t("Alle weiteren Rechnungen in diesem Run kosten 8% weniger.") },
@@ -816,7 +816,7 @@ const SEGEN = [
     { id: "keimkraft", badge: "🌱", name: t("Keimkraft"), text: t("Jedes freie Feld hat zum Tagesstart 12% Chance, schon einen Samen zu haben.") },
     { id: "kompost", badge: "🪱", name: t("Kompost"), text: t("Jedes Feld hat jeden Tag 8% Chance, gedüngt zu sein (doppeltes Gold).") },
     { id: "regenwolke", badge: "🌧️", name: t("Regenwolke"), text: t("Jedes Feld hat jeden Tag 8% Chance, bewässert zu sein (wächst doppelt so schnell).") },
-    { id: "flink", badge: "👐", name: t("Flinke Hände"), text: t("-2 Klicks pro Samen.") },
+    { id: "flink", badge: "👐", name: t("Flinke Hände"), max: 3, text: t("-2 Klicks pro Samen (höchstens 3-mal wählbar).") },
     { id: "wissen", badge: "📚", name: t("Wissensdurst"), text: t("+15% Chance, dass eine Sternensaat doppelt zählt.") },
     { id: "glueckspilz", badge: "🍄", name: t("Glückspilz"), text: t("+2% Chance auf epische Saaten.") },
     { id: "wachstum", badge: "🌿", name: t("Wachstumsschub"), text: t("Alle Pflanzen wachsen 10% schneller.") },

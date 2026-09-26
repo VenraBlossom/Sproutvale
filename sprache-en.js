@@ -1830,6 +1830,7 @@ Object.assign(UEBERSETZUNG, {
     " pro weitere Stufe": " per extra level",
     "🎟️ Alle abholen (": "🎟️ Claim all (",
     " Chance auf legendäre Saat": " chance for a Legendary Drop",
+    "-2 Klicks pro Samen (höchstens 3-mal wählbar).": "-2 clicks per seed (can be chosen at most 3 times).",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
