@@ -1,7 +1,7 @@
 "use strict";
 
 // ============================================================
-// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Slotmaschine, Rubbellose, Huehnerrennen, Samen-Plinko)
+// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Slotmaschine, Rubbellose, Huehnerrennen, Samen-Plinko, Roulette, Blackjack)
 // Werden im Stellarium (Ast "Glueck") freigeschaltet. Jedes Spiel darf zwischen zwei Tagen nur ein paar Mal gespielt
 // werden (GLUECKSSPIEL.xyz.proPause + Stammkunde). Glueck (glueckBonus() in script.js) verbessert alle Chancen.
 // Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
@@ -23,13 +23,29 @@ function zeigeUeberspringen(element) {
 
 function neuerGlueckZustand() {
     return {
-        muenzwurf: 0, slot: 0, rubbellos: 0, huehnerrennen: 0, plinko: 0,
-        los: null, letzterWurf: null, letzterSlot: null, letztesRennen: null, letztesPlinko: null
+        muenzwurf: 0, slot: 0, rubbellos: 0, huehnerrennen: 0, plinko: 0, roulette: 0, blackjack: 0,
+        los: null, letzterWurf: null, letzterSlot: null, letztesRennen: null, letztesPlinko: null,
+        letztesRoulette: null, rouletteWahl: "rot", rouletteVerlauf: [], bj: null
     };
 }
 
+// Alle Gluecksspiele: Stern im Stellarium, Name im Reiter, Aufbau
+const GLUECK_SPIELE = [
+    { id: "muenzwurf", text: () => t("🪙 Münzwurf"), render: () => renderMuenzwurf() },
+    { id: "gacha", text: () => t("🎰 Slotmaschine"), render: () => renderSlot() },
+    { id: "rubbellos", text: () => t("🎟️ Rubbellose"), render: () => renderRubbellos() },
+    { id: "huehnerrennen", text: () => t("🐔 Hühnerrennen"), render: () => renderHuehnerrennen() },
+    { id: "plinko", text: () => t("🔻 Samen-Plinko"), render: () => renderPlinko() },
+    { id: "roulette", text: () => t("🎡 Roulette"), render: () => renderRoulette() },
+    { id: "blackjack", text: () => t("🃏 Blackjack"), render: () => renderBlackjack() }
+];
+
+function freieGluecksspiele() {
+    return GLUECK_SPIELE.filter(s => level(s.id) > 0);
+}
+
 function hatGluecksspiel() {
-    return ["muenzwurf", "gacha", "rubbellos", "huehnerrennen", "plinko"].some(id => level(id) > 0);
+    return freieGluecksspiele().length > 0;
 }
 
 function spieleProPause(id) {
@@ -45,15 +61,13 @@ function zaehleSieg() {
     meta.lebenszeit.gluecksspielSiege += 1;
 }
 
-function renderGluecksspiele() {
+// Ein Spiel (der gewaehlte Reiter im Gluecksspiel-Markt)
+function renderGluecksspiele(id) {
     const glueck = glueckBonus();
     shopContent.appendChild(erstelleHinweis(t("🍀 Dein Glück: +") + prozentText(glueck) +
         (glueck > 0 ? t(" (bessere Gewinnchancen)") : t(" (Glück bekommst du im Stellarium (Ast \"Glück\"), im Mondteich und von Kuscheltieren)"))));
-    if (level("muenzwurf") > 0) renderMuenzwurf();
-    if (level("gacha") > 0) renderSlot();
-    if (level("rubbellos") > 0) renderRubbellos();
-    if (level("huehnerrennen") > 0) renderHuehnerrennen();
-    if (level("plinko") > 0) renderPlinko();
+    const spiel = GLUECK_SPIELE.find(s => s.id === id && level(s.id) > 0);
+    if (spiel) spiel.render();
 }
 
 function spielKarte(titel, beschreibung, info) {
@@ -595,4 +609,310 @@ function lassePlinkoFallen(anteil, brett, samen) {
         }, 350);
     }
     setTimeout(naechsterSchritt, 150);
+}
+
+// ---------- ROULETTE: eine Kugel, 37 Faecher (0 ist gruen) ----------
+// Rot/Schwarz und Gerade/Ungerade zahlen x2, die gruene 0 zahlt x36. Glueck: verliert man, rollt die Kugel mit
+// dieser Chance ein zweites Mal.
+
+const ROULETTE_ROT = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+const ROULETTE_WETTEN = [
+    { id: "rot", text: () => t("🔴 Rot"), multi: 2, trifft: z => ROULETTE_ROT.has(z) },
+    { id: "schwarz", text: () => t("⚫ Schwarz"), multi: 2, trifft: z => z > 0 && !ROULETTE_ROT.has(z) },
+    { id: "gerade", text: () => t("Gerade"), multi: 2, trifft: z => z > 0 && z % 2 === 0 },
+    { id: "ungerade", text: () => t("Ungerade"), multi: 2, trifft: z => z % 2 === 1 },
+    { id: "gruen", text: () => t("🟢 Die 0"), multi: 36, trifft: z => z === 0 }
+];
+
+function rouletteFarbe(zahl) {
+    return zahl === 0 ? "gruen" : ROULETTE_ROT.has(zahl) ? "rot" : "schwarz";
+}
+
+function setzeRouletteZahl(feld, zahl) {
+    feld.textContent = zahl;
+    feld.className = "roulette-zahl roulette-" + rouletteFarbe(zahl);
+}
+
+function renderRoulette() {
+    const karte = spielKarte(t("🎡 Roulette"),
+        t("Wähle eine Wette und deinen Einsatz. Rot, Schwarz, Gerade oder Ungerade: x2. Die grüne 0: x36."),
+        restText("roulette"));
+    const wahl = run.glueck.rouletteWahl || "rot";
+    const wetten = el("div", "spiel-knoepfe roulette-wetten");
+    ROULETTE_WETTEN.forEach(w => {
+        wetten.appendChild(kleinerKnopf(w.text(), !glueckAnimation, () => {
+            run.glueck.rouletteWahl = w.id;
+            renderShop();
+        }, "roulette-wette" + (w.id === wahl ? " aktiv" : "")));
+    });
+    karte.appendChild(wetten);
+
+    const letztes = run.glueck.letztesRoulette;
+    const rad = el("div", "roulette-rad");
+    const feld = el("div", "roulette-zahl");
+    setzeRouletteZahl(feld, letztes ? letztes.zahl : 0);
+    rad.appendChild(feld);
+    const verlauf = el("div", "roulette-verlauf");
+    (run.glueck.rouletteVerlauf || []).forEach(z => verlauf.appendChild(el("span", "roulette-mini roulette-" + rouletteFarbe(z), String(z))));
+    rad.appendChild(verlauf);
+    karte.appendChild(rad);
+    karte.appendChild(einsatzKnoepfe("roulette", anteil => dreheRoulette(anteil, feld), 1));
+    if (letztes) spielErgebnis(karte, letztes.text, letztes.gewonnen);
+}
+
+function dreheRoulette(anteil, feld) {
+    const einsatz = Math.floor(run.gold * anteil);
+    if (!darfEinkaufen() || glueckAnimation || einsatz < 1 || restSpiele("roulette") <= 0) return;
+    const wette = ROULETTE_WETTEN.find(w => w.id === (run.glueck.rouletteWahl || "rot"));
+    run.gold -= einsatz;
+    run.glueck.roulette = (run.glueck.roulette || 0) + 1;
+    glueckAnimation = true;
+    shopContent.querySelectorAll(".spiel-knopf").forEach(knopf => { knopf.disabled = true; });
+    zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
+
+    let ergebnis = Math.floor(Math.random() * 37);
+    if (!wette.trifft(ergebnis) && Math.random() < glueckBonus()) ergebnis = Math.floor(Math.random() * 37);
+
+    // Die Kugel laeuft ueber die Zahlen und wird langsamer
+    let schritt = 0;
+    const schritte = 22;
+    let fertig = false;
+    const beende = () => {
+        if (fertig) return;
+        fertig = true;
+        glueckUeberspringen = null;
+        glueckAnimation = false;
+        setzeRouletteZahl(feld, ergebnis);
+        const gewonnen = wette.trifft(ergebnis);
+        const rect = feld.getBoundingClientRect();
+        if (gewonnen) {
+            run.gold += einsatz * wette.multi;
+            zaehleSieg();
+            if (wette.multi > 2 || anteil >= 0.25) Klang.jackpot();
+            else Klang.muenze(3);
+            partikel(rect.left + rect.width / 2, rect.top + rect.height / 2, ["#ffd93d", "#ffffff", "#e0453a"], 22, 90);
+        } else {
+            Klang.fehler();
+        }
+        run.glueck.rouletteVerlauf = [ergebnis, ...(run.glueck.rouletteVerlauf || [])].slice(0, 8);
+        run.glueck.letztesRoulette = {
+            zahl: ergebnis, gewonnen,
+            text: tf("Die Kugel fällt auf {0}. ", ergebnis) +
+                (gewonnen ? "+" + zahl(einsatz * (wette.multi - 1)) + t(" Gold") : "-" + zahl(einsatz) + t(" Gold"))
+        };
+        aktualisiereAlles();
+    };
+    const tick = () => {
+        if (fertig) return;
+        if (schritt >= schritte) return beende();
+        setzeRouletteZahl(feld, Math.floor(Math.random() * 37));
+        Klang.plinkoNagel(schritt % 8);
+        schritt += 1;
+        setTimeout(tick, 35 + schritt * schritt * 0.35);
+    };
+    glueckUeberspringen = beende;
+    zeigeUeberspringen(feld);
+    tick();
+}
+
+// ---------- BLACKJACK: gegen den Dealer, wer naeher an 21 ist ----------
+// Gewinn x2, Blackjack (21 mit 2 Karten) x2,5, Gleichstand = Einsatz zurueck. Der Dealer zieht bis 17.
+// Glueck: wuerde eine gezogene Karte dich ueber 21 bringen, wird mit dieser Chance eine andere Karte gezogen.
+
+const BJ_WERTE = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const BJ_FARBEN = ["♠", "♥", "♦", "♣"];
+
+function bjKarte() {
+    return { w: zufall(BJ_WERTE), f: zufall(BJ_FARBEN) };
+}
+
+function bjSumme(karten) {
+    let summe = 0;
+    let asse = 0;
+    karten.forEach(k => {
+        if (k.w === "A") {
+            summe += 11;
+            asse += 1;
+        } else {
+            summe += ["J", "Q", "K"].includes(k.w) ? 10 : Number(k.w);
+        }
+    });
+    while (summe > 21 && asse > 0) {
+        summe -= 10;
+        asse -= 1;
+    }
+    return summe;
+}
+
+function bjKartenEl(karten, verdeckt) {
+    const reihe = el("div", "bj-karten");
+    karten.forEach((k, i) => {
+        if (verdeckt && i === 1) {
+            reihe.appendChild(el("div", "bj-karte verdeckt"));
+            return;
+        }
+        const rot = k.f === "♥" || k.f === "♦";
+        reihe.appendChild(el("div", "bj-karte" + (rot ? " rot" : ""), null, [
+            el("span", "bj-wert", k.w), el("span", "bj-farbe", k.f)
+        ]));
+    });
+    return reihe;
+}
+
+function renderBlackjack() {
+    const karte = spielKarte(t("🃏 Blackjack"),
+        t("Komm näher an 21 als der Dealer, ohne drüber zu gehen. Gewinn x2, Blackjack x2,5, Gleichstand: Einsatz zurück. Der Dealer zieht bis 17."),
+        restText("blackjack"));
+    const hand = run.glueck.bj;
+    const imSpiel = hand && !hand.fertig;
+
+    // Der Dealer mit Sprechblase
+    const spruch = !hand ? t("Setz dich, gleich gibt es Karten.")
+        : imSpiel ? (hand.dealerZieht ? t("Ich ziehe …") : t("Dein Zug. Ziehen oder halten?"))
+        : hand.spruch;
+    karte.appendChild(el("div", "bj-dealer", null, [
+        pixelIcon("🤵", 48, "bj-dealer-bild"),
+        el("div", "bj-sprechblase", spruch)
+    ]));
+
+    const tisch = el("div", "bj-tisch");
+    if (hand) {
+        const verdeckt = imSpiel && !hand.dealerZieht;
+        tisch.appendChild(el("div", "bj-reihe-titel", t("Dealer") + (verdeckt ? "" : " · " + bjSumme(hand.dealer))));
+        tisch.appendChild(bjKartenEl(hand.dealer, verdeckt));
+        tisch.appendChild(el("div", "bj-reihe-titel", t("Du") + " · " + bjSumme(hand.spieler) +
+            " · " + t("Einsatz: ") + zahl(hand.einsatz) + t(" Gold")));
+        tisch.appendChild(bjKartenEl(hand.spieler, false));
+    } else {
+        tisch.appendChild(el("div", "bj-leer", t("Wähle deinen Einsatz, dann werden die Karten verteilt.")));
+    }
+    karte.appendChild(tisch);
+
+    if (imSpiel) {
+        const frei = darfEinkaufen() && !glueckAnimation && !hand.dealerZieht;
+        const leiste = el("div", "spiel-knoepfe");
+        leiste.appendChild(kleinerKnopf(t("➕ Ziehen"), frei, bjZiehen, "knopf-gruen"));
+        leiste.appendChild(kleinerKnopf(t("✋ Halten"), frei, bjHalten));
+        const verdoppeln = frei && hand.spieler.length === 2 && run.gold >= hand.einsatz;
+        leiste.appendChild(kleinerKnopf(t("✖2 Verdoppeln"), verdoppeln, bjVerdoppeln, "knopf-rot"));
+        karte.appendChild(leiste);
+    } else {
+        karte.appendChild(einsatzKnoepfe("blackjack", bjAusteilen, 1));
+    }
+    if (hand && hand.fertig) spielErgebnis(karte, hand.text, hand.gewonnen);
+}
+
+function bjAusteilen(anteil) {
+    const einsatz = Math.floor(run.gold * anteil);
+    if (!darfEinkaufen() || glueckAnimation || einsatz < 1 || restSpiele("blackjack") <= 0) return;
+    run.gold -= einsatz;
+    run.glueck.blackjack = (run.glueck.blackjack || 0) + 1;
+    run.glueck.bj = { einsatz, spieler: [bjKarte(), bjKarte()], dealer: [bjKarte(), bjKarte()], fertig: false, dealerZieht: false };
+    Klang.kaufen();
+    if (bjSumme(run.glueck.bj.spieler) === 21) return bjAuswerten();
+    aktualisiereAlles();
+}
+
+// Glueck: eine Karte, die dich ueber 21 bringen wuerde, wird mit dieser Chance noch einmal gezogen
+function bjZieheFuerSpieler(hand) {
+    let karte = bjKarte();
+    if (bjSumme([...hand.spieler, karte]) > 21 && Math.random() < glueckBonus()) karte = bjKarte();
+    hand.spieler.push(karte);
+    Klang.kaufen();
+}
+
+function bjZiehen() {
+    const hand = run.glueck.bj;
+    if (!hand || hand.fertig || hand.dealerZieht || !darfEinkaufen()) return;
+    bjZieheFuerSpieler(hand);
+    const summe = bjSumme(hand.spieler);
+    if (summe > 21) return bjAuswerten();
+    if (summe === 21) return bjHalten();
+    aktualisiereAlles();
+}
+
+function bjVerdoppeln() {
+    const hand = run.glueck.bj;
+    if (!hand || hand.fertig || hand.spieler.length !== 2 || run.gold < hand.einsatz || !darfEinkaufen()) return;
+    run.gold -= hand.einsatz;
+    hand.einsatz *= 2;
+    bjZieheFuerSpieler(hand);
+    if (bjSumme(hand.spieler) > 21) return bjAuswerten();
+    bjHalten();
+}
+
+// Der Dealer deckt auf und zieht Karte fuer Karte bis mindestens 17
+function bjHalten() {
+    const hand = run.glueck.bj;
+    if (!hand || hand.fertig || hand.dealerZieht) return;
+    hand.dealerZieht = true;
+    renderShop();
+    glueckAnimation = true;
+    let schnell = false;
+    glueckUeberspringen = () => { schnell = true; };
+    zeigeUeberspringen(shopContent.querySelector(".bj-tisch"));
+    const zug = () => {
+        if (bjSumme(hand.dealer) < 17) {
+            hand.dealer.push(bjKarte());
+            Klang.kaufen();
+            if (!schnell) {
+                glueckAnimation = false;
+                renderShop();
+                glueckAnimation = true;
+                zeigeUeberspringen(shopContent.querySelector(".bj-tisch"));
+            }
+            setTimeout(zug, schnell ? 0 : 600);
+            return;
+        }
+        glueckUeberspringen = null;
+        glueckAnimation = false;
+        bjAuswerten();
+    };
+    setTimeout(zug, 600);
+}
+
+function bjAuswerten() {
+    const hand = run.glueck.bj;
+    const spieler = bjSumme(hand.spieler);
+    const dealer = bjSumme(hand.dealer);
+    const blackjack = spieler === 21 && hand.spieler.length === 2;
+    let auszahlung = 0;
+    let spruch;
+    if (spieler > 21) {
+        spruch = t("Über 21. Die Bank gewinnt.");
+    } else if (blackjack && !(dealer === 21 && hand.dealer.length === 2)) {
+        auszahlung = Math.floor(hand.einsatz * 2.5);
+        spruch = t("Blackjack! Glückwunsch.");
+    } else if (dealer > 21 || spieler > dealer) {
+        auszahlung = hand.einsatz * 2;
+        spruch = dealer > 21 ? t("Ich bin drüber. Du gewinnst.") : t("Gut gespielt. Du gewinnst.");
+    } else if (spieler === dealer) {
+        auszahlung = hand.einsatz;
+        spruch = t("Gleichstand. Du bekommst deinen Einsatz zurück.");
+    } else {
+        spruch = t("Die Bank gewinnt.");
+    }
+    hand.fertig = true;
+    hand.dealerZieht = false;
+    hand.spruch = spruch;
+    run.gold += auszahlung;
+    hand.gewonnen = auszahlung > hand.einsatz;
+    const differenz = auszahlung - hand.einsatz;
+    hand.text = differenz > 0 ? "+" + zahl(differenz) + t(" Gold") : differenz < 0 ? "-" + zahl(-differenz) + t(" Gold") : t("±0 Gold");
+    if (hand.gewonnen) {
+        zaehleSieg();
+        if (blackjack) Klang.jackpot();
+        else Klang.muenze(3);
+    } else if (differenz < 0) {
+        Klang.fehler();
+    }
+    aktualisiereAlles();
+}
+
+// Ein offenes Blatt, wenn die Pause vorbei ist: der Dealer spielt es sofort zu Ende (du haeltst)
+function bjSchliesseOffeneHand() {
+    const hand = run && run.glueck && run.glueck.bj;
+    if (!hand || hand.fertig) return;
+    while (bjSumme(hand.dealer) < 17) hand.dealer.push(bjKarte());
+    bjAuswerten();
 }

@@ -449,6 +449,9 @@ const maus = { x: -9999, y: -9999 };
 const lootKugeln = [];
 let slotEls = [];
 let aktiverShopReiter = "allgemein";
+// Markt oder Gluecksspiel (umschalten mit Muenze / Karte oben im Markt)
+let marktModus = "markt";
+let aktiverGlueckReiter = "muenzwurf";
 let aktiverStern = "p_weizen";
 let aktiverPrestigeReiter = "upgrades";
 let aktiverStatistikReiter = "aktuell";
@@ -3167,6 +3170,7 @@ function naechsterSandboxTag() {
     haken("tagEnde");
 
     run.tag += 1;
+    bjSchliesseOffeneHand();
     run.glueck = neuerGlueckZustand();
     run.tagesBoni = run.naechsterTag;
     run.naechsterTag = leereTagesBoni();
@@ -3258,6 +3262,7 @@ function aktualisiereLebenszeitMaxima() {
 
 function beendeTag() {
     run.phase = "vorTag";
+    bjSchliesseOffeneHand();
     run.glueck = neuerGlueckZustand();
     fxLayer.querySelectorAll(".sternschnuppe, .gluehwuermchen").forEach(e => e.remove());
     run.goldBuffMs = 0;
@@ -3812,12 +3817,51 @@ function marktGesperrt(titel, text) {
 
 const PFLANZEN_UPGRADE_ICONS = { ertrag: "💰", wachstum: "⏱️", pracht: "🎨", ueberfluss: "➕" };
 
+// Oben im Markt: Muenze = normaler Markt, Karte = Gluecksspiel
+function renderMarktModus() {
+    const leiste = $("markt-modus");
+    leiste.innerHTML = "";
+    if (!hatGluecksspiel()) return;
+    [["markt", "🪙", t("Markt")], ["glueck", "🃏", t("Glücksspiel")]].forEach(([id, symbol, name]) => {
+        const knopf = el("button", "knopf markt-modus-knopf" + (marktModus === id ? " aktiv" : ""));
+        knopf.appendChild(pixelIcon(symbol, 28));
+        setzeTipp(knopf, name);
+        knopf.addEventListener("click", () => {
+            if (glueckAnimation || marktModus === id) return;
+            Klang.klick(8);
+            marktModus = id;
+            renderShop();
+        });
+        leiste.appendChild(knopf);
+    });
+}
+
 function renderShop() {
     // Waehrend eine Muenze fliegt oder die Huehner rennen, wird der Glueck-Reiter nicht neu aufgebaut
-    if (glueckAnimation && aktiverShopReiter === "glueck" && !shopPanel.classList.contains("hidden")) return;
+    if (glueckAnimation && marktModus === "glueck" && !shopPanel.classList.contains("hidden")) return;
+    if (!hatGluecksspiel()) marktModus = "markt";
+    renderMarktModus();
+
+    const goldAnzeige = $("markt-gold");
+    goldAnzeige.innerHTML = "";
+    goldAnzeige.append(spriteIcon("muenze"), " " + zahl(run.gold) + t(" Gold"));
+
+    // Gluecksspiel: eigene Reiter, ein Spiel pro Reiter
+    if (marktModus === "glueck") {
+        const spiele = freieGluecksspiele();
+        if (!spiele.some(s => s.id === aktiverGlueckReiter)) aktiverGlueckReiter = spiele[0].id;
+        renderReiter(shopReiter, spiele.map(s => ({ id: s.id, text: s.text() })), aktiverGlueckReiter, id => {
+            aktiverGlueckReiter = id;
+            renderShop();
+        });
+        shopContent.innerHTML = "";
+        if (!darfEinkaufen()) shopContent.appendChild(erstelleHinweis(t("🌙 Spielen geht nur zwischen den Tagen.")));
+        renderGluecksspiele(aktiverGlueckReiter);
+        return;
+    }
+
     const liste = [{ id: "allgemein", text: t("⚙️ Allgemein") }];
     run.pflanzen.filter(p => p.freigeschaltet).forEach(p => liste.push({ id: p.id, text: p.emoji + " " + p.name }));
-    if (hatGluecksspiel()) liste.push({ id: "glueck", text: t("🎲 Glücksspiel") });
     if (!liste.some(r => r.id === aktiverShopReiter)) aktiverShopReiter = "allgemein";
 
     renderReiter(shopReiter, liste, aktiverShopReiter, id => {
@@ -3826,9 +3870,6 @@ function renderShop() {
     });
 
     shopContent.innerHTML = "";
-    const goldAnzeige = $("markt-gold");
-    goldAnzeige.innerHTML = "";
-    goldAnzeige.append(spriteIcon("muenze"), " " + zahl(run.gold) + t(" Gold"));
     if (!darfEinkaufen()) shopContent.appendChild(erstelleHinweis(t("🌙 Einkaufen geht nur zwischen den Tagen.")));
     const raster = el("div", "markt-raster");
 
@@ -3851,11 +3892,6 @@ function renderShop() {
             raster.appendChild(marktGesperrt(gesperrt + t(" weitere Stände"), t("Schaltest du im Stellarium frei (Äste Hof und Helfer).")));
         }
         shopContent.appendChild(raster);
-        return;
-    }
-
-    if (aktiverShopReiter === "glueck") {
-        renderGluecksspiele();
         return;
     }
 
@@ -4758,7 +4794,7 @@ reglerSfx.addEventListener("change", () => Klang.muenze(2));
 
 function gewuenschtesLied() {
     if (!prestigeShop.classList.contains("versteckt")) return "mondteich";
-    if (!shopPanel.classList.contains("hidden") && aktiverShopReiter === "glueck") return "gluecksspiel";
+    if (!shopPanel.classList.contains("hidden") && marktModus === "glueck") return "gluecksspiel";
     // Beim Probehoeren im Haus laeuft das angeprobierte Lied
     const gewaehlt = gewaehlteKosmetik("musik").id;
     if (gewaehlt !== "auto" && LIEDER[gewaehlt]) return gewaehlt;

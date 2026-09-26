@@ -17,6 +17,8 @@
 const pixelIconCache = {};
 
 function pixelIconUrl(emoji, pixel = 16) {
+    // "sprite:name" = eigenes Pixel-Sprite statt Emoji (z.B. die Sense)
+    if (emoji.startsWith("sprite:")) return spriteUrl(emoji.slice(7));
     const schluessel = emoji + "|" + pixel;
     if (!pixelIconCache[schluessel]) {
         const leinwand = document.createElement("canvas");

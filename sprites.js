@@ -1407,6 +1407,27 @@ SPRITE_PIXEL.grosserstern = Array.from({ length: 15 }, (_, y) => Array.from({ le
     if (dx === dy && dx <= 4) return "F";
     return ".";
 }).join(""));
+// Sense (Sternenfall-Shop "Sense"): gebogenes Stahlblatt am Holzstiel
+SPRITE_PIXEL.sense_basis = [
+    "................",
+    "......111111....",
+    "....1122222213..",
+    "..11222111113...",
+    ".12211.....33...",
+    ".121.......3....",
+    ".11.......33....",
+    "..........3.....",
+    ".........33.....",
+    ".........3......",
+    "........44......",
+    "........4.......",
+    ".......33.......",
+    ".......3........",
+    "......33........",
+    "......3........."
+];
+SPRITE_ABWANDLUNGEN.sense = { basis: "sense_basis", farben: { 1: "#4f5866", 2: "#dfe6ef", 3: "#9a6634", 4: "#5b3a22" } };
+
 // Mondbluete: eine einzelne Kirschbluete in Lavendel (5 Bluetenblaetter mit Kerbe, gelbe Staubblaetter)
 SPRITE_PIXEL.mondbluete = (() => {
     const g = 15;

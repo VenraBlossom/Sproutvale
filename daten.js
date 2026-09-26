@@ -520,6 +520,10 @@ const SKILLS = [
         t("Schaltet das Hühnerrennen auf dem Markt frei: Wette auf ein Huhn, je größer der Außenseiter, desto höher der Gewinn.")),
     spielStern("plinko", "🔻", [-1840, 0], "huehnerrennen", t("Samen-Plinko"), 4000,
         t("Schaltet Samen-Plinko auf dem Markt frei: Ein Samen hüpft durch Nägel in ein Gewinnfach.")),
+    spielStern("roulette", "🎡", [-2060, 0], "plinko", t("Roulette"), 6000,
+        t("Schaltet Roulette auf dem Markt frei: Setz auf Rot, Schwarz, Gerade, Ungerade oder die grüne 0.")),
+    spielStern("blackjack", "🃏", [-2280, 0], "roulette", t("Blackjack"), 9000,
+        t("Schaltet Blackjack auf dem Markt frei: Spiel gegen den Dealer, wer näher an 21 kommt.")),
     stern("glueckstraehne", "glueck", "🍀", [-960, -220], "muenzwurf", t("Glückssträhne"), 400, 2, 5,
         t("+3% Glück bei allen Glücksspielen (mehr Gewinnchance)."),
         () => "+" + prozentText(glueckBonus()) + t(" Glück")),
@@ -527,7 +531,7 @@ const SKILLS = [
         t("Gewinne an der Slotmaschine sind 10% höher."),
         () => "+" + prozentText(0.1 * level("gluecksrabatt")) + t(" Slot-Gewinne")),
     stern("stammkunde", "glueck", "🎫", [-1400, -220], "rubbellos", t("Stammkunde"), 1500, 2.5, 3,
-        t("+1 Spiel pro Pause bei Münzwurf, Slotmaschine, Rubbellos, Hühnerrennen und Plinko."),
+        t("+1 Spiel pro Pause bei allen Glücksspielen."),
         () => "+" + level("stammkunde") + t(" Spiele pro Pause")),
     stern("haendlerfreund", "glueck", "🧳", [-1620, -220], "huehnerrennen", t("Händlerfreund"), 2000, 2.5, 2,
         t("Der Wanderhändler kommt öfter vorbei."),
@@ -799,7 +803,11 @@ const GLUECKSSPIEL = {
         ] },
     // Plinko: 8 Reihen Naegel, der Samen faellt in eines von 9 Faechern (Erwartungswert ca. 0,94)
     plinko: { proPause: 3, einsaetze: [0.05, 0.1, 0.25], reihen: 8,
-        faecher: [8, 3, 1.3, 0.6, 0.3, 0.6, 1.3, 3, 8] }
+        faecher: [8, 3, 1.3, 0.6, 0.3, 0.6, 1.3, 3, 8] },
+    // Roulette: 37 Faecher, Rot/Schwarz/Gerade/Ungerade x2, die 0 x36
+    roulette: { proPause: 3, einsaetze: [0.05, 0.1, 0.25, 0.5] },
+    // Blackjack gegen den Dealer: Gewinn x2, Blackjack x2,5
+    blackjack: { proPause: 3, einsaetze: [0.05, 0.1, 0.25] }
 };
 
 // ---------- SEGEN: nach jeder bezahlten Rechnung 1 von 3 waehlen, gilt fuer den ganzen Run ----------
@@ -1763,26 +1771,26 @@ const KUSCHEL_NACH_ID = Object.fromEntries(KUSCHELTIERE.map(k => [k.id, k]));
 // Dafuer: Sternensplitter fuer den Sternenfall-Shop UND jeder Sternenfall verdoppelt alle zukuenftigen Mondblueten (x2, x4, x8 ...).
 
 const STERNENFALL_KONFIG = {
-    mindestMondblueten: 1000,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
-    splitterTeiler: 60            // Sternensplitter = Wurzel(verdiente Mondblueten / 60)
+    mindestMondblueten: 1500,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
+    splitterTeiler: 150           // Sternensplitter = Wurzel(verdiente Mondblueten / 150)
 };
 
 const STERNENFALL_UPGRADES = [
-    { id: "sternenregen", name: t("Sternenregen"), symbol: "🌠", basiskosten: 1, faktor: 1.35, max: Infinity,
+    { id: "sternenregen", name: t("Sternenregen"), symbol: "🌠", basiskosten: 1, faktor: 1.6, max: Infinity,
         beschreibung: t("+25% Gold aus allen Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 25 * lvl + t("% Gold") },
-    { id: "sternensaat", name: t("Sternensaat"), symbol: "✨", basiskosten: 1, faktor: 1.4, max: Infinity,
+    { id: "sternensaat", name: t("Sternensaat"), symbol: "✨", basiskosten: 1, faktor: 1.7, max: Infinity,
         beschreibung: t("+10% Sternensamen aus Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 10 * lvl + t("% Sternensamen") },
-    { id: "mondmagnet", name: t("Mondmagnet"), symbol: "🌙", basiskosten: 1, faktor: 1.45, max: Infinity,
+    { id: "mondmagnet", name: t("Mondmagnet"), symbol: "🌙", basiskosten: 2, faktor: 1.8, max: Infinity,
         beschreibung: t("+10% Mondblüten am Ende jedes Runs. Unendlich oft kaufbar."), info: lvl => "+" + 10 * lvl + t("% Mondblüten") },
-    { id: "ewigerfruehling", name: t("Ewiger Frühling"), symbol: "🌸", basiskosten: 1, faktor: 1.5, max: 10,
+    { id: "ewigerfruehling", name: t("Ewiger Frühling"), symbol: "🌸", basiskosten: 2, faktor: 1.9, max: 10,
         beschreibung: t("Alle Pflanzen wachsen 5% schneller."), info: lvl => "+" + 5 * lvl + t("% Wachstum") },
-    { id: "glueckstern", name: t("Glücksstern"), symbol: "⭐", basiskosten: 1, faktor: 1.6, max: 5,
+    { id: "glueckstern", name: t("Glücksstern"), symbol: "⭐", basiskosten: 2, faktor: 2, max: 5,
         beschreibung: t("+3% Glück bei allen Glücksspielen."), info: lvl => "+" + 3 * lvl + t("% Glück") },
-    { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 2, faktor: 2, max: 3,
+    { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 4, faktor: 2.5, max: 3,
         beschreibung: t("Jeder Run startet mit einem zufälligen Werkzeug."), info: lvl => lvl + t(" Werkzeuge zum Start") },
-    { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 2, faktor: 2, max: 3,
+    { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 3, faktor: 3, max: 3,
         beschreibung: t("Jeder Sternenfall schenkt dir 3 Kuschel-Gutscheine."), info: lvl => 3 * lvl + t(" Gutscheine pro Sternenfall") },
-    { id: "dauerklick", name: t("Dauerklick"), symbol: "🖱️", basiskosten: 1, faktor: 1, max: 1,
+    { id: "dauerklick", name: t("Sense"), symbol: "sprite:sense", basiskosten: 1, faktor: 1, max: 1,
         beschreibung: t("Halte die Maus auf dem Samenladen gedrückt: Er klickt von allein, 15-mal pro Sekunde."),
         info: lvl => (lvl > 0 ? t("Aktiv") : t("Nicht aktiv")) }
 ];
