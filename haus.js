@@ -329,7 +329,18 @@ const LADEN_BAUTEILE = {
     zirkus: ["bau-spot", "bau-zelt", "bau-vorhang links", "bau-vorhang rechts", "bau-manege", "bau-wimpel", "bau-seeball"],
     sternwarte: ["bau-nachthimmel", "bau-turmhaus", "bau-sockel", "bau-teleskop", "bau-kuppel", "bau-orbit"],
     hexe: ["bau-huette", "bau-dach", "bau-kessel", "bau-blasen"],
-    leuchtturm: ["bau-strahl", "bau-leuchtturm", "bau-galerie", "bau-laterne", "bau-fels", "bau-moewe"]
+    leuchtturm: ["bau-strahl", "bau-leuchtturm", "bau-galerie", "bau-laterne", "bau-fels", "bau-moewe"],
+    mondteich: ["bau-mondlicht", "bau-teichrand", "bau-wasser", "bau-mondspiegel", "bau-seerosen", "bau-schimmer"],
+    // epische Gebaeude: ruhig, ohne grosse Animationen
+    kisten: ["bau-tafel", "bau-kisten", "bau-gemuese"],
+    beerenbusch: ["bau-busch-blaetter", "bau-busch", "bau-beeren"],
+    strandbude: ["bau-sand", "bau-bude", "bau-strohdach", "bau-surfbrett"],
+    truhe: ["bau-deckel", "bau-truhe", "bau-muenzberg"],
+    kirschbaum: ["bau-stamm", "bau-krone", "bau-blueten-boden"],
+    bienenkorb: ["bau-korb", "bau-honigtopf"],
+    eiswagen: ["bau-schirm", "bau-wagen", "bau-raeder"],
+    nachtzelt: ["bau-nachtzelt", "bau-eingang", "bau-laternen"],
+    lebkuchenhaus: ["bau-zuckerstangen", "bau-lebkuchen", "bau-zuckerdach", "bau-bonbons"]
 };
 
 function baueLaden(laden) {
@@ -340,6 +351,8 @@ function baueLaden(laden) {
     // Ohne Gebaeude darf das Attribut gar nicht da sein (sonst greifen die Gebaeude-Styles)
     if (bauweise) marktstand.dataset.bauweise = bauweise;
     else delete marktstand.dataset.bauweise;
+    // epische Gebaeude: kein Bild in der Mitte, Schild unten, keine Leerlauf-Animationen
+    marktstand.classList.toggle("bau-ruhig", Boolean(bauweise) && laden.paket === "unterstuetzer");
     marktstand.querySelectorAll(".laden-bau").forEach(e => e.remove());
     if (!bauweise) return;
     const bau = el("div", "laden-bau");
@@ -383,7 +396,7 @@ function baueLaden(laden) {
 
 // Oberkante des Gebaeudes (Dach, Zelt oder Kuppel), dort starten die Idle-Effekte
 function ladenSpitze() {
-    const teil = marktstand.querySelector(".bau-rakete, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne") || plantButton;
+    const teil = marktstand.querySelector(".bau-rakete, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne, .bau-wasser") || plantButton;
     const rect = teil.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + 6, rect };
 }
@@ -497,6 +510,14 @@ function ladenIdle(laden) {
             void marktstand.offsetWidth;
             marktstand.classList.add("bau-trick");
         }
+    } else if (laden.bauweise === "mondteich") {
+        // Ab und zu laeuft ein Schimmer ueber das Wasser, dazu ein paar Glitzerpunkte
+        marktstand.classList.remove("bau-trick");
+        void marktstand.offsetWidth;
+        marktstand.classList.add("bau-trick");
+        const wasser = marktstand.querySelector(".bau-wasser");
+        const r = wasser ? wasser.getBoundingClientRect() : spitze.rect;
+        partikel(r.left + r.width / 2, r.top + r.height * 0.4, laden.funken, 8, 35);
     } else if (laden.bauweise === "leuchtturm") {
         // Das Licht blitzt kurz hell auf
         marktstand.classList.remove("bau-trick");
@@ -517,6 +538,14 @@ function wurfAnkunft(x, y, laden, istSamen) {
     if (laden.bauweise === "feuerwerk") {
         feuerwerkRing(x, y, istSamen ? laden.ankunft : [zufall(laden.ankunft), "#ffffff"], istSamen ? 18 : 6, istSamen ? 38 : 14);
         if (istSamen) Klang.plinkoNagel(2);
+    } else if (laden.bauweise === "mondteich") {
+        // Blasen platzen auf dem Feld und ziehen kleine Wasserringe
+        const ring = el("div", "wasser-ring" + (istSamen ? " gross" : ""));
+        ring.style.left = x + "px";
+        ring.style.top = y + "px";
+        fxLayer.appendChild(ring);
+        setTimeout(() => ring.remove(), 900);
+        partikel(x, y, laden.ankunft, istSamen ? 10 : 3, istSamen ? 30 : 12);
     } else if (laden.bauweise === "sternwarte" || laden.bauweise === "leuchtturm") {
         feuerwerkRing(x, y, laden.ankunft, istSamen ? 10 : 4, istSamen ? 26 : 10);
     } else {
