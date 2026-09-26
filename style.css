@@ -10018,3 +10018,8 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { background-position: 150% 0; border-color: #8fa2f0; box-shadow: 0 0 14px rgba(143, 162, 240, 0.8); }
     100% { background-position: 300% 0; border-color: #7ae0a0; box-shadow: 0 0 10px rgba(122, 224, 160, 0.7); }
 }
+
+.erfolg-alle {
+    display: block;
+    margin: 0 auto 8px;
+}

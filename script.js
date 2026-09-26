@@ -2677,6 +2677,18 @@ function renderErfolge() {
         erfolgeContent.appendChild(leiste);
     }
     const offen = anzahlAbholbar(m, sandbox);
+    // Mehrere Gutscheine offen: alle auf einmal abholen
+    if (aktiv && offen > 1) {
+        const alle = el("button", "knopf knopf-lila erfolg-alle", t("🎟️ Alle abholen (") + offen + ")");
+        alle.addEventListener("click", () => {
+            erfolgKettenFuer(sandbox).forEach(kette => {
+                if (abholbareStufen(kette).length > 0) holeErfolgAb(kette, null);
+            });
+            const r = alle.getBoundingClientRect();
+            partikel(r.left + r.width / 2, r.top + r.height / 2, ["#b06ee8", "#ffd93d", "#ffffff"], 24, 80);
+        });
+        erfolgeContent.appendChild(alle);
+    }
     erfolgeContent.appendChild(erstelleHinweis(
         "🏆 " + fertig + t(" von ") + alle + t(" Stufen geschafft") + (sandbox ? t(" (Sandbox)") : t(" (Standard)")) +
         t(". Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.") +

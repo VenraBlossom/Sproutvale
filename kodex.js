@@ -32,7 +32,8 @@ function kodexEintraege(reiter) {
         case "werkzeuge":
             return WERKZEUGE.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.werkzeuge[w.id] || 0,
                 text: w.text(w.wert), zaehler: t("gekauft"),
-                detail: w.kurz(w.wert) + " (" + w.kurz(w.wert * WERKZEUG_STUFEN_BONUS) + t(" pro Stufe") + ")" }));
+                detail: t("Stufe 1: ") + w.kurz(w.wert) + " · " + (w.kurz(1).trim().startsWith("-") ? "-" : "+") +
+                    prozentText(w.wert * WERKZEUG_STUFEN_BONUS) + t(" pro weitere Stufe") }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
                 text: z.text, ohneZaehler: true }));
