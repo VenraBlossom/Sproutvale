@@ -120,7 +120,7 @@ function leererMetaStand() {
         erfolge: {}, erfolgeAbgeholt: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
         sternenfaelle: 0, sternensplitter: 0, sternenfallUpgrades: {}, mondbluetenSeitSternenfall: 0,
         sandbox: false, dlc: false, freigeschaltet: {}, kosmetik: leereKosmetik(),
-        mondphase: 0, mondphaseFrei: 0
+        mondphase: 0, mondphaseFrei: 0, mondphaseGesehen: 0
     };
 }
 
@@ -149,6 +149,8 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 freigeschaltet: { ...daten.freigeschaltet },
                 kosmetik: { ...leereKosmetik(), ...daten.kosmetik }
             };
+            // Alte Spielstaende: schon freie Mondphasen gelten als gesehen (kein Ausrufezeichen fuer Altes)
+            if (daten.mondphaseGesehen === undefined) stand.mondphaseGesehen = stand.mondphaseFrei || 0;
             // Umzug alter Felder: freieSkins/deko/haustierSkin gibt es jetzt unter freigeschaltet/kosmetik
             (daten.freieSkins || []).forEach(id => { stand.freigeschaltet["haustier:" + id] = true; });
             (daten.deko || []).forEach(id => { stand.freigeschaltet["deko:" + id] = true; });
@@ -987,6 +989,7 @@ const moneyDisplay = $("money-display");
 const skillpointDisplay = $("skillpoint-display");
 const kalenderDisplay = $("kalender-display");
 const rechnungDisplay = $("rechnung-display");
+const mondphaseDisplay = $("mondphase-display");
 const buffAnzeige = $("buff-anzeige");
 const energieFuellung = $("energie-fuellung");
 const energieText = $("energie-text");
@@ -3618,6 +3621,21 @@ function aktualisiereTopBar() {
         "\n- " + t("In diesem Run gesammelt: ") + zahl(gesamtSterne));
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
+    // Aktuelle Mondphase (Schwierigkeit), nur in Story
+    mondphaseDisplay.classList.toggle("versteckt", Boolean(run.sandbox));
+    if (!run.sandbox) {
+        const stufe = run.mondphase || 0;
+        const phase = MONDPHASEN[stufe];
+        mondphaseDisplay.querySelector("span").textContent = phase.symbol;
+        mondphaseDisplay.classList.toggle("hat-neues", neueMondphase());
+        const regeln = MONDPHASEN.slice(1, stufe + 1).map(p => "\n- " + p.symbol + " " + p.text).join("");
+        setzeTipp(mondphaseDisplay, "## " + t("🌙 Mondphase: ") + phase.name + "\n= " + phase.symbol + " " + phase.name +
+            (stufe === 0 ? "\n" + t("Die normalen Regeln.") : "\n" + t("Es gelten zusammen:") + regeln) +
+            "\n> +" + Math.round(MONDPHASE_BONUS * 100 * stufe) + t("% Mondblüten am Ende des Runs") +
+            (neueMondphase() ? "\n> " + t("❗ Neue Mondphase frei: wählbar im Mondteich unter Spielmodi") : "") +
+            "\n" + t("Die Mondphase wählst du im Mondteich (Spielmodi). Sie gilt ab dem nächsten Run."));
+    }
+    aktualisiereMondphaseHinweis();
     if (run.sandbox) {
         // Meilensteine erreicht man einfach (nichts wird abgezogen): angezeigt wird nur das naechste Ziel
         const ziel = meilensteinSchwelle(run.meilensteine + 1);

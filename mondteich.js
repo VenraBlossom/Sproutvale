@@ -484,7 +484,9 @@ function renderMondphasen() {
     MONDPHASEN.forEach((phase, index) => {
         const frei = index <= (meta.mondphaseFrei || 0);
         const aktiv = index === Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0);
-        const knopf = el("button", "mondphase" + (aktiv ? t(" aktiv") : "") + (frei ? "" : t(" gesperrt")), null, [
+        const neu = index > (meta.mondphaseGesehen || 0) && frei;
+        const knopf = el("button", "mondphase" + (aktiv ? " aktiv" : "") + (frei ? "" : " gesperrt") + (neu ? " neu" : ""), null, [
+            neu ? el("div", "mondphase-neu", t("NEU")) : null,
             el("div", "mondphase-symbol", phase.symbol),
             el("div", "mondphase-name", phase.name),
             el("div", "mondphase-text", frei ? phase.text : "🔒 " + MONDPHASE_FREI_AB_RECHNUNGEN + t(" Rechnungen in der Phase davor")),
@@ -506,6 +508,12 @@ function renderMondphasen() {
 function renderSpielmodi() {
     prestigeInfo.textContent = t("Spielmodi verändern die Regeln eines Runs.");
     if (!run.sandbox) renderMondphasen(); // Mondphasen gelten nur fuer normale Runs
+    // Neue Mondphasen sind jetzt gesehen (das Ausrufezeichen verschwindet beim naechsten Oeffnen)
+    if (neueMondphase()) {
+        meta.mondphaseGesehen = meta.mondphaseFrei || 0;
+        speichereMeta();
+        aktualisiereMondphaseHinweis();
+    }
     prestigeInhalt.appendChild(erstelleKarte({
         icon: "🌱",
         titel: t("Normaler Run"),
@@ -531,6 +539,17 @@ function renderSpielmodi() {
     }));
 }
 
+// Wurde eine neue Mondphase frei, die man sich noch nicht angesehen hat?
+function neueMondphase() {
+    return (meta.mondphaseFrei || 0) > (meta.mondphaseGesehen || 0);
+}
+
+// Ausrufezeichen am Mondteich-Knopf (Tageskarte)
+function aktualisiereMondphaseHinweis() {
+    const knopf = $("karte-prestige");
+    if (knopf) knopf.classList.toggle("hat-neues", neueMondphase());
+}
+
 // ---------- MONDTEICH-FENSTER ----------
 
 function renderPrestigeShop() {
@@ -550,7 +569,7 @@ function renderPrestigeShop() {
         { id: "kuschel", text: t("🧸 Kuscheltiere (") + Object.keys(meta.kuscheltiere).length + "/" + KUSCHELTIERE.length + ")" +
             (meta.gutscheine > 0 ? " 🎟️" + meta.gutscheine : "") },
         { id: "sternenfall", text: t("☄️ Sternenfall") + (kannSternenfall() ? " !" : "") },
-        { id: "modi", text: t("🎮 Spielmodi") }
+        { id: "modi", text: t("🎮 Spielmodi") + (neueMondphase() ? " !" : "") }
     ], aktiverPrestigeReiter, id => {
         aktiverPrestigeReiter = id;
         renderPrestigeShop();

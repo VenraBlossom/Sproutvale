@@ -10589,3 +10589,139 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .einstellungen-rahmen.breit .statistik-rahmen {
     max-height: none;
 }
+
+/* ---------- Mondphase oben und Ausrufezeichen fuer Neues ---------- */
+#mondphase-display span {
+    font-size: 1.25em;
+}
+.hat-neues {
+    position: relative;
+}
+.hat-neues::after {
+    content: "!";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e8434a;
+    color: #fff;
+    border: 2px solid #fff6dc;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    animation: neues-huepfen 1.2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+@keyframes neues-huepfen {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+.mondphase.neu {
+    position: relative;
+    box-shadow: 0 0 0 3px #ffd93d, 0 0 18px rgba(255, 217, 61, 0.6);
+}
+.mondphase-neu {
+    position: absolute;
+    top: -10px;
+    right: -6px;
+    background: #e8434a;
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.75em;
+    padding: 2px 7px;
+    border-radius: 8px;
+    border: 2px solid #fff6dc;
+}
+
+/* ---------- Mondteich: naechtlicher Teich (Sternenhimmel, Mondlicht, Wasser) ---------- */
+#prestige-shop {
+    background:
+        radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 28% 72%, #fff 50%, transparent 51%),
+        radial-gradient(2px 2px at 44% 12%, #fff6c0 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 63% 84%, #fff 50%, transparent 51%),
+        radial-gradient(2px 2px at 78% 26%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 90% 64%, #cfe0ff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 6% 88%, #fff 50%, transparent 51%),
+        radial-gradient(ellipse at 50% 120%, rgba(90, 70, 190, 0.55), transparent 60%),
+        rgba(10, 10, 36, 0.86);
+}
+.prestige-fenster {
+    background: linear-gradient(180deg, #262a66 0%, #1a1c48 55%, #141638 100%);
+    border: 4px solid #8f7ae0;
+    box-shadow: 0 0 0 3px #1b1440, 0 0 40px rgba(143, 122, 224, 0.45), 0 14px 40px rgba(0, 0, 0, 0.6);
+    border-radius: 14px;
+}
+.prestige-kopf {
+    position: relative;
+    padding: 16px 22px 20px;
+    background:
+        radial-gradient(circle at calc(100% - 70px) 50%, #fff6c8 0 16px, rgba(255, 246, 200, 0.35) 17px 30px, transparent 46px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 18px, transparent 18px 40px) bottom / 100% 5px no-repeat,
+        linear-gradient(#4a4fb0, #2b2f78);
+    border-bottom: 4px solid #0e1030;
+}
+.prestige-kopf h2 {
+    font-size: 1.7em;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #141a42, 0 0 12px rgba(200, 180, 255, 0.6);
+}
+#prestige-guthaben {
+    margin-right: 90px;
+}
+#prestige-guthaben .guthaben-teil {
+    background: rgba(10, 12, 40, 0.45);
+    border: 2px solid rgba(200, 180, 255, 0.45);
+    border-radius: 20px;
+    padding: 3px 12px 3px 6px;
+}
+#prestige-info {
+    color: #d8d0ff;
+    padding: 12px 22px 4px;
+}
+.prestige-reiter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 22px 14px;
+    border-bottom: 3px solid #4a3f9a;
+    background: rgba(255, 255, 255, 0.03);
+}
+.prestige-reiter .reiter-knopf {
+    font-size: 1.15em;
+    padding: 11px 20px;
+    color: #f1ecff;
+    text-shadow: 1px 1px 0 #1b1440;
+    background: linear-gradient(#5a4fb8, #3e3690);
+    border: 3px solid #1b1440;
+    border-radius: 22px;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 3px 0 #0e0a26;
+}
+.prestige-reiter .reiter-knopf:hover {
+    background: linear-gradient(#6a5fcc, #4a40a8);
+}
+.prestige-reiter .reiter-knopf.aktiv {
+    color: #3a2412;
+    text-shadow: none;
+    background: linear-gradient(#fff6c8, #f0d88a);
+    border-color: #8a6a1a;
+    box-shadow: 0 0 14px rgba(255, 230, 150, 0.7), 0 3px 0 #5a4410;
+}
+#prestige-inhalt {
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(120, 100, 230, 0.18), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(90, 170, 230, 0.14), transparent 55%);
+}
+#prestige-inhalt .upgrade-item {
+    border-color: #8f7ae0;
+    box-shadow: 0 3px 0 #0e0a26, 0 0 0 2px rgba(143, 122, 224, 0.25);
+}
+.prestige-fuss {
+    background: #141638;
+    border-top: 3px solid #4a3f9a;
+}
