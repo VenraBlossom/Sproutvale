@@ -433,6 +433,8 @@ function koopEmpfange(n) {
         case "start":
             if (koop.rolle === "gast") {
                 koop.spielId = n.spielId || null;
+                koop.gastPlatz = 0;
+                koop.keinPlatzGemeldet = false;
                 koop.partnerStand = n.hostDaten || null;
                 koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts", n.gastDaten || null);
             }
@@ -578,6 +580,7 @@ function koopLeseEigenenRun(endlos, slot) {
 // Wohin speichere ich dieses Koop-Spiel? Host: gewaehlter Platz. Gast: Platz mit demselben Spiel, sonst ein freier Platz.
 function koopSpeicherPlatz() {
     if (koop.rolle === "host") return run.koopSlot;
+    if (koop.gastPlatz) return koop.gastPlatz;
     let frei = 0;
     for (let slot = 1; slot <= KOOP_KONFIG.slots; slot++) {
         const stand = koopLeseStand(slot);
@@ -591,7 +594,7 @@ function koopSpeicherPlatz() {
 function koopSchreibeStand(eigeneDaten) {
     const platz = koopSpeicherPlatz();
     if (!platz) {
-        if (!koop.keinPlatzGemeldet) zeigeToast(t("💾 Kein freier Koop-Speicherstand. Lösche einen in der Lobby, um dieses Spiel zu speichern."));
+        if (!koop.keinPlatzGemeldet) koopFragePlatzUeberschreiben();
         koop.keinPlatzGemeldet = true;
         return;
     }
@@ -615,6 +618,30 @@ function koopSchreibeStand(eigeneDaten) {
     } catch (e) {
         console.warn("Koop-Spielstand", e);
     }
+}
+
+// Gast mit 3 belegten Koop-Speicherstaenden: einen ueberschreiben oder dieses Spiel nicht speichern
+function koopFragePlatzUeberschreiben() {
+    const knoepfe = [];
+    for (let slot = 1; slot <= KOOP_KONFIG.slots; slot++) {
+        const r = (koopLeseEigenenRun(true, slot) || {}).run;
+        knoepfe.push({
+            text: t("💾 Platz ") + slot + (r ? " (" + t("Tag ") + r.tag + ")" : ""),
+            klasse: "knopf-rot",
+            aktion: () => {
+                koop.gastPlatz = slot;
+                speichereRun();
+                zeigeToast(tf("💾 Koop-Spiel wird auf Platz {0} gespeichert", slot));
+            }
+        });
+    }
+    knoepfe.push({ text: t("Nicht speichern"), aktion: () => {} });
+    zeigePopup({
+        titel: t("💾 Alle Koop-Speicherstände sind voll"),
+        breite: 560,
+        inhalt: t("Wähle einen Speicherstand, der mit diesem Koop-Spiel überschrieben wird. Der alte Stand auf diesem Platz geht dabei verloren."),
+        knoepfe
+    });
 }
 
 // Aus speichereRun: eigenen Stand speichern und dem Mitspieler schicken
