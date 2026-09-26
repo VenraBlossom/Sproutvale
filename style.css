@@ -9592,3 +9592,71 @@ body.muenzen-planet .loot-kugel.loot-gelandet:not(.loot-stern) {
     0%, 100% { filter: drop-shadow(0 0 4px rgba(154, 138, 255, 0.8)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); rotate: -8deg; }
     50% { filter: drop-shadow(0 0 10px rgba(200, 190, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); rotate: 8deg; }
 }
+
+/* ---------- Legendaere Pflanzen-Looks: Ernte- und Reife-Effekte (haus.js PFLANZEN_EFFEKTE) ---------- */
+
+.fx-stern,
+.fx-splitter,
+.fx-ring,
+.fx-flamme {
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Pixel-Stern: ein Punkt mit vier Armen */
+.fx-stern {
+    width: 5px;
+    height: 5px;
+    margin: -2px 0 0 -2px;
+    background: #ffffff;
+    box-shadow: 5px 0 0 var(--farbe), -5px 0 0 var(--farbe), 0 5px 0 var(--farbe), 0 -5px 0 var(--farbe),
+        0 0 10px 3px var(--farbe);
+}
+
+.fx-glanz {
+    box-shadow: 4px 0 0 var(--farbe), -4px 0 0 var(--farbe), 0 4px 0 var(--farbe), 0 -4px 0 var(--farbe),
+        8px 0 0 -1px rgba(255, 255, 255, 0.6), -8px 0 0 -1px rgba(255, 255, 255, 0.6),
+        0 8px 0 -1px rgba(255, 255, 255, 0.6), 0 -8px 0 -1px rgba(255, 255, 255, 0.6), 0 0 10px 3px #9fe8ff;
+}
+
+.fx-splitter {
+    width: 7px;
+    height: 7px;
+    margin: -3px 0 0 -3px;
+    background: linear-gradient(135deg, #ffffff 0 35%, var(--farbe) 35% 70%, #3a88b8 70%);
+    box-shadow: 0 0 6px 1px rgba(191, 240, 255, 0.9);
+}
+
+.fx-ring {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid var(--farbe);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--farbe);
+}
+
+.fx-flamme {
+    width: 18px;
+    height: 24px;
+    margin: -20px 0 0 -9px;
+    border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%;
+    background: radial-gradient(ellipse at 50% 75%, #fff6c0 0 18%, #ffd060 30%, #ff6a2a 60%, rgba(232, 67, 42, 0) 72%);
+    filter: drop-shadow(0 0 6px #ff8a2a);
+    transform-origin: 50% 100%;
+}
+
+.fx-flamme-klein {
+    width: 8px;
+    height: 11px;
+    margin: -9px 0 0 -4px;
+}
+
+/* Reife Kristallpflanzen schimmern, reife Glutpflanzen flackern schneller */
+body.pflanzen-kristall .feld-fertig .feld-sprite {
+    animation: wippen 1.2s ease-in-out infinite, kristall-schimmer 2.2s ease-in-out infinite;
+}
+
+body.pflanzen-glut .feld-fertig .feld-sprite {
+    animation: wippen 1.2s ease-in-out infinite, glut-glimmen 0.9s ease-in-out infinite;
+}

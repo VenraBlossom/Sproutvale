@@ -1491,15 +1491,15 @@ const PFLANZEN_SKINS = [
     { id: "bonbon", name: t("Bonbonblätter"), quelle: "dlc", paket: "unterstuetzer", farben: { G: "#ffb3d9", g: "#8fe0c0", d: "#5aa98a" } },
     { id: "mitternacht", name: t("Mitternachtsblätter"), quelle: "dlc", paket: "unterstuetzer", farben: { G: "#8a7ae0", g: "#5a4ab0", d: "#2a1d68" } },
     { id: "sternenpflanzen", name: t("Sternenpflanzen"), quelle: "dlc", paket: "einzeln", farben: { G: "#9fb0ff", g: "#5a6ad8", d: "#2a3590" },
-        klasse: "pflanzen-sterne", teilchen: ["#fff6a0", "#9fb0ff", "#ffffff"] },
+        klasse: "pflanzen-sterne", teilchen: ["#fff6a0", "#9fb0ff", "#ffffff"], effekt: "sterne" },
     { id: "kristall", name: t("Kristallpflanzen"), quelle: "dlc", paket: "einzeln", farben: { G: "#bff0ff", g: "#7ac8e8", d: "#3a88b8" },
-        klasse: "pflanzen-kristall", teilchen: ["#bff0ff", "#ffffff", "#9fe8ff"] },
+        klasse: "pflanzen-kristall", teilchen: ["#bff0ff", "#ffffff", "#9fe8ff"], effekt: "kristall" },
     { id: "kirschbluete", name: t("Kirschblütenblätter"), quelle: "erspielt", bedingungText: t("Erlebe 20 Frühlinge"),
         bedingung: () => ((meta.kodex.jahreszeiten || {}).fruehling || 0) >= 20, farben: { G: "#ffc2dc", g: "#8fcf5c", d: "#4f8a32" } },
     { id: "goldblatt", name: t("Goldblätter"), quelle: "erspielt", bedingungText: t("Sammle 500 legendäre Jackpots"),
         bedingung: () => meta.lebenszeit.jackpots >= 500, farben: { G: "#ffe08a", g: "#d9a82a", d: "#8a6010" } },
     { id: "glut", name: t("Glutblätter"), quelle: "dlc", paket: "einzeln", farben: { G: "#ffb060", g: "#e8432a", d: "#5a1a08" },
-        klasse: "pflanzen-glut", teilchen: ["#ffb060", "#ff6a2a", "#ffd060"] }
+        klasse: "pflanzen-glut", teilchen: ["#ffb060", "#ff6a2a", "#ffd060"], effekt: "glut" }
 ];
 
 // Der Mondteich im Hof (x in Prozent). Klick darauf oeffnet den Mondteich-Shop.

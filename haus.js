@@ -369,6 +369,113 @@ setInterval(() => {
     }
 }, 450);
 
+// ---------- LEGENDAERE PFLANZEN-LOOKS: eigener Ernte-Effekt und Funkeln an reifen Pflanzen ----------
+function fxTeil(klasse, x, y, farbe) {
+    const teil = el("div", klasse);
+    teil.style.left = x + "px";
+    teil.style.top = y + "px";
+    if (farbe) teil.style.setProperty("--farbe", farbe);
+    fxLayer.appendChild(teil);
+    return teil;
+}
+
+function fliegeWeg(teil, schritte, dauer) {
+    teil.animate(schritte, { duration: dauer, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => teil.remove();
+}
+
+const PFLANZEN_EFFEKTE = {
+    // Sternenpflanzen: Pixel-Sterne fliegen auseinander, manchmal zieht eine kleine Sternschnuppe los
+    sterne: {
+        ernte(x, y, look) {
+            for (let i = 0; i < 7; i++) {
+                const w = (i / 7) * Math.PI * 2 + Math.random() * 0.4;
+                const weite = 26 + Math.random() * 22;
+                fliegeWeg(fxTeil("fx-stern", x, y, zufall(look.teilchen)), [
+                    { transform: "scale(0.4) rotate(0deg)", opacity: 1 },
+                    { transform: `translate(${Math.cos(w) * weite}px, ${Math.sin(w) * weite - 14}px) scale(1.1) rotate(90deg)`, opacity: 0 }
+                ], 650 + Math.random() * 300);
+            }
+            if (Math.random() < 0.35) miniSchnuppe(x, y - 16, Math.random() < 0.5 ? 1 : -1);
+        },
+        reif(x, y, look) {
+            fliegeWeg(fxTeil("fx-stern", x, y, zufall(look.teilchen)), [
+                { transform: "scale(0) rotate(0deg)", opacity: 0 },
+                { transform: "scale(1.3) rotate(45deg)", opacity: 1, offset: 0.5 },
+                { transform: "scale(0) rotate(90deg)", opacity: 0 }
+            ], 900);
+        }
+    },
+    // Kristallpflanzen: die Pflanze zerspringt in glitzernde Splitter, dazu ein heller Ring
+    kristall: {
+        ernte(x, y, look) {
+            for (let i = 0; i < 9; i++) {
+                const w = (i / 9) * Math.PI * 2 + Math.random() * 0.3;
+                const weite = 22 + Math.random() * 20;
+                const dx = Math.cos(w) * weite;
+                const dy = Math.sin(w) * weite - 12;
+                fliegeWeg(fxTeil("fx-splitter", x, y, zufall(look.teilchen)), [
+                    { transform: "rotate(45deg) scale(0.6)", opacity: 1 },
+                    { transform: `translate(${dx}px, ${dy}px) rotate(200deg) scale(1)`, opacity: 1, offset: 0.55 },
+                    { transform: `translate(${dx * 1.2}px, ${dy + 26}px) rotate(320deg) scale(0.7)`, opacity: 0 }
+                ], 800 + Math.random() * 250);
+            }
+            fliegeWeg(fxTeil("fx-ring", x, y, "#bff0ff"), [
+                { transform: "scale(0.3)", opacity: 0.9 },
+                { transform: "scale(2.2)", opacity: 0 }
+            ], 500);
+        },
+        reif(x, y) {
+            fliegeWeg(fxTeil("fx-stern fx-glanz", x, y, "#ffffff"), [
+                { transform: "scale(0) rotate(0deg)", opacity: 0 },
+                { transform: "scale(1.6) rotate(0deg)", opacity: 1, offset: 0.4 },
+                { transform: "scale(0) rotate(0deg)", opacity: 0 }
+            ], 600);
+        }
+    },
+    // Glutblaetter: eine Stichflamme puffert hoch, Glutfunken spruehen und steigen langsam auf
+    glut: {
+        ernte(x, y, look) {
+            fliegeWeg(fxTeil("fx-flamme", x, y), [
+                { transform: "translate(0, 0) scale(0.5, 0.4)", opacity: 1 },
+                { transform: "translate(0, -18px) scale(1.2, 1.4)", opacity: 0.9, offset: 0.4 },
+                { transform: "translate(0, -34px) scale(0.6, 1.1)", opacity: 0 }
+            ], 650);
+            partikel(x, y, look.teilchen, 10, 42);
+            for (let i = 0; i < 4; i++) steigendesTeilchen(x + (Math.random() - 0.5) * 30, y + (Math.random() - 0.5) * 10, look.teilchen);
+        },
+        reif(x, y) {
+            fliegeWeg(fxTeil("fx-flamme fx-flamme-klein", x, y), [
+                { transform: "translate(0, 0) scale(0.4)", opacity: 0 },
+                { transform: "translate(0, -8px) scale(1)", opacity: 0.9, offset: 0.35 },
+                { transform: "translate(0, -20px) scale(0.3)", opacity: 0 }
+            ], 700);
+        }
+    }
+};
+
+registriereHaken("ernte", feld => {
+    const look = gewaehlteKosmetik("pflanzen");
+    const effekt = look.effekt && PFLANZEN_EFFEKTE[look.effekt];
+    if (!effekt) return;
+    const rect = feld.el.spriteEl.getBoundingClientRect();
+    effekt.ernte(rect.left + rect.width / 2, rect.top + rect.height * 0.45, look);
+});
+
+// Reife Pflanzen funkeln ab und zu (Sterne, Kristallglanz, kleine Flammen)
+setInterval(() => {
+    if (document.hidden || !run || spielPausiert()) return;
+    const look = gewaehlteKosmetik("pflanzen");
+    const effekt = look.effekt && PFLANZEN_EFFEKTE[look.effekt];
+    if (!effekt) return;
+    const reif = run.felder.filter(f => !f.leer && f.fertig);
+    if (reif.length === 0) return;
+    const anzahl = Math.min(3, Math.ceil(reif.length / 4));
+    for (let i = 0; i < anzahl; i++) {
+        const rect = zufall(reif).el.spriteEl.getBoundingClientRect();
+        effekt.reif(rect.left + rect.width * (0.2 + Math.random() * 0.6), rect.top + rect.height * (0.15 + Math.random() * 0.5), look);
+    }
+}, 700);
+
 function steigendesTeilchen(x, y, farben) {
     const funke = el("div", "deko-funke");
     funke.style.left = x + "px";
