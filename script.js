@@ -4944,7 +4944,8 @@ function speichereRun() {
         run: { ...rest, pflanzen: pflanzen.map(p => ({ id: p.id, freigeschaltet: p.freigeschaltet, level: p.level })) }
     };
     try {
-        localStorage.setItem(run.koop ? koopRunKey(run.sandbox, run.koopSlot) : runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
+        if (run.koop) return koopSpeichereRun(daten);
+        localStorage.setItem(runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
         if (run.sandbox) letzteSandboxSicherung = performance.now();
     } catch (fehler) {
         console.warn(t("Run konnte nicht gespeichert werden"), fehler);

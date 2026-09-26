@@ -362,6 +362,10 @@ function koopVerbindungWeg() {
     } else if (warImSpiel) {
         // Der Host ist weg: wir werden Host und melden denselben Code wieder an
         koop.rolle = "host";
+        // Ab jetzt gelten meine Skins, und mein Speicherplatz wird der Platz der Lobby
+        koop.kosmetik = { ...meta.kosmetik };
+        if (run) wendeKosmetikAn();
+        if (run && run.koop && run.sandbox && run.koopSlot) koop.lobby = { ...koop.lobby, modus: "endlos", slot: run.koopSlot };
         zeigeToast(t("👑 Der Host hat das Spiel verlassen. Du bist jetzt Host und spielst weiter."));
         koopMeldeCodeWiederAn(koop.code, 0);
     } else {
@@ -421,11 +425,21 @@ function koopEmpfange(n) {
             zeigePauseSchild();
             break;
         case "kosmetik":
+            // Nur die Skins des Hosts gelten
+            if (koop.rolle !== "gast") break;
             koop.kosmetik = n.kosmetik || {};
             if (run) wendeKosmetikAn();
             break;
         case "start":
-            if (koop.rolle === "gast") koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts");
+            if (koop.rolle === "gast") {
+                koop.spielId = n.spielId || null;
+                koop.partnerStand = n.hostDaten || null;
+                koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts", n.gastDaten || null);
+            }
+            break;
+        case "stand":
+            koop.partnerStand = n.daten || null;
+            if (run && run.koop && run.sandbox) koopSchreibeStand(null);
             break;
         case "info":
             koopEmpfangeInfo(n);
@@ -476,12 +490,19 @@ function koopStarteSpiel() {
     if (!koopKannStarten()) return;
     const endlos = koop.lobby.modus === "endlos";
     const slot = endlos ? koop.lobby.slot : 0;
-    koopSende("start", { sandbox: endlos, slot, kosmetik: { ...meta.kosmetik }, gastSeite: "rechts" });
-    koopStarteEigenesSpiel(endlos, slot, { ...meta.kosmetik }, "links");
+    // Endlos: der Host spielt wieder seine alte Seite, der Gast uebernimmt die andere Seite des Spielstands
+    const stand = endlos ? koopLeseStand(slot) : null;
+    const hostSeite = stand ? stand.ich : "links";
+    const gastSeite = hostSeite === "links" ? "rechts" : "links";
+    koop.spielId = stand && stand.id ? stand.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    koop.partnerStand = stand ? stand.seiten[gastSeite] || null : null;
+    const hostDaten = stand ? stand.seiten[hostSeite] || null : null;
+    koopSende("start", { sandbox: endlos, slot, kosmetik: { ...meta.kosmetik }, gastSeite, spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten });
+    koopStarteEigenesSpiel(endlos, slot, { ...meta.kosmetik }, hostSeite, hostDaten);
 }
 
 // Eigenes Koop-Spiel starten (oder den eigenen Koop-Spielstand weiterspielen)
-function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite) {
+function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite, gespeichert = null) {
     legeRunBeiseite();
     wechsleMetaProfil(false);
     raeumeLootAuf();
@@ -495,7 +516,6 @@ function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite) {
     koop.partnerFertig = false;
     koop.partnerBereit = false;
     koop.ichBereit = false;
-    const gespeichert = koopLeseEigenenRun(endlos, slot);
     run = erstelleRunZustand(endlos);
     run.koop = true;
     run.koopSlot = slot;
@@ -521,22 +541,87 @@ function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite) {
     wendeKosmetikAn();
     Klang.start();
     aktualisiereAlles();
+    // Gleich speichern, damit beide den ganzen Spielstand haben
+    if (endlos) setTimeout(speichereRun, 500);
 }
 
-// ---------- EIGENER KOOP-SPIELSTAND ----------
-// Story im Duo: ein Spielstand (fuer den Wiedereinstieg). Endlos im Duo: 3 Speicherstaende. Jeder speichert seine eigene Seite.
+// ---------- KOOP-SPIELSTAND ----------
+// Nur Endlos. Jeder speichert den ganzen Stand (beide Seiten) und merkt sich, welche Seite er selbst war.
+// Spielt man den Stand spaeter mit jemand anderem, ist man wieder man selbst und der Neue uebernimmt die andere Seite.
+// Skins stehen NICHT im Spielstand (es gelten immer die Skins des Hosts).
 
 function koopRunKey(endlos, slot) {
     return endlos ? "sproutvale_koop_" + slot : "sproutvale_koop_story";
 }
 
-function koopLeseEigenenRun(endlos, slot) {
+// Ganzer Stand: { id, ich, seiten: { links, rechts } } (alte Staende mit nur einer Seite werden umgedeutet)
+function koopLeseStand(slot) {
     try {
-        const daten = JSON.parse(localStorage.getItem(koopRunKey(endlos, slot)));
-        return daten && daten.run ? daten : null;
+        const daten = JSON.parse(localStorage.getItem(koopRunKey(true, slot)));
+        if (!daten) return null;
+        if (daten.seiten) return daten;
+        if (daten.run) return { id: null, ich: "links", seiten: { links: daten, rechts: null } };
     } catch (e) {
-        return null;
+        console.warn("Koop-Spielstand", e);
     }
+    return null;
+}
+
+// Die eigene Seite eines Stands (fuer die Anzeige in der Lobby)
+function koopLeseEigenenRun(endlos, slot) {
+    if (!endlos) return null;
+    const stand = koopLeseStand(slot);
+    const daten = stand && stand.seiten[stand.ich];
+    return daten && daten.run ? daten : null;
+}
+
+// Wohin speichere ich dieses Koop-Spiel? Host: gewaehlter Platz. Gast: Platz mit demselben Spiel, sonst ein freier Platz.
+function koopSpeicherPlatz() {
+    if (koop.rolle === "host") return run.koopSlot;
+    let frei = 0;
+    for (let slot = 1; slot <= KOOP_KONFIG.slots; slot++) {
+        const stand = koopLeseStand(slot);
+        if (stand && stand.id && stand.id === koop.spielId) return slot;
+        if (!stand && !frei) frei = slot;
+    }
+    return frei;
+}
+
+// Stand schreiben: eigene Seite (wenn uebergeben) plus die zuletzt erhaltene Seite des Mitspielers
+function koopSchreibeStand(eigeneDaten) {
+    const platz = koopSpeicherPlatz();
+    if (!platz) {
+        if (!koop.keinPlatzGemeldet) zeigeToast(t("💾 Kein freier Koop-Speicherstand. Lösche einen in der Lobby, um dieses Spiel zu speichern."));
+        koop.keinPlatzGemeldet = true;
+        return;
+    }
+    const alt = koopLeseStand(platz);
+    const gleich = alt && alt.id === koop.spielId;
+    const ich = eigeneSeite();
+    const stand = {
+        id: koop.spielId,
+        ich,
+        seiten: {
+            links: gleich ? alt.seiten.links : null,
+            rechts: gleich ? alt.seiten.rechts : null
+        }
+    };
+    if (eigeneDaten) stand.seiten[ich] = eigeneDaten;
+    if (koop.partnerStand) stand.seiten[partnerSeite()] = koop.partnerStand;
+    if (!stand.seiten[ich]) return;
+    run.koopSlot = platz;
+    try {
+        localStorage.setItem(koopRunKey(true, platz), JSON.stringify(stand));
+    } catch (e) {
+        console.warn("Koop-Spielstand", e);
+    }
+}
+
+// Aus speichereRun: eigenen Stand speichern und dem Mitspieler schicken
+function koopSpeichereRun(daten) {
+    if (!run.sandbox) return;
+    koopSchreibeStand(daten);
+    koopSende("stand", { daten });
 }
 
 function koopWendeRunDatenAn(daten) {
@@ -785,8 +870,13 @@ function zeigeWarteSchild(text) {
 
 // ---------- KOSMETIK IM KOOP ----------
 
+// Im Koop gelten immer die Skins des Hosts. Sie werden nie im Spielstand gespeichert.
 function koopSetzeKosmetik(kategorie, wert) {
     if (!koopAktiv()) return;
+    if (koop.rolle !== "host") {
+        zeigeToast(t("🎨 Im Koop gelten die Skins des Hosts."));
+        return;
+    }
     koop.kosmetik = { ...koop.kosmetik, [kategorie]: wert };
     koopSende("kosmetik", { kosmetik: koop.kosmetik });
 }
