@@ -2450,6 +2450,77 @@ function zeichneHof(breite, hoehe, thema = "standard") {
 
 // ---------- SAAT IN ANDEREN FORMEN (Kosmetik "Saat") ----------
 // k = Rand, Y = Farbe, y = Schatten, w = Glanz, Z = Kern in der Farbe der Seltenheit
+// Neue Formen: Klee, Pilz (Punkte in der Farbe der Seltenheit), Muschel, Laterne (E = Gold), Planet (E/e = Ring)
+SPRITE_PIXEL.form_klee = [
+    "..kkk..kkk..",
+    ".kYwYkkYYyk.",
+    ".kYYYYYYYyk.",
+    "..kYYZZYyk..",
+    ".kYYYZZYYyk.",
+    ".kYwYYYYYyk.",
+    ".kYYYkkYYyk.",
+    "..kkk.kkkk..",
+    "......kk....",
+    ".......kk...",
+    "........k...",
+    "............"
+];
+SPRITE_PIXEL.form_pilz = [
+    "...kkkkkk...",
+    "..kYYwYYYk..",
+    ".kYwwYYZYYk.",
+    "kYYYYYZZZYyk",
+    "kYZYYYYZYyyk",
+    "kyyyyyyyyyyk",
+    ".kkkkkkkkkk.",
+    "....kwwk....",
+    "....kwwk....",
+    "....kwyk....",
+    "...kkkkkk...",
+    "............"
+];
+SPRITE_PIXEL.form_muschel = [
+    "....kkkk....",
+    "..kkYwYYkk..",
+    ".kYwYyYYyYk.",
+    "kYwYyYZYyYyk",
+    "kYYyYZZZyYyk",
+    "kYYyYZZZyYyk",
+    ".kYyYYZYyYk.",
+    "..kyYYYYyk..",
+    "...kkyykk...",
+    "....kyyk....",
+    "....kkkk....",
+    "............"
+];
+SPRITE_PIXEL.form_laterne = [
+    ".....kk.....",
+    "...kEEEEk...",
+    "..kYYwYYYk..",
+    ".kYwYYYYYyk.",
+    ".kYYYZZYYyk.",
+    ".kYYZZZZYyk.",
+    ".kYYYZZYYyk.",
+    ".kYYYYYYYyk.",
+    "..kYYYYYyk..",
+    "...kEEEEk...",
+    ".....EE.....",
+    "....E..E...."
+];
+SPRITE_PIXEL.form_planet = [
+    "....kkkk....",
+    "..kkYwYYkk..",
+    ".kYwYYYYYyk.",
+    ".kYYYZZYYyk.",
+    "EkYYZZZZYykE",
+    "eEEEEEEEEEEe",
+    ".keeeeeeeek.",
+    ".kYYYYYYyyk.",
+    "..kkyyyykk..",
+    "....kkkk....",
+    "............",
+    "............"
+];
 SPRITE_PIXEL.form_blatt = [
     "........kkk.",
     "......kkYYk.",

@@ -1451,7 +1451,18 @@ const KUGEL_SKINS = [
         farben: { k: "#1d2a4a", w: "#ffffff", Y: "#e8eef8", y: "#a8b4c8" },
         raritaetFarben: [{ Y: "#e8eef8", y: "#a8b4c8" }, { Y: "#9af09a", y: "#2e9e2e" }, { Y: "#9ad6ff", y: "#2f7fcf" },
             { Y: "#d6a8ff", y: "#7c2fc2" }, { Y: "#fff0a0", y: "#e0a800" }],
-        funken: ["#ffffff", "#9ad6ff", "#d6a8ff"] }
+        funken: ["#ffffff", "#9ad6ff", "#d6a8ff"] },
+    { id: "klee", name: t("Kleesaat"), quelle: "dlc", paket: "unterstuetzer", form: "klee",
+        farben: { Y: "#7ad05a", y: "#3f8a32", k: "#1a4a12", w: "#d8ffc0" } },
+    { id: "pilz", name: t("Pilzsaat"), quelle: "dlc", paket: "unterstuetzer", form: "pilz",
+        farben: { Y: "#e8434a", y: "#a8232a", k: "#4a1010", w: "#ffffff" } },
+    { id: "muschel", name: t("Muschelsaat"), quelle: "dlc", paket: "unterstuetzer", form: "muschel",
+        farben: { Y: "#ffd6c0", y: "#e0907a", k: "#6a3020", w: "#fff4ee" } },
+    { id: "laterne", name: t("Laternensaat"), quelle: "dlc", paket: "einzeln", form: "laterne", klasse: "muenzen-laterne",
+        farben: { Y: "#ff5a4a", y: "#b8232a", k: "#4a0a0a", w: "#ffb0a0", E: "#ffd84a" }, funken: ["#ffd84a", "#ff5a4a", "#ff9a3a"] },
+    { id: "planet", name: t("Planetensaat"), quelle: "dlc", paket: "einzeln", form: "planet", klasse: "muenzen-planet",
+        farben: { Y: "#9a8aff", y: "#5a4ad0", k: "#1a1450", w: "#e0dcff", E: "#ffd6a0", e: "#c08a5a" },
+        funken: ["#ffffff", "#9ad6ff", "#ffd6a0"] }
 ];
 
 // Rahmen der Kuscheltier-Karten im Mondteich

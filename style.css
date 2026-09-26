@@ -9561,3 +9561,34 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     from { scale: 1 1; }
     to { scale: 0.25 1; }
 }
+
+/* ---------- Legendaere Saat: Laterne (warmes Flackern) und Planet (Sternenschein, leichtes Kippen) ---------- */
+
+body.muenzen-laterne .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-laterne {
+    animation: laterne-glut 1.3s ease-in-out infinite;
+}
+
+body.muenzen-laterne .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, laterne-glut 1.3s ease-in-out infinite;
+}
+
+@keyframes laterne-glut {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 90, 60, 0.8)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    40% { filter: drop-shadow(0 0 10px rgba(255, 190, 80, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.15); }
+    60% { filter: drop-shadow(0 0 6px rgba(255, 120, 60, 0.9)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+}
+
+body.muenzen-planet .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-planet {
+    animation: planet-schein 2.6s ease-in-out infinite;
+}
+
+body.muenzen-planet .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, planet-schein 2.6s ease-in-out infinite;
+}
+
+@keyframes planet-schein {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(154, 138, 255, 0.8)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); rotate: -8deg; }
+    50% { filter: drop-shadow(0 0 10px rgba(200, 190, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); rotate: 8deg; }
+}
