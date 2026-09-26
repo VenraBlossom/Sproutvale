@@ -181,6 +181,71 @@ function renderDeko() {
     });
 }
 
+// Feuerwerksfest: eine Rakete steigt in den Himmel und zerplatzt in bunte Pixel-Funken
+function starteFeuerwerk(farben) {
+    const x = 6 + Math.random() * 88;
+    const ziel = 27 + Math.random() * 12; // unter der oberen Leiste, ueber der Wiese
+    const farbe = zufall(farben);
+    const rakete = el("div", "feuerwerk-rakete");
+    rakete.style.left = x + "%";
+    rakete.style.setProperty("--ziel", ziel + "%");
+    rakete.style.setProperty("--farbe", farbe);
+    hofEbene.appendChild(rakete);
+    setTimeout(() => {
+        rakete.remove();
+        if (document.hidden) return;
+        const anzahl = 12 + Math.floor(Math.random() * 6);
+        const radius = 28 + Math.random() * 26;
+        const zweiteFarbe = zufall(farben);
+        // aussen ein grosser Ring, innen ein kleinerer in der zweiten Farbe
+        [[anzahl, 1, farbe], [Math.round(anzahl * 0.6), 0.5, zweiteFarbe]].forEach(([n, groesse, ringFarbe]) => {
+            for (let i = 0; i < n; i++) {
+                const winkel = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+                const funke = el("div", "feuerwerk-funke");
+                funke.style.left = x + "%";
+                funke.style.top = ziel + "%";
+                funke.style.setProperty("--dx", Math.cos(winkel) * radius * groesse + "px");
+                funke.style.setProperty("--dy", Math.sin(winkel) * radius * groesse * 0.8 + "px");
+                funke.style.setProperty("--farbe", ringFarbe);
+                hofEbene.appendChild(funke);
+                setTimeout(() => funke.remove(), 1500);
+            }
+        });
+        const blitz = el("div", "feuerwerk-blitz");
+        blitz.style.left = x + "%";
+        blitz.style.top = ziel + "%";
+        blitz.style.setProperty("--farbe", farbe);
+        hofEbene.appendChild(blitz);
+        setTimeout(() => blitz.remove(), 500);
+    }, 900);
+}
+
+// Zauberwald: ein leuchtender Falter flattert quer ueber die Wiese
+function starteZauberfalter(farbe) {
+    const vonLinks = Math.random() < 0.5;
+    const falter = el("div", "zauber-falter");
+    falter.style.left = vonLinks ? "-3%" : "103%";
+    falter.style.top = 38 + Math.random() * 30 + "%";
+    falter.style.setProperty("--farbe", farbe);
+    falter.style.setProperty("--weg", (vonLinks ? 1 : -1) * (window.innerWidth + 60) + "px");
+    falter.appendChild(el("div", "falter-koerper"));
+    hofEbene.appendChild(falter);
+    setTimeout(() => falter.remove(), 16000);
+}
+
+// Kraehe auf dem Pfahl: nur der Vogel bewegt sich, der Pfahl bleibt stehen
+const KRAEHE_ABLAUF = "000000000000333333000000001100000000440404000000000022022000000000003300";
+let kraeheSchritt = 0;
+setInterval(() => {
+    if (document.hidden) return;
+    kraeheSchritt = (kraeheSchritt + 1) % KRAEHE_ABLAUF.length;
+    document.querySelectorAll("img.deko-kraehe").forEach((bild, i) => {
+        const bildName = "kraehe_" + KRAEHE_ABLAUF[(kraeheSchritt + i * 23) % KRAEHE_ABLAUF.length];
+        const url = spriteUrl(bildName);
+        if (bild.src !== url) bild.src = url;
+    });
+}, 240);
+
 let teichEl = null;
 
 function erstelleTeich() {
@@ -281,6 +346,12 @@ setInterval(() => {
             const rect = zufall(bepflanzt).el.spriteEl.getBoundingClientRect();
             steigendesTeilchen(rect.left + rect.width * (0.2 + Math.random() * 0.6), rect.top + rect.height * 0.3, pflanzenLook.teilchen);
         }
+    }
+    if (thema.feuerwerk && hofEbene.querySelectorAll(".feuerwerk-rakete").length < 2 && Math.random() < 0.16) {
+        starteFeuerwerk(thema.feuerwerk);
+    }
+    if (thema.falter && hofEbene.querySelectorAll(".zauber-falter").length < 2 && Math.random() < 0.05) {
+        starteZauberfalter(zufall(thema.falter));
     }
     if (thema.funkeln && hofEbene.querySelectorAll(".land-funke").length < 12) {
         const funke = el("div", "land-funke");

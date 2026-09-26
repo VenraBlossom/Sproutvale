@@ -1261,6 +1261,19 @@ function zeichneLandschaften() {
         el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
         fensterLichter.appendChild(el);
     });
+    // Laternen und Pilze leuchten den ganzen Tag ein wenig, nachts sieht man es staerker
+    hofEbene.querySelectorAll(".hof-leuchten").forEach(e => e.remove());
+    hofSzene.leuchten.forEach((licht, i) => {
+        const el = document.createElement("div");
+        el.classList.add("hof-leuchten");
+        el.style.left = (licht.x / hofSzene.breite) * 100 + "%";
+        el.style.top = (licht.y / hofSzene.hoehe) * 100 + "%";
+        el.style.width = (licht.b / hofSzene.breite) * 100 + "%";
+        el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
+        el.style.setProperty("--farbe", licht.farbe);
+        el.style.animationDelay = -(i * 0.7) + "s";
+        hofEbene.appendChild(el);
+    });
     zeichneMenueHintergrund();
     letzteHimmelZeit = -1;
     haken("landschaftGezeichnet", hofSzene);

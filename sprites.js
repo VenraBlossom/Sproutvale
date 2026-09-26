@@ -740,24 +740,96 @@ const SPRITE_PIXEL = {
         "..wwwwwwww..",
         "...zzzzzz..."
     ],
-    // Wetterhahn auf einer Stange (dreht sich im Wind)
-    wetterhahn: [
-        "....kk......",
-        "...kRkk.....",
-        "...kkkkk....",
-        "..kkkkkkk.k.",
-        ".k.kkkkkkkk.",
-        "....kkkkk...",
-        ".....kk.....",
-        "kkkkkkkkkkk.",
-        "k....KK....k",
-        ".....KK.....",
-        ".....KK.....",
-        ".....KK.....",
-        ".....KK.....",
-        ".....KK.....",
+    // Kraehe auf einem Zaunpfahl: 5 Bilder, nur der Vogel bewegt sich (0 sitzt, 1 kraechzt, 2 flattert, 3 schaut links, 4 nickt)
+    kraehe_0: [
+        "............",
+        "......XXX...",
+        ".....XXwXX0.",
+        ".....XXXXX00",
+        "...XXXXXX...",
+        "..XX00XXXX..",
+        ".XX0000XXX..",
+        "XX.XXXXXXX..",
+        "X....XXXX...",
+        ".....8.8....",
+        "..KKKKKKKK..",
+        "..kKKKKKKk..",
         "....KKKK....",
-        "...KKKKKK..."
+        "....KkKK....",
+        "....KKKK....",
+        "..gKKKKKKg.."
+    ],
+    kraehe_1: [
+        "............",
+        "......XXX...",
+        ".....XXwXX00",
+        ".....XXXXX..",
+        "...XXXXXX0..",
+        "..XX00XXXX..",
+        ".XX0000XXX..",
+        "XX.XXXXXXX..",
+        "X....XXXX...",
+        ".....8.8....",
+        "..KKKKKKKK..",
+        "..kKKKKKKk..",
+        "....KKKK....",
+        "....KkKK....",
+        "....KKKK....",
+        "..gKKKKKKg.."
+    ],
+    kraehe_2: [
+        "............",
+        "......XXX...",
+        "..00.XXwXX0.",
+        "...00XXXXX00",
+        "...XXXXXX...",
+        "..XXXXXXXX..",
+        ".XXXXXXXXX..",
+        "XX.XXXXXXX..",
+        "X....XXXX...",
+        ".....8.8....",
+        "..KKKKKKKK..",
+        "..kKKKKKKk..",
+        "....KKKK....",
+        "....KkKK....",
+        "....KKKK....",
+        "..gKKKKKKg.."
+    ],
+    kraehe_3: [
+        "............",
+        "......XXX...",
+        "....0XwXXX..",
+        "...00XXXXX..",
+        "...XXXXXX...",
+        "..XX00XXXX..",
+        ".XX0000XXX..",
+        "XX.XXXXXXX..",
+        "X....XXXX...",
+        ".....8.8....",
+        "..KKKKKKKK..",
+        "..kKKKKKKk..",
+        "....KKKK....",
+        "....KkKK....",
+        "....KKKK....",
+        "..gKKKKKKg.."
+    ],
+    kraehe_4: [
+        "............",
+        "............",
+        "......XXX...",
+        ".....XXwXX0.",
+        "...XXXXXXX00",
+        "..XX00XXXX..",
+        ".XX0000XXX..",
+        "XX.XXXXXXX..",
+        "X....XXXX...",
+        ".....8.8....",
+        "..KKKKKKKK..",
+        "..kKKKKKKk..",
+        "....KKKK....",
+        "....KkKK....",
+        "....KKKK....",
+        "..gKKKKKKg.."
     ],
     // Kuerbislaterne mit leuchtendem Gesicht
     kuerbislaterne: [
@@ -1057,7 +1129,10 @@ const SPRITE_ABWANDLUNGEN = {
     gras_tropen: { basis: "gras", farben: { h: "#5fc05a", H: "#72d06a", j: "#55b050", J: "#ffb030" } },
     baum_zauberwald: { basis: "baum", farben: { G: "#7ad0c0", g: "#3a8a9a", d: "#2a4a7a" } },
     busch_zauberwald: { basis: "busch", farben: { G: "#b48cff", g: "#7a5ad0", d: "#3a2a7a" } },
-    gras_zauberwald: { basis: "gras", farben: { h: "#3f8a7a", H: "#4f9a8a", j: "#357a6c", J: "#c9b0f5" } }
+    gras_zauberwald: { basis: "gras", farben: { h: "#3f8a7a", H: "#4f9a8a", j: "#357a6c", J: "#c9b0f5" } },
+    baum_feuerwerk: { basis: "baum", farben: { G: "#ff8a9a", g: "#e8435a", d: "#a82a3a", K: "#4a2a1a" } },
+    busch_feuerwerk: { basis: "busch", farben: { G: "#5aa84a", g: "#e8434a", d: "#2f6a2a" } },
+    gras_feuerwerk: { basis: "gras", farben: { h: "#6aae4a", H: "#7cbf58", j: "#5a9a3e", J: "#e8434a" } }
 };
 
 // Muenzen mit unterschiedlicher Form in der Mitte (Farbenblind-Modus): Dreieck, Raute, Quadrat
@@ -1978,7 +2053,13 @@ const HOF_FARBEN = {
     zauberwald: {
         berge: ["#5a4a9a", "#6a5aaa"], schnee: "#c9b0f5", huegel: ["#2f6a6a", "#3a7a7a"], nadel: ["#1f4a5a", "#2a5a6a"],
         wiese: ["#3f8a7a", "#4f9a8a", "#45907f"], halm: "#2f6a5a", weg: ["#8a7ac0", "#a898d8"],
-        blumen: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"], baum: "baum_zauberwald", busch: "busch_zauberwald"
+        blumen: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"], baum: "baum_zauberwald", busch: "busch_zauberwald", pilze: true
+    },
+    feuerwerk: {
+        berge: ["#7a6aa8", "#8a7ab8"], schnee: "#ffe0ea", huegel: ["#3f7a3a", "#4f8a42"], nadel: ["#24503a", "#2f6044"],
+        wiese: ["#7cbf58", "#8ccb66", "#80c45c"], halm: "#5a9a3e", weg: ["#a8603a", "#c87a4a"],
+        blumen: ["#e8434a", "#ffd84a", "#ff8fb1", "#ffffff", "#e8434a"], baum: "baum_feuerwerk", busch: "busch_feuerwerk",
+        chinesisch: true
     },
     winter: {
         berge: ["#9aa8c8", "#b8c4dc"], schnee: "#ffffff", huegel: ["#c9d6e6", "#dde8f4"], nadel: ["#2f5a4a", "#3b6b58"],
@@ -2062,6 +2143,36 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         else pixel(x, y, F.halm, 1, 2);
     }
 
+    // Leuchtende Stellen (Laternen, Pilze): werden im Spiel als sanft pulsierender Schein darueber gelegt
+    const leuchten = [];
+
+    // Feuerwerksfest: Pagode mit geschwungenen Daechern am Wiesenrand
+    if (F.chinesisch) {
+        const cx = Math.round(W * 0.41);
+        let y = bodenY + 3;
+        [13, 9, 5].forEach(bw => {
+            const links = cx - Math.floor(bw / 2);
+            y -= 4;
+            pixel(links, y, "#c42a30", bw, 4);
+            pixel(links, y, "#8f1f2a", 1, 4);
+            pixel(links + bw - 1, y, "#8f1f2a", 1, 4);
+            pixel(links, y + 3, "#8f1f2a", bw, 1);
+            pixel(cx, y + 1, "#ffd84a", 1, 2);
+            leuchten.push({ x: cx, y: y + 1, b: 1, h: 2, farbe: "rgba(255, 210, 90, 0.9)" });
+            // Dach mit hochgezogenen Ecken
+            const rw = bw + 6;
+            const rl = cx - Math.floor(rw / 2);
+            y -= 2;
+            pixel(rl + 1, y + 1, "#1f4a4a", rw - 2, 1);
+            pixel(rl + 2, y, "#2f6a66", rw - 4, 1);
+            pixel(rl, y, "#1f4a4a");
+            pixel(rl + rw - 1, y, "#1f4a4a");
+            pixel(rl + 1, y + 2, "#ffd84a", rw - 2, 1);
+        });
+        pixel(cx, y - 3, "#ffd84a", 1, 3);
+        pixel(cx - 1, y - 1, "#ffd84a", 3, 1);
+    }
+
     // Hintere Reihe: Baeume und Buesche am Wiesenrand
     [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => bild(F.baum, W * bx, bodenY + 6));
     [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => bild(F.busch, W * bx, bodenY + 8));
@@ -2088,13 +2199,65 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         for (let x = 0; x < 20; x++) pixel(scheune.x + x, scheune.y + Math.max(0, 5 - Math.min(x, 19 - x) / 2), "#ffffff");
     }
 
-    // Zaun unten als Grenze zu den Feldern
-    pixel(0, H - 5, "#6b3f1d", W, 1);
-    pixel(0, H - 4, "#9a6a3a", W, 1);
-    pixel(0, H - 2, "#6b3f1d", W, 1);
+    // Feuerwerksfest: rote Laternen an Schnueren zwischen roten Pfaehlen
+    if (F.chinesisch) {
+        [[0.29, 0.45], [0.55, 0.73]].forEach(([a, b]) => {
+            const x1 = Math.round(W * a);
+            const x2 = Math.round(W * b);
+            const unten = bodenY + 10;
+            const oben = unten - 13;
+            [x1, x2].forEach(x => {
+                pixel(x, oben, "#b8232a", 1, 13);
+                pixel(x, oben - 1, "#ffd84a");
+            });
+            for (let x = x1 + 1; x < x2; x++) {
+                const t = (x - x1) / (x2 - x1);
+                pixel(x, oben + Math.round(Math.sin(t * Math.PI) * 3), "#3a2a2a");
+            }
+            for (let x = x1 + 4; x < x2 - 2; x += 5) {
+                const t = (x - x1) / (x2 - x1);
+                const ly = oben + Math.round(Math.sin(t * Math.PI) * 3) + 1;
+                pixel(x, ly, "#ffd84a");
+                pixel(x - 1, ly + 1, "#e8342a", 3, 3);
+                pixel(x - 1, ly + 1, "#ff7a5a", 1, 2);
+                pixel(x + 1, ly + 2, "#a81f1f", 1, 2);
+                pixel(x, ly + 4, "#ffd84a");
+                leuchten.push({ x: x - 1, y: ly + 1, b: 3, h: 3, farbe: "rgba(255, 90, 60, 0.85)" });
+            }
+        });
+        // Boellerketten am Bauernhaus
+        for (let i = 0; i < 6; i++) {
+            pixel(haus.x - 1, haus.y + 9 + i, i % 2 ? "#e8342a" : "#b8232a");
+            pixel(haus.x + haus.sprite.width, haus.y + 9 + i, i % 2 ? "#b8232a" : "#e8342a");
+        }
+        pixel(haus.x - 1, haus.y + 8, "#ffd84a");
+        pixel(haus.x + haus.sprite.width, haus.y + 8, "#ffd84a");
+    }
+
+    // Zauberwald: leuchtende Pilze auf der Wiese
+    if (F.pilze) {
+        const hut = ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#b8f07a"];
+        [0.08, 0.34, 0.39, 0.61, 0.67, 0.86, 0.95].forEach((px, i) => {
+            const x = Math.round(W * px);
+            const y = bodenY + 9 + (i * 5) % Math.max(4, zaunOben - bodenY - 12);
+            const farbe = hut[i % hut.length];
+            pixel(x, y + 1, "#f4f0ff", 1, 2);
+            pixel(x - 1, y - 1, farbe, 3, 2);
+            pixel(x - 2, y, farbe, 5, 1);
+            pixel(x - 1, y - 1, "#ffffff");
+            leuchten.push({ x: x - 2, y: y - 1, b: 5, h: 2, farbe });
+        });
+    }
+
+    // Zaun unten als Grenze zu den Feldern (beim Feuerwerksfest rot mit goldenen Kappen)
+    const zaunDunkel = F.chinesisch ? "#7a1a1f" : "#6b3f1d";
+    const zaunHell = F.chinesisch ? "#b8232a" : "#9a6a3a";
+    pixel(0, H - 5, zaunDunkel, W, 1);
+    pixel(0, H - 4, zaunHell, W, 1);
+    pixel(0, H - 2, zaunDunkel, W, 1);
     for (let x = 1; x < W; x += 7) {
-        pixel(x, H - 7, "#9a6a3a", 2, 7);
-        pixel(x, H - 7, thema === "winter" ? "#ffffff" : "#c08a50", 2, 1);
+        pixel(x, H - 7, zaunHell, 2, 7);
+        pixel(x, H - 7, thema === "winter" ? "#ffffff" : F.chinesisch ? "#ffd84a" : "#c08a50", 2, 1);
     }
 
     return {
@@ -2110,7 +2273,8 @@ function zeichneHof(breite, hoehe, thema = "standard") {
             { x: scheune.x + 9, y: scheune.y + 7, b: 2, h: 1 }
         ],
         // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
-        haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height }
+        haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height },
+        leuchten
     };
 }
 

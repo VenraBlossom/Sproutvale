@@ -5787,18 +5787,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { rotate: 2deg; }
 }
 
-/* Wetterhahn: dreht sich ab und zu in den Wind */
-.deko-drehen {
-    animation: deko-drehen 11s steps(1) infinite;
-}
-
-@keyframes deko-drehen {
-    0%, 45% { scale: 1 1; }
-    47% { scale: 0.4 1; }
-    49%, 94% { scale: -1 1; }
-    96% { scale: -0.4 1; }
-    98%, 100% { scale: 1 1; }
-}
+/* Kraehe: wird ueber Bildwechsel in haus.js animiert, der Pfahl bleibt ruhig */
 
 /* ---------- HELFER-FIGUREN (helfer.js): Eichhoernchen, Igel, Bienen, Spatz, Hase ---------- */
 
@@ -9444,4 +9433,131 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
 .laden-vorschau[class*="vorschau-bau-"] {
     background: none;
     animation: none;
+}
+
+/* ============================================================
+   LANDSCHAFTEN: Feuerwerksfest und Zauberwald
+   ============================================================ */
+
+/* Schein ueber Laternen und Pilzen (Positionen kommen aus zeichneHof) */
+.hof-leuchten {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 4px var(--farbe);
+    opacity: 0.35;
+    animation: hof-leuchten 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes hof-leuchten {
+    to { opacity: 0.75; }
+}
+
+/* Feuerwerk: Rakete steigt, zerplatzt in Pixel-Funken */
+.feuerwerk-rakete {
+    position: absolute;
+    top: 55%;
+    width: 4px;
+    height: 8px;
+    margin-left: -2px;
+    background: #fff6d8;
+    box-shadow: 0 4px 0 var(--farbe), 0 9px 0 -1px rgba(255, 220, 140, 0.6), 0 15px 0 -2px rgba(255, 220, 140, 0.3);
+    pointer-events: none;
+    z-index: 0;
+    animation: rakete-steigen 0.9s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+
+@keyframes rakete-steigen {
+    from { top: 55%; }
+    to { top: var(--ziel); }
+}
+
+.feuerwerk-funke {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    margin: -2px 0 0 -2px;
+    background: var(--farbe);
+    box-shadow: 0 0 6px 1px var(--farbe);
+    pointer-events: none;
+    z-index: 0;
+    animation: feuerwerk-funke 1.5s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes feuerwerk-funke {
+    0% { transform: translate(0, 0); opacity: 1; }
+    55% { transform: translate(var(--dx), var(--dy)); opacity: 1; }
+    100% { transform: translate(var(--dx), calc(var(--dy) + 22px)); opacity: 0; }
+}
+
+.feuerwerk-blitz {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: #fffbe0;
+    box-shadow: 0 0 24px 12px var(--farbe);
+    pointer-events: none;
+    z-index: 0;
+    animation: feuerwerk-blitz 0.5s ease-out forwards;
+}
+
+@keyframes feuerwerk-blitz {
+    from { opacity: 0.9; transform: scale(0.6); }
+    to { opacity: 0; transform: scale(1.6); }
+}
+
+/* Zauberfalter: fliegt quer ueber den Hof und flattert dabei */
+.zauber-falter {
+    position: absolute;
+    width: 18px;
+    height: 12px;
+    pointer-events: none;
+    z-index: 0;
+    animation: falter-flug 15s linear forwards;
+}
+
+@keyframes falter-flug {
+    from { transform: translateX(0); }
+    to { transform: translateX(var(--weg)); }
+}
+
+.falter-koerper {
+    position: absolute;
+    inset: 0;
+    animation: falter-auf-ab 1.4s ease-in-out infinite alternate;
+}
+
+.falter-koerper::before,
+.falter-koerper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 12px;
+    background: linear-gradient(var(--farbe) 0 55%, transparent 55% 62%, var(--farbe) 62%);
+    box-shadow: 0 0 10px 2px var(--farbe);
+    animation: falter-schlag 0.16s steps(2) infinite alternate;
+}
+
+.falter-koerper::before {
+    left: 0;
+    transform-origin: 100% 50%;
+}
+
+.falter-koerper::after {
+    right: 0;
+    transform-origin: 0 50%;
+}
+
+@keyframes falter-auf-ab {
+    from { transform: translateY(-8px); }
+    to { transform: translateY(10px); }
+}
+
+@keyframes falter-schlag {
+    from { scale: 1 1; }
+    to { scale: 0.25 1; }
 }

@@ -1252,6 +1252,7 @@ const LEGENDAER_PREIS = 0.99;
 
 // Seltenheit eines Kosmetik-Eintrags (Index in KUSCHEL_RARITAETEN: 0 gewoehnlich, 1 ungewoehnlich, 3 episch, 4 legendaer)
 function kosmetikSeltenheit(eintrag) {
+    if (eintrag.seltenheit !== undefined) return eintrag.seltenheit;
     if (eintrag.quelle === "frei") return 0;
     if (eintrag.quelle === "erspielt") return 1;
     return eintrag.paket === "unterstuetzer" ? 3 : 4;
@@ -1282,14 +1283,17 @@ const KOSMETIK_KATEGORIEN = [
 // Hof-Themen: Farben fuer zeichneHof (sprites.js). funkeln = leuchtende Teilchen ueber der Wiese
 const HOF_THEMEN = [
     { id: "standard", name: t("Sommerhof"), quelle: "frei" },
-    { id: "herbst", name: t("Herbsthof"), quelle: "erspielt", bedingungText: t("Erreiche Tag 30 in einem Run"),
+    { id: "tropen", name: t("Tropeninsel"), quelle: "erspielt", seltenheit: 2, bedingungText: t("Erreiche Tag 30 in einem Run"),
         bedingung: () => meta.lebenszeit.maxTag >= 30 },
-    { id: "fruehling", name: t("Kirschblütenhof"), quelle: "dlc", paket: "unterstuetzer" },
+    { id: "herbst", name: t("Herbsthof"), quelle: "dlc", paket: "unterstuetzer" },
+    { id: "fruehling", name: t("Frühlingshof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "winter", name: t("Winterhof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "wueste", name: t("Oase"), quelle: "dlc", paket: "unterstuetzer" },
-    { id: "tropen", name: t("Tropeninsel"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "zauberwald", name: t("Zauberwald"), quelle: "dlc", paket: "einzeln", funkeln: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"],
-        irrlichter: ["#9fe8ff", "#c9b0f5", "#b8f07a"] }
+        irrlichter: ["#9fe8ff", "#c9b0f5", "#b8f07a"], falter: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"] },
+    // feuerwerk = Farben der Raketen, die ueber dem Hof in den Himmel steigen und zerplatzen
+    { id: "feuerwerk", name: t("Feuerwerksfest"), quelle: "dlc", paket: "einzeln", funkeln: ["#ffd84a", "#ff8a4a"],
+        feuerwerk: ["#ff4a4a", "#ffd84a", "#ff8a2a", "#ff6ad0", "#7ad8ff", "#9aff6a"] }
 ];
 
 // Deko: bis zu 3 Objekte stehen auf festen Plaetzen im Hintergrund der Hofwiese (x in Prozent)
@@ -1315,7 +1319,7 @@ const DEKO_OBJEKTE = [
     { id: "vogeltraenke", name: t("Vogeltränke"), sprite: "vogeltraenke", quelle: "erspielt", effekt: "glitzern",
         bedingungText: t("Verscheuche insgesamt 300 Krähen"), bedingung: () => meta.lebenszeit.kraehen >= 300 },
     { id: "schneemann", name: t("Schneemann"), sprite: "schneemann", quelle: "dlc", paket: "unterstuetzer", effekt: "wackeln" },
-    { id: "wetterhahn", name: t("Wetterhahn"), sprite: "wetterhahn", quelle: "dlc", paket: "unterstuetzer", effekt: "drehen" },
+    { id: "wetterhahn", name: t("Krähe"), sprite: "kraehe_0", quelle: "dlc", paket: "unterstuetzer", effekt: "kraehe" },
     { id: "kuerbislaterne", name: t("Kürbislaterne"), sprite: "kuerbislaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer" },
     { id: "pilzhaus", name: t("Pilzhäuschen"), sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
     { id: "windmuehle", name: t("Windmühle"), sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },

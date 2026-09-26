@@ -1707,6 +1707,8 @@ Object.assign(UEBERSETZUNG, {
     ". Samen schlägt wie ein Blitz ein und ist sofort erntereif.": "th seed strikes like lightning and is ready to harvest instantly.",
     ". Legendäre Inhalte mit Animationen gibt es einzeln für je ": ". Legendary content with animations is sold individually for ",
     ". Kaufen geht, sobald Sproutvale auf Steam ist.": ". Buying is possible once Sproutvale is on Steam.",
+    "Frühlingshof": "Spring Farm",
+    "Feuerwerksfest": "Firecracker",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
