@@ -9701,3 +9701,63 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     75% { opacity: 1; }
     100% { transform: translateY(-40px) scale(1); opacity: 0; }
 }
+
+/* ---------- Erfolge: abholbare Belohnung leuchtet, rotes Ausrufezeichen ---------- */
+.erfolg {
+    position: relative;
+}
+
+.erfolg.abholbar {
+    cursor: pointer;
+    border-color: #b06ee8 !important;
+    animation: erfolg-leuchten 1.3s ease-in-out infinite;
+}
+
+@keyframes erfolg-leuchten {
+    0%, 100% { box-shadow: 0 0 4px rgba(176, 110, 232, 0.5); }
+    50% { box-shadow: 0 0 16px rgba(255, 217, 61, 0.95), inset 0 0 8px rgba(255, 217, 61, 0.5); }
+}
+
+.erfolg-ausruf {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    background: #e8342a;
+    color: #fff;
+    font-weight: 700;
+    border: 2px solid #fff6d8;
+    border-radius: 50%;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+    animation: ausruf-huepfen 0.9s ease-in-out infinite;
+}
+
+@keyframes ausruf-huepfen {
+    50% { transform: translateY(-3px); }
+}
+
+.erfolg-modi {
+    margin-bottom: 8px;
+}
+
+/* Kuschel-Automat: Hinweis, wenn die Gutscheine aufgebraucht sind */
+.kuschel-sperre {
+    width: 100%;
+    text-align: center;
+    color: #b8232a;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+/* Sandbox: Haendler-Symbol blinkt, wenn er kommt */
+#haendler-button.blinkt {
+    animation: haendler-blinken 0.5s steps(2) 20;
+}
+
+@keyframes haendler-blinken {
+    0% { filter: brightness(1.6) drop-shadow(0 0 8px #ffd93d); transform: scale(1.12); }
+    100% { filter: none; transform: none; }
+}

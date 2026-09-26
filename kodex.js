@@ -99,6 +99,7 @@ function pruefeKodexBelohnungen() {
             geaendert = true;
         }
     });
+    meta.kodexEntdecktZahl = summe;
     // Gutschein alle 10 Entdeckungen (zaehlt ab jetzt, bereits entdecktes zaehlt beim ersten Mal mit)
     const stufe = Math.floor(summe / KODEX_BELOHNUNG.alleEntdeckungen);
     if (meta.kodexStufe === undefined) meta.kodexStufe = 0;

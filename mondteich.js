@@ -183,13 +183,18 @@ function kuschelNaechsteStufeBei(stufe) {
     return Math.pow(2, stufe);
 }
 
+// Sind die Gutscheine gerade aufgebraucht, kann man kurz nicht mit Mondblueten ziehen (sonst gibt man sie aus Versehen aus)
+const KUSCHEL_SPERRE_MS = 2500;
+let kuschelSperreBis = 0;
+
 function zieheKuschel(mitGutschein) {
     if (mitGutschein) {
         if (meta.gutscheine <= 0) return;
         meta.gutscheine -= 1;
+        if (meta.gutscheine === 0) kuschelSperreBis = performance.now() + KUSCHEL_SPERRE_MS;
     } else {
         const preis = kuschelPreis();
-        if (meta.mondblueten < preis) return;
+        if (meta.mondblueten < preis || performance.now() < kuschelSperreBis) return;
         meta.mondblueten -= preis;
         meta.kuschelZuegeBezahlt += 1;
     }
@@ -258,6 +263,17 @@ function zeigeKapsel(ergebnis) {
             ? el("button", "knopf knopf-lila", t("Nochmal mit Gutschein 🎟️ (") + meta.gutscheine + ")")
             : el("button", "knopf knopf-lila", t("Nochmal · ") + zahl(kuschelPreis()) + t(" Mondblüten"));
         nochmal.disabled = meta.gutscheine <= 0 && meta.mondblueten < kuschelPreis();
+        // Letzter Gutschein verbraucht: kurz warten und deutlich sagen, dass jetzt Mondblueten kosten
+        const rest = kuschelSperreBis - performance.now();
+        if (meta.gutscheine <= 0 && rest > 0 && !nochmal.disabled) {
+            nochmal.disabled = true;
+            const text = nochmal.textContent;
+            unten.appendChild(el("div", "kuschel-sperre", t("Keine Gutscheine mehr! Der nächste Zug kostet Mondblüten.")));
+            setTimeout(() => {
+                nochmal.disabled = meta.mondblueten < kuschelPreis();
+                nochmal.textContent = text;
+            }, rest);
+        }
         nochmal.addEventListener("click", () => {
             schliesse();
             zieheKuschel(meta.gutscheine > 0);
@@ -275,7 +291,7 @@ function renderKuscheltiere() {
     const k = KUSCHEL_KONFIG;
     prestigeInfo.textContent = t("Kuscheltiere bleiben für immer und geben dir in jedem Run einen Bonus. ") +
         t("Doppelte verbessern ein Kuscheltier automatisch (Stufe 1 bis ") + k.maxStufe + t(": 1, 2, 4, 8, 16 Stück). ") +
-        t("Gutscheine bekommst du für jede Erfolg-Stufe.");
+        t("Gutscheine bekommst du für jede Erfolg-Stufe (bei den Erfolgen abholen).");
 
     const preis = kuschelPreis();
     const chancen = el("div", "kuschel-chancen");
@@ -288,7 +304,8 @@ function renderKuscheltiere() {
         el("div", "kuschel-automat-kopf", null, [pixelIcon("🎪", 48), el("b", null, t("Kuschel-Automat")), chancen]),
         el("div", "spiel-knoepfe", null, [
             kleinerKnopf(t("🎟️ Mit Gutschein ziehen (") + meta.gutscheine + ")", meta.gutscheine > 0, () => zieheKuschel(true), "knopf-gruen"),
-            kleinerKnopf(t("Ziehen · ") + zahl(preis) + t(" Mondblüten"), meta.mondblueten >= preis, () => zieheKuschel(false), "knopf-lila")
+            kleinerKnopf(t("Ziehen · ") + zahl(preis) + t(" Mondblüten"), meta.mondblueten >= preis && performance.now() >= kuschelSperreBis,
+                () => zieheKuschel(false), "knopf-lila")
         ]),
         el("div", "kuschel-hinweis", (metaLevel("kuschelrabatt") > 0 ? t("Jeder 2. Zug") : t("Jeder Zug")) +
             t(" mit Mondblüten macht den nächsten um 1 teurer. Gutschein-Züge sind immer kostenlos."))

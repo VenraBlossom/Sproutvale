@@ -73,7 +73,8 @@ const MAX_FELDER = FELD_POSITIONEN.length;
 // "meta" ist immer der Fortschritt des Modus, der gerade laeuft. Der andere wartet in metaRuhend bzw. im Speicher.
 const META_SPEICHER_KEY = "sproutvale_meta";
 const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
-const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "erfolge", "kaeufeUmzug"];
+// Erfolge gehoeren NICHT dazu: Standard und Sandbox haben getrennte Erfolge und Gutscheine
+const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
 let metaRuhend = null; // Fortschritt des Standard-Modus, waehrend die Sandbox laeuft
@@ -82,7 +83,7 @@ function leereLebenszeit() {
     return {
         gold: 0, ernten: 0, jackpots: 0, spezial: 0, sterne: 0, klicks: 0, streicheln: 0, tage: 0, rechnungen: 0,
         gluehwuermchen: 0, streichelGold: 0, sternensamen: 0, bossRechnungen: 0, kraehen: 0, goldregen: 0,
-        gluecksspielSiege: 0, maxWerkzeuge: 0, runs: 0, maxTag: 0,
+        gluecksspielSiege: 0, maxWerkzeuge: 0, runs: 0, maxTag: 0, maxMeilensteine: 0,
         hoechsterGewinn: 0, maxKombo: 0, maxFelder: 0, maxPflanzen: 0
     };
 }
@@ -102,7 +103,7 @@ function leererMetaStand() {
     return {
         mondblueten: 0, gutscheine: 0, upgrades: {}, tarot: [], tarotVerbessert: [], tarotSlots: [],
         kuscheltiere: {}, kuschelZuegeBezahlt: 0,
-        erfolge: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
+        erfolge: {}, erfolgeAbgeholt: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
         sternenfaelle: 0, sternensplitter: 0, sternenfallUpgrades: {}, mondbluetenSeitSternenfall: 0,
         sandbox: false, dlc: false, freigeschaltet: {}, kosmetik: leereKosmetik(),
         mondphase: 0, mondphaseFrei: 0
@@ -125,6 +126,8 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 tarot: Array.isArray(daten.tarot) ? daten.tarot : [],
                 tarotVerbessert: Array.isArray(daten.tarotVerbessert) ? daten.tarotVerbessert : [],
                 erfolge: { ...daten.erfolge },
+                // Aeltere Spielstaende: dort gab es den Gutschein sofort, also gilt alles Erreichte als abgeholt
+                erfolgeAbgeholt: { ...(daten.erfolgeAbgeholt || daten.erfolge) },
                 kuscheltiere: { ...daten.kuscheltiere },
                 lebenszeit: { ...leereLebenszeit(), ...daten.lebenszeit },
                 kodex: { ...leererKodex(), ...daten.kodex },
@@ -509,6 +512,7 @@ function energieMax() {
     let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") + 25 * metaLevel("ausdauer") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy") + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
+    energie *= 1 + 0.03 * kuschel("faultier");
     if (bossIst("kurzeTage")) energie *= 0.8;
     energie *= jahreszeit().energie || 1;
     if (run.mondphase >= 3) energie *= 0.9;
@@ -550,7 +554,7 @@ function komboFensterMs() {
 }
 
 function anzahlBewaessert() {
-    return level("giessen") + aufrunden(tw("herrscherin")) + level("sprinkler") + werkzeugWert("giesskanne") + gachaBonus("felder");
+    return level("giessen") + aufrunden(tw("herrscherin")) + level("sprinkler") + werkzeugWert("giesskanne") + gachaBonus("felder") + kuschel("delfin");
 }
 
 function anzahlGeduengt() {
@@ -562,7 +566,7 @@ function doppelwurfChance() {
 }
 function zinsDeckelAnteil() { return KONFIG.zinsDeckel + 0.25 * level("lagerhaus"); }
 function zinsSatz() { return 0.02 * level("zinsen") + 0.005 * kuschel("kuh") + werkzeugWert("sparstrumpf"); }
-function extraKugelChance() { return 0.08 * segen("erntesegen") + werkzeugWert("flechtkorb") + 0.03 * level("obstkorb"); }
+function extraKugelChance() { return 0.08 * segen("erntesegen") + werkzeugWert("flechtkorb") + 0.03 * level("obstkorb") + 0.01 * kuschel("marienkaefer"); }
 
 // ---------- Himmels-Ast ----------
 function gekaufteSterne() {
@@ -627,7 +631,7 @@ function feldKosten() {
     // Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
     // Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
     const gekauft = Math.max(0, run.felder.length - (run.startFelder || 1));
-    return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) *
+    return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
         Math.pow(0.85, segen("sparsam")));
 }
 
@@ -874,7 +878,7 @@ function wuerfleRaritaetIndex() {
 // Multiplikator einer Münz-Farbe (mit Edelsteinschleifer, Geizige Kundschaft, Schildkroete)
 function raritaetsMulti(index) {
     if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen") + 0.5 * segen("gutesaat"));
-    return RARITAETEN[index].multi * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? 1 + level("jackpotjaeger") : 1);
+    return RARITAETEN[index].multi * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? (1 + level("jackpotjaeger")) * (1 + 0.2 * kuschel("pfau")) : 1);
 }
 
 function wuerfleVariante() {
@@ -1621,7 +1625,7 @@ function berechneErnte(feld) {
     // Goldene Sichel: jede 10. Ernte bringt 10-fach Gold
     run.ernteZaehler += 1;
     const sichel = hatWerkzeug("sichel") && run.ernteZaehler % 10 === 0 ? werkzeugWert("sichel") : 0;
-    const mondschein = istNacht() ? 1 + 0.2 * segen("mondschein") : 1;
+    const mondschein = istNacht() ? 1 + 0.2 * segen("mondschein") + 0.05 * kuschel("flamingo") : 1;
     const nebel = wetterIst("nebel") ? 1.2 : 1;
     const abend = tagesAnteil() > 2 / 3 ? 1 + 0.15 * level("abendsonne") : 1;
     const morgen = tagesAnteil() < 0.5 ? 1 + 0.2 * segen("morgenstund") : 1;
@@ -2485,7 +2489,7 @@ function spawnGluehwuermchen() {
         el.remove();
         // Energie (ausser in der Sandbox) und immer auch Sternensamen, damit sie bei voller Energie nicht nutzlos sind
         const plus = run.sandbox ? 0 : gibEnergie(gluehwuermchenEnergie());
-        const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne * (1 + segen("gluehfreund")));
+        const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne * (1 + segen("gluehfreund")) * (1 + 0.1 * kuschel("otter")));
         gibSternensamen(sterne);
         aktualisiereTopBar();
         run.statistik.gluehwuermchen += 1;
@@ -2572,18 +2576,17 @@ function meldeAnDesktop(art, wert) {
 }
 
 function pruefeErfolge() {
-    if (run.sandbox) return; // in der Sandbox gibt es keine Erfolge
     let neu = false;
-    ERFOLG_KETTEN.forEach(kette => {
-        const wert = Number(kette.wert()) || 0; // fehlende Werte aus alten Spielstaenden zaehlen als 0
+    erfolgKettenFuer(run.sandbox).forEach(kette => {
+        const wert = Number(kette.wert(meta, run)) || 0; // fehlende Werte aus alten Spielstaenden zaehlen als 0
         kette.ziele.forEach((ziel, index) => {
             const id = erfolgStufeId(kette, index);
             if (meta.erfolge[id] || wert < ziel) return;
             meta.erfolge[id] = true;
             neu = true;
-            meta.gutscheine += ERFOLG_BELOHNUNG_GUTSCHEINE;
-            zeigeBanner(kette.icon, t("Erfolg: ") + kette.text(ziel), t("+1 Kuschel-Gutschein 🎟️"), "#7c4fb3", 3600);
-            meldeAnDesktop("erfolg", steamErfolgId(kette, index));
+            // Die Belohnung holt man bei den Erfolgen ab (dort leuchtet der Erfolg)
+            zeigeBanner(kette.icon, t("Erfolg: ") + kette.text(ziel), "", "#7c4fb3", 3600);
+            if (!run.sandbox) meldeAnDesktop("erfolg", steamErfolgId(kette, index));
             Klang.erfolg();
         });
     });
@@ -2594,28 +2597,101 @@ function pruefeErfolge() {
     }
 }
 
-function anzahlErfolge() {
-    const gesamt = ERFOLG_KETTEN.reduce((summe, k) => summe + k.ziele.length, 0);
-    const geschafft = ERFOLG_KETTEN.reduce((summe, k) => summe + k.ziele.filter((_, i) => meta.erfolge[erfolgStufeId(k, i)]).length, 0);
+function anzahlErfolge(m = meta, sandbox = run ? run.sandbox : metaProfil === "sandbox") {
+    const ketten = erfolgKettenFuer(sandbox);
+    const gesamt = ketten.reduce((summe, k) => summe + k.ziele.length, 0);
+    const geschafft = ketten.reduce((summe, k) => summe + k.ziele.filter((_, i) => m.erfolge[erfolgStufeId(k, i)]).length, 0);
     return { geschafft, gesamt };
+}
+
+// Erreichte Stufen einer Kette, deren Gutschein noch nicht abgeholt ist
+function abholbareStufen(kette, m = meta) {
+    const abgeholt = m.erfolgeAbgeholt || {};
+    return kette.ziele.map((_, i) => erfolgStufeId(kette, i)).filter(id => m.erfolge[id] && !abgeholt[id]);
+}
+
+function anzahlAbholbar(m = meta, sandbox = metaProfil === "sandbox") {
+    return erfolgKettenFuer(sandbox).reduce((summe, k) => summe + abholbareStufen(k, m).length, 0);
+}
+
+// Gutscheine einer Kette abholen (nur im gerade aktiven Modus)
+function holeErfolgAb(kette, knopf) {
+    const offen = abholbareStufen(kette);
+    if (offen.length === 0) return;
+    if (!meta.erfolgeAbgeholt) meta.erfolgeAbgeholt = {};
+    offen.forEach(id => { meta.erfolgeAbgeholt[id] = true; });
+    const menge = offen.length * ERFOLG_BELOHNUNG_GUTSCHEINE;
+    meta.gutscheine += menge;
+    speichereMeta();
+    Klang.geschenk();
+    if (knopf) {
+        const r = knopf.getBoundingClientRect();
+        partikel(r.left + r.width / 2, r.top + r.height / 2, ["#b06ee8", "#ffd93d", "#ffffff"], 18, 70);
+        zeigeSchwebeText(r.left + r.width / 2, r.top - 6, "+" + menge + " 🎟️", "#7c4fb3", true);
+    }
+    renderErfolge();
+    aktualisiereNeuPunkt();
+    if (!prestigeShop.classList.contains("versteckt")) renderPrestigeShop();
+}
+
+// Welcher Erfolgs-Stand gezeigt wird: im Spiel immer der laufende Modus, im Hauptmenue waehlbar
+let erfolgeAnsicht = null;
+
+function erfolgsProfil(sandbox) {
+    const aktiv = (metaProfil === "sandbox") === sandbox;
+    if (aktiv) return { m: meta, r: run && run.sandbox === sandbox ? run : null, aktiv: true };
+    const m = sandbox ? ladeMeta(SANDBOX_META_KEY) : metaRuhend || meta;
+    return { m, r: null, aktiv: false };
 }
 
 function renderErfolge() {
     // Die Erfolge stehen in den Einstellungen (Reiter "Erfolge")
     if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "erfolge") return;
-    const { geschafft, gesamt } = anzahlErfolge();
 
     erfolgeContent.innerHTML = "";
-    erfolgeContent.appendChild(erstelleHinweis(
-        "🏆 " + geschafft + t(" von ") + gesamt + t(" Stufen geschafft. Erfolge gelten für immer. Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich.") +
-        (run && run.sandbox ? t(" In der Sandbox gibt es keine Erfolge.") : "")));
+    const imMenue = !hauptmenue.classList.contains("versteckt");
+    const aktuellSandbox = run && !imMenue ? run.sandbox : metaProfil === "sandbox";
+    if (!imMenue || erfolgeAnsicht === null) erfolgeAnsicht = aktuellSandbox ? "sandbox" : "standard";
+    const sandbox = erfolgeAnsicht === "sandbox";
+    const { m, r, aktiv } = erfolgsProfil(sandbox);
+    const { geschafft: fertig, gesamt: alle } = anzahlErfolge(m, sandbox);
 
-    ERFOLG_KETTEN.forEach(kette => {
-        const offenIndex = kette.ziele.findIndex((_, i) => !meta.erfolge[erfolgStufeId(kette, i)]);
+    // Im Hauptmenue: Reiter Standard / Sandbox (getrennte Fortschritte)
+    if (imMenue) {
+        const leiste = el("div", "haus-reiter erfolg-modi");
+        [["standard", t("🌾 Standard")], ["sandbox", t("🏖️ Sandbox")]].forEach(([id, name]) => {
+            const knopf = el("button", "knopf reiter-knopf", name);
+            knopf.classList.toggle("aktiv", id === erfolgeAnsicht);
+            knopf.addEventListener("click", () => {
+                erfolgeAnsicht = id;
+                Klang.klick(8);
+                renderErfolge();
+            });
+            leiste.appendChild(knopf);
+        });
+        erfolgeContent.appendChild(leiste);
+    }
+    const offen = anzahlAbholbar(m, sandbox);
+    erfolgeContent.appendChild(erstelleHinweis(
+        "🏆 " + fertig + t(" von ") + alle + t(" Stufen geschafft") + (sandbox ? t(" (Sandbox)") : t(" (Standard)")) +
+        t(". Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.") +
+        (offen > 0 && !aktiv ? t(" Abholen kannst du sie, wenn du in diesem Modus spielst.") : "")));
+
+    erfolgKettenFuer(sandbox).forEach(kette => {
+        const offenIndex = kette.ziele.findIndex((_, i) => !m.erfolge[erfolgStufeId(kette, i)]);
         const item = el("div", "erfolg");
         const text = el("span", "erfolg-text");
         const stufeText = el("span", "erfolg-stufe");
         item.appendChild(el("div", "erfolg-kopf", null, [pixelIcon(kette.icon, 32), text, stufeText]));
+        const abholbar = abholbareStufen(kette, m).length;
+        if (abholbar > 0) {
+            item.classList.add("abholbar");
+            item.appendChild(el("span", "erfolg-ausruf", "!"));
+            if (aktiv) {
+                item.addEventListener("click", () => holeErfolgAb(kette, item));
+                setzeTipp(item, t("Klicken: ") + abholbar + (abholbar === 1 ? t(" Gutschein abholen") : t(" Gutscheine abholen")));
+            }
+        }
 
         if (offenIndex === -1) {
             item.classList.add("geschafft");
@@ -2623,7 +2699,7 @@ function renderErfolge() {
             stufeText.textContent = t("✅ Alle ") + kette.ziele.length + t(" Stufen");
         } else {
             const ziel = kette.ziele[offenIndex];
-            const wert = Math.min(Number(kette.wert()) || 0, ziel);
+            const wert = Math.min(Number(kette.wert(m, r)) || 0, ziel);
             text.textContent = kette.text(ziel);
             stufeText.textContent = t("Stufe ") + (offenIndex + 1) + "/" + kette.ziele.length;
 
@@ -2653,7 +2729,7 @@ const STATISTIK_ZEILEN = [
     ["sternensamen", t("✨ Sternensamen erhalten")],
     ["ernten", t("🌾 Ernten")],
     ["spezial", t("✨ Spezialpflanzen geerntet")],
-    ["jackpots", t("🌟 Legendäre Jackpots eingesammelt")],
+    ["jackpots", t("🌟 Goldene Saaten eingesammelt")],
     ["hoechsterGewinn", t("💎 Höchster Einzelgewinn")],
     ["maxKombo", t("🥁 Höchste Kombo")],
     ["klicks", t("👆 Klicks auf den Samenladen")],
@@ -3033,6 +3109,7 @@ function aktualisiereLebenszeitMaxima() {
     l.maxPflanzen = Math.max(l.maxPflanzen, run.pflanzen.filter(p => p.freigeschaltet).length);
     l.maxTag = Math.max(l.maxTag || 0, run.tag);
     l.maxWerkzeuge = Math.max(l.maxWerkzeuge || 0, run.werkzeuge.length);
+    if (run.sandbox) l.maxMeilensteine = Math.max(l.maxMeilensteine || 0, run.meilensteine);
 }
 
 function beendeTag() {
@@ -3996,7 +4073,10 @@ function renderModusKarten() {
     const guthaben = $("menue-guthaben");
     guthaben.innerHTML = "";
     guthaben.append(
-        el("span", null, null, [spriteIcon("pokal"), el("span", null, anzahlErfolge().geschafft + " / " + anzahlErfolge().gesamt + t(" Erfolge"))]),
+        el("span", null, null, [spriteIcon("pokal"), el("span", null, (() => {
+            const e = anzahlErfolge(erfolgsProfil(false).m, false);
+            return e.geschafft + " / " + e.gesamt + t(" Erfolge");
+        })())]),
         el("span", null, "📅 " + zahl(meta.lebenszeit.tage) + t(" Tage gespielt"))
     );
 
@@ -4160,7 +4240,6 @@ function renderEinstellungen() {
     if (run) renderStatistik();
     renderErfolge();
     if (aktiverEinstellungsReiter === "kodex") renderKodex($("kodex-seite"));
-    if (aktiverEinstellungsReiter === "erfolge" || aktiverEinstellungsReiter === "kodex") merkeGesehen(aktiverEinstellungsReiter);
     aktualisiereNeuPunkt();
     // Schalter fuer Anzeige-Optionen
     document.querySelectorAll("[data-option]").forEach(schalter => {
@@ -4432,29 +4511,14 @@ function kodexEntdeckt() {
     return KODEX_REITER.reduce((summe, r) => summe + kodexEintraege(r.id).filter(e => e.anzahl > 0).length, 0);
 }
 
+// Nur noch abholbare Erfolge zeigen das rote Ausrufezeichen (Kodex und Meisterschaft geben ihre Belohnung sofort)
 function neuStand() {
-    const gesehen = einstellungen.gesehen || (einstellungen.gesehen = {});
-    const jetzt = { erfolge: anzahlErfolge().geschafft, ["kodex:" + metaProfil]: kodexEntdeckt() };
-    const neu = {};
-    Object.entries(jetzt).forEach(([schluessel, wert]) => {
-        // Beim ersten Mal (oder nach einem Reset) nichts anzeigen, nur merken
-        if (gesehen[schluessel] === undefined || gesehen[schluessel] > wert) gesehen[schluessel] = wert;
-        neu[schluessel.split(":")[0]] = wert > gesehen[schluessel];
-    });
-    return { neu, jetzt };
-}
-
-function merkeGesehen(reiter) {
-    const { jetzt } = neuStand();
-    const schluessel = reiter === "kodex" ? "kodex:" + metaProfil : reiter;
-    if (jetzt[schluessel] === undefined || einstellungen.gesehen[schluessel] === jetzt[schluessel]) return;
-    einstellungen.gesehen[schluessel] = jetzt[schluessel];
-    speichereEinstellungen();
+    return { neu: { erfolge: anzahlAbholbar() > 0 } };
 }
 
 function aktualisiereNeuPunkt() {
     const { neu } = neuStand();
-    $("einstellungen-button").querySelector(".neu-punkt").classList.toggle("versteckt", !neu.erfolge && !neu.kodex);
+    $("einstellungen-button").querySelector(".neu-punkt").classList.toggle("versteckt", !neu.erfolge);
     document.querySelectorAll("#einstellungen-reiter .reiter-knopf").forEach(knopf => {
         const id = knopf.dataset.reiter;
         knopf.classList.toggle("hat-punkt", Boolean(neu[id]));

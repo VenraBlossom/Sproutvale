@@ -365,6 +365,13 @@ function haendlerKommt() {
     }
     run.haendler = { angebote };
     Klang.haendler();
+    // Sandbox: das Haendler-Symbol oben blinkt 10 Sekunden lang
+    if (run.sandbox) {
+        haendlerKnopf.classList.remove("blinkt");
+        void haendlerKnopf.offsetWidth;
+        haendlerKnopf.classList.add("blinkt");
+        setTimeout(() => haendlerKnopf.classList.remove("blinkt"), 10000);
+    }
     zeigeBanner("🧳", t("Ein Wanderhändler ist da!"), t("Er bleibt bis zum nächsten Tag"), "#b8862b", 3200);
 }
 
@@ -376,7 +383,7 @@ function kaufeAngebot(angebot) {
     if (!darfEinkaufen() || angebot.gekauft || run.haendler.gekauft || run.gold < angebot.preis) return;
     if (angebot.art === "werkzeug" && run.werkzeuge.length >= werkzeugPlaetze()) {
         Klang.fehler();
-        zeigeToast("🧰 Kein Platz mehr. Verkauf zuerst ein Werkzeug (Rechtsklick in der Werkzeug-Leiste).");
+        zeigeToast(t("🧰 Kein Platz mehr. Verkauf zuerst ein Werkzeug (Rechtsklick in der Werkzeug-Leiste)."));
         return;
     }
     run.gold -= angebot.preis;
