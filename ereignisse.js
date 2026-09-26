@@ -474,7 +474,7 @@ function oeffneHaendler() {
         const werkzeug = angebot.art === "werkzeug";
         const stufe = angebot.stufe || 1;
         const weg = run.haendler.gekauft && !angebot.gekauft;
-        const karte = el("div", "haendler-karte" + (angebot.gekauft ? t(" gekauft") : "") + (weg ? t(" weg") : ""), null, [
+        const karte = el("div", "haendler-karte" + (angebot.gekauft ? " gekauft" : "") + (weg ? " weg" : ""), null, [
             pixelIcon(eintrag.symbol, 64),
             el("div", "haendler-name", eintrag.name),
             el("div", "haendler-art", werkzeug ? t("🧰 Werkzeug · Stufe ") + stufe : t("📦 Ware")),
@@ -522,7 +522,7 @@ function renderWerkzeugLeiste() {
     werkzeugLeiste.innerHTML = "";
     for (let i = 0; i < werkzeugPlaetze(); i++) {
         const id = run.werkzeuge[i];
-        const platz = el("div", "werkzeug-platz" + (id ? "" : t(" leer")));
+        const platz = el("div", "werkzeug-platz" + (id ? "" : " leer"));
         if (id) {
             const w = WERKZEUG_NACH_ID[id];
             platz.appendChild(pixelIcon(w.symbol, 32));

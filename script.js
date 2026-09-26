@@ -3805,7 +3805,7 @@ function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten,
     const istMax = lvl >= max;
     const leistbar = !istMax && darfEinkaufen() && run.gold >= kosten;
     const bild = pixelIcon(icon, 48);
-    const karte = el("div", "markt-karte" + (istMax ? t(" maximal") : "") + (leistbar ? t(" leistbar") : ""), null, [
+    const karte = el("div", "markt-karte" + (istMax ? " maximal" : "") + (leistbar ? " leistbar" : ""), null, [
         el("div", "markt-karte-kopf", null, [
             el("div", "markt-bildrahmen", null, [bild]),
             el("div", "markt-karte-titel", null, [
@@ -4256,7 +4256,7 @@ function renderSternDetails(def) {
     const kosten = knotenKosten(def);
     const erledigt = def.erledigt && def.erledigt();
 
-    const karte = el("div", "stern-karte" + (istMax ? t(" maximal") : ""));
+    const karte = el("div", "stern-karte" + (istMax ? " maximal" : ""));
     karte.append(
         el("div", "stern-karte-kopf", null, [
             pixelIcon(verborgen ? "❓" : def.icon, 64),

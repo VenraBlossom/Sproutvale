@@ -134,7 +134,7 @@ function zeigeTarotDetails(karte) {
         el("div", "tarot-detail-bild", null, [el("div", "tarot-nummer", karte.nummer), pixelIcon(karte.symbol, 96)]),
         el("div", "tarot-detail-texte", null, [
             el("div", "tarot-detail-zeile", null, [el("b", null, t("Normal: ")), el("span", null, karte.text(1))]),
-            el("div", "tarot-detail-zeile" + (ausgeruestet ? t(" aktiv") : ""), null, [
+            el("div", "tarot-detail-zeile" + (ausgeruestet ? " aktiv" : ""), null, [
                 el("b", null, t("Verbessert und ausgerüstet: ")),
                 el("span", null, karte.text(f) + (karte.extra ? t(" Zusätzlich: ") + karte.extra : ""))
             ]),
