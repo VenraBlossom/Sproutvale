@@ -10795,3 +10795,272 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
         linear-gradient(-33.7deg, transparent 45%, #fff 45% 55%, transparent 55%),
         #012169;
 }
+
+/* ---------- Eigene Figur auf dem Hof ---------- */
+.hof-figur {
+    pointer-events: auto;
+    cursor: pointer;
+}
+.figur-mensch {
+    z-index: 0;
+    bottom: calc(var(--hof-px) * 9);
+}
+.figur-begleiter {
+    z-index: 1;
+    bottom: calc(var(--hof-px) * 7);
+}
+.figur-bild {
+    position: relative;
+    image-rendering: pixelated;
+}
+.figur-schicht {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+.figur-name {
+    position: absolute;
+    left: 50%;
+    top: -18px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.8em;
+    font-weight: 800;
+    color: #fff;
+    background: rgba(30, 20, 10, 0.55);
+    padding: 1px 8px;
+    border-radius: 8px;
+    text-shadow: 1px 1px 0 #000;
+    pointer-events: none;
+}
+.figur-partner .figur-name {
+    background: rgba(90, 60, 170, 0.7);
+}
+/* Legendaere Effekte (nur Aussehen) */
+.figur-schicht.fx-rgb {
+    animation: fx-rgb 3s linear infinite;
+}
+@keyframes fx-rgb {
+    from { filter: hue-rotate(0deg) saturate(1.4); }
+    to { filter: hue-rotate(360deg) saturate(1.4); }
+}
+.figur-schicht.fx-geist {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 3px #cfe0ff);
+}
+.figur-schicht.fx-glow {
+    animation: fx-glow 1.6s ease-in-out infinite;
+}
+@keyframes fx-glow {
+    0%, 100% { filter: drop-shadow(0 0 1px var(--fx-farbe, #fff6a0)); }
+    50% { filter: drop-shadow(0 0 5px var(--fx-farbe, #fff6a0)) brightness(1.2); }
+}
+.figur-schicht.fx-flamme {
+    animation: fx-flamme 0.5s steps(2) infinite;
+}
+@keyframes fx-flamme {
+    0% { filter: drop-shadow(0 -1px 3px var(--fx-farbe, #ff8a2a)) brightness(1.1); }
+    100% { filter: drop-shadow(0 -2px 6px var(--fx-farbe, #ff8a2a)) brightness(1.3); }
+}
+.figur-schicht.fx-funkeln {
+    filter: drop-shadow(0 0 2px var(--fx-farbe, #fff6a0));
+}
+.figur-bild.fx-schwebt {
+    animation: fx-schweben 2.4s ease-in-out infinite;
+}
+@keyframes fx-schweben {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+}
+
+/* ---------- Emote-Menue (Rechtsklick auf die Figur) ---------- */
+.emote-menue {
+    position: fixed;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px;
+    background: var(--pergament);
+    border: 3px solid var(--holz-dunkel);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    width: 210px;
+}
+.emote-knopf {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    font-size: 0.9em;
+    justify-content: flex-start;
+}
+
+/* ---------- Profil-Knopf und Profil-Fenster ---------- */
+.profil-knopf {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 14px 4px 6px;
+    font-size: 1.05em;
+}
+.profil-knopf .figur-bild {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+}
+#profil-fenster {
+    z-index: 70;
+}
+.profil-rahmen {
+    width: min(1100px, calc(100% - 40px));
+    height: min(720px, calc(100vh - 60px));
+    display: flex;
+    flex-direction: column;
+}
+.profil-kopf {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+#profil-inhalt {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+}
+.profil-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+.profil-buehne {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 10px;
+    border-radius: 12px;
+    border: 3px solid var(--holz);
+    background:
+        linear-gradient(transparent 78%, #7cbf4d 78%, #5fa03a 100%),
+        linear-gradient(#a8daf5, #d0ecfa);
+}
+.profil-posen {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.profil-pose {
+    padding: 4px 8px;
+    min-width: 0;
+}
+.profil-pose.aktiv,
+.profil-reiter .reiter-knopf.aktiv {
+    box-shadow: 0 0 0 3px #5fb03c inset;
+}
+.profil-name-zeile {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-weight: 700;
+}
+.profil-name-zeile input {
+    font: inherit;
+    padding: 8px 10px;
+    border: 3px solid var(--holz);
+    border-radius: 8px;
+    background: #fffdf5;
+}
+.profil-anprobe {
+    font-size: 0.85em;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff4d0;
+    border: 2px dashed #c89a1a;
+}
+.profil-rechts {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.profil-reiter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.profil-reiter .reiter-knopf {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.profil-inventar {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 10px;
+    align-content: start;
+    padding: 4px 6px 4px 2px;
+}
+.profil-kachel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: 3px solid var(--seltenheit, #8a8a8a);
+    background: #fffdf5;
+    cursor: pointer;
+    font: inherit;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+.profil-kachel:hover {
+    transform: translateY(-2px);
+}
+.profil-kachel.gewaehlt {
+    background: #eaf8dc;
+    box-shadow: 0 0 0 3px #5fb03c, 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+.profil-kachel.gesperrt .figur-bild {
+    opacity: 0.75;
+}
+.profil-kachel-name {
+    font-weight: 800;
+    font-size: 0.9em;
+    text-align: center;
+}
+.profil-kachel-status {
+    font-size: 0.75em;
+    color: var(--text-leise);
+    text-align: center;
+}
+.profil-legende {
+    margin-top: 8px;
+    font-size: 0.8em;
+    color: var(--text-leise);
+}
+
+.koop-spieler-zeile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.koop-spieler-zeile .figur-bild {
+    flex: 0 0 auto;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+}

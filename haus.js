@@ -19,7 +19,16 @@ const KOSMETIK_LISTEN = {
     felder: FELD_SKINS,
     kugeln: KUGEL_SKINS,
     rahmen: RAHMEN_SKINS,
-    pflanzen: PFLANZEN_SKINS
+    pflanzen: PFLANZEN_SKINS,
+    // Teile der eigenen Figur (Profil im Hauptmenue, nicht im Haus)
+    figur_haut: FIGUR_TEILE.haut,
+    figur_augen: FIGUR_TEILE.augen,
+    figur_frisur: FIGUR_TEILE.frisur,
+    figur_haarfarbe: FIGUR_TEILE.haarfarbe,
+    figur_oberteil: FIGUR_TEILE.oberteil,
+    figur_hose: FIGUR_TEILE.hose,
+    figur_schuhe: FIGUR_TEILE.schuhe,
+    figur_kopf: FIGUR_TEILE.kopf
 };
 
 // frei = immer, erspielt = Bedingung einmal erfuellt (bleibt dann fuer immer),
@@ -46,7 +55,7 @@ let kosmetikVorschau = null; // { kategorie, id }
 function gewaehlteKosmetik(kategorie) {
     const liste = KOSMETIK_LISTEN[kategorie];
     // Koop: gemeinsame Skins (standardmaessig die des Leiters, wer zuletzt waehlt, gewinnt)
-    if (typeof koopAktiv === "function" && koopAktiv() && koop.kosmetik && kategorie !== "deko" && koop.kosmetik[kategorie] &&
+    if (typeof koopAktiv === "function" && koopAktiv() && koop.kosmetik && kategorie !== "deko" && kategorie !== "haustier" && koop.kosmetik[kategorie] &&
         !(kosmetikVorschau && kosmetikVorschau.kategorie === kategorie)) {
         const eintrag = liste.find(e => e.id === koop.kosmetik[kategorie]);
         if (eintrag) return eintrag;
@@ -1030,7 +1039,11 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
         meta.kosmetik[kategorie] = eintrag.id;
     }
     // Koop: die Wahl gilt auch fuer den Mitspieler
-    if (typeof koopAktiv === "function" && koopAktiv()) koopSetzeKosmetik(kategorie, kategorie === "deko" ? [...meta.kosmetik.deko] : eintrag.id);
+    if (typeof koopAktiv === "function" && koopAktiv()) {
+        // Den Begleiter waehlt jeder fuer sich, der Mitspieler sieht ihn ueber das Profil
+        if (kategorie === "haustier") koopSendeProfil();
+        else koopSetzeKosmetik(kategorie, kategorie === "deko" ? [...meta.kosmetik.deko] : eintrag.id);
+    }
     speichereMeta();
     wendeKosmetikAn();
     aktualisiereMusik();

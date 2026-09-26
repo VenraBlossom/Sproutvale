@@ -77,7 +77,7 @@ const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
 // (Mondblueten, Upgrades, Kuscheltiere, Erfolge, Statistik) und eigenem laufenden Hof.
 const ENDLOS_SLOTS = 3;
 // Erfolge gehoeren NICHT dazu: Story und jeder Endlos-Speicherstand haben getrennte Erfolge und Gutscheine
-const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot"];
+const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot", "profil"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
 let metaSlot = 0; // welcher Endlos-Speicherstand gerade in "meta" geladen ist (0 = Story)
@@ -120,7 +120,8 @@ function leererMetaStand() {
         erfolge: {}, erfolgeAbgeholt: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
         sternenfaelle: 0, sternensplitter: 0, sternenfallUpgrades: {}, mondbluetenSeitSternenfall: 0,
         sandbox: false, dlc: false, freigeschaltet: {}, kosmetik: leereKosmetik(),
-        mondphase: 0, mondphaseFrei: 0, mondphaseGesehen: 0
+        mondphase: 0, mondphaseFrei: 0, mondphaseGesehen: 0,
+        profil: { name: "", teile: { ...FIGUR_STANDARD } }
     };
 }
 
@@ -147,7 +148,8 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 kodex: { ...leererKodex(), ...daten.kodex },
                 sternenfallUpgrades: { ...daten.sternenfallUpgrades },
                 freigeschaltet: { ...daten.freigeschaltet },
-                kosmetik: { ...leereKosmetik(), ...daten.kosmetik }
+                kosmetik: { ...leereKosmetik(), ...daten.kosmetik },
+                profil: { name: (daten.profil && daten.profil.name) || "", teile: { ...FIGUR_STANDARD, ...(daten.profil && daten.profil.teile) } }
             };
             // Alte Spielstaende: schon freie Mondphasen gelten als gesehen (kein Ausrufezeichen fuer Altes)
             if (daten.mondphaseGesehen === undefined) stand.mondphaseGesehen = stand.mondphaseFrei || 0;
@@ -5334,6 +5336,8 @@ function hauptSchleife(jetzt) {
     } else {
         kombo.letzterKlick += dtMs; // Kombo bricht in der Pause nicht ab
     }
+    // Die Figuren laufen auch im Hauptmenue und in der Pause (nur Aussehen)
+    if (typeof aktualisiereFiguren === "function") aktualisiereFiguren(dtMs, jetzt);
 
     musikPruefMs += dtMs;
     if (musikPruefMs >= 500) {

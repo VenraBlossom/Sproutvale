@@ -176,6 +176,11 @@ requestAnimationFrame(hauptSchleife);
 
 $("menue-version").textContent = SPIEL_VERSION;
 
+// Profil (oben rechts im Hauptmenue)
+$("profil-knopf").addEventListener("click", oeffneProfil);
+$("profil-schliessen").addEventListener("click", schliesseProfil);
+aktualisiereProfilKnopf();
+
 // Sprache waehlen: speichern und neu laden (alle Texte werden beim Start uebersetzt)
 // Grosse Karten mit Flagge (per CSS gezeichnet, Windows zeigt keine Flaggen-Emojis); die aktive Sprache hat einen Haken
 (function spracheWahl() {

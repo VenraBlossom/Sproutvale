@@ -1805,3 +1805,149 @@ const SANDBOX_KONFIG = {
     preis: 500,
     mondbluetenAnteil: 0.5    // Meilenstein n zaehlt wie bezahlte Rechnung n, davon gibt es die Haelfte
 };
+
+// ---------- PROFIL: EIGENE FIGUR (Charakter-Editor im Hauptmenue) ----------
+// Die Figur laeuft wie der Begleiter ueber den Hof (etwas groesser, etwas weiter hinten). Sie droppt nichts und hat
+// keine Spiel-Effekte, nur Aussehen. Gewoehnlich = frei, episch = Unterstuetzer-Paket, legendaer = einzeln (0,99 €).
+// fx (nur Aussehen): rgb (Farben laufen durch), geist (durchsichtig, schwebt), glow (leuchtet, fxFarbe),
+//     funkeln (kleine Sterne), flamme (flackert und gluet), schweben (wippt sanft auf und ab)
+// Farb-Buchstaben: Haut 4/s/r/m, Augen 5, Haare 2/h, Oberteil 6/8/k, Hose 3/9, Schuhe 1/l, Hut a/b/c
+
+const FIGUR_KATEGORIEN = [
+    { id: "haut", name: t("Haut"), symbol: "✋" },
+    { id: "augen", name: t("Augen"), symbol: "👀" },
+    { id: "frisur", name: t("Frisur"), symbol: "💇" },
+    { id: "haarfarbe", name: t("Haarfarbe"), symbol: "🎨" },
+    { id: "oberteil", name: t("Oberteil"), symbol: "👕" },
+    { id: "hose", name: t("Hose"), symbol: "👖" },
+    { id: "schuhe", name: t("Schuhe"), symbol: "👟" },
+    { id: "kopf", name: t("Kopf"), symbol: "👒" }
+];
+
+const EPISCH = { quelle: "dlc", paket: "unterstuetzer" };
+const LEGENDAER = { quelle: "dlc", paket: "einzeln" };
+
+const FIGUR_TEILE = {
+    haut: [
+        { id: "hell", name: t("Hell"), quelle: "frei", farben: { 4: "#ffe2cc", s: "#f0c0a2", r: "#ff9aa0", m: "#9a4a3a" } },
+        { id: "pfirsich", name: t("Pfirsich"), quelle: "frei", farben: { 4: "#f5c8a0", s: "#e0a880", r: "#f08a8a", m: "#8a3a2a" } },
+        { id: "mittel", name: t("Mittel"), quelle: "frei", farben: { 4: "#d9a078", s: "#c0845c", r: "#e07a6a", m: "#7a3222" } },
+        { id: "gebraeunt", name: t("Gebräunt"), quelle: "frei", farben: { 4: "#b87850", s: "#9a603c", r: "#c8604a", m: "#5a2418" } },
+        { id: "braun", name: t("Braun"), quelle: "frei", farben: { 4: "#8a5a3a", s: "#6e4428", r: "#a84a3a", m: "#3e1a10" } },
+        { id: "dunkel", name: t("Dunkel"), quelle: "frei", farben: { 4: "#5e3c28", s: "#4a2c1c", r: "#7a3a2a", m: "#2a120a" } },
+        { id: "blau", name: t("Blau"), ...EPISCH, farben: { 4: "#8ab8f0", s: "#6a98d8", r: "#c89af0", m: "#2a3a7a" } },
+        { id: "gruen", name: t("Grün"), ...EPISCH, farben: { 4: "#9ad68a", s: "#7ab86a", r: "#e8a0a0", m: "#2a5a2a" } },
+        { id: "lila", name: t("Lila"), ...EPISCH, farben: { 4: "#c0a0e8", s: "#a080d0", r: "#ff9ad0", m: "#4a2a7a" } },
+        { id: "stein", name: t("Stein"), ...EPISCH, farben: { 4: "#a8a8b4", s: "#8a8a98", r: "#c8a0a0", m: "#3a3a48" } },
+        { id: "geist", name: t("Geist"), ...LEGENDAER, fx: "geist", farben: { 4: "#eef4ff", s: "#c8d8f0", r: "#b8c8ff", m: "#6a7ab0" } },
+        { id: "rgb", name: t("RGB"), ...LEGENDAER, fx: "rgb", farben: { 4: "#ff8a8a", s: "#e06a6a", r: "#ffd0d0", m: "#6a1a1a" } },
+        { id: "kristall", name: t("Kristall"), ...LEGENDAER, fx: "funkeln", fxFarbe: "#bff0ff",
+            farben: { 4: "#c8f4ff", s: "#8ad8f0", r: "#f0c8ff", m: "#3a7a9a" } }
+    ],
+    augen: [
+        { id: "braun", name: t("Braun"), quelle: "frei", farben: { 5: "#4a2a12" } },
+        { id: "blau", name: t("Blau"), quelle: "frei", farben: { 5: "#2a5ac0" } },
+        { id: "gruen", name: t("Grün"), quelle: "frei", farben: { 5: "#2a8a3a" } },
+        { id: "grau", name: t("Grau"), quelle: "frei", farben: { 5: "#5a5a6a" } },
+        { id: "rot", name: t("Rot"), ...EPISCH, farben: { 5: "#c8201a" } },
+        { id: "gold", name: t("Gold"), ...EPISCH, farben: { 5: "#d49a10" } },
+        { id: "lila", name: t("Lila"), ...EPISCH, farben: { 5: "#7a2ad0" } },
+        { id: "leuchtend", name: t("Leuchtend"), ...LEGENDAER, fx: "glow", fxFarbe: "#5af0ff", farben: { 5: "#3ae0ff" } },
+        { id: "herz", name: t("Herzaugen"), ...LEGENDAER, form: "herz", fx: "glow", fxFarbe: "#ff5a9a", farben: { 5: "#ff3a8a" } }
+    ],
+    frisur: [
+        { id: "kurz", name: t("Kurz"), quelle: "frei", form: "kurz" },
+        { id: "lang", name: t("Lang"), quelle: "frei", form: "lang" },
+        { id: "zopf", name: t("Pferdeschwanz"), quelle: "frei", form: "zopf" },
+        { id: "locken", name: t("Locken"), quelle: "frei", form: "locken" },
+        { id: "dutt", name: t("Dutt"), quelle: "frei", form: "dutt" },
+        { id: "glatze", name: t("Glatze"), quelle: "frei", form: "glatze" },
+        { id: "iro", name: t("Irokese"), ...EPISCH, form: "iro" },
+        { id: "zoepfe", name: t("Zöpfe"), ...EPISCH, form: "zoepfe" },
+        { id: "stachel", name: t("Stachelhaar"), ...EPISCH, form: "stachel" },
+        { id: "flamme", name: t("Flammenhaar"), ...LEGENDAER, form: "flamme", fx: "flamme", fxFarbe: "#ff8a2a" },
+        { id: "wolke", name: t("Wolkenhaar"), ...LEGENDAER, form: "wolke", fx: "schweben" },
+        { id: "sternenhaar", name: t("Sternenhaar"), ...LEGENDAER, form: "sterne", fx: "funkeln", fxFarbe: "#fff6a0" }
+    ],
+    haarfarbe: [
+        { id: "braun", name: t("Braun"), quelle: "frei", farben: { 2: "#6b3f1d", h: "#9a6634" } },
+        { id: "dunkelbraun", name: t("Dunkelbraun"), quelle: "frei", farben: { 2: "#3a2414", h: "#5e3c22" } },
+        { id: "schwarz", name: t("Schwarz"), quelle: "frei", farben: { 2: "#1e1e26", h: "#3e3e4a" } },
+        { id: "blond", name: t("Blond"), quelle: "frei", farben: { 2: "#e0b848", h: "#fff0a0" } },
+        { id: "rot", name: t("Rot"), quelle: "frei", farben: { 2: "#c0482a", h: "#e87a4a" } },
+        { id: "grau", name: t("Grau"), quelle: "frei", farben: { 2: "#9a9aa6", h: "#cacad4" } },
+        { id: "weiss", name: t("Weiß"), quelle: "frei", farben: { 2: "#e8e8ee", h: "#ffffff" } },
+        { id: "rosa", name: t("Rosa"), ...EPISCH, farben: { 2: "#ff8fb8", h: "#ffc8dc" } },
+        { id: "tuerkis", name: t("Türkis"), ...EPISCH, farben: { 2: "#2ab8b0", h: "#8ae8e0" } },
+        { id: "lila", name: t("Lila"), ...EPISCH, farben: { 2: "#7a4ac0", h: "#b08ae8" } },
+        { id: "blau", name: t("Blau"), ...EPISCH, farben: { 2: "#2a5ac8", h: "#6a9af0" } },
+        { id: "gruen", name: t("Grün"), ...EPISCH, farben: { 2: "#3a8a2a", h: "#7cc85a" } },
+        { id: "regenbogen", name: t("Regenbogen"), ...LEGENDAER, fx: "rgb", farben: { 2: "#ff4a4a", h: "#ffd23a" } },
+        { id: "glut", name: t("Glut"), ...LEGENDAER, fx: "flamme", fxFarbe: "#ff6a0a", farben: { 2: "#ff5a0a", h: "#ffd23a" } },
+        { id: "galaxie", name: t("Galaxie"), ...LEGENDAER, fx: "funkeln", fxFarbe: "#c9b0f5", farben: { 2: "#2a1a5a", h: "#8a6af0" } }
+    ],
+    oberteil: [
+        { id: "latz", name: t("Latzhose"), quelle: "frei", form: "latz", farben: { 6: "#4a7ad0", 8: "#3a5ea8", k: "#f4ead4" } },
+        { id: "shirt_weiss", name: t("Weißes Shirt"), quelle: "frei", farben: { 6: "#f4f4f4", 8: "#cfcfd8", k: "#cfcfd8" } },
+        { id: "shirt_rot", name: t("Rotes Shirt"), quelle: "frei", farben: { 6: "#d9483f", 8: "#a8322a", k: "#a8322a" } },
+        { id: "shirt_gruen", name: t("Grünes Shirt"), quelle: "frei", farben: { 6: "#5fb03c", 8: "#3e8a28", k: "#3e8a28" } },
+        { id: "pulli", name: t("Gelber Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#f0c83a", 8: "#c89a1a", k: "#c89a1a" } },
+        { id: "karo", name: t("Karohemd"), quelle: "frei", form: "karo", farben: { 6: "#c8302a", 8: "#8a1a18", k: "#f4e4d0" } },
+        { id: "hoodie", name: t("Hoodie"), ...EPISCH, form: "hoodie", farben: { 6: "#7a3ab0", 8: "#55287e", k: "#9a5ad0" } },
+        { id: "kimono", name: t("Kimono"), ...EPISCH, form: "kimono", farben: { 6: "#e8566a", 8: "#b83a4c", k: "#f4d060" } },
+        { id: "matrose", name: t("Matrosenhemd"), ...EPISCH, form: "matrose", farben: { 6: "#f6f6fa", 8: "#d0d0dc", k: "#2a3a7a" } },
+        { id: "weste", name: t("Weste"), ...EPISCH, form: "weste", farben: { 6: "#6b3f1d", 8: "#4a2a12", k: "#f4f0e8" } },
+        { id: "umhang", name: t("Sternenumhang"), ...LEGENDAER, form: "umhang", fx: "funkeln", fxFarbe: "#fff6a0",
+            farben: { 6: "#2a3a8a", 8: "#1a2460", k: "#fff6a0" } },
+        { id: "bluetenkleid", name: t("Blütenkleid"), ...LEGENDAER, form: "kleid", fx: "funkeln", fxFarbe: "#ffb3d0",
+            farben: { 6: "#8fd07a", 8: "#5fb03c", k: "#ff8fb8" } }
+    ],
+    hose: [
+        { id: "jeans", name: t("Jeans"), quelle: "frei", farben: { 3: "#3a5a9a", 9: "#2a4478" } },
+        { id: "braun", name: t("Braune Hose"), quelle: "frei", farben: { 3: "#7a5a3a", 9: "#5a4028" } },
+        { id: "schwarz", name: t("Schwarze Hose"), quelle: "frei", farben: { 3: "#2c2c34", 9: "#1a1a20" } },
+        { id: "gruen", name: t("Grüne Hose"), quelle: "frei", farben: { 3: "#4a7a3a", 9: "#345a28" } },
+        { id: "rock", name: t("Rock"), quelle: "frei", form: "rock", farben: { 3: "#c83a3a", 9: "#9a2a2a" } },
+        { id: "shorts", name: t("Shorts"), ...EPISCH, form: "shorts", farben: { 3: "#c8a060", 9: "#a07a40" } },
+        { id: "latzrot", name: t("Rote Latzhose"), ...EPISCH, farben: { 3: "#c8302a", 9: "#8a1a18" } },
+        { id: "sternenhose", name: t("Sternenhose"), ...LEGENDAER, form: "sterne", fx: "funkeln", fxFarbe: "#fff6a0",
+            farben: { 3: "#1d2a6a", 9: "#121a48" } }
+    ],
+    schuhe: [
+        { id: "braun", name: t("Braune Schuhe"), quelle: "frei", farben: { 1: "#5a3a1a", l: "#7a5a3a" } },
+        { id: "schwarz", name: t("Schwarze Schuhe"), quelle: "frei", farben: { 1: "#1e1e24", l: "#3a3a44" } },
+        { id: "weiss", name: t("Turnschuhe"), quelle: "frei", farben: { 1: "#f4f4f4", l: "#d0d0d8" } },
+        { id: "gummistiefel", name: t("Gummistiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#f0c83a", l: "#c89a1a" } },
+        { id: "rotestiefel", name: t("Rote Stiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#c8302a", l: "#8a1a18" } },
+        { id: "wolken", name: t("Wolkenschuhe"), ...LEGENDAER, form: "wolke", fx: "schweben", farben: { 1: "#ffffff", l: "#d8e4f4" } }
+    ],
+    kopf: [
+        { id: "keiner", name: t("Nichts"), quelle: "frei", form: "keiner" },
+        { id: "strohhut", name: t("Strohhut"), quelle: "frei", form: "strohhut", farben: { a: "#e8c860", b: "#c8a040", c: "#c8302a" } },
+        { id: "muetze", name: t("Mütze"), quelle: "frei", form: "muetze", farben: { a: "#c8302a", b: "#9a2420", c: "#ffffff" } },
+        { id: "kappe", name: t("Kappe"), quelle: "frei", form: "kappe", farben: { a: "#3a6ad0", b: "#2a4a9a", c: "#ffffff" } },
+        { id: "blumenkranz", name: t("Blumenkranz"), ...EPISCH, form: "kranz", farben: { a: "#5fb03c", b: "#ff8fb8", c: "#ffd23a" } },
+        { id: "hexenhut", name: t("Hexenhut"), ...EPISCH, form: "hexe", farben: { a: "#3a2a5a", b: "#241a3a", c: "#a86ae0" } },
+        { id: "katzenohren", name: t("Katzenohren"), ...EPISCH, form: "ohren", farben: { a: "#3a2a2a", b: "#ff9ab8", c: "#3a2a2a" } },
+        { id: "kopfhoerer", name: t("Kopfhörer"), ...EPISCH, form: "kopfhoerer", farben: { a: "#2a2a30", b: "#ff5a8a", c: "#ff5a8a" } },
+        { id: "krone", name: t("Krone"), ...LEGENDAER, form: "krone", fx: "funkeln", fxFarbe: "#ffe066",
+            farben: { a: "#ffd23a", b: "#c89a10", c: "#e8434a" } },
+        { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", fx: "glow", fxFarbe: "#fff6a0",
+            farben: { a: "#fff6a0", b: "#ffe066", c: "#ffffff" } },
+        { id: "pilzhut", name: t("Pilzhut"), ...LEGENDAER, form: "pilz", fx: "schweben", farben: { a: "#e8434a", b: "#b82a30", c: "#ffffff" } }
+    ]
+};
+
+const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut" };
+
+// Emotes mit Rechtsklick auf die eigene Figur
+const FIGUR_EMOTES = [
+    { id: "winken", symbol: "👋", name: t("Winken"), pose: "winken" },
+    { id: "jubeln", symbol: "🎉", name: t("Jubeln"), pose: "jubeln" },
+    { id: "tanzen", symbol: "💃", name: t("Tanzen"), pose: "tanzen" },
+    { id: "hacken", symbol: "⛏️", name: t("Hacken"), pose: "hacken" },
+    { id: "herz", symbol: "❤️", name: t("Herz"), pose: "stehen" },
+    { id: "lachen", symbol: "😂", name: t("Lachen"), pose: "jubeln" },
+    { id: "daumen", symbol: "👍", name: t("Daumen hoch"), pose: "winken" },
+    { id: "schlafen", symbol: "💤", name: t("Nickerchen"), pose: "schlafen" }
+];

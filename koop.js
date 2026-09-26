@@ -193,6 +193,7 @@ function richteKanalEin(kanal) {
             koop.ws = null;
         }
         koopSende("hallo", { hatEndlos: hatSandbox(), rolle: koop.rolle, version: SPIEL_VERSION });
+        koopSendeProfil();
         renderKoopLobby();
     };
     kanal.onmessage = event => {
@@ -351,7 +352,7 @@ function koopVerlassen(still) {
     clearInterval(koop.wsTakt);
     Object.assign(koop, {
         rolle: null, code: null, ws: null, pc: null, kanal: null, partnerId: null, verbunden: false, imSpiel: false,
-        partner: null, partnerPausiert: false, status: still ? koop.status : ""
+        partner: null, partnerProfil: null, partnerPausiert: false, status: still ? koop.status : ""
     });
     zeigePauseSchild();
     if (!still) renderKoopLobby();
@@ -362,6 +363,7 @@ function koopVerbindungWeg() {
     if (!koop.verbunden && !koop.kanal) return;
     const warImSpiel = koop.imSpiel;
     koop.verbunden = false;
+    koop.partnerProfil = null; // Figur und Begleiter des Mitspielers verschwinden
     koop.kanal = null;
     koop.partnerPausiert = false;
     koop.partnerFelder = [];
@@ -492,6 +494,13 @@ function koopEmpfange(n) {
                 zeigeToast(t("👥 Dein Mitspieler hat den Run beendet."));
                 koopBeendeRunLokal();
             }
+            break;
+        case "profil":
+            koop.partnerProfil = { name: String(n.name || "").slice(0, 16), teile: n.teile || {}, begleiter: n.begleiter || "rot" };
+            renderKoopLobby();
+            break;
+        case "emote":
+            zeigePartnerEmote(n.id);
             break;
         case "zurLobby":
             koopZurueckZurLobby(false);
@@ -1017,11 +1026,24 @@ function renderKoopLobby() {
     inhalt.appendChild(codeZeile);
 
     // Spieler
+    // mit Namen und kleiner Figur aus dem Profil
+    const spielerZeile = (text, teile, klasse = "") => {
+        const zeile = el("div", "koop-spieler-zeile" + klasse);
+        if (teile) {
+            const mini = erstelleFigurBild(2);
+            zeigeFigurBild(mini, figurTeileAus(teile, false), "stehen", 0, false);
+            zeile.appendChild(mini.huelle);
+        }
+        zeile.appendChild(el("span", null, text));
+        return zeile;
+    };
+    const partner = koop.partnerProfil;
     inhalt.appendChild(el("div", "koop-spieler", null, [
-        el("div", "koop-spieler-zeile", (host ? t("👑 Du (Host)") : t("🙂 Du"))),
-        el("div", "koop-spieler-zeile" + (koop.verbunden ? "" : " wartet"),
-            koop.verbunden ? (host ? t("🙂 Mitspieler: verbunden") : t("👑 Host: verbunden"))
-                : host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"))
+        spielerZeile((host ? "👑 " : "🙂 ") + profilName() + (host ? t(" (du, Host)") : t(" (du)")), profil().teile),
+        koop.verbunden
+            ? spielerZeile((host ? "🙂 " : "👑 ") + (partner && partner.name ? partner.name : t("Mitspieler")) + (host ? "" : t(" (Host)")),
+                partner ? partner.teile : null)
+            : spielerZeile(host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"), null, " wartet")
     ]));
 
     // Modus

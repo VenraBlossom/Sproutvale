@@ -155,6 +155,17 @@
         </div>
     </div>
 
+    <!-- Profil: Name und eigene Figur (aus dem Hauptmenue) -->
+    <div id="profil-fenster" class="overlay versteckt">
+        <div class="profil-rahmen pergament">
+            <div class="profil-kopf">
+                <h2>👤 Profil</h2>
+                <button class="knopf knopf-gruen" id="profil-schliessen">✔ Fertig</button>
+            </div>
+            <div id="profil-inhalt"></div>
+        </div>
+    </div>
+
     <!-- Pflicht-Auswahl nach jeder bezahlten Rechnung -->
     <div id="segen-fenster" class="overlay versteckt">
         <div class="segen-rahmen pergament">
@@ -298,6 +309,7 @@
 
     <!-- Hauptmenue: Startseite und Auswahl des Spielmodus (Standard oder Sandbox, jeder mit eigenem Spielstand) -->
     <div id="hauptmenue">
+        <button class="knopf profil-knopf" id="profil-knopf">Profil</button>
         <div id="menue-wolken"></div>
         <div id="menue-teilchen"></div>
         <div class="menue-inhalt" id="menue-start">
@@ -367,6 +379,7 @@
     <script src="ui.js"></script>
     <script src="script.js"></script>
     <script src="haus.js"></script>
+    <script src="figur.js"></script>
     <script src="glueck.js"></script>
     <script src="mondteich.js"></script>
     <script src="ereignisse.js"></script>
