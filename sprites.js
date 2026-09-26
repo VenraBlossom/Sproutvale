@@ -831,6 +831,131 @@ const SPRITE_PIXEL = {
         "....KKKK....",
         "..gKKKKKKg.."
     ],
+    // Neue Deko: Heuwagen, Briefkasten, Steinlaterne (episch), Gluecksdrache mit 4 Bildern (legendaer)
+    heuwagen: [
+        "....yYYyY.......",
+        "..yYYYyYYYy.....",
+        ".yYYyYYYYyYY....",
+        ".DDDDDDDDDDDD...",
+        ".DVWVWVWVWVWD...",
+        ".DDDDDDDDDDDDDDD",
+        "..kKKk....kKKk..",
+        "..KkkK....KkkK..",
+        "..kKKk....kKKk.."
+    ],
+    briefkasten: [
+        "...ww...R",
+        "..qwwqq.R",
+        ".qQzQQQqR",
+        ".qQQQQQqk",
+        ".qqqqqqqk",
+        ".qQQQQQq.",
+        ".qqqqqqq.",
+        "....KK...",
+        "....KK...",
+        "....KK...",
+        "....KK...",
+        "....KK...",
+        "....KK...",
+        "...kKKk.."
+    ],
+    steinlaterne: [
+        "....99....",
+        "...9889...",
+        ".99888899.",
+        "9888888889",
+        "..999999..",
+        "..8vYYv8..",
+        "..8YvvY8..",
+        "..999999..",
+        "...8888...",
+        "....88....",
+        "....89....",
+        "....88....",
+        "...8889...",
+        "..988889..",
+        ".99999999."
+    ],
+    gluecksdrache_0: [
+        ".....yY..yY.......",
+        "......yY.yY.......",
+        "....OOlllll.......",
+        "...OOlRRRRRl......",
+        "..OOlRRwXRRRll....",
+        "..OlRRRRRRRRRRl...",
+        "..OlRRRRRRRRRRRl..",
+        "...lRRRrrrRRlll...",
+        "...lRRlYYlll.Y....",
+        "..OlRRl.Y....Y....",
+        "..OlRRRl..........",
+        "...lRRRRl...lll...",
+        "....lRRRRlllRRRl..",
+        "...lRRYYRRRRRRYRl.",
+        "..lRRYl.lRRRRYRl..",
+        ".yYYYYYYYYYYYYYYy.",
+        ".yyYyyYyyYyyYyyYy.",
+        "..yyyyyyyyyyyyyy.."
+    ],
+    gluecksdrache_1: [
+        ".....yY..yY.......",
+        "......yY.yY.......",
+        "....OOlllll.......",
+        "...OOlRRRRRl......",
+        "..OOlRRllRRRll....",
+        "..OlRRRRRRRRRRl...",
+        "..OlRRRRRRRRRRRl..",
+        "...lRRRrrrRRlll...",
+        "...lRRlYYlll.Y....",
+        "..OlRRl.Y....Y....",
+        "..OlRRRl..........",
+        "...lRRRRl...lll...",
+        "....lRRRRlllRRRl..",
+        "...lRRYYRRRRRRYRl.",
+        "..lRRYl.lRRRRYRl..",
+        ".yYYYYYYYYYYYYYYy.",
+        ".yyYyyYyyYyyYyyYy.",
+        "..yyyyyyyyyyyyyy.."
+    ],
+    gluecksdrache_2: [
+        ".....yY..yY.......",
+        "......yY.yY.......",
+        "....OOlllll.......",
+        "...OOlRRRRRl......",
+        "..OOlRRwXRRRll....",
+        "..OlRRRRRRRRRRl...",
+        "..OlRRRRRRRRRRRlO.",
+        "...lRRRrrrRRl..vO.",
+        "...lRRlYYlll.Y....",
+        "..OlRRl.Y....Y....",
+        "..OlRRRl..........",
+        "...lRRRRl...lll...",
+        "....lRRRRlllRRRl..",
+        "...lRRYYRRRRRRYRl.",
+        "..lRRYl.lRRRRYRl..",
+        ".yYYYYYYYYYYYYYYy.",
+        ".yyYyyYyyYyyYyyYy.",
+        "..yyyyyyyyyyyyyy.."
+    ],
+    gluecksdrache_3: [
+        ".....yY..yY.......",
+        "......yY.yY.......",
+        "....OOlllll.......",
+        "...OOlRRRRRl......",
+        "..OOlRRwXRRRll....",
+        "..OlRRRRRRRRRRl.O.",
+        "..OlRRRRRRRRRRRlYO",
+        "...lRRRrrrRRl.vYOO",
+        "...lRRlYYlll.YvO..",
+        "..OlRRl.Y....Y....",
+        "..OlRRRl..........",
+        "...lRRRRl...lll...",
+        "....lRRRRlllRRRl..",
+        "...lRRYYRRRRRRYRl.",
+        "..lRRYl.lRRRRYRl..",
+        ".yYYYYYYYYYYYYYYy.",
+        ".yyYyyYyyYyyYyyYy.",
+        "..yyyyyyyyyyyyyy.."
+    ],
     // Kuerbislaterne mit leuchtendem Gesicht
     kuerbislaterne: [
         ".....Gg.....",
@@ -1227,6 +1352,51 @@ SPRITE_PIXEL.muehlenfluegel = (() => {
         return ".";
     }).join(""));
 })();
+
+// Koi-Teich (legendaere Deko): 8 Bilder. Zwei Koi schwimmen im Kreis, das Schilf wiegt sich, der Rand bleibt stehen
+for (let n = 0; n < 8; n++) {
+    const B = 22;
+    const H = 12;
+    const raster = Array.from({ length: H }, () => Array(B).fill("."));
+    const setze = (x, y, c, nurWasser) => {
+        const px = Math.round(x);
+        const py = Math.round(y);
+        if (px < 0 || px >= B || py < 0 || py >= H) return;
+        if (nurWasser && !"qQx".includes(raster[py][px])) return;
+        raster[py][px] = c;
+    };
+    // Steinrand und Wasser (innen tiefer)
+    for (let y = 0; y < H; y++) {
+        for (let x = 0; x < B; x++) {
+            const d = Math.hypot((x - 10.5) / 10.6, (y - 7) / 4.7);
+            if (d > 1) continue;
+            if (d > 0.8) raster[y][x] = y > 8 ? "0" : (x + y) % 3 === 0 ? "9" : "8";
+            else raster[y][x] = d > 0.64 ? "q" : "Q";
+        }
+    }
+    // Schilf links und rechts, die Spitzen wiegen sich
+    const wiegen = n % 4 < 2 ? 0 : 1;
+    [[1, 1], [3, 0], [20, 2]].forEach(([x, oben]) => {
+        for (let y = oben + 2; y < 8; y++) setze(x, y, "g");
+        setze(x + wiegen, oben, "k");
+        setze(x + wiegen, oben + 1, "k");
+    });
+    // Seerose
+    setze(15, 5, "g", true); setze(16, 5, "G", true); setze(17, 6, "g", true); setze(15, 6, "G", true); setze(16, 6, "g", true);
+    setze(16, 5, "t");
+    // Zwei Koi: Kopf, Koerper, Fleck, Schwanz
+    const winkel = (n / 8) * Math.PI * 2;
+    [[0, ["O", "O", "w", "o"]], [Math.PI, ["w", "w", "R", "w"]]].forEach(([versatz, farben]) => {
+        farben.forEach((farbe, i) => {
+            const a = winkel + versatz - i * 0.22;
+            setze(10.5 + Math.cos(a) * 6.4, 7 + Math.sin(a) * 2.4, farbe, true);
+        });
+    });
+    // Lichtfunkeln auf dem Wasser
+    setze(6 + ((n * 3) % 9), 5, "z", true);
+    setze(14 - ((n * 2) % 7), 9, "z", true);
+    SPRITE_PIXEL["koiteich_" + n] = raster.map(z => z.join(""));
+}
 
 SPRITE_PIXEL.mond = Array.from({ length: 13 }, (_, y) => Array.from({ length: 13 }, (_, x) => {
     const aussen = Math.hypot(x - 6, y - 6);

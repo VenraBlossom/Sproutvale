@@ -1298,7 +1298,8 @@ const HOF_THEMEN = [
 
 // Deko: bis zu 3 Objekte stehen auf festen Plaetzen im Hintergrund der Hofwiese (x in Prozent)
 // farben = Farbvariante des Sprites, effekt = CSS-Look (bienen: Bienen summen herum), partikel = aufsteigende Teilchen,
-// fluegel = Windmuehlen-Fluegel drehen sich als eigenes Bild vor dem Turm
+// fluegel = Windmuehlen-Fluegel drehen sich als eigenes Bild vor dem Turm,
+// ablauf = Bildfolge (ein Zeichen pro Schritt, das Sprite heisst <sprite ohne _0>_<Zeichen>), so bewegt sich nur der animierte Teil
 const DEKO_SLOTS = [{ x: 31 }, { x: 47 }, { x: 69 }];
 const DEKO_MAX = DEKO_SLOTS.length;
 
@@ -1319,7 +1320,11 @@ const DEKO_OBJEKTE = [
     { id: "vogeltraenke", name: t("Vogeltränke"), sprite: "vogeltraenke", quelle: "erspielt", effekt: "glitzern",
         bedingungText: t("Verscheuche insgesamt 300 Krähen"), bedingung: () => meta.lebenszeit.kraehen >= 300 },
     { id: "schneemann", name: t("Schneemann"), sprite: "schneemann", quelle: "dlc", paket: "unterstuetzer", effekt: "wackeln" },
-    { id: "wetterhahn", name: t("Krähe"), sprite: "kraehe_0", quelle: "dlc", paket: "unterstuetzer", effekt: "kraehe" },
+    { id: "wetterhahn", name: t("Krähe"), sprite: "kraehe_0", quelle: "dlc", paket: "unterstuetzer",
+        ablauf: "000000000000333333000000001100000000440404000000000022022000000000003300" },
+    { id: "heuwagen", name: t("Heuwagen"), sprite: "heuwagen", quelle: "dlc", paket: "unterstuetzer" },
+    { id: "briefkasten", name: t("Briefkasten"), sprite: "briefkasten", quelle: "dlc", paket: "unterstuetzer" },
+    { id: "steinlaterne", name: t("Steinlaterne"), sprite: "steinlaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
     { id: "kuerbislaterne", name: t("Kürbislaterne"), sprite: "kuerbislaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer" },
     { id: "pilzhaus", name: t("Pilzhäuschen"), sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
     { id: "windmuehle", name: t("Windmühle"), sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
@@ -1328,7 +1333,11 @@ const DEKO_OBJEKTE = [
     { id: "feenbrunnen", name: t("Feenbrunnen"), sprite: "brunnen", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
         farben: { T: "#8d6bd6", U: "#b48cff", Q: "#ff9ad5" }, partikel: ["#ff9ad5", "#c9b0f5", "#ffffff"] },
     { id: "leuchtpilze", name: t("Leuchtpilz-Haus"), sprite: "pilzhaus", quelle: "dlc", paket: "einzeln", effekt: "leuchten-blau",
-        farben: { R: "#4a8aff", r: "#2a5ad0", w: "#bff0ff" }, partikel: ["#9fe8ff", "#4a8aff", "#ffffff"] }
+        farben: { R: "#4a8aff", r: "#2a5ad0", w: "#bff0ff" }, partikel: ["#9fe8ff", "#4a8aff", "#ffffff"] },
+    { id: "koiteich", name: t("Koi-Teich"), sprite: "koiteich_0", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
+        ablauf: "01234567" },
+    { id: "gluecksdrache", name: t("Glücksdrache"), sprite: "gluecksdrache_0", quelle: "dlc", paket: "einzeln",
+        ablauf: "0000000000100000000233332000000000100000000000233320000", partikel: ["#ffd84a", "#ff8a2a", "#ff4a4a"] }
 ];
 
 // Musik: "auto" spielt je nach Tageszeit (nur Lieder, die du hast). Die Noten stehen in audio.js (LIEDER).

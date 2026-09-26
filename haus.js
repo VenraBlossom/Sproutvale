@@ -169,6 +169,7 @@ function renderDeko() {
         const sprite = deko.farben ? spriteVariante("deko_" + deko.id, deko.sprite, deko.farben) : deko.sprite;
         const bild = hofSprite(sprite, DEKO_SLOTS[index].x, "deko");
         bild.dataset.deko = deko.id;
+        setzeDekoAblauf(bild, deko);
         if (deko.effekt) bild.classList.add("deko-" + deko.effekt);
         if (deko.partikel) bild.dataset.partikel = deko.partikel.join(",");
         setzeTipp(bild, deko.name);
@@ -233,15 +234,20 @@ function starteZauberfalter(farbe) {
     setTimeout(() => falter.remove(), 16000);
 }
 
-// Kraehe auf dem Pfahl: nur der Vogel bewegt sich, der Pfahl bleibt stehen
-const KRAEHE_ABLAUF = "000000000000333333000000001100000000440404000000000022022000000000003300";
-let kraeheSchritt = 0;
+// Deko mit Bildfolge (Kraehe, Koi-Teich, Gluecksdrache): nur der bewegte Teil aendert sich, der Rest bleibt stehen
+function setzeDekoAblauf(bild, deko) {
+    if (!deko.ablauf) return;
+    bild.dataset.ablauf = deko.ablauf;
+    bild.dataset.bildBasis = deko.sprite.replace(/_0$/, "");
+}
+
+let dekoSchritt = 0;
 setInterval(() => {
     if (document.hidden) return;
-    kraeheSchritt = (kraeheSchritt + 1) % KRAEHE_ABLAUF.length;
-    document.querySelectorAll("img.deko-kraehe").forEach((bild, i) => {
-        const bildName = "kraehe_" + KRAEHE_ABLAUF[(kraeheSchritt + i * 23) % KRAEHE_ABLAUF.length];
-        const url = spriteUrl(bildName);
+    dekoSchritt++;
+    document.querySelectorAll("img[data-ablauf]").forEach((bild, i) => {
+        const ablauf = bild.dataset.ablauf;
+        const url = spriteUrl(bild.dataset.bildBasis + "_" + ablauf[(dekoSchritt + i * 23) % ablauf.length]);
         if (bild.src !== url) bild.src = url;
     });
 }, 240);
@@ -783,6 +789,7 @@ function kosmetikBild(kategorie, eintrag) {
         case "deko":
             setzeSpriteBild(bild, eintrag.farben ? spriteVariante("deko_" + eintrag.id, eintrag.sprite, eintrag.farben) : eintrag.sprite, 3);
             if (eintrag.effekt) bild.classList.add("deko-" + eintrag.effekt);
+            setzeDekoAblauf(bild, eintrag);
             if (eintrag.fluegel) {
                 // Vorschau der Windmuehle: Turm mit drehenden Fluegeln
                 const fluegel = document.createElement("img");
