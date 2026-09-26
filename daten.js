@@ -1287,7 +1287,7 @@ function euro(preis) {
 // Text fuer den Preis eines DLC-Inhalts
 function dlcPreisText(eintrag) {
     if (eintrag.paket === "unterstuetzer") return t("Im ") + DLC_PAKETE.unterstuetzer.name + t(" enthalten");
-    return t("Einzeln ") + euro(eintrag.preis || LEGENDAER_PREIS);
+    return euro(eintrag.preis || LEGENDAER_PREIS);
 }
 
 const KOSMETIK_KATEGORIEN = [
