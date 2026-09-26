@@ -406,6 +406,14 @@ function koopEmpfange(n) {
             }
             koop.partner = { hatEndlos: Boolean(n.hatEndlos) };
             if (koop.rolle === "host") koopSende("lobby", { lobby: koop.lobby });
+            // Laeuft schon ein Endlos-Koop-Spiel, steigt der Neue direkt auf der freien Seite ein
+            if (koop.rolle === "host" && koop.imSpiel && run && run.koop && run.sandbox) {
+                koopSende("start", {
+                    sandbox: true, slot: run.koopSlot, kosmetik: { ...koop.kosmetik }, gastSeite: partnerSeite(),
+                    spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten: null
+                });
+                zeigeToast(t("👥 Dein Mitspieler ist wieder da."));
+            }
             renderKoopLobby();
             break;
         case "lobby":

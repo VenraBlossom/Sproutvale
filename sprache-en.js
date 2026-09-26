@@ -2001,6 +2001,7 @@ Object.assign(UEBERSETZUNG, {
     "Nicht speichern": "Don't save",
     "💾 Alle Koop-Speicherstände sind voll": "💾 All co-op save slots are full",
     "Wähle einen Speicherstand, der mit diesem Koop-Spiel überschrieben wird. Der alte Stand auf diesem Platz geht dabei verloren.": "Choose a save slot to overwrite with this co-op game. The old save in that slot will be lost.",
+    "👥 Dein Mitspieler ist wieder da.": "👥 Your partner is back.",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
