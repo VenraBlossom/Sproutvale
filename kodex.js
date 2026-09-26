@@ -34,7 +34,7 @@ function kodexEintraege(reiter) {
                 text: t("Stufe 1: ") + w.text(werkzeugWertFuer(w, 1)) + t(" Stufe 5: ") + w.text(werkzeugWertFuer(w, 5)), zaehler: t("gekauft") }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
-                text: z.text, zaehler: t("erlebt") }));
+                text: z.text, ohneZaehler: true }));
         case "segen":
             return SEGEN.map(s => ({ bild: { emoji: s.badge }, name: s.name, anzahl: (k.segen || {})[s.id] || 0, text: s.text, zaehler: t("gewählt") }));
         case "boss":
@@ -161,11 +161,11 @@ function renderKodex(inhalt) {
             bild = pixelIcon(e.bild.emoji, 64);
         }
         bild.classList.add("kodex-bild");
-        const karte = el("div", "kodex-karte" + (entdeckt ? "" : t(" unbekannt")), null, [
+        const karte = el("div", "kodex-karte" + (entdeckt ? "" : " unbekannt"), null, [
             el("div", "kodex-bildrahmen", null, [bild]),
             el("div", "kodex-name", entdeckt ? e.name : "???"),
             el("div", "kodex-text", entdeckt ? e.text : t("Noch nicht entdeckt.")),
-            el("div", "kodex-zahl", entdeckt ? zahl(e.anzahl) + t("x ") + e.zaehler : ""),
+            el("div", "kodex-zahl", entdeckt && !e.ohneZaehler ? zahl(e.anzahl) + t("x ") + e.zaehler : ""),
             entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null
         ]);
         raster.appendChild(karte);

@@ -88,7 +88,8 @@ const SPIEL_VERSION = "Alpha 0.5.2";
 
 const KONFIG = {
     startKlicksProSamen: 40,
-    minKlicksProSamen: 8,
+    minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
+    klickWachstum: 0.01,              // ein Klick auf eine wachsende Pflanze: +1% ihrer ganzen Wachstumszeit
     startEnergie: 150,
     energieProSek: 5,
     tageProRechnung: 5,
@@ -123,7 +124,8 @@ const KONFIG = {
     bonusEnergieDeckel: 0.6,          // Extra-Energie (Blitzpflanzen, Kaffee, Gluehwuermchen) hoechstens 60% der Tagesenergie, sonst endet der Tag nie
     streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Saat fallen (nur waehrend eines Tages)
     streichelSperreMs: 350,           // schneller gestreichelt zaehlt nicht (gegen Autoklicker)
-    streichelAnteil: 0.0002,          // Wert einer Streichel-Saat = 0,02% der aktuellen Rechnung (mal Farbe)
+    streichelAnteile: [0.001, 0.002, 0.003, 0.004, 0.005], // Wert einer Streichel-Saat je Farbe: 0,1% bis 0,5% der Rechnung
+    streichelMindestGold: [1, 2, 3, 4, 5],                 // ... aber mindestens so viel Gold
     streichelMaxProTag: 40,           // hoechstens so viele Streichel-Saaten pro Tag: nur Streicheln reicht nie fuer eine Rechnung
     streichelHerzAb: 33333,           // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und es gibt 3-fache Saat
     streichelHerzFaktor: 3,
@@ -237,8 +239,8 @@ const PFLANZEN_UPGRADES = [
     { id: "ertrag", name: t("Ertrag"), basiskosten: 3, faktor: 1.65, max: Infinity, knoten: null,
         beschreibung: t("+25% Verkaufswert. Alle 10 Stufen verdoppelt sich der Wert zusätzlich!"),
         info: pflanze => zahl(verkaufswert(pflanze)) + t(" Gold Grundwert (") + multiText(ertragMulti(pflanze)) + ")" },
-    { id: "wachstum", name: t("Wachstum"), basiskosten: 5, faktor: 1.65, max: 15, knoten: "pw_",
-        beschreibung: t("-8% Wachstumszeit."),
+    { id: "wachstum", name: t("Wachstum"), basiskosten: 5, faktor: 1.45, max: 20, knoten: "pw_",
+        beschreibung: t("-3% Wachstumszeit."),
         info: pflanze => sekText(basisStufenZeitSek(pflanze) * 3) + t(" bis zur Ernte") },
     { id: "pracht", name: t("Prachtexemplar"), basiskosten: 12, faktor: 1.8, max: 15, knoten: "pp_",
         beschreibung: t("+4% Chance, dass die Farbe ihrer Saat 2-mal gewürfelt wird. Die bessere zählt."),
@@ -254,8 +256,8 @@ const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [
 // wenn ihr Stern im Stellarium gekauft ist (knoten).
 
 const SHOP_UPGRADES = [
-    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 2.0, max: 8,
-        beschreibung: t("-3 Klicks pro Samen."),
+    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 6, faktor: 1.6, max: 22,
+        beschreibung: t("-1 Klick pro Samen."),
         info: () => klicksProSamen() + t(" Klicks pro Samen") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,
         beschreibung: t("+25 Energie pro Tag."),
@@ -829,7 +831,7 @@ const SEGEN = [
     { id: "keimkraft", badge: "🌱", name: t("Keimkraft"), text: t("Jedes freie Feld hat zum Tagesstart 12% Chance, schon einen Samen zu haben.") },
     { id: "kompost", badge: "🪱", name: t("Kompost"), text: t("Jedes Feld hat jeden Tag 8% Chance, gedüngt zu sein (doppeltes Gold).") },
     { id: "regenwolke", badge: "🌧️", name: t("Regenwolke"), text: t("Jedes Feld hat jeden Tag 8% Chance, bewässert zu sein (wächst doppelt so schnell).") },
-    { id: "flink", badge: "👐", name: t("Flinke Hände"), text: t("-3 Klicks pro Samen.") },
+    { id: "flink", badge: "👐", name: t("Flinke Hände"), text: t("-2 Klicks pro Samen.") },
     { id: "wissen", badge: "📚", name: t("Wissensdurst"), text: t("+15% Chance, dass eine Sternensaat doppelt zählt.") },
     { id: "glueckspilz", badge: "🍄", name: t("Glückspilz"), text: t("+2% Chance auf epische Saaten.") },
     { id: "wachstum", badge: "🌿", name: t("Wachstumsschub"), text: t("Alle Pflanzen wachsen 10% schneller.") },
@@ -967,7 +969,7 @@ const BOSS_NACH_ID = Object.fromEntries(BOSS_REGELN.map(b => [b.id, b]));
 // preis = Anteil der naechsten Rechnung (in Gold). Verkaufen gibt 40% zurueck.
 
 const HAENDLER_KONFIG = {
-    chance: 0.25,
+    chance: 0.15,
     abTag: 3,
     angebote: 4,                      // immer 4 Angebote, aber nur 1 Kauf pro Besuch
     verkaufsAnteil: 0.4
@@ -1282,9 +1284,10 @@ const KOSMETIK_KATEGORIEN = [
 
 // Hof-Themen: Farben fuer zeichneHof (sprites.js). funkeln = leuchtende Teilchen ueber der Wiese
 const HOF_THEMEN = [
-    { id: "standard", name: t("Sommerhof"), quelle: "frei" },
-    { id: "tropen", name: t("Tropeninsel"), quelle: "erspielt", seltenheit: 2, bedingungText: t("Erreiche Tag 30 in einem Run"),
+    { id: "standard", name: t("Sproutvale"), quelle: "frei" },
+    { id: "tropen", name: t("Tropeninsel"), quelle: "erspielt", bedingungText: t("Erreiche Tag 30 in einem Run"),
         bedingung: () => meta.lebenszeit.maxTag >= 30 },
+    { id: "sommer", name: t("Sommerhof"), quelle: "dlc", paket: "unterstuetzer", falter: ["#ffffff", "#ffd84a", "#ff9a3a"] },
     { id: "herbst", name: t("Herbsthof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "fruehling", name: t("Frühlingshof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "winter", name: t("Winterhof"), quelle: "dlc", paket: "unterstuetzer" },
@@ -1314,7 +1317,8 @@ const DEKO_OBJEKTE = [
     { id: "blumenbogen", name: t("Blumenbogen"), sprite: "blumenbogen", quelle: "dlc", paket: "unterstuetzer" },
     { id: "kuerbisstapel", name: t("Kürbisstapel"), sprite: "kuerbisstapel", quelle: "dlc", paket: "unterstuetzer" },
     { id: "brunnen", name: t("Brunnen"), sprite: "brunnen", quelle: "dlc", paket: "unterstuetzer", effekt: "glitzern" },
-    { id: "laterne", name: t("Gartenlaterne"), sprite: "gartenlaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
+    { id: "laterne", name: t("Gartenlaterne"), sprite: "gartenlaterne", quelle: "erspielt", effekt: "leuchten",
+        bedingungText: t("Fange insgesamt 100 Glühwürmchen"), bedingung: () => meta.lebenszeit.gluehwuermchen >= 100 },
     { id: "bienenstock", name: t("Bienenkorb"), sprite: "bienenstock", quelle: "erspielt", effekt: "bienen",
         bedingungText: t("Ernte insgesamt 50.000 Pflanzen"), bedingung: () => meta.lebenszeit.ernten >= 50000 },
     { id: "vogeltraenke", name: t("Vogeltränke"), sprite: "vogeltraenke", quelle: "erspielt", effekt: "glitzern",
@@ -1330,9 +1334,9 @@ const DEKO_OBJEKTE = [
     { id: "windmuehle", name: t("Windmühle"), sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
     { id: "lagerfeuer", name: t("Lagerfeuer"), sprite: "lagerfeuer", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer",
         partikel: ["#ffd93d", "#ff8a2a", "#ffffff"] },
-    { id: "feenbrunnen", name: t("Feenbrunnen"), sprite: "brunnen", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
+    { id: "feenbrunnen", name: t("Feenbrunnen"), sprite: "brunnen", quelle: "dlc", paket: "unterstuetzer", effekt: "glitzern",
         farben: { T: "#8d6bd6", U: "#b48cff", Q: "#ff9ad5" }, partikel: ["#ff9ad5", "#c9b0f5", "#ffffff"] },
-    { id: "leuchtpilze", name: t("Leuchtpilz-Haus"), sprite: "pilzhaus", quelle: "dlc", paket: "einzeln", effekt: "leuchten-blau",
+    { id: "leuchtpilze", name: t("Leuchtpilz-Haus"), sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten-blau",
         farben: { R: "#4a8aff", r: "#2a5ad0", w: "#bff0ff" }, partikel: ["#9fe8ff", "#4a8aff", "#ffffff"] },
     { id: "koiteich", name: t("Koi-Teich"), sprite: "koiteich_0", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
         ablauf: "01234567" },
@@ -1517,11 +1521,9 @@ const META_UPGRADES = [
     { id: "startsp", name: t("Bauernweisheit"), basiskosten: 2, faktor: 1.5, max: 10,
         beschreibung: t("+60 Sternensamen zu Beginn jedes Runs."), info: lvl => "+" + 60 * lvl + t(" Sternensamen") },
     { id: "startfelder", name: t("Vorbereiteter Boden"), basiskosten: 3, faktor: 2, max: 4,
-        beschreibung: t("+1 Feld zu Beginn jedes Runs."), info: lvl => "+" + lvl + t(" Felder") },
+        beschreibung: t("+1 Feld zu Beginn jedes Runs. Das nächste Feld kostet trotzdem nur 1 Gold."), info: lvl => "+" + lvl + t(" Felder") },
     { id: "ausdauer", name: t("Ausdauer"), basiskosten: 6, faktor: 2.4, max: 4,
         beschreibung: t("+25 Energie pro Tag."), info: lvl => "+" + 25 * lvl + t(" Energie") },
-    { id: "flinkeFinger", name: t("Flinke Finger"), basiskosten: 3, faktor: 1.8, max: 5,
-        beschreibung: t("-2 Klicks pro Samen."), info: lvl => "-" + 2 * lvl + t(" Klicks") },
     { id: "verhandlung", name: t("Verhandlungsgeschick"), basiskosten: 5, faktor: 2.1, max: 5,
         beschreibung: t("Rechnungen kosten 4% weniger."), info: lvl => "-" + 4 * lvl + t("% Rechnungen") },
     { id: "ertrag", name: t("Fruchtbarer Hof"), basiskosten: 4, faktor: 1.45, max: 10,
@@ -1543,8 +1545,6 @@ const META_UPGRADES = [
     { id: "vogelscheuchenlehre", name: t("Vogelscheuchen-Lehre"), basiskosten: 25, faktor: 1, max: 1,
         beschreibung: t("Die Vogelscheuche ist in jedem Run sofort aktiv (ihr Stern im Stellarium ist schon gekauft)."),
         info: lvl => (lvl ? t("Aktiv") : t("Nicht aktiv")) },
-    { id: "segensreich", name: t("Segensreich"), basiskosten: 60, faktor: 1, max: 1,
-        beschreibung: t("Nach jeder Rechnung hast du 4 Segen zur Auswahl statt 3."), info: lvl => (lvl ? t("4 Segen") : t("3 Segen")) },
     { id: "kuschelrabatt", name: t("Kuschel-Rabatt"), basiskosten: 120, faktor: 1, max: 1,
         beschreibung: t("Kuschel-Züge werden nur noch nach jedem 2. Zug um 1 teurer."),
         info: lvl => (lvl ? t("+1 alle 2 Züge") : t("+1 pro Zug")) },
@@ -1577,8 +1577,8 @@ const TAROT = [
         text: f => "+" + prozentText(0.15 * f) + t(" Chance, dass ein Samen einen zweiten mitbringt.") },
     { id: "wagen", nummer: "VII", symbol: "🐎", name: t("Der Wagen"), wert: 25,
         text: f => "+" + aufrunden(25 * f) + t(" Energie pro Tag.") },
-    { id: "kraft", nummer: "VIII", symbol: "🦁", name: t("Die Kraft"), wert: 6,
-        text: f => "-" + aufrunden(6 * f) + t(" Klicks pro Samen.") },
+    { id: "kraft", nummer: "VIII", symbol: "🦁", name: t("Die Kraft"), wert: 1,
+        text: f => "-" + aufrunden(f) + (aufrunden(f) === 1 ? t(" Klick pro Samen.") : t(" Klicks pro Samen.")) },
     { id: "eremit", nummer: "IX", symbol: "🏮", name: t("Der Eremit"), wert: 2,
         text: f => t("Der Igel-Sammler startet jeden Run auf Stufe ") + aufrunden(2 * f) + "." },
     { id: "schicksal", nummer: "X", symbol: "🎡", name: t("Rad des Schicksals"), wert: 0.005,
@@ -1589,8 +1589,8 @@ const TAROT = [
         text: () => t("+1 Platz für Werkzeuge vom Wanderhändler."),
         extra: t("Noch ein Werkzeug-Platz mehr (+2 insgesamt).") },
     { id: "tod", nummer: "XIII", symbol: "💀", name: t("Der Tod"), wert: 1,
-        text: () => t("Fertige Pflanzen werden bei Feierabend automatisch geerntet."),
-        extra: t("Liegengebliebene Saaten werden bei Feierabend auch eingesammelt, statt zu verfallen.") },
+        text: () => t("Liegengebliebene Saaten werden bei Feierabend eingesammelt, statt zu verfallen."),
+        extra: t("Fertige Pflanzen werden bei Feierabend zusätzlich automatisch geerntet und eingesammelt.") },
     { id: "maessigkeit", nummer: "XIV", symbol: "🏺", name: t("Die Mäßigkeit"), wert: 0.5,
         text: f => t("Reißt die Kombo ab, behältst du ") + prozentText(0.5 * f) + t(" davon.") },
     { id: "teufel", nummer: "XV", symbol: "😈", name: t("Der Teufel"), wert: 0.4, nachteil: 0.2,
@@ -1639,7 +1639,7 @@ const KUSCHELTIERE = [
     { id: "teddy", symbol: "🧸", name: t("Teddy Brummi"), raritaet: 0,
         text: s => "+" + 10 * s + t(" Energie pro Tag.") },
     { id: "frosch", symbol: "🐸", name: t("Frosch Quaki"), raritaet: 0,
-        text: s => "-" + s + t(" Klicks pro Samen.") },
+        text: s => t("Bewässerte Felder wachsen ") + 10 * s + t("% schneller.") },
     { id: "maus", symbol: "🐭", name: t("Maus Krümel"), raritaet: 0,
         text: s => "+" + 3 * s + t("% Chance, dass eine Sternensaat doppelt zählt.") },
     { id: "schaf", symbol: "🐑", name: t("Schaf Wolke"), raritaet: 0,

@@ -1405,17 +1405,18 @@ function streichleHaustier(event) {
     }
 }
 
-// Das Haustier laesst eine Saat fallen, die man einsammeln muss. Ihr Wert waechst mit der aktuellen Rechnung,
-// die Farbe wird wie bei einer Ernte gewuerfelt (hoechstens episch). Ab dem 33.333. Streicheln "<3" = 3-fach.
-function streichelBasisWert() {
-    const ziel = run.sandbox ? meilensteinSchwelle(run.meilensteine + 1) - meilensteinSchwelle(run.meilensteine) : naechsteRechnung().betrag;
-    return Math.max(1, ziel * KONFIG.streichelAnteil);
+// Das Haustier laesst eine Saat fallen, die man einsammeln muss. Die Farbe wird wie bei einer Ernte gewuerfelt
+// (dieselben Chancen), ihr Wert ist ein kleiner Anteil der aktuellen Rechnung bzw. des Meilensteins:
+// 0,1% gewoehnlich bis 0,5% legendaer, mit Mindestwert. Ab dem 33.333. Streicheln "<3" = 3-fach.
+function streichelZiel() {
+    return run.sandbox ? meilensteinSchwelle(run.meilensteine + 1) - meilensteinSchwelle(run.meilensteine) : naechsteRechnung().betrag;
 }
 
 function gibStreichelGold() {
     const herz = meta.lebenszeit.streicheln >= KONFIG.streichelHerzAb;
-    const raritaet = Math.min(3, wuerfleRaritaetIndex());
-    const menge = Math.max(1, Math.round(streichelBasisWert() * raritaetsMulti(raritaet) * (herz ? KONFIG.streichelHerzFaktor : 1) *
+    const raritaet = wuerfleRaritaetIndex();
+    const basis = Math.max(KONFIG.streichelMindestGold[raritaet], streichelZiel() * KONFIG.streichelAnteile[raritaet]);
+    const menge = Math.max(1, Math.round(basis * (herz ? KONFIG.streichelHerzFaktor : 1) *
         (1 + 0.25 * kuschel("kuschelkatze")) * (1 + segen("tierfreund"))));
     const rect = haustier.bild.getBoundingClientRect();
     spawnLootKugel(rect.left + rect.width / 2, rect.top + rect.height * 0.6, menge, raritaet, "gold", {

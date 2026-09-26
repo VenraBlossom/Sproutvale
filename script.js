@@ -109,6 +109,9 @@ function leererMetaStand() {
     };
 }
 
+// Upgrades, die es nicht mehr gibt: [Grundkosten, Faktor], damit die Mondblueten zurueckgegeben werden koennen
+const ENTFERNTE_META_UPGRADES = { flinkeFinger: [3, 1.8], segensreich: [60, 1] };
+
 function ladeMeta(schluessel = META_SPEICHER_KEY) {
     try {
         const daten = JSON.parse(localStorage.getItem(schluessel));
@@ -139,6 +142,12 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
             }
             ["sternensamen", "prestige", "offeneSternensamen", "freieSkins", "deko", "haustierSkin", "kuschelZuege"]
                 .forEach(alt => delete stand[alt]);
+            // Entfernte Mondteich-Upgrades: die ausgegebenen Mondblueten gibt es zurueck
+            Object.entries(ENTFERNTE_META_UPGRADES).forEach(([id, [basis, faktor]]) => {
+                const stufe = stand.upgrades[id] || 0;
+                for (let i = 0; i < stufe; i++) stand.mondblueten += kostenMitFaktor(basis, faktor, i);
+                delete stand.upgrades[id];
+            });
             // Nur verbesserte Karten duerfen ausgeruestet sein
             stand.tarotSlots = (Array.isArray(daten.tarotSlots) ? daten.tarotSlots : [])
                 .filter(id => stand.tarotVerbessert.includes(id));
@@ -490,9 +499,8 @@ function glueckBonus() {
 }
 
 function klicksProSamen() {
-    const abzug = 3 * level("aussaat") + 2 * metaLevel("flinkeFinger") + aufrunden(tw("kraft")) + 4 * segen("flink") +
-        kuschel("frosch") + werkzeugWert("saatbeutel") + gachaBonus("klicks");
-    const klicks = Math.max(KONFIG.minKlicksProSamen, KONFIG.startKlicksProSamen - abzug);
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * segen("flink") + gachaBonus("klicks");
+    const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
     return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
 }
 
@@ -616,8 +624,10 @@ function variantenChance(variante) {
 }
 
 function feldKosten() {
-    // 2. Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger)
-    return aufrunden(Math.pow(KONFIG.feldKostenFaktor, run.felder.length - 1) * Math.pow(0.92, level("feldvermessung")) *
+    // Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
+    // Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
+    const gekauft = Math.max(0, run.felder.length - (run.startFelder || 1));
+    return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) *
         Math.pow(0.85, segen("sparsam")));
 }
 
@@ -769,7 +779,7 @@ function wachstumsTempoOhneJahreszeit() {
 }
 
 function basisStufenZeitSek(pflanze) {
-    const mitUpgrade = pflanze.sekProStufe * Math.pow(0.92, pflanze.level.wachstum);
+    const mitUpgrade = pflanze.sekProStufe * Math.pow(0.97, pflanze.level.wachstum);
     return mitUpgrade / wachstumsTempo();
 }
 
@@ -831,7 +841,7 @@ function istSandboxAus(id) {
 function stufenZeitSek(feld) {
     let tempo = feld.variante && feld.variante.tempo || 1;
     const bewaessert = feld.bewaessert || (pflanzenBonus(feld.pflanze, "reis") && !bossIst("duerre"));
-    if (bewaessert) tempo *= (feld.pflanze.eigenschaft === "wasser" ? 3 : 2) * (1 + 0.15 * level("regentonne"));
+    if (bewaessert) tempo *= (feld.pflanze.eigenschaft === "wasser" ? 3 : 2) * (1 + 0.15 * level("regentonne")) * (1 + 0.1 * kuschel("frosch"));
     if (pflanzenBonus(feld.pflanze, "karotte")) tempo *= 1.5;
     if (tagesAnteil() < 0.2) tempo *= 1 + 0.25 * level("morgentau");
     if (feld.pflanze.eigenschaft === "nacht" && istNacht()) tempo *= 2;
@@ -1365,12 +1375,31 @@ function ernteMitCursor(x, y) {
     treffer.forEach(t => {
         if (klickFeld(t.feld)) geerntet += 1;
     });
+    run.felder
+        .filter(feld => !feld.leer && !feld.fertig && !feld.kraehe &&
+            abstandZuRechteck(x, y, feld.el.feldDiv.getBoundingClientRect()) <= radius)
+        .forEach(schubsWachstum);
     if (geerntet >= 2) {
         const farbe = geerntet >= 9 ? "#d9452c" : geerntet >= 4 ? "#e08a00" : "#2e9e2e";
         zeigeSchwebeText(x, y - 24, geerntet + t("x Ernte!"), farbe, geerntet >= 3);
         if (geerntet >= 4) partikel(x, y, ["#ffd93d", "#ffffff", "#a3dc6f"], Math.min(40, 10 + geerntet * 2), 90);
         if (geerntet >= 3) grosseErnteWelle(x, y, geerntet);
     }
+}
+
+// Ein Klick laesst eine wachsende Pflanze ein kleines Stueck weiterwachsen
+function schubsWachstum(feld) {
+    const stufenMs = stufenZeitSek(feld) * 1000;
+    feld.fortschrittMs += stufenMs * 3 * KONFIG.klickWachstum;
+    while (!feld.fertig && feld.fortschrittMs >= stufenMs) {
+        feld.fortschrittMs -= stufenMs;
+        wachseEineStufe(feld);
+    }
+    if (!feld.fertig) setzeWachstumsBalken(feld, stufenMs);
+    const sprite = feld.el.spriteEl;
+    sprite.animate([{ scale: "1 1" }, { scale: "1.08 0.94" }, { scale: "1 1" }], { duration: 160 });
+    const { x, y } = feldMitte(feld);
+    partikel(x, y + 6, ["#a3dc6f", "#6cc24a"], 2, 18);
 }
 
 function feldMitte(feld) {
@@ -2145,6 +2174,21 @@ function zeigeSchwebeText(x, y, text, farbe, gross) {
     setTimeout(() => el.remove(), 1000);
 }
 
+// Belohnung mit Pixel-Symbolen (z.B. Energie und Sternensamen vom Gluehwuermchen): schwebt nach oben und bleibt etwas laenger
+function zeigeBelohnung(x, y, teile) {
+    const box = el("div", "belohnung-schild");
+    teile.filter(Boolean).forEach(([sprite, text]) => {
+        const bild = document.createElement("img");
+        bild.alt = "";
+        setzeSpriteBild(bild, sprite, 3);
+        box.appendChild(el("span", "belohnung-teil", null, [bild, el("b", null, text)]));
+    });
+    box.style.left = x + "px";
+    box.style.top = y + "px";
+    fxLayer.appendChild(box);
+    setTimeout(() => box.remove(), 1700);
+}
+
 function zeigeToast(text) {
     const el = document.createElement("div");
     el.classList.add("toast");
@@ -2178,7 +2222,7 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
         if (laden.drehen) {
             const vx = zielX - startX;
             const vy = zielY - startY - Math.cos(t * Math.PI) * Math.PI * bogen;
-            kugel.style.transform = "rotate(" + (Math.atan2(vy, vx) + Math.PI / 2) + t("rad)");
+            kugel.style.transform = "rotate(" + (Math.atan2(vy, vx) + Math.PI / 2) + "rad)";
         }
         if (laden.spur && ++spurZaehler % 3 === 0) {
             partikel(parseFloat(kugel.style.left), parseFloat(kugel.style.top), laden.spur, 1, 8);
@@ -2447,7 +2491,7 @@ function spawnGluehwuermchen() {
         run.statistik.gluehwuermchen += 1;
         run.gesamt.gluehwuermchen += 1;
         meta.lebenszeit.gluehwuermchen += 1;
-        zeigeSchwebeText(x, y - 16, (plus > 0 ? "+" + Math.round(plus) + " ⚡  " : "") + "+" + zahl(sterne) + " ✨", "#c9a400", false);
+        zeigeBelohnung(x, y - 16, [plus > 0 ? ["blitz", "+" + Math.round(plus)] : null, ["sternensamen", "+" + zahl(sterne)]]);
         partikel(x, y, ["#fff6a0", "#d8ff7a", "#ffffff"], 14, 60);
         Klang.gluehwuermchen();
         aktualisiereEnergieAnzeige();
@@ -2736,7 +2780,7 @@ segenKnopf.addEventListener("click", () => {
 
 function segenAuswahlAnzahl() {
     if (run.mondphase >= 4 && !run.segenBoss) return 3;
-    return (metaLevel("segensreich") > 0 || kuschel("phoenix") > 0 || run.segenBoss) ? 4 : 3;
+    return (kuschel("phoenix") > 0 || run.segenBoss) ? 4 : 3;
 }
 
 // Kurze Sperre nach dem Oeffnen: Wer gerade noch schnell auf den Samenladen klickt, waehlt sonst aus Versehen einen Segen
@@ -3003,13 +3047,13 @@ function beendeTag() {
     meta.lebenszeit.tage += 1;
     haken("tagEnde");
 
-    if (hatTarot("tod")) {
+    if (istVerstaerkt("tod")) {
         run.felder.filter(f => f.fertig && !f.kraehe).forEach(f => ernteFeld(f, true, 1));
     }
 
-    // Feierabend: liegengebliebene Saaten verfallen (ausser mit "Der Gehaengte")
+    // Feierabend: liegengebliebene Saaten verfallen (ausser mit "Der Tod" oder der Vorratskammer)
     [...lootKugeln].forEach(loot => {
-        if (istVerstaerkt("tod") || level("vorratskammer") > 0) sammleEin(loot);
+        if (hatTarot("tod") || level("vorratskammer") > 0) sammleEin(loot);
         else lassVerfallen(loot);
     });
 
@@ -3084,6 +3128,7 @@ function starteNeuenRun(sandbox = false) {
 
     erstelleSlots();
     const startFelder = 1 + metaLevel("startfelder");
+    run.startFelder = startFelder;
     for (let i = 0; i < startFelder; i++) erstelleFeld();
 
     prestigeShop.classList.add("versteckt");

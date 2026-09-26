@@ -1255,6 +1255,9 @@ const SPRITE_ABWANDLUNGEN = {
     baum_zauberwald: { basis: "baum", farben: { G: "#7ad0c0", g: "#3a8a9a", d: "#2a4a7a" } },
     busch_zauberwald: { basis: "busch", farben: { G: "#b48cff", g: "#7a5ad0", d: "#3a2a7a" } },
     gras_zauberwald: { basis: "gras", farben: { h: "#3f8a7a", H: "#4f9a8a", j: "#357a6c", J: "#c9b0f5" } },
+    baum_sommer: { basis: "baum", farben: { G: "#5cc03a", g: "#3a9a2a", d: "#1f6a1a" } },
+    busch_sommer: { basis: "busch", farben: { G: "#6ccc4a", g: "#e8434a", d: "#2f7a2a" } },
+    gras_sommer: { basis: "gras", farben: { h: "#7cc84a", H: "#90d85a", j: "#6ab43e", J: "#ffd84a" } },
     baum_feuerwerk: { basis: "baum", farben: { G: "#ff8a9a", g: "#e8435a", d: "#a82a3a", K: "#4a2a1a" } },
     busch_feuerwerk: { basis: "busch", farben: { G: "#5aa84a", g: "#e8434a", d: "#2f6a2a" } },
     gras_feuerwerk: { basis: "gras", farben: { h: "#6aae4a", H: "#7cbf58", j: "#5a9a3e", J: "#e8434a" } }
@@ -2200,6 +2203,12 @@ const HOF_FARBEN = {
         wiese: ["#86c457", "#9bd66a", "#8ccb5c"], halm: "#6fae45", weg: ["#b08a55", "#c9a46a"],
         blumen: ["#ffffff", "#ffd84a", "#ff8fb1", "#b48cff", "#ff6a5a"], baum: "baum", busch: "busch", sonnenblumen: true
     },
+    sommer: {
+        berge: ["#7aa8e0", "#92bcec"], schnee: "#ffffff", huegel: ["#4f9f3a", "#66b84a"], nadel: ["#2f7a34", "#3b8a40"],
+        wiese: ["#7cc84a", "#90d85a", "#84ce50"], halm: "#5aa83a", weg: ["#c09a60", "#d8b478"],
+        blumen: ["#e8342a", "#ffd84a", "#5a8aff", "#ffffff", "#e8342a", "#ff8a2a"], baum: "baum_sommer", busch: "busch_sommer",
+        sonnenblumen: true, weizenfeld: true
+    },
     herbst: {
         berge: ["#8a8ab8", "#a3a3cc"], schnee: "#f4f8ff", huegel: ["#8f7a2e", "#a8903a"], nadel: ["#4a5a2a", "#5a6b30"],
         wiese: ["#a8ac4a", "#bcc05a", "#aeb452"], halm: "#8a8a3a", weg: ["#a8804a", "#c09a60"],
@@ -2293,16 +2302,16 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     pixel(0, bodenY, F.wiese[1], W, 1);
     for (let y = bodenY + 3; y < zaunOben; y += 4) pixel(0, y, F.wiese[2], W, 2);
 
-    // Erdweg vom Samenladen (unten Mitte) zur Haustuer
     const hausX = Math.round(W * 0.05);
-    const tuerX = hausX + 12;
-    for (let t = 0; t <= 1; t += 0.004) {
-        const x = (1 - t) * (1 - t) * (W / 2) + 2 * (1 - t) * t * (W * 0.42) + t * t * tuerX;
-        const y = (1 - t) * (1 - t) * (H - 2) + 2 * (1 - t) * t * (H - 4) + t * t * (H - 9);
-        const breiteWeg = 2.5 - t * 1.2;
-        for (let dx = -breiteWeg; dx <= breiteWeg; dx++) {
-            pixel(x + dx, y, Math.abs(dx) > breiteWeg - 1 ? F.weg[0] : F.weg[1]);
-        }
+
+    // Sommerhof: goldene Weizenfelder auf den Huegeln hinter der Wiese
+    if (F.weizenfeld) {
+        [[0.34, 0.5], [0.6, 0.9]].forEach(([a, b]) => {
+            for (let x = Math.round(W * a); x < Math.round(W * b); x++) {
+                for (let y = huegel[x] + 1; y < bodenY; y++) pixel(x, y, (x + 2 * y) % 5 === 0 ? "#d4a830" : "#ecc850");
+                pixel(x, huegel[x], x % 2 ? "#f5dc70" : "#e0b440");
+            }
+        });
     }
 
     // Blumen und Grasbueschel (im Winter Schneeglitzer)
