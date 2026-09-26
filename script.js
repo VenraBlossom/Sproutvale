@@ -1163,6 +1163,19 @@ function aktualisiereHimmel(dtMs) {
     fensterLichter.style.opacity = Math.min(klemme((p - 0.6) / 0.25, 0, 1), nachtWeg);
     nachtSchleier.style.opacity = nacht * 0.45;
     wolkenEl.style.filter = "brightness(" + (1 - nacht * 0.55) * (trueb ? 0.75 : 1) + ")";
+
+    // Landschaft "Kosmische Nacht": der Himmel ist immer Nacht (Sterne, Mond, Fensterlichter)
+    if (gewaehlteKosmetik("landschaft").ewigeNacht) {
+        himmelEl.style.background = "linear-gradient(#070620, #1d1450 55%, #3a2170)";
+        himmelEl.style.filter = "";
+        sonneEl.style.opacity = 0;
+        mondEl.style.left = "12%";
+        mondEl.style.top = gipfel + 14 + "px";
+        mondEl.style.opacity = 1;
+        himmelSterne.style.opacity = 1;
+        fensterLichter.style.opacity = 1;
+        wolkenEl.style.filter = "brightness(0.35)";
+    }
 }
 
 function erstelleHimmel() {
@@ -1209,16 +1222,28 @@ function zeichneMenueHintergrund() {
         const g = leinwand.getContext("2d");
         g.imageSmoothingEnabled = false;
 
-        // Himmel wie am Vormittag im Spiel
+        // Himmel wie am Vormittag im Spiel (Kosmische Nacht: Sternenhimmel mit Mond)
+        const nacht = gewaehlteKosmetik("landschaft").ewigeNacht;
         const himmel = g.createLinearGradient(0, 0, 0, hofY + hofH * 0.5);
-        himmel.addColorStop(0, "#5fb0ea");
-        himmel.addColorStop(1, "#cfeefb");
+        himmel.addColorStop(0, nacht ? "#070620" : "#5fb0ea");
+        himmel.addColorStop(1, nacht ? "#3a2170" : "#cfeefb");
         g.fillStyle = himmel;
         g.fillRect(0, 0, W, hofY + hofH);
-        g.drawImage(spriteLeinwand("sonne"), Math.round(W * 0.8), Math.round(H * 0.06));
+        if (nacht) {
+            const zufallsZahl = zufallsGenerator(42);
+            for (let i = 0; i < W * 0.25; i++) {
+                g.fillStyle = zufallsZahl() < 0.7 ? "#fff6d8" : "#c9b0f5";
+                g.fillRect(Math.floor(zufallsZahl() * W), Math.floor(zufallsZahl() * (hofY + hofH * 0.4)), 1, 1);
+            }
+            g.drawImage(spriteLeinwand("mond"), Math.round(W * 0.12), Math.round(H * 0.06));
+        } else {
+            g.drawImage(spriteLeinwand("sonne"), Math.round(W * 0.8), Math.round(H * 0.06));
+        }
         const wolke = spriteLeinwand("wolke");
-        [[0.06, 0.07], [0.3, 0.03], [0.55, 0.1], [0.9, 0.16], [0.72, 0.02]].forEach(([x, y]) =>
-            g.drawImage(wolke, Math.round(W * x), Math.round(H * y)));
+        if (!nacht) {
+            [[0.06, 0.07], [0.3, 0.03], [0.55, 0.1], [0.9, 0.16], [0.72, 0.02]].forEach(([x, y]) =>
+                g.drawImage(wolke, Math.round(W * x), Math.round(H * y)));
+        }
 
         g.drawImage(hofBild, 0, hofY);
 
@@ -1278,6 +1303,17 @@ function zeichneLandschaften() {
         el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
         fensterLichter.appendChild(el);
     });
+    // Kosmische Nacht: Zeiger der grossen Uhr (echte Uhrzeit)
+    hofEbene.querySelectorAll(".hof-uhr").forEach(e => e.remove());
+    if (hofSzene.uhr) {
+        const u = hofSzene.uhr;
+        const uhr = el("div", "hof-uhr", null, [el("div", "uhr-stunde"), el("div", "uhr-minute"), el("div", "uhr-mitte")]);
+        uhr.style.left = (u.x / hofSzene.breite) * 100 + "%";
+        uhr.style.top = (u.y / hofSzene.hoehe) * 100 + "%";
+        uhr.style.setProperty("--radius", (u.r / hofSzene.breite) * kopf.width + "px");
+        hofEbene.appendChild(uhr);
+        stelleHofUhr();
+    }
     // Laternen und Pilze leuchten den ganzen Tag ein wenig, nachts sieht man es staerker
     hofEbene.querySelectorAll(".hof-leuchten").forEach(e => e.remove());
     hofSzene.leuchten.forEach((licht, i) => {
@@ -1295,6 +1331,18 @@ function zeichneLandschaften() {
     letzteHimmelZeit = -1;
     haken("landschaftGezeichnet", hofSzene);
 }
+
+// Stunden- und Minutenzeiger der Uhr in der Kosmischen Nacht auf die aktuelle Uhrzeit stellen
+function stelleHofUhr() {
+    const uhr = hofEbene.querySelector(".hof-uhr");
+    if (!uhr) return;
+    const jetzt = new Date();
+    const minuten = jetzt.getMinutes() + jetzt.getSeconds() / 60;
+    const stunden = (jetzt.getHours() % 12) + minuten / 60;
+    uhr.querySelector(".uhr-stunde").style.rotate = stunden * 30 + "deg";
+    uhr.querySelector(".uhr-minute").style.rotate = minuten * 6 + "deg";
+}
+setInterval(stelleHofUhr, 1000);
 
 let landschaftTimer = null;
 window.addEventListener("resize", () => {
@@ -1852,7 +1900,6 @@ function waehleZielFeld() {
 }
 
 let kassenTextZaehler = 0;
-let sternTextZaehler = 0;
 
 function klickSamenladen(vonHelfer, klickX, klickY) {
     if (run.phase !== "tag") return;
@@ -1889,13 +1936,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
 
     // Jeder eigene Klick, der Fortschritt wirft, gibt Sternensamen (Helfer-Klicks nicht)
     if (!vonHelfer) {
-        const sterne = sternensamenProKlick();
-        gibSternensamen(sterne);
-        sternTextZaehler += sterne;
-        if (run.gesamt.klicks % 5 === 0) {
-            zeigeSchwebeText(klickX - 30, klickY - 30, "+" + zahl(sternTextZaehler) + " ✨", "#4a5fc0", false);
-            sternTextZaehler = 0;
-        }
+        gibSternensamen(sternensamenProKlick());
         zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     }
 

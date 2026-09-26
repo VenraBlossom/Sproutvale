@@ -1330,6 +1330,9 @@ const SPRITE_ABWANDLUNGEN = {
     baum_zauberwald: { basis: "baum", farben: { G: "#7ad0c0", g: "#3a8a9a", d: "#2a4a7a" } },
     busch_zauberwald: { basis: "busch", farben: { G: "#b48cff", g: "#7a5ad0", d: "#3a2a7a" } },
     gras_zauberwald: { basis: "gras", farben: { h: "#3f8a7a", H: "#4f9a8a", j: "#357a6c", J: "#c9b0f5" } },
+    baum_kosmos: { basis: "baum", farben: { G: "#7a6ae0", g: "#4a3aa0", d: "#2a1d68", K: "#3a2a4a" } },
+    busch_kosmos: { basis: "busch", farben: { G: "#4a7ad0", g: "#fff6a0", d: "#1d2a6a" } },
+    gras_kosmos: { basis: "gras", farben: { h: "#2a4070", H: "#304a80", j: "#263c68", J: "#6a7ac0" } },
     baum_sommer: { basis: "baum", farben: { G: "#5cc03a", g: "#3a9a2a", d: "#1f6a1a" } },
     busch_sommer: { basis: "busch", farben: { G: "#6ccc4a", g: "#e8434a", d: "#2f7a2a" } },
     gras_sommer: { basis: "gras", farben: { h: "#7cc84a", H: "#90d85a", j: "#6ab43e", J: "#ffd84a" } },
@@ -2339,6 +2342,12 @@ const HOF_FARBEN = {
         wiese: ["#86c457", "#9bd66a", "#8ccb5c"], halm: "#6fae45", weg: ["#b08a55", "#c9a46a"],
         blumen: ["#ffffff", "#ffd84a", "#ff8fb1", "#b48cff", "#ff6a5a"], baum: "baum", busch: "busch", sonnenblumen: true
     },
+    kosmos: {
+        berge: ["#2a1d5a", "#35257a"], schnee: "#c9b0f5", huegel: ["#1d2a5a", "#27366e"], nadel: ["#141a42", "#1d2560"],
+        wiese: ["#233a6a", "#2b4478", "#26406f"], halm: "#1d3060", weg: ["#3a3f7a", "#4a4f8a"],
+        blumen: ["#fff6a0", "#9fe8ff", "#ff9ad5", "#ffffff", "#c9b0f5"], baum: "baum_kosmos", busch: "busch_kosmos",
+        kosmos: true
+    },
     sommer: {
         berge: ["#7aa8e0", "#92bcec"], schnee: "#ffffff", huegel: ["#4f9f3a", "#66b84a"], nadel: ["#2f7a34", "#3b8a40"],
         wiese: ["#7cc84a", "#90d85a", "#84ce50"], halm: "#5aa83a", weg: ["#c09a60", "#d8b478"],
@@ -2488,9 +2497,62 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         pixel(cx - 1, y - 1, "#ffd84a", 3, 1);
     }
 
+    // Kosmische Nacht: Planet mit Ring am Himmel und ein grosser Uhrturm (die Zeiger kommen als eigenes Element dazu)
+    let uhr = null;
+    if (F.kosmos) {
+        const px = Math.round(W * 0.86);
+        const py = Math.round(bodenY * 0.62);
+        for (let y = -4; y <= 4; y++) {
+            for (let x = -4; x <= 4; x++) {
+                const d = Math.hypot(x, y);
+                if (d <= 4.2) pixel(px + x, py + y, d > 3.3 ? "#6a4aa0" : (x + y < -2 ? "#c9a0f0" : "#9a70d0"));
+            }
+        }
+        for (let x = -7; x <= 7; x++) {
+            const y = Math.round(x * 0.18);
+            if (Math.abs(x) > 3 || y > 0) pixel(px + x, py + y + 1, Math.abs(x) > 5 ? "#e0b060" : "#ffd88a");
+        }
+        leuchten.push({ x: px - 4, y: py - 4, b: 9, h: 9, farbe: "rgba(200, 160, 255, 0.6)" });
+
+        const ux = Math.round(W * 0.585);
+        const r = 7;
+        const mitteY = bodenY - 3;
+        // Turm (Stein), Fenster, Sockel
+        const unten = bodenY + 11;
+        pixel(ux - 6, mitteY, "#2a2f62", 13, unten - mitteY);
+        pixel(ux - 5, mitteY + 1, "#3a3f7a", 11, unten - mitteY - 1);
+        pixel(ux - 1, unten - 5, "#1d1840", 3, 5);
+        pixel(ux - 4, unten - 7, "#ffd35a", 2, 2);
+        pixel(ux + 3, unten - 7, "#ffd35a", 2, 2);
+        leuchten.push({ x: ux - 4, y: unten - 7, b: 9, h: 2, farbe: "rgba(255, 211, 90, 0.8)" });
+        // Spitzdach mit Stern
+        for (let i = 0; i < 5; i++) pixel(ux - 6 + i, mitteY - r - 1 - i, "#4a2a8a", 13 - 2 * i, 1);
+        pixel(ux, mitteY - r - 7, "#fff6a0");
+        pixel(ux - 1, mitteY - r - 6, "#fff6a0", 3, 1);
+        // Zifferblatt: goldener Rand, heller Grund, Striche fuer 12, 3, 6 und 9
+        for (let y = -r - 1; y <= r + 1; y++) {
+            for (let x = -r - 1; x <= r + 1; x++) {
+                const d = Math.hypot(x, y);
+                if (d <= r + 1.2) pixel(ux + x, mitteY + y, d > r + 0.2 ? "#ffd84a" : d > r - 0.7 ? "#c9a030" : "#fff6d8");
+            }
+        }
+        pixel(ux, mitteY - r + 1, "#2a1d5a");
+        pixel(ux, mitteY + r - 1, "#2a1d5a");
+        pixel(ux - r + 1, mitteY, "#2a1d5a");
+        pixel(ux + r - 1, mitteY, "#2a1d5a");
+        leuchten.push({ x: ux - r - 1, y: mitteY - r - 1, b: 2 * r + 3, h: 2 * r + 3, farbe: "rgba(255, 216, 74, 0.55)" });
+        uhr = { x: ux + 0.5, y: mitteY + 0.5, r };
+    }
+
     // Hintere Reihe: Baeume und Buesche am Wiesenrand
-    [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => bild(F.baum, W * bx, bodenY + 6));
-    [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => bild(F.busch, W * bx, bodenY + 8));
+    [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => {
+        if (F.kosmos && Math.abs(bx - 0.585) < 0.05) return; // Platz fuer den Uhrturm
+        bild(F.baum, W * bx, bodenY + 6);
+    });
+    [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => {
+        if (F.kosmos && Math.abs(bx - 0.585) < 0.05) return; // Platz fuer den Uhrturm
+        bild(F.busch, W * bx, bodenY + 8);
+    });
 
     // Gebaeude
     const haus = bild("bauernhaus", hausX, H - 8);
@@ -2507,7 +2569,7 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     bild("heu", scheune.x - 6, H - 13);
     bild("heu", scheune.x + scheune.sprite.width + 2, H - 8);
     bild(F.busch, W * 0.46, H - 7);
-    bild(F.busch, W * 0.55, H - 7);
+    if (!F.kosmos) bild(F.busch, W * 0.55, H - 7);
     if (F.schneeDaecher) {
         // Schnee auf den Daechern
         for (let x = 1; x < 23; x++) pixel(haus.x + x, haus.y + Math.max(1, 8 - Math.min(x, 22 - x)) - 1, "#ffffff");
@@ -2589,7 +2651,8 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         ],
         // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
         haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height },
-        leuchten
+        leuchten,
+        uhr
     };
 }
 

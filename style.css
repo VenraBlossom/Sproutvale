@@ -10023,3 +10023,47 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     display: block;
     margin: 0 auto 8px;
 }
+
+/* ---------- Kosmische Nacht: grosse Uhr mit echter Uhrzeit ---------- */
+.hof-uhr {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.uhr-stunde,
+.uhr-minute {
+    position: absolute;
+    left: -3px;
+    width: 6px;
+    background: #2a1d5a;
+    border-radius: 2px;
+    transform-origin: 50% 100%;
+    box-shadow: 0 0 0 1px rgba(255, 246, 216, 0.4);
+}
+
+.uhr-stunde {
+    height: calc(var(--radius) * 0.55);
+    bottom: 0;
+}
+
+.uhr-minute {
+    left: -2px;
+    width: 4px;
+    height: calc(var(--radius) * 0.85);
+    bottom: 0;
+    background: #6a2a8a;
+}
+
+.uhr-mitte {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 10px;
+    height: 10px;
+    background: #ffd84a;
+    border: 2px solid #2a1d5a;
+    border-radius: 50%;
+}

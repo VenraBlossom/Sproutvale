@@ -356,6 +356,12 @@ setInterval(() => {
     if (thema.feuerwerk && hofEbene.querySelectorAll(".feuerwerk-rakete").length < 2 && Math.random() < 0.16) {
         starteFeuerwerk(thema.feuerwerk);
     }
+    // Kosmische Nacht: Sternschnuppen ueber dem Hof
+    if (thema.sternschnuppen && Math.random() < 0.07) {
+        const kopf = topBar.getBoundingClientRect();
+        miniSchnuppe(kopf.left + kopf.width * (0.1 + Math.random() * 0.8), kopf.top + kopf.height * (0.3 + Math.random() * 0.15),
+            Math.random() < 0.5 ? 1 : -1);
+    }
     if (thema.falter && hofEbene.querySelectorAll(".zauber-falter").length < 2 && Math.random() < 0.05) {
         starteZauberfalter(zufall(thema.falter));
     }
