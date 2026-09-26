@@ -1519,6 +1519,7 @@ function feldTipp(feld) {
     if (eigenschaftText(p)) text += "\n" + eigenschaftText(p);
     if (feld.bewaessert) text += t("\n💧 Bewässert: wächst schneller");
     if (feld.geduengt) text += t("\n🪱 Gedüngt: doppeltes Gold");
+    text += t("\n👆 Anklicken: wächst ein kleines Stück schneller");
     return text;
 }
 
@@ -2692,7 +2693,7 @@ function renderErfolge() {
             item.classList.add("abholbar");
             item.appendChild(el("span", "erfolg-ausruf", "!"));
             if (aktiv) {
-                item.addEventListener("click", () => holeErfolgAb(kette, item));
+                item.addEventListener("pointerdown", () => holeErfolgAb(kette, item));
                 setzeTipp(item, t("Klicken: ") + abholbar + (abholbar === 1 ? t(" Gutschein abholen") : t(" Gutscheine abholen")));
             }
         }

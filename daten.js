@@ -256,7 +256,7 @@ const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [
 // wenn ihr Stern im Stellarium gekauft ist (knoten).
 
 const SHOP_UPGRADES = [
-    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 6, faktor: 1.6, max: 22,
+    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9, max: 22,
         beschreibung: t("-1 Klick pro Samen."),
         info: () => klicksProSamen() + t(" Klicks pro Samen") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,

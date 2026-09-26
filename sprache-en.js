@@ -1826,6 +1826,7 @@ Object.assign(UEBERSETZUNG, {
     " Gutscheine abholen": " claim vouchers",
     "🌟 Goldene Saaten eingesammelt": "🌟 Golden Drops collected",
     "Bewässerte Felder wachsen ": "Watered fields grow ",
+    "\n👆 Anklicken: wächst ein kleines Stück schneller": "\n👆 Click: grows a little faster",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
