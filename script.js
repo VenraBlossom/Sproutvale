@@ -4207,7 +4207,7 @@ function renderSternDetails(def) {
         }
         if (def.max > 1) karte.appendChild(stufenPunkte(lvl, def.max));
     }
-    let knopfText = istMax ? (def.max > 1 ? t("Maximal") : t("Freigeschaltet")) : "✨ " + zahl(kosten);
+    let knopfText = istMax ? (def.max > 1 ? t("Maximal") : t("Freigeschaltet")) : zahl(kosten);
     if (!offen) knopfText = t("🔒 Gesperrt");
     const knopf = el("button", "knopf knopf-gruen stern-karte-kaufen", knopfText);
     knopf.disabled = !(offen && !istMax && darfEinkaufen() && run.skillpunkte >= kosten);

@@ -22,9 +22,9 @@ const KOOP_KONFIG = {
     ice: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
     codeZeichen: "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
     codeLaenge: 6,
-    zustandMs: 200,         // so oft schickt der Host den Zustand
-    sicherungMs: 15000,     // so oft schickt der Host eine Sicherung (falls er das Spiel verlaesst)
-    mondbluetenAnteil: 0.6, // Anteil der Mondblueten fuer jeden Spieler am Run-Ende
+    infoMs: 400,            // so oft wird geprueft, ob sich Gold oder Felder geaendert haben
+    infoSpaetestensMs: 2000, // spaetestens dann wird die Info trotzdem geschickt (Lebenszeichen)
+    stilleMs: 15000,        // so lange ohne Nachricht, dann gilt der Mitspieler als weg
     slots: 3                // Endlos-Speicherstaende im Koop
 };
 
@@ -46,7 +46,6 @@ const koop = {
     lootZiel: null,         // Host: Ernte vom Gast, die Saaten gehen an den Gast
     lootSlot: null,
     naechsteLootId: 1,
-    rechnungSchliesse: null,
     status: ""
 };
 
@@ -168,6 +167,15 @@ function neueVerbindung() {
     pc.onconnectionstatechange = () => {
         if (koop.pc === pc && ["failed", "closed"].includes(pc.connectionState)) koopVerbindungWeg();
     };
+    // Kurz "disconnected" kommt bei wackligem WLAN vor, erst nach 8 Sekunden aufgeben
+    pc.oniceconnectionstatechange = () => {
+        clearTimeout(koop.wackelTimer);
+        if (koop.pc === pc && pc.iceConnectionState === "disconnected") {
+            koop.wackelTimer = setTimeout(() => {
+                if (koop.pc === pc && pc.iceConnectionState === "disconnected") koopVerbindungWeg();
+            }, 8000);
+        }
+    };
     return pc;
 }
 
@@ -175,6 +183,9 @@ function richteKanalEin(kanal) {
     koop.kanal = kanal;
     kanal.onopen = () => {
         koop.verbunden = true;
+        koop.letzteNachricht = performance.now();
+        koop.letzteInfo = "";
+        koop.letzterStand = "";
         koop.status = "";
         // Der Gast braucht den Vermittler nicht mehr (die Verbindung laeuft jetzt direkt)
         if (koop.rolle === "gast" && koop.ws) {
@@ -182,10 +193,10 @@ function richteKanalEin(kanal) {
             koop.ws = null;
         }
         koopSende("hallo", { hatEndlos: hatSandbox(), rolle: koop.rolle, version: SPIEL_VERSION });
-        if (koop.rolle === "host" && koop.imSpiel) koopSendeStart(true);
         renderKoopLobby();
     };
     kanal.onmessage = event => {
+        koop.letzteNachricht = performance.now();
         let nachricht;
         try {
             nachricht = JSON.parse(event.data);
@@ -656,6 +667,11 @@ function koopFragePlatzUeberschreiben() {
 function koopSpeichereRun(daten) {
     if (!run.sandbox) return;
     koopSchreibeStand(daten);
+    // Den Stand nur schicken, wenn er sich geaendert hat (ohne die Uhrzeit)
+    const { gespeichertAm, ...vergleich } = daten;
+    const text = JSON.stringify(vergleich);
+    if (text === koop.letzterStand) return;
+    koop.letzterStand = text;
     koopSende("stand", { daten });
 }
 
@@ -690,9 +706,22 @@ function koopLoescheEigenenRun(endlos, slot) {
 
 // ---------- INFOS FUER DEN MITSPIELER (Gold und Felder, nur zum Ansehen) ----------
 
+// Nur schicken, wenn sich etwas geaendert hat (spaetestens alle 2 Sekunden als Lebenszeichen)
 setInterval(() => {
-    if (!koopAktiv() || !koop.verbunden) return;
-    koopSende("info", {
+    if (!koop.verbunden) return;
+    // Kommt lange nichts mehr an (Spiel abgestuerzt, Internet weg), gilt der Mitspieler als weg
+    if (performance.now() - (koop.letzteNachricht || 0) > KOOP_KONFIG.stilleMs) {
+        koopVerbindungWeg();
+        return;
+    }
+    if (!koopAktiv()) {
+        if (performance.now() - (koop.letzteInfoZeit || 0) > KOOP_KONFIG.infoSpaetestensMs) {
+            koop.letzteInfoZeit = performance.now();
+            koopSende("lebt");
+        }
+        return;
+    }
+    const info = {
         gold: run.gold,
         gesamtGold: run.gesamt.gold,
         tag: run.tag,
@@ -703,17 +732,24 @@ setInterval(() => {
                 slot: feld.slot,
                 bild: feld.leer ? null : feld.stufe === 2 ? unreifSprite(feld.pflanze.id) : feld.stufe < 3 ? STUFEN_SPRITES[feld.stufe] : feld.pflanze.id,
                 fertig: feld.fertig,
-                anteil: feld.leer ? 0 : feld.fertig ? 1 : (feld.stufe + Math.min(1, feld.fortschrittMs / stufenMs)) / 3
+                anteil: feld.leer ? 0 : feld.fertig ? 1 : Math.round((feld.stufe + Math.min(1, feld.fortschrittMs / stufenMs)) / 3 * 50) / 50
             };
         })
-    });
+    };
+    const text = JSON.stringify(info);
+    const jetzt = performance.now();
+    if (text !== koop.letzteInfo || jetzt - (koop.letzteInfoZeit || 0) > KOOP_KONFIG.infoSpaetestensMs) {
+        koop.letzteInfo = text;
+        koop.letzteInfoZeit = jetzt;
+        koopSende("info", info);
+    }
     // eigene Pause melden (Einstellungen oder Hauptmenue offen)
     const pause = !hauptmenue.classList.contains("versteckt") || !einstellungenFenster.classList.contains("versteckt");
     if (pause !== koop.eigenePause) {
         koop.eigenePause = pause;
         koopSende("pause", { an: pause });
     }
-}, 400);
+}, KOOP_KONFIG.infoMs);
 
 function koopEmpfangeInfo(n) {
     koop.partnerGold = n.gold || 0;
