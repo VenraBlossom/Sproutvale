@@ -199,7 +199,7 @@ function verscheucheKraehe(eintrag) {
     meta.lebenszeit.kraehen += 1;
     Klang.fluegelschlag();
     partikel(eintrag.x, eintrag.y, ["#1c1b24", "#3a3a4a", "#ffffff"], 10, 50);
-    spawnLootKugel(eintrag.x, eintrag.y, wuerfleSternWert(KRAEHEN_KONFIG.belohnungSternensamen * (segen("kraehenkoenig") > 0 ? 5 : 1)), null, "stern");
+    spawnLootKugel(eintrag.x, eintrag.y, wuerfleSternWert((KRAEHEN_KONFIG.belohnungSternensamen + 5 * kuschel("biber")) * (segen("kraehenkoenig") > 0 ? 5 : 1)), null, "stern");
     if (hatWerkzeug("feder")) {
         const wert = aufrunden(verkaufswert(bestePflanze()) * werkzeugWert("feder") * goldMulti());
         spawnLootKugel(eintrag.x, eintrag.y, wert, 0);
