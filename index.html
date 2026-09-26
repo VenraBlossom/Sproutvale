@@ -251,6 +251,11 @@
                     <span>📖 Tutorial</span>
                     <button class="knopf" id="tutorial-neu">Neu starten</button>
                 </div>
+                <div class="einstellung versteckt" id="koop-einstellung-zeile">
+                    <span id="koop-einstellung-code">👥 Lobby-Code</span>
+                    <button class="knopf" id="koop-einstellung-kopieren">📋 Kopieren</button>
+                    <button class="knopf" id="koop-einstellung-neu">🔄 Neuer Code</button>
+                </div>
                 <div class="einstellung versteckt" id="endlos-speichern-zeile">
                     <span id="endlos-speichern-text">💾 Endlos speichern</span>
                     <button class="knopf knopf-gruen" id="endlos-speichern">Jetzt speichern</button>
@@ -298,6 +303,33 @@
                 <button class="knopf menue-knopf" id="menue-beenden">🚪 Beenden</button>
             </div>
         </div>
+        <div class="menue-inhalt versteckt" id="menue-art">
+            <div class="menue-schild">Wie willst du spielen?</div>
+            <div class="modus-reihe">
+                <div class="modus-spalte">
+                    <button class="modus-karte art-karte" id="art-solo">
+                        <div class="modus-bild" id="art-solo-bild"></div>
+                        <div class="modus-name">Solo</div>
+                        <div class="modus-text">Story und Endlos, allein auf deinem Hof.</div>
+                        <div class="modus-los">▶ Solo</div>
+                    </button>
+                </div>
+                <div class="modus-spalte">
+                    <button class="modus-karte art-karte" id="art-duo">
+                        <div class="modus-bild" id="art-duo-bild"></div>
+                        <div class="modus-name">Duo</div>
+                        <div class="modus-text">Online mit einem Freund: ein gemeinsamer Hof, jeder spielt eine Seite.</div>
+                        <div class="modus-los">▶ Duo</div>
+                    </button>
+                </div>
+            </div>
+            <button class="knopf menue-knopf" id="art-zurueck">← Zurück</button>
+        </div>
+        <div class="menue-inhalt versteckt" id="menue-koop">
+            <div class="menue-schild">👥 Duo</div>
+            <div id="koop-inhalt"></div>
+            <button class="knopf menue-knopf" id="koop-zurueck">← Zurück</button>
+        </div>
         <div class="menue-inhalt versteckt" id="menue-modi">
             <div class="menue-schild">Wähle deinen Spielmodus</div>
             <div id="menue-guthaben"></div>
@@ -333,6 +365,7 @@
     <script src="effekte.js"></script>
     <script src="kodex.js"></script>
     <script src="tutorial.js"></script>
+    <script src="koop.js"></script>
     <script src="start.js"></script>
 </body>
 </html>

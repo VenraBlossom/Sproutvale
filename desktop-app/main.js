@@ -47,7 +47,10 @@ const SPEICHER_DATEIEN = {
     sproutvale_meta_sandbox_2: ["persistedsavefile_2.json", "fortschritt"],
     sproutvale_sandbox_2: ["persistedsavefile_2.json", "run"],
     sproutvale_meta_sandbox_3: ["persistedsavefile_3.json", "fortschritt"],
-    sproutvale_sandbox_3: ["persistedsavefile_3.json", "run"]
+    sproutvale_sandbox_3: ["persistedsavefile_3.json", "run"],
+    sproutvale_koop_1: ["koop_1.json"],
+    sproutvale_koop_2: ["koop_2.json"],
+    sproutvale_koop_3: ["koop_3.json"]
 };
 
 const SPEICHER_ORDNER = path.join(app.getPath("userData"), "save");
@@ -117,6 +120,7 @@ try {
         "persistedsavefile_1.json  = Endlos, Speicherstand 1 (Fortschritt und Hof)\r\n" +
         "persistedsavefile_2.json  = Endlos, Speicherstand 2\r\n" +
         "persistedsavefile_3.json  = Endlos, Speicherstand 3\r\n" +
+        "koop_1.json bis _3.json   = Endlos im Duo (gemeinsame Speicherstaende)\r\n" +
         "einstellungen.json        = Klang, Anzeige ...\r\n" +
         "kaeufe.dat                = gekaufte Inhalte\r\n", "utf8");
 } catch (fehler) {

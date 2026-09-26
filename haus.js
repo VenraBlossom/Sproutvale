@@ -45,6 +45,12 @@ let kosmetikVorschau = null; // { kategorie, id }
 
 function gewaehlteKosmetik(kategorie) {
     const liste = KOSMETIK_LISTEN[kategorie];
+    // Koop: gemeinsame Skins (standardmaessig die des Leiters, wer zuletzt waehlt, gewinnt)
+    if (typeof koopAktiv === "function" && koopAktiv() && koop.kosmetik && kategorie !== "deko" && koop.kosmetik[kategorie] &&
+        !(kosmetikVorschau && kosmetikVorschau.kategorie === kategorie)) {
+        const eintrag = liste.find(e => e.id === koop.kosmetik[kategorie]);
+        if (eintrag) return eintrag;
+    }
     if (kosmetikVorschau && kosmetikVorschau.kategorie === kategorie && kategorie !== "deko") {
         return liste.find(e => e.id === kosmetikVorschau.id);
     }
@@ -64,9 +70,10 @@ function aktuellerSkin() {
 
 // Deko, die gerade im Hof steht (hoechstens 3, beim Anprobieren ersetzt die Vorschau den letzten Platz)
 function aufgestellteDeko() {
-    const liste = meta.kosmetik.deko
+    const koopDeko = typeof koopAktiv === "function" && koopAktiv() && Array.isArray(koop.kosmetik.deko) ? koop.kosmetik.deko : null;
+    const liste = (koopDeko || meta.kosmetik.deko)
         .map(id => DEKO_OBJEKTE.find(d => d.id === id))
-        .filter(deko => deko && istKosmetikFrei(deko, "deko"));
+        .filter(deko => deko && (koopDeko || istKosmetikFrei(deko, "deko")));
     if (kosmetikVorschau && kosmetikVorschau.kategorie === "deko" && !liste.some(d => d.id === kosmetikVorschau.id)) {
         if (liste.length >= DEKO_MAX) liste.pop();
         liste.push(DEKO_OBJEKTE.find(d => d.id === kosmetikVorschau.id));
@@ -995,6 +1002,8 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
     } else {
         meta.kosmetik[kategorie] = eintrag.id;
     }
+    // Koop: die Wahl gilt auch fuer den Mitspieler
+    if (typeof koopAktiv === "function" && koopAktiv()) koopSetzeKosmetik(kategorie, kategorie === "deko" ? [...meta.kosmetik.deko] : eintrag.id);
     speichereMeta();
     wendeKosmetikAn();
     aktualisiereMusik();

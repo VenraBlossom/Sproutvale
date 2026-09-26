@@ -10203,3 +10203,220 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 #tooltip.tipp-fest {
     box-shadow: 0 0 0 2px var(--holz-dunkel), 0 0 0 5px #ffd93d, 0 6px 14px rgba(0, 0, 0, 0.3);
 }
+
+/* ============================================================
+   KOOP (Duo): Lobby, Pause-Schild, fremde Seite
+   ============================================================ */
+.art-karte .modus-bild {
+    display: flex;
+    justify-content: center;
+}
+
+#koop-inhalt {
+    width: min(720px, 94vw);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    background: rgba(255, 246, 216, 0.95);
+    border: 4px solid var(--holz-dunkel);
+    border-radius: 10px;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+}
+
+.koop-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 3px solid #b8905a;
+    border-radius: 8px;
+}
+
+.koop-karte p {
+    margin: 0;
+}
+
+.koop-zeile,
+.koop-knoepfe {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.koop-knoepfe {
+    justify-content: space-between;
+}
+
+.koop-code-eingabe {
+    flex: 1;
+    font: inherit;
+    font-size: 1.4em;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 6px 10px;
+    border: 3px solid var(--holz-dunkel);
+    border-radius: 6px;
+    background: #fffaf0;
+}
+
+.koop-gross {
+    font-size: 1.1em;
+    padding: 8px 18px;
+}
+
+.koop-klein {
+    padding: 4px 10px;
+    font-size: 0.9em;
+}
+
+.koop-code {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: linear-gradient(#b87a3e, #8a5a2c);
+    border: 3px solid var(--holz-dunkel);
+    border-radius: 8px;
+    color: #fff6dc;
+    text-shadow: 1px 1px 0 #3e2412;
+}
+
+.koop-code-wert {
+    flex: 1;
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+}
+
+.koop-spieler {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.koop-spieler-zeile {
+    padding: 6px 10px;
+    background: rgba(124, 192, 74, 0.25);
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.koop-spieler-zeile.wartet {
+    background: rgba(0, 0, 0, 0.08);
+    font-weight: 400;
+    animation: funkeln 1.6s ease-in-out infinite;
+}
+
+.koop-modi {
+    display: flex;
+    gap: 8px;
+}
+
+.koop-modus {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.6);
+    border: 3px solid #b8905a;
+    border-radius: 8px;
+}
+
+.koop-modus.aktiv {
+    border-color: #2e9e2e;
+    box-shadow: 0 0 8px rgba(46, 158, 46, 0.5);
+    background: rgba(163, 220, 111, 0.35);
+}
+
+.koop-modus:disabled {
+    cursor: default;
+}
+
+.koop-modus.gesperrt {
+    opacity: 0.55;
+}
+
+.koop-status {
+    margin: 0;
+    color: #b8232a;
+    font-weight: 700;
+}
+
+.koop-warte {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Pause-Schild, wenn der andere Spieler pausiert */
+.koop-pause-schild {
+    position: fixed;
+    left: 50%;
+    top: 40%;
+    translate: -50% -50%;
+    z-index: 95;
+    padding: 16px 28px;
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #fff6dc;
+    background: linear-gradient(#b87a3e, #8a5a2c);
+    border: 4px solid var(--holz-dunkel);
+    border-radius: 10px;
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3), 0 0 0 2000px rgba(0, 0, 0, 0.25);
+    text-shadow: 1px 1px 0 #3e2412;
+    pointer-events: none;
+}
+
+/* Kaufkachel des Mitspielers: nur ansehen */
+.kauf-kachel.fremd {
+    opacity: 0.55;
+    filter: grayscale(0.5);
+    cursor: default;
+}
+
+/* Kraehe auf einem Feld (beim Gast als Markierung) */
+.feld.koop-kraehe::before {
+    content: "🐦";
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 1.2em;
+    z-index: 3;
+}
+
+/* Koop: Felder des Mitspielers (nur ansehen) */
+.feld.partner-feld {
+    cursor: default;
+    filter: saturate(0.85);
+}
+
+.feld.partner-feld .feld-sprite {
+    pointer-events: none;
+}
+
+/* Koop: warten auf den Mitspieler (Feierabend, naechster Tag) */
+.koop-warte-schild {
+    position: fixed;
+    left: 50%;
+    top: 22%;
+    translate: -50% 0;
+    z-index: 94;
+    padding: 10px 22px;
+    font-size: 1.15em;
+    font-weight: 700;
+    color: #fff6dc;
+    background: linear-gradient(#5a7ac0, #3a4f8a);
+    border: 4px solid #1d2560;
+    border-radius: 10px;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 0 #1d2560;
+    pointer-events: none;
+    animation: funkeln 2s ease-in-out infinite;
+}

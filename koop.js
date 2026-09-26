@@ -1,0 +1,947 @@
+"use strict";
+
+// ============================================================
+// SPROUTVALE: Online-Koop (Duo)
+// Zwei Spiele verbinden sich direkt (WebRTC-Datenkanal). Zum Finden dient der kostenlose PeerJS-Vermittler
+// (0.peerjs.com): Der Lobby-Code ist die Adresse des Hosts. Kein eigener Server, keine Kosten.
+//
+// Aufteilung:
+// - Jeder spielt sein eigenes Spiel auf seiner Seite des Ackers: eigenes Gold, eigener Markt, eigenes Stellarium,
+//   eigene Segen, eigener Mondteich. Der Host spielt links, der Gast rechts. Die Felder des anderen sieht man nur.
+// - Gemeinsam: Tag und Feierabend (Feierabend, wenn beide keine Energie mehr haben), die Rechnungen (das Gold beider
+//   wird zusammengezaehlt, jeder zahlt seinen Anteil) und in Endlos die Meilensteine (Gold beider zusammen).
+//   Rechnungen und Meilensteine sind im Koop doppelt so teuer.
+// - Skins: standardmaessig die des Hosts, wer zuletzt waehlt, gewinnt. Es gibt einen gemeinsamen Begleiter.
+// - Beide muessen dieselbe Spielversion haben.
+// ============================================================
+
+const KOOP_KONFIG = {
+    server: "wss://0.peerjs.com/peerjs",
+    schluessel: "peerjs",
+    praefix: "sproutvale-v1-",
+    ice: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
+    codeZeichen: "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+    codeLaenge: 6,
+    zustandMs: 200,         // so oft schickt der Host den Zustand
+    sicherungMs: 15000,     // so oft schickt der Host eine Sicherung (falls er das Spiel verlaesst)
+    mondbluetenAnteil: 0.6, // Anteil der Mondblueten fuer jeden Spieler am Run-Ende
+    slots: 3                // Endlos-Speicherstaende im Koop
+};
+
+const koop = {
+    rolle: null,            // "host" | "gast" | null
+    code: null,
+    ws: null,
+    wsTakt: null,
+    pc: null,
+    kanal: null,
+    partnerId: null,
+    verbunden: false,
+    imSpiel: false,
+    partner: null,          // { hatEndlos, meta }
+    lobby: { modus: "story", slot: 1 },
+    kosmetik: {},           // gemeinsame Skins im Koop (ueberschreiben die eigenen, werden nicht gespeichert)
+    partnerPausiert: false,
+    eigenePause: false,
+    lootZiel: null,         // Host: Ernte vom Gast, die Saaten gehen an den Gast
+    lootSlot: null,
+    naechsteLootId: 1,
+    rechnungSchliesse: null,
+    status: ""
+};
+
+function koopAktiv() {
+    return koop.imSpiel && Boolean(run && run.koop);
+}
+function koopHost() {
+    return koopAktiv() && koop.rolle === "host" && koop.verbunden;
+}
+function koopGast() {
+    return koopAktiv() && koop.rolle === "gast";
+}
+// Welche Seite des Ackers gehoert mir? (null = alle, also Solo)
+function eigeneSeite() {
+    if (!koopAktiv()) return null;
+    return koop.seite || (koop.rolle === "gast" ? "rechts" : "links");
+}
+// Seite des Mitspielers (nach einer Uebernahme kann der Host auch rechts spielen)
+function partnerSeite() {
+    return eigeneSeite() === "links" ? "rechts" : "links";
+}
+
+function zufallsCode(laenge = KOOP_KONFIG.codeLaenge) {
+    let code = "";
+    for (let i = 0; i < laenge; i++) code += KOOP_KONFIG.codeZeichen[Math.floor(Math.random() * KOOP_KONFIG.codeZeichen.length)];
+    return code;
+}
+
+// ---------- VERMITTLER (nur zum Finden, danach laeuft alles direkt) ----------
+
+function koopVermittler(id) {
+    return new Promise((erfolg, fehler) => {
+        const token = Math.random().toString(36).slice(2);
+        let ws;
+        try {
+            ws = new WebSocket(KOOP_KONFIG.server + "?key=" + KOOP_KONFIG.schluessel + "&id=" + encodeURIComponent(id) +
+                "&token=" + token + "&version=1.5.4");
+        } catch (e) {
+            fehler(new Error("keine Verbindung"));
+            return;
+        }
+        let offen = false;
+        const zeit = setTimeout(() => {
+            if (!offen) {
+                fehler(new Error("keine Verbindung"));
+                ws.close();
+            }
+        }, 10000);
+        ws.onmessage = event => {
+            let nachricht;
+            try {
+                nachricht = JSON.parse(event.data);
+            } catch (e) {
+                return;
+            }
+            if (nachricht.type === "OPEN") {
+                offen = true;
+                clearTimeout(zeit);
+                erfolg(ws);
+                return;
+            }
+            if (nachricht.type === "ID-TAKEN") {
+                clearTimeout(zeit);
+                fehler(new Error("belegt"));
+                ws.close();
+                return;
+            }
+            if (nachricht.type === "ERROR" && !offen) {
+                clearTimeout(zeit);
+                fehler(new Error("fehler"));
+                return;
+            }
+            koopSignal(nachricht);
+        };
+        ws.onerror = () => {
+            if (!offen) {
+                clearTimeout(zeit);
+                fehler(new Error("keine Verbindung"));
+            }
+        };
+        ws.onclose = () => {
+            if (koop.ws === ws) {
+                koop.ws = null;
+                clearInterval(koop.wsTakt);
+            }
+        };
+    });
+}
+
+// Der Vermittler erwartet die Angaben, die auch die PeerJS-Bibliothek mitschickt
+function koopPaketDaten() {
+    const id = koop.verbindungsId || "dc_sproutvale";
+    return { type: "data", connectionId: id, label: id, reliable: true, serialization: "json", browser: "chrome" };
+}
+
+function koopVermittlerSende(nachricht) {
+    if (koop.ws && koop.ws.readyState === 1) koop.ws.send(JSON.stringify(nachricht));
+}
+
+function setzeVermittler(ws) {
+    if (koop.ws && koop.ws !== ws) koop.ws.close();
+    koop.ws = ws;
+    clearInterval(koop.wsTakt);
+    koop.wsTakt = setInterval(() => koopVermittlerSende({ type: "HEARTBEAT" }), 5000);
+}
+
+// ---------- DIREKTE VERBINDUNG ----------
+
+function neueVerbindung() {
+    if (koop.pc) koop.pc.close();
+    const pc = new RTCPeerConnection({ iceServers: KOOP_KONFIG.ice });
+    koop.pc = pc;
+    koop.wartendeKandidaten = [];
+    pc.onicecandidate = event => {
+        if (event.candidate && koop.partnerId) {
+            koopVermittlerSende({ type: "CANDIDATE", dst: koop.partnerId, payload: { candidate: event.candidate.toJSON(), ...koopPaketDaten() } });
+        }
+    };
+    pc.onconnectionstatechange = () => {
+        if (koop.pc === pc && ["failed", "closed"].includes(pc.connectionState)) koopVerbindungWeg();
+    };
+    return pc;
+}
+
+function richteKanalEin(kanal) {
+    koop.kanal = kanal;
+    kanal.onopen = () => {
+        koop.verbunden = true;
+        koop.status = "";
+        // Der Gast braucht den Vermittler nicht mehr (die Verbindung laeuft jetzt direkt)
+        if (koop.rolle === "gast" && koop.ws) {
+            koop.ws.close();
+            koop.ws = null;
+        }
+        koopSende("hallo", { hatEndlos: hatSandbox(), rolle: koop.rolle, version: SPIEL_VERSION });
+        if (koop.rolle === "host" && koop.imSpiel) koopSendeStart(true);
+        renderKoopLobby();
+    };
+    kanal.onmessage = event => {
+        let nachricht;
+        try {
+            nachricht = JSON.parse(event.data);
+        } catch (e) {
+            return;
+        }
+        koopEmpfange(nachricht);
+    };
+    kanal.onclose = () => koopVerbindungWeg();
+}
+
+async function koopSignal(nachricht) {
+    const payload = nachricht.payload || {};
+    try {
+        if (nachricht.type === "OFFER" && koop.rolle === "host") {
+            if (koop.verbunden) return; // schon ein Mitspieler da
+            koop.partnerId = nachricht.src;
+            const pc = neueVerbindung();
+            pc.ondatachannel = event => richteKanalEin(event.channel);
+            await pc.setRemoteDescription(payload.sdp);
+            const antwort = await pc.createAnswer();
+            await pc.setLocalDescription(antwort);
+            koop.verbindungsId = payload.connectionId || koop.verbindungsId;
+            koopVermittlerSende({ type: "ANSWER", dst: koop.partnerId, payload: { sdp: { type: pc.localDescription.type, sdp: pc.localDescription.sdp }, ...koopPaketDaten() } });
+            koop.wartendeKandidaten.splice(0).forEach(k => pc.addIceCandidate(k).catch(() => {}));
+        } else if (nachricht.type === "ANSWER" && koop.pc) {
+            await koop.pc.setRemoteDescription(payload.sdp);
+            koop.wartendeKandidaten.splice(0).forEach(k => koop.pc.addIceCandidate(k).catch(() => {}));
+        } else if (nachricht.type === "CANDIDATE" && koop.pc && payload.candidate) {
+            if (koop.pc.remoteDescription) await koop.pc.addIceCandidate(payload.candidate);
+            else koop.wartendeKandidaten.push(payload.candidate);
+        } else if (nachricht.type === "EXPIRE" && koop.rolle === "gast" && !koop.verbunden) {
+            koopFehler(t("Lobby nicht gefunden. Stimmt der Code?"));
+        }
+    } catch (e) {
+        console.warn("Koop-Signal", e);
+    }
+}
+
+function koopSende(typ, daten = {}) {
+    if (!koop.kanal || koop.kanal.readyState !== "open") return;
+    try {
+        koop.kanal.send(JSON.stringify({ typ, ...daten }));
+    } catch (e) {
+        console.warn("Koop senden", e);
+    }
+}
+
+// Mitspieler trennen, die Lobby bleibt offen (z.B. bei falscher Version)
+function koopVerbindungTrennen() {
+    if (koop.kanal) {
+        koop.kanal.onclose = null;
+        koop.kanal.close();
+    }
+    if (koop.pc) koop.pc.close();
+    koop.kanal = null;
+    koop.pc = null;
+    koop.verbunden = false;
+    koop.partner = null;
+    renderKoopLobby();
+}
+
+// ---------- LOBBY ----------
+
+async function koopLobbyErstellen() {
+    koopVerlassen(true);
+    koop.rolle = "host";
+    koop.status = t("Lobby wird erstellt …");
+    renderKoopLobby();
+    for (let versuch = 0; versuch < 4; versuch++) {
+        const code = zufallsCode();
+        try {
+            setzeVermittler(await koopVermittler(KOOP_KONFIG.praefix + code));
+            koop.code = code;
+            koop.status = "";
+            renderKoopLobby();
+            return;
+        } catch (e) {
+            if (e.message !== "belegt") break;
+        }
+    }
+    koopFehler(t("Keine Verbindung zum Vermittler. Bist du online?"));
+}
+
+// Neuer Code: der alte verfaellt sofort, ein verbundener Mitspieler bleibt verbunden
+async function koopNeuerCode() {
+    if (koop.rolle !== "host") return;
+    if (koop.ws) koop.ws.close();
+    koop.ws = null;
+    koop.code = null;
+    renderKoopLobby();
+    for (let versuch = 0; versuch < 4; versuch++) {
+        const code = zufallsCode();
+        try {
+            setzeVermittler(await koopVermittler(KOOP_KONFIG.praefix + code));
+            koop.code = code;
+            renderKoopLobby();
+            if (typeof renderEinstellungen === "function" && !einstellungenFenster.classList.contains("versteckt")) renderEinstellungen();
+            return;
+        } catch (e) {
+            if (e.message !== "belegt") break;
+        }
+    }
+    koopFehler(t("Keine Verbindung zum Vermittler. Bist du online?"));
+}
+
+async function koopBeitreten(eingabe) {
+    const code = String(eingabe || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (code.length !== KOOP_KONFIG.codeLaenge) {
+        koopFehler(t("Der Code hat 6 Zeichen."));
+        return;
+    }
+    koopVerlassen(true);
+    koop.rolle = "gast";
+    koop.code = code;
+    koop.status = t("Verbinde …");
+    renderKoopLobby();
+    try {
+        setzeVermittler(await koopVermittler(KOOP_KONFIG.praefix + "g-" + zufallsCode(10)));
+    } catch (e) {
+        koopFehler(t("Keine Verbindung zum Vermittler. Bist du online?"));
+        return;
+    }
+    koop.partnerId = KOOP_KONFIG.praefix + code;
+    const pc = neueVerbindung();
+    richteKanalEin(pc.createDataChannel("sproutvale", { ordered: true }));
+    const angebot = await pc.createOffer();
+    await pc.setLocalDescription(angebot);
+    koop.verbindungsId = "dc_" + zufallsCode(12).toLowerCase();
+    koopVermittlerSende({ type: "OFFER", dst: koop.partnerId, payload: { sdp: { type: pc.localDescription.type, sdp: pc.localDescription.sdp }, ...koopPaketDaten() } });
+    setTimeout(() => {
+        if (koop.rolle === "gast" && !koop.verbunden && koop.code === code) koopFehler(t("Lobby nicht gefunden. Stimmt der Code?"));
+    }, 15000);
+}
+
+function koopFehler(text) {
+    Klang.fehler();
+    zeigeToast("👥 " + text);
+    koop.status = text;
+    if (koop.rolle === "gast" && !koop.verbunden) koopVerlassen(true);
+    renderKoopLobby();
+}
+
+// Lobby verlassen (still = ohne Meldung, z.B. vor einem neuen Versuch)
+function koopVerlassen(still) {
+    if (koop.imSpiel) koopBeendeSpiel(true);
+    koopSende("tschuess");
+    if (koop.kanal) koop.kanal.onclose = null;
+    if (koop.kanal) koop.kanal.close();
+    if (koop.pc) koop.pc.close();
+    if (koop.ws) koop.ws.close();
+    clearInterval(koop.wsTakt);
+    Object.assign(koop, {
+        rolle: null, code: null, ws: null, pc: null, kanal: null, partnerId: null, verbunden: false, imSpiel: false,
+        partner: null, partnerPausiert: false, status: still ? koop.status : ""
+    });
+    zeigePauseSchild();
+    if (!still) renderKoopLobby();
+}
+
+// Verbindung zum Mitspieler ist weg: jeder spielt sein eigenes Spiel weiter
+function koopVerbindungWeg() {
+    if (!koop.verbunden && !koop.kanal) return;
+    const warImSpiel = koop.imSpiel;
+    koop.verbunden = false;
+    koop.kanal = null;
+    koop.partnerPausiert = false;
+    koop.partnerFelder = [];
+    koop.partnerGold = 0;
+    zeigePauseSchild();
+    if (warImSpiel && run) renderPartnerFelder();
+    if (koop.rolle === "host") {
+        if (warImSpiel) zeigeToast(t("👥 Dein Mitspieler hat das Spiel verlassen. Mit dem Lobby-Code kann er wieder beitreten."));
+    } else if (warImSpiel) {
+        // Der Host ist weg: wir werden Host und melden denselben Code wieder an
+        koop.rolle = "host";
+        zeigeToast(t("👑 Der Host hat das Spiel verlassen. Du bist jetzt Host und spielst weiter."));
+        koopMeldeCodeWiederAn(koop.code, 0);
+    } else {
+        zeigeToast(t("👥 Die Verbindung zum Host ist weg."));
+        koopVerlassen(false);
+    }
+    // Wartet man gerade auf den Mitspieler, geht es jetzt allein weiter
+    if (warImSpiel && run) {
+        if (run.koopFertig) koopPruefeFeierabend();
+        if (koop.ichBereit) koopPruefeTagStart();
+    }
+    renderKoopLobby();
+}
+
+// Denselben Code wieder anmelden (der alte Host braucht ein paar Sekunden, bis sein Code frei ist)
+async function koopMeldeCodeWiederAn(code, versuch) {
+    if (koop.rolle !== "host" || !code) return;
+    try {
+        setzeVermittler(await koopVermittler(KOOP_KONFIG.praefix + code));
+        koop.code = code;
+        renderKoopLobby();
+    } catch (e) {
+        if (versuch < 12) setTimeout(() => koopMeldeCodeWiederAn(code, versuch + 1), 4000);
+        else koopNeuerCode();
+    }
+}
+
+// ---------- NACHRICHTEN ----------
+
+function koopEmpfange(n) {
+    switch (n.typ) {
+        case "hallo":
+            // Beide muessen dieselbe Version haben, sonst passt das Spiel nicht zusammen
+            if (koop.rolle === "host" && n.version !== SPIEL_VERSION) {
+                koopSende("falscheVersion", { version: SPIEL_VERSION });
+                setTimeout(() => koopVerbindungTrennen(), 500);
+                return;
+            }
+            koop.partner = { hatEndlos: Boolean(n.hatEndlos) };
+            if (koop.rolle === "host") koopSende("lobby", { lobby: koop.lobby });
+            renderKoopLobby();
+            break;
+        case "lobby":
+            if (koop.rolle === "gast") koop.lobby = n.lobby;
+            renderKoopLobby();
+            break;
+        case "falscheVersion":
+            koopVerlassen(true);
+            koopFehler(tf("Du hast nicht dieselbe Version wie der Host (Host: {0}, du: {1}). Aktualisiert beide auf dieselbe Version.",
+                n.version, SPIEL_VERSION));
+            break;
+        case "tschuess":
+            koopVerbindungWeg();
+            break;
+        case "pause":
+            koop.partnerPausiert = Boolean(n.an);
+            zeigePauseSchild();
+            break;
+        case "kosmetik":
+            koop.kosmetik = n.kosmetik || {};
+            if (run) wendeKosmetikAn();
+            break;
+        case "start":
+            if (koop.rolle === "gast") koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts");
+            break;
+        case "info":
+            koopEmpfangeInfo(n);
+            break;
+        case "wurf":
+            if (koopAktiv()) koopZeigeWurf(n.slot, n.samen);
+            break;
+        case "fertig":
+            koop.partnerFertig = true;
+            koop.partnerGold = n.gold || 0;
+            if (koop.rolle === "host") koopPruefeFeierabend();
+            break;
+        case "feierabend":
+            koop.partnerGold = n.gold || 0;
+            koopFuehreFeierabendAus();
+            break;
+        case "rechnung":
+            koopRechnungEntscheidung(Boolean(n.bezahlen), false);
+            break;
+        case "bereit":
+            koop.partnerBereit = true;
+            if (koop.rolle === "host") koopPruefeTagStart();
+            break;
+        case "tagStart":
+            koopStarteTagGemeinsam();
+            break;
+        case "ende":
+            if (koopAktiv() && run.phase !== "runEnde") {
+                zeigeToast(t("👥 Dein Mitspieler hat den Run beendet."));
+                koopBeendeRunLokal();
+            }
+            break;
+        case "zurLobby":
+            koopZurueckZurLobby(false);
+            break;
+        default:
+            break;
+    }
+}
+
+// ---------- SPIEL STARTEN (jeder spielt sein eigenes Spiel auf seiner Seite) ----------
+
+function koopKannStarten() {
+    return koop.rolle === "host" && koop.verbunden && !(koop.lobby.modus === "endlos" && !hatSandbox());
+}
+
+function koopStarteSpiel() {
+    if (!koopKannStarten()) return;
+    const endlos = koop.lobby.modus === "endlos";
+    const slot = endlos ? koop.lobby.slot : 0;
+    koopSende("start", { sandbox: endlos, slot, kosmetik: { ...meta.kosmetik }, gastSeite: "rechts" });
+    koopStarteEigenesSpiel(endlos, slot, { ...meta.kosmetik }, "links");
+}
+
+// Eigenes Koop-Spiel starten (oder den eigenen Koop-Spielstand weiterspielen)
+function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite) {
+    legeRunBeiseite();
+    wechsleMetaProfil(false);
+    raeumeLootAuf();
+    koop.imSpiel = true;
+    koop.seite = seite;
+    koop.slot = slot;
+    koop.kosmetik = kosmetik;
+    koop.partnerFelder = [];
+    koop.partnerGold = 0;
+    koop.partnerGesamtGold = 0;
+    koop.partnerFertig = false;
+    koop.partnerBereit = false;
+    koop.ichBereit = false;
+    const gespeichert = koopLeseEigenenRun(endlos, slot);
+    run = erstelleRunZustand(endlos);
+    run.koop = true;
+    run.koopSlot = slot;
+    run.slot = 0;
+    erstelleSlots();
+    if (gespeichert) {
+        koopWendeRunDatenAn(gespeichert);
+    } else {
+        run.startFelder = 1 + metaLevel("startfelder");
+        for (let i = 0; i < run.startFelder; i++) erstelleFeld(naechsterSlot(seite));
+        run.pflanzen.slice(1, 1 + metaLevel("saatvorrat")).forEach(p => {
+            p.freigeschaltet = true;
+            run.level["p_" + p.id] = 1;
+        });
+    }
+    hauptmenue.classList.add("versteckt");
+    prestigeShop.classList.add("versteckt");
+    einstellungenFenster.classList.add("versteckt");
+    segenFenster.classList.add("versteckt");
+    haken("runStart");
+    if (endlos) starteTag(true);
+    else zeigeTagesKarte(run.tag === 1 && run.bezahlteRechnungen === 0 ? "start" : "feierabend");
+    wendeKosmetikAn();
+    Klang.start();
+    aktualisiereAlles();
+}
+
+// ---------- EIGENER KOOP-SPIELSTAND ----------
+// Story im Duo: ein Spielstand (fuer den Wiedereinstieg). Endlos im Duo: 3 Speicherstaende. Jeder speichert seine eigene Seite.
+
+function koopRunKey(endlos, slot) {
+    return endlos ? "sproutvale_koop_" + slot : "sproutvale_koop_story";
+}
+
+function koopLeseEigenenRun(endlos, slot) {
+    try {
+        const daten = JSON.parse(localStorage.getItem(koopRunKey(endlos, slot)));
+        return daten && daten.run ? daten : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function koopWendeRunDatenAn(daten) {
+    const { pflanzen, ...rest } = daten.run;
+    Object.assign(run, rest, { koop: true, zielFeld: null, samenUnterwegs: false, klickZaehler: 0, phase: rest.sandbox ? "vorTag" : "vorTag" });
+    (pflanzen || []).forEach(gespeichert => {
+        const pflanze = run.pflanzen.find(p => p.id === gespeichert.id);
+        if (!pflanze) return;
+        pflanze.freigeschaltet = gespeichert.freigeschaltet;
+        pflanze.level = { ...pflanze.level, ...gespeichert.level };
+    });
+    erstelleSlots();
+    run.felder = [];
+    const slots = daten.feldSlots || [];
+    slots.forEach((slot, i) => {
+        erstelleFeld(slot);
+        if (daten.felder && daten.felder[i]) stelleFeldWiederHer(run.felder[i], daten.felder[i]);
+    });
+    if (slots.length === 0) {
+        for (let i = 0; i < Math.max(1, daten.anzahlFelder || 1); i++) erstelleFeld(naechsterSlot(eigeneSeite()));
+    }
+}
+
+function koopLoescheEigenenRun(endlos, slot) {
+    try {
+        localStorage.removeItem(koopRunKey(endlos, slot));
+    } catch (e) {
+        console.warn("Koop-Spielstand", e);
+    }
+}
+
+// ---------- INFOS FUER DEN MITSPIELER (Gold und Felder, nur zum Ansehen) ----------
+
+setInterval(() => {
+    if (!koopAktiv() || !koop.verbunden) return;
+    koopSende("info", {
+        gold: run.gold,
+        gesamtGold: run.gesamt.gold,
+        tag: run.tag,
+        phase: run.phase,
+        felder: run.felder.map(feld => {
+            const stufenMs = feld.leer || feld.fertig ? 1 : stufenZeitSek(feld) * 1000;
+            return {
+                slot: feld.slot,
+                bild: feld.leer ? null : feld.stufe === 2 ? unreifSprite(feld.pflanze.id) : feld.stufe < 3 ? STUFEN_SPRITES[feld.stufe] : feld.pflanze.id,
+                fertig: feld.fertig,
+                anteil: feld.leer ? 0 : feld.fertig ? 1 : (feld.stufe + Math.min(1, feld.fortschrittMs / stufenMs)) / 3
+            };
+        })
+    });
+    // eigene Pause melden (Einstellungen oder Hauptmenue offen)
+    const pause = !hauptmenue.classList.contains("versteckt") || !einstellungenFenster.classList.contains("versteckt");
+    if (pause !== koop.eigenePause) {
+        koop.eigenePause = pause;
+        koopSende("pause", { an: pause });
+    }
+}, 400);
+
+function koopEmpfangeInfo(n) {
+    koop.partnerGold = n.gold || 0;
+    koop.partnerGesamtGold = n.gesamtGold || 0;
+    koop.partnerTag = n.tag;
+    koop.partnerFelder = n.felder || [];
+    if (koopAktiv()) renderPartnerFelder();
+}
+
+// Felder des Mitspielers auf seiner Seite zeigen (anklicken geht nicht)
+function renderPartnerFelder() {
+    const belegt = new Set(koop.partnerFelder.map(f => f.slot));
+    slotEls.forEach((el, i) => {
+        if (el.classList.contains("partner-feld") && !belegt.has(i)) {
+            el.className = "slot";
+            el.innerHTML = "";
+        }
+    });
+    koop.partnerFelder.forEach(f => {
+        const el = slotEls[f.slot];
+        if (!el || run.felder.some(eigen => eigen.slot === f.slot)) return;
+        if (!el.classList.contains("partner-feld")) {
+            el.className = "slot feld partner-feld";
+            el.innerHTML = '<img class="feld-sprite" alt="" draggable="false"><div class="fortschritt-aussen"><div class="fortschritt-innen"></div></div>';
+            setzeTipp(el, t("Feld deines Mitspielers"));
+        }
+        const bild = el.querySelector(".feld-sprite");
+        if (f.bild) {
+            const url = spriteUrl(pflanzenSkinSprite(f.bild));
+            if (bild.dataset.bild !== f.bild) {
+                bild.dataset.bild = f.bild;
+                bild.src = url;
+            }
+            bild.hidden = false;
+        } else {
+            bild.hidden = true;
+            bild.dataset.bild = "";
+        }
+        el.classList.toggle("feld-leer", !f.bild);
+        el.classList.toggle("feld-fertig", Boolean(f.fertig));
+        el.querySelector(".fortschritt-innen").style.width = Math.round(f.anteil * 100) + "%";
+    });
+}
+
+// Wurf des Mitspielers: Samen fliegen vom Samenladen auf seine Seite
+function koopZeigeWurf(slot, samen) {
+    const el = slotEls[slot];
+    if (!el) return;
+    const ziel = el.getBoundingClientRect();
+    const knopf = plantButton.getBoundingClientRect();
+    spawnWurfKugel(knopf.left + knopf.width / 2, knopf.top + knopf.height * 0.45, ziel.left + ziel.width / 2, ziel.top + ziel.height / 2, samen, () => {});
+}
+
+// ---------- FEIERABEND: erst wenn beide keine Energie mehr haben ----------
+
+function koopMeldeFertig() {
+    if (run.koopFertig) return;
+    run.koopFertig = true;
+    koopSende("fertig", { gold: run.gold });
+    zeigeWarteSchild(t("🌙 Feierabend! Warte auf deinen Mitspieler …"));
+    if (koop.rolle === "host") koopPruefeFeierabend();
+}
+
+function koopPruefeFeierabend() {
+    if (!run.koopFertig || (koop.verbunden && !koop.partnerFertig)) return;
+    koopSende("feierabend", { gold: run.gold });
+    koopFuehreFeierabendAus();
+}
+
+function koopFuehreFeierabendAus() {
+    if (!run.koopFertig && run.phase !== "tag") return;
+    run.koopFertig = false;
+    koop.partnerFertig = false;
+    zeigeWarteSchild(null);
+    beendeTag();
+}
+
+// Rechnung: Gold beider zusammen. Wer zuerst entscheidet, entscheidet fuer beide.
+function koopRechnungEntscheidung(bezahlen, selbst) {
+    if (!koopAktiv() || !run.rechnungOffen) return;
+    if (selbst) koopSende("rechnung", { bezahlen });
+    document.querySelectorAll(".rechnung-frage").forEach(fenster => {
+        const huelle = fenster.closest(".popup-huelle");
+        if (huelle) huelle.remove();
+    });
+    run.rechnungOffen = false;
+    if (bezahlen) {
+        if (bezahleRechnungen()) schliesseFeierabendAb();
+    } else {
+        run.tag += 1;
+        beendeRun(0, true);
+    }
+}
+
+// Naechster Tag: startet, wenn beide bereit sind
+function koopBereit() {
+    if (koop.ichBereit) return;
+    koop.ichBereit = true;
+    koopSende("bereit");
+    zeigeWarteSchild(t("☀️ Bereit! Warte auf deinen Mitspieler …"));
+    if (koop.rolle === "host") koopPruefeTagStart();
+}
+
+function koopPruefeTagStart() {
+    if (!koop.ichBereit || (koop.verbunden && !koop.partnerBereit)) return;
+    koopSende("tagStart");
+    koopStarteTagGemeinsam();
+}
+
+function koopStarteTagGemeinsam() {
+    koop.ichBereit = false;
+    koop.partnerBereit = false;
+    zeigeWarteSchild(null);
+    koop.tagStartFrei = true;
+    starteTag();
+    koop.tagStartFrei = false;
+}
+
+// Run beenden (einer beendet, beide sind fertig)
+function koopBeendeRunLokal() {
+    if (run.phase === "runEnde") return;
+    run.rechnungOffen = false;
+    document.querySelectorAll(".rechnung-frage").forEach(fenster => {
+        const huelle = fenster.closest(".popup-huelle");
+        if (huelle) huelle.remove();
+    });
+    zeigeWarteSchild(null);
+    beendeRun(0, true);
+}
+
+// ---------- ZURUECK IN DIE LOBBY ----------
+
+function koopZurueckZurLobby(melden) {
+    if (melden) koopSende("zurLobby");
+    koopBeendeSpiel(true);
+    zeigeHauptmenue();
+    zeigeMenueSeite("koop");
+}
+
+function koopBeendeSpiel(ladeSolo) {
+    if (!koop.imSpiel) return;
+    if (run && run.koop && run.phase !== "runEnde") speichereRun();
+    koop.imSpiel = false;
+    koop.partnerPausiert = false;
+    koop.kosmetik = {};
+    koop.partnerFelder = [];
+    raeumeLootAuf();
+    segenFenster.classList.add("versteckt");
+    zeigePauseSchild();
+    zeigeWarteSchild(null);
+    if (ladeSolo) {
+        speichernGesperrt = true;
+        const endlos = meta.letzterModus === "sandbox" && hatSandbox();
+        if (!ladeRun(endlos) && !(endlos && ladeRun(false))) starteNeuenRun(false);
+        speichernGesperrt = false;
+        wendeKosmetikAn();
+    }
+}
+
+// ---------- SCHILDER: Pause des Mitspielers und Warten ----------
+
+function zeigePauseSchild() {
+    let schild = document.getElementById("koop-pause");
+    const zeigen = koopAktiv() && koop.partnerPausiert;
+    if (!zeigen) {
+        if (schild) schild.remove();
+        return;
+    }
+    if (!schild) {
+        schild = el("div", "koop-pause-schild", t("⏸ Der andere Spieler hat das Spiel pausiert"));
+        schild.id = "koop-pause";
+        document.body.appendChild(schild);
+    }
+}
+
+function zeigeWarteSchild(text) {
+    let schild = document.getElementById("koop-warten");
+    if (!text) {
+        if (schild) schild.remove();
+        return;
+    }
+    if (!schild) {
+        schild = el("div", "koop-warte-schild");
+        schild.id = "koop-warten";
+        document.body.appendChild(schild);
+    }
+    schild.textContent = text;
+}
+
+// ---------- KOSMETIK IM KOOP ----------
+
+function koopSetzeKosmetik(kategorie, wert) {
+    if (!koopAktiv()) return;
+    koop.kosmetik = { ...koop.kosmetik, [kategorie]: wert };
+    koopSende("kosmetik", { kosmetik: koop.kosmetik });
+}
+
+// ---------- OBERFLAECHE: SOLO/DUO UND LOBBY ----------
+
+function renderKoopLobby() {
+    const seite = $("menue-koop");
+    if (!seite || seite.classList.contains("versteckt")) return;
+    const inhalt = $("koop-inhalt");
+    inhalt.innerHTML = "";
+
+    if (!koop.rolle) {
+        // Noch keine Lobby: erstellen oder beitreten
+        const erstellen = el("button", "knopf knopf-gruen koop-gross", t("➕ Lobby erstellen"));
+        erstellen.addEventListener("click", koopLobbyErstellen);
+        const eingabe = document.createElement("input");
+        eingabe.className = "koop-code-eingabe";
+        eingabe.maxLength = 7;
+        eingabe.placeholder = t("Code");
+        eingabe.autocomplete = "off";
+        const beitreten = el("button", "knopf koop-gross", t("🚪 Beitreten"));
+        beitreten.addEventListener("click", () => koopBeitreten(eingabe.value));
+        eingabe.addEventListener("keydown", event => {
+            if (event.key === "Enter") koopBeitreten(eingabe.value);
+        });
+        inhalt.append(
+            el("div", "koop-karte", null, [el("b", null, t("Neue Lobby")), el("p", null, t("Du bist Host und wählst den Modus. Gib deinem Freund den Code.")), erstellen]),
+            el("div", "koop-karte", null, [el("b", null, t("Einer Lobby beitreten")), el("p", null, t("Gib den Code ein, den dir dein Freund gegeben hat.")),
+                el("div", "koop-zeile", null, [eingabe, beitreten])])
+        );
+        if (koop.status) inhalt.appendChild(el("p", "koop-status", koop.status));
+        return;
+    }
+
+    const host = koop.rolle === "host";
+    // Waehrend eines Koop-Spiels (ueber das Hauptmenue hierher gekommen)
+    if (koop.imSpiel) {
+        const zurueck = el("button", "knopf knopf-gruen koop-gross", t("▶ Zurück ins Spiel"));
+        zurueck.addEventListener("click", () => {
+            hauptmenue.classList.add("versteckt");
+            aktualisiereAlles();
+        });
+        const ende = el("button", "knopf knopf-rot", host ? t("🏳️ Koop-Spiel beenden") : t("🚪 Koop-Spiel verlassen"));
+        ende.addEventListener("click", () => (host ? koopZurueckZurLobby(true) : koopVerlassen(false)));
+        inhalt.appendChild(el("div", "koop-knoepfe", null, [ende, zurueck]));
+    }
+    // Code
+    const codeZeile = el("div", "koop-code", null, [
+        el("span", "koop-code-titel", t("Lobby-Code")),
+        el("span", "koop-code-wert", koop.code || "…")
+    ]);
+    if (koop.code) {
+        const kopieren = el("button", "knopf koop-klein", t("📋 Kopieren"));
+        kopieren.addEventListener("click", () => {
+            navigator.clipboard && navigator.clipboard.writeText(koop.code);
+            zeigeToast(t("📋 Code kopiert: ") + koop.code);
+        });
+        codeZeile.appendChild(kopieren);
+    }
+    if (host) {
+        const neu = el("button", "knopf koop-klein", t("🔄 Neuer Code"));
+        setzeTipp(neu, t("Der alte Code verfällt sofort. Ein verbundener Mitspieler bleibt in der Lobby."));
+        neu.addEventListener("click", koopNeuerCode);
+        codeZeile.appendChild(neu);
+    }
+    inhalt.appendChild(codeZeile);
+
+    // Spieler
+    inhalt.appendChild(el("div", "koop-spieler", null, [
+        el("div", "koop-spieler-zeile", (host ? t("👑 Du (Host)") : t("🙂 Du"))),
+        el("div", "koop-spieler-zeile" + (koop.verbunden ? "" : " wartet"),
+            koop.verbunden ? (host ? t("🙂 Mitspieler: verbunden") : t("👑 Host: verbunden"))
+                : host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"))
+    ]));
+
+    // Modus
+    const modi = el("div", "koop-modi");
+    [["story", t("🌾 Story"), t("Immer ein neuer Run. Alle 5 Tage kommt eine gemeinsame Rechnung.")],
+        ["endlos", t("♾️ Endlos"), t("Keine Rechnungen, keine Energie. 3 gemeinsame Speicherstände.")]].forEach(([id, name, text]) => {
+        const gesperrt = id === "endlos" && host && !hatSandbox();
+        const karte = el("button", "koop-modus" + (koop.lobby.modus === id ? " aktiv" : "") + (gesperrt ? " gesperrt" : ""), null, [
+            el("b", null, name), el("span", null, gesperrt ? t("🔒 Der Host braucht Endlos freigeschaltet.") : text)
+        ]);
+        karte.disabled = !host || gesperrt;
+        karte.addEventListener("click", () => {
+            koop.lobby = { ...koop.lobby, modus: id };
+            koopSende("lobby", { lobby: koop.lobby });
+            Klang.klick(8);
+            renderKoopLobby();
+        });
+        modi.appendChild(karte);
+    });
+    inhalt.appendChild(modi);
+
+    // Endlos: gemeinsame Speicherstaende
+    if (koop.lobby.modus === "endlos") {
+        const liste = el("div", "endlos-slots koop-slots");
+        for (let slot = 1; slot <= KOOP_KONFIG.slots; slot++) {
+            const daten = koopLeseEigenenRun(true, slot);
+            const r = daten && daten.run;
+            const zeile = el("div", "endlos-slot" + (koop.lobby.slot === slot ? " aktiv" : ""), null, [
+                el("div", "endlos-slot-text", null, [
+                    el("b", null, t("Koop-Speicherstand ") + slot),
+                    el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold") : t("Leer"))
+                ])
+            ]);
+            if (host) {
+                const waehlen = el("button", "knopf knopf-gruen", koop.lobby.slot === slot ? t("✔ Gewählt") : r ? t("Wählen") : t("+ Neu"));
+                waehlen.addEventListener("click", () => {
+                    koop.lobby = { ...koop.lobby, slot };
+                    koopSende("lobby", { lobby: koop.lobby });
+                    renderKoopLobby();
+                });
+                zeile.appendChild(waehlen);
+                if (r) {
+                    const weg = el("button", "knopf knopf-rot endlos-slot-loeschen", "🗑️");
+                    setzeTipp(weg, t("Speicherstand löschen"));
+                    weg.addEventListener("click", () => {
+                        koopLoescheEigenenRun(true, slot);
+                        renderKoopLobby();
+                    });
+                    zeile.appendChild(weg);
+                }
+            }
+            liste.appendChild(zeile);
+        }
+        inhalt.appendChild(liste);
+    }
+
+    // Knoepfe
+    const knoepfe = el("div", "koop-knoepfe");
+    const verlassen = el("button", "knopf knopf-rot", t("🚪 Lobby verlassen"));
+    verlassen.addEventListener("click", () => koopVerlassen(false));
+    knoepfe.appendChild(verlassen);
+    if (host) {
+        const start = el("button", "knopf knopf-gruen koop-gross", t("▶ Spiel starten"));
+        start.disabled = !koopKannStarten();
+        if (!koop.verbunden) setzeTipp(start, t("Warte, bis dein Mitspieler verbunden ist."));
+        start.addEventListener("click", koopStarteSpiel);
+        knoepfe.appendChild(start);
+    } else {
+        knoepfe.appendChild(el("span", "koop-warte", t("⏳ Der Host startet das Spiel.")));
+    }
+    inhalt.appendChild(knoepfe);
+}
+
+// Eintrag in den Einstellungen: Lobby-Code waehrend des Spiels (anzeigen, kopieren, neu)
+function renderKoopEinstellung() {
+    const zeile = $("koop-einstellung-zeile");
+    if (!zeile) return;
+    const aktiv = Boolean(koop.rolle);
+    zeile.classList.toggle("versteckt", !aktiv);
+    if (!aktiv) return;
+    $("koop-einstellung-code").textContent = t("👥 Lobby-Code: ") + (koop.code || "…") +
+        (koop.verbunden ? t(" · Mitspieler verbunden") : t(" · Mitspieler nicht da"));
+    $("koop-einstellung-neu").classList.toggle("versteckt", koop.rolle !== "host");
+}

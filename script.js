@@ -646,10 +646,12 @@ function variantenChance(variante) {
     return chance;
 }
 
-function feldKosten() {
+function feldKosten(seite = eigeneSeite()) {
     // Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
     // Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
-    const gekauft = Math.max(0, run.felder.length - (run.startFelder || 1));
+    // Im Koop hat jede Seite ihre eigene Preisleiter.
+    const felder = seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length;
+    const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
         Math.pow(0.85, segen("sparsam")));
 }
@@ -662,7 +664,7 @@ function rechnungsBetrag(nummer) {
     const extra = phase >= 5 ? 3 : 0;
     let betrag = KONFIG.rechnungBasis;
     for (let i = 0; i < nummer; i++) betrag *= (KONFIG.rechnungFaktorenStart[i] || KONFIG.rechnungFaktor) + extra;
-    return aufrunden(betrag * faktor);
+    return aufrunden(betrag * faktor * (run && run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
 function naechsterRechnungsTag() {
@@ -693,6 +695,9 @@ function tageText(anzahl) {
 // Jede Schwelle, an der im normalen Run eine Rechnung faellig waere, ist ein Meilenstein (Summe aller Rechnungen bis dahin).
 // Meilensteine geben einen Segen und beim Sandbox-Prestige Mondblueten (weniger als ein normaler Run).
 
+// Im Koop sind Rechnungen und Meilensteine doppelt so teuer (dafuer zaehlt das Gold beider)
+const KOOP_ANFORDERUNG = 2;
+
 function meilensteinSchwelle(nummer) {
     let summe = 0;
     for (let i = 0; i < nummer; i++) {
@@ -700,12 +705,17 @@ function meilensteinSchwelle(nummer) {
         for (let j = 0; j < i; j++) betrag *= KONFIG.rechnungFaktorenStart[j] || KONFIG.rechnungFaktor;
         summe += betrag;
     }
-    return summe;
+    return summe * (run && run.koop ? KOOP_ANFORDERUNG : 1);
+}
+
+// Verdientes Gold fuer die Meilensteine (im Koop: beide zusammen)
+function meilensteinGold() {
+    return run.gesamt.gold + (run.koop && typeof koop !== "undefined" ? koop.partnerGesamtGold || 0 : 0);
 }
 
 function erreichteMeilensteine() {
     let anzahl = 0;
-    while (run.gesamt.gold >= meilensteinSchwelle(anzahl + 1)) anzahl++;
+    while (meilensteinGold() >= meilensteinSchwelle(anzahl + 1)) anzahl++;
     return anzahl;
 }
 
@@ -1369,9 +1379,20 @@ function erstelleSlots() {
     });
 }
 
-function erstelleFeld() {
+// Seite eines Feldes ("links" oder "rechts" vom Samenladen)
+function feldSeite(feld) {
+    return FELD_POSITIONEN[feld.slot].links ? "links" : "rechts";
+}
+
+// Naechster freier Platz (seite = null: egal welche Seite, sonst nur diese Seite)
+function naechsterSlot(seite) {
+    const belegt = new Set(run.felder.map(f => f.slot));
+    return FELD_POSITIONEN.findIndex((pos, i) => !belegt.has(i) && (!seite || (seite === "links") === pos.links));
+}
+
+function erstelleFeld(slot = naechsterSlot(null)) {
     const index = run.felder.length;
-    const feldDiv = slotEls[index];
+    const feldDiv = slotEls[slot];
     feldDiv.className = "slot feld feld-leer";
     feldDiv.innerHTML = "";
     delete feldDiv.dataset.tipp;
@@ -1396,7 +1417,7 @@ function erstelleFeld() {
     feldDiv.append(varianteEl, markerEl, spriteEl, nameEl, balkenAussen);
 
     run.felder.push({
-        index, pflanze: null, variante: null, stufe: 0, fortschrittMs: 0, fertig: false, leer: true,
+        index, slot, pflanze: null, variante: null, stufe: 0, fortschrittMs: 0, fertig: false, leer: true,
         reserviert: false, ernteKlicksRest: 0, bewaessert: false, geduengt: false,
         el: { feldDiv, varianteEl, markerEl, spriteEl, nameEl, balkenInnen }
     });
@@ -1408,7 +1429,8 @@ fieldGrid.addEventListener("pointerdown", event => {
     if (event.button !== 0 || spielPausiert()) return;
     if (event.target.closest("#marktstand")) return;
     const slot = event.target.closest(".slot");
-    const kaufKachel = slot && Number(slot.dataset.index) === run.felder.length;
+    // Kaufkachel der eigenen Seite (Solo: die eine Kaufkachel)
+    const kaufKachel = slot && Number(slot.dataset.index) === naechsterSlot(eigeneSeite());
     if (run.phase === "tag" && !(run.sandbox && kaufKachel)) {
         ernteMitCursor(event.clientX, event.clientY);
         return;
@@ -1424,8 +1446,9 @@ function abstandZuRechteck(x, y, rect) {
 
 function ernteMitCursor(x, y) {
     const radius = sammelRadius();
+    const seite = eigeneSeite();
     const treffer = run.felder
-        .filter(feld => feld.fertig)
+        .filter(feld => feld.fertig && (!seite || feldSeite(feld) === seite))
         .map(feld => ({ feld, abstand: abstandZuRechteck(x, y, feld.el.feldDiv.getBoundingClientRect()) }))
         .filter(t => t.abstand <= radius)
         .sort((a, b) => a.abstand - b.abstand);
@@ -1497,19 +1520,32 @@ function kaufeFeld() {
     aktualisiereAlles();
 }
 
+// Kaufkachel(n): Solo eine, im Koop eine pro Seite (die des Mitspielers nur zum Ansehen)
 function aktualisiereKaufKachel() {
-    const el = slotEls[run.felder.length];
-    if (!el) return;
-
-    if (!el.classList.contains("kauf-kachel")) {
-        el.classList.add("feld", "kauf-kachel");
-        el.innerHTML = '<div class="kauf-schild"><div class="kauf-plus">+</div><div class="kauf-preis"></div></div>';
-    }
-    const kosten = feldKosten();
-    el.querySelector(".kauf-preis").textContent = zahl(kosten) + t(" Gold");
-    el.classList.toggle("gesperrt", !darfEinkaufen() || run.gold < kosten);
-    el.classList.toggle("leistbar", darfEinkaufen() && run.gold >= kosten);
-    setzeTipp(el, darfEinkaufen() ? t("Neues Feld kaufen") : t("Felder kaufst du zwischen den Tagen"));
+    const seiten = koopAktiv() ? [eigeneSeite()] : [null];
+    const kacheln = seiten.map(seite => ({ seite, slot: naechsterSlot(seite) })).filter(k => k.slot >= 0);
+    slotEls.forEach((el, i) => {
+        if (el.classList.contains("kauf-kachel") && !kacheln.some(k => k.slot === i)) {
+            el.className = "slot";
+            el.innerHTML = "";
+            delete el.dataset.tipp;
+        }
+    });
+    kacheln.forEach(({ seite, slot }) => {
+        const el = slotEls[slot];
+        if (!el.classList.contains("kauf-kachel")) {
+            el.classList.add("feld", "kauf-kachel");
+            el.innerHTML = '<div class="kauf-schild"><div class="kauf-plus">+</div><div class="kauf-preis"></div></div>';
+        }
+        const eigene = !koopAktiv() || seite === eigeneSeite();
+        const kosten = feldKosten(seite);
+        el.querySelector(".kauf-preis").textContent = zahl(kosten) + t(" Gold");
+        el.classList.toggle("fremd", !eigene);
+        el.classList.toggle("gesperrt", !eigene || !darfEinkaufen() || run.gold < kosten);
+        el.classList.toggle("leistbar", eigene && darfEinkaufen() && run.gold >= kosten);
+        setzeTipp(el, !eigene ? t("Feld deines Mitspielers (kauft er selbst)")
+            : darfEinkaufen() ? t("Neues Feld kaufen") : t("Felder kaufst du zwischen den Tagen"));
+    });
 }
 
 function setzeVariantenKlasse(feld, variante) {
@@ -1650,9 +1686,9 @@ function aktualisiereWachstum(dtMs) {
 
 // Nachbarn auf derselben Seite des Weges
 function nachbarFelder(feld) {
-    const pos = FELD_POSITIONEN[feld.index];
+    const pos = FELD_POSITIONEN[feld.slot];
     return run.felder.filter(anderes => {
-        const p = FELD_POSITIONEN[anderes.index];
+        const p = FELD_POSITIONEN[anderes.slot];
         return anderes !== feld && p.links === pos.links &&
             Math.max(Math.abs(p.spalte - pos.spalte), Math.abs(p.zeile - pos.zeile)) === 1;
     });
@@ -1894,7 +1930,8 @@ function gibSternensamen(menge) {
 
 function waehleZielFeld() {
     if (run.zielFeld) return run.zielFeld;
-    const freie = run.felder.filter(f => f.leer && !f.reserviert);
+    const seite = eigeneSeite();
+    const freie = run.felder.filter(f => f.leer && !f.reserviert && (!seite || feldSeite(f) === seite));
     if (freie.length === 0) return null;
 
     const feld = zufall(freie);
@@ -1910,7 +1947,8 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     if (run.phase !== "tag") return;
 
     // Sind alle Felder belegt, passiert nichts: auch die Kombo laeuft nicht weiter
-    const allesBelegt = !run.zielFeld && !run.samenUnterwegs && !run.felder.some(f => f.leer && !f.reserviert);
+    const seite = eigeneSeite();
+    const allesBelegt = !run.zielFeld && !run.samenUnterwegs && !run.felder.some(f => f.leer && !f.reserviert && (!seite || feldSeite(f) === seite));
     if (allesBelegt) return;
 
     if (!vonHelfer) {
@@ -1965,6 +2003,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     const knopfRect = plantButton.getBoundingClientRect();
     const { x: zielX, y: zielY } = feldMitte(zielFeld);
     const runId = run.id;
+    if (koopAktiv()) koopSende("wurf", { slot: zielFeld.slot, samen: wirdSamen });
 
     spawnWurfKugel(knopfRect.left + knopfRect.width / 2, knopfRect.top + knopfRect.height * 0.45, zielX, zielY, wirdSamen, () => {
         // Kein Tag-Vergleich: in der Sandbox kann waehrend des Flugs ein neuer Tag beginnen (sonst hing der Laden fest)
@@ -1984,7 +2023,8 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
 
 // Doppelwurf: ein zweiter Samen fliegt vom Samenladen auf ein anderes, noch freies Feld
 function wirfZweitenSamen() {
-    const frei = run.felder.filter(f => f.leer && !f.reserviert);
+    const seite = eigeneSeite();
+    const frei = run.felder.filter(f => f.leer && !f.reserviert && (!seite || feldSeite(f) === seite));
     if (frei.length === 0) return;
     const feld = zufall(frei);
     feld.reserviert = true;
@@ -3023,7 +3063,10 @@ function aktualisiereEnergie(dtMs) {
     }
     run.energie = Math.max(0, run.energie - KONFIG.energieProSek * dtMs / 1000);
     aktualisiereEnergieAnzeige();
-    if (run.energie <= 0) beendeTag();
+    if (run.energie <= 0) {
+        if (koopAktiv()) koopMeldeFertig();
+        else beendeTag();
+    }
 }
 
 function verteileFeldEffekte() {
@@ -3039,6 +3082,10 @@ function verteileFeldEffekte() {
 
 // fortsetzen = true: eine gespeicherte Sandbox laeuft weiter (ohne Start-Klang)
 function starteTag(fortsetzen = false) {
+    if (koopAktiv() && !run.sandbox && !koop.tagStartFrei && run.phase === "vorTag" && !run.segenAuswahl && !run.rechnungOffen) {
+        koopBereit();
+        return;
+    }
     if (run.phase !== "vorTag" || (run.segenAuswahl && !run.sandbox) || run.rechnungOffen) return;
 
     run.phase = "tag";
@@ -3154,9 +3201,9 @@ function bezahleRechnungen() {
     const faellig = run.gnadenRechnung || (run.tag % KONFIG.tageProRechnung === 0 ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
     if (faellig === 0) return true;
 
-    if (run.gold >= faellig) {
+    if (koopGesamtGold() >= faellig) {
         const warBoss = istBossRechnung(run.bezahlteRechnungen);
-        run.gold -= faellig;
+        run.gold -= koopEigenerAnteil(faellig);
         run.bezahlteRechnungen += 1;
         meta.lebenszeit.rechnungen += 1;
         run.gnadenRechnung = 0;
@@ -3246,7 +3293,7 @@ function beendeTag() {
     // Rechnung faellig und genug Gold: der Spieler entscheidet (bezahlen oder den Run beenden).
     // Reicht das Gold nicht, endet der Run wie gewohnt (bzw. greift die Gerechtigkeit).
     const faellig = faelligeRechnung();
-    if (faellig > 0 && run.gold >= faellig) {
+    if (faellig > 0 && koopGesamtGold() >= faellig) {
         run.rechnungOffen = true;
         speichereMeta();
         aktualisiereAlles();
@@ -3267,6 +3314,18 @@ function schliesseFeierabendAb() {
 }
 
 // Betrag, der heute Abend faellig ist (0 = keine Rechnung)
+// Gold fuer die Rechnung: im Koop das Gold beider zusammen
+function koopGesamtGold() {
+    return run.gold + (run.koop && typeof koop !== "undefined" ? koop.partnerGold || 0 : 0);
+}
+
+// Wie viel von der Rechnung ich zahle (im Koop: im Verhaeltnis zum eigenen Gold)
+function koopEigenerAnteil(betrag) {
+    if (!run.koop) return betrag;
+    const summe = koopGesamtGold();
+    return Math.min(run.gold, Math.round(betrag * (summe > 0 ? run.gold / summe : 0.5)));
+}
+
 function faelligeRechnung() {
     if (run.sandbox) return 0;
     return run.gnadenRechnung || (run.tag % KONFIG.tageProRechnung === 0 ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
@@ -3288,16 +3347,20 @@ function zeigeRechnungsFrage() {
         klasse: "rechnung-frage",
         inhalt: el("div", null, null, [
             el("p", "rechnung-betrag", zahl(faellig) + t(" Gold")),
-            el("p", null, t("Du hast ") + zahl(run.gold) + t(" Gold. Bezahlst du, geht es mit der Segen-Auswahl weiter.")),
+            el("p", null, run.koop
+                ? t("Ihr habt zusammen ") + zahl(koopGesamtGold()) + t(" Gold (du: ") + zahl(run.gold) + t("). Jeder zahlt seinen Anteil, dann wählt jeder seinen Segen.")
+                : t("Du hast ") + zahl(run.gold) + t(" Gold. Bezahlst du, geht es mit der Segen-Auswahl weiter.")),
             el("p", "rechnung-klein", t("Oder du beendest den Run jetzt und bekommst +") + zahl(mondbluetenJetzt()) + t(" Mondblüten."))
         ]),
         knoepfe: [
             { text: t("🏳️ Run beenden"), klasse: "knopf-rot", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
+                if (run.koop) return koopRechnungEntscheidung(false, true);
                 run.rechnungOffen = false;
                 run.tag += 1; // der heutige Tag zaehlt als gespielt
                 beendeRun(0, true);
             } },
             { text: kredit ? t("🏦 Kredit bezahlen") : t("🧾 Rechnung bezahlen"), klasse: "knopf-gruen", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
+                if (run.koop) return koopRechnungEntscheidung(true, true);
                 run.rechnungOffen = false;
                 if (bezahleRechnungen()) schliesseFeierabendAb();
             } }
@@ -4177,6 +4240,7 @@ function imHauptmenue() {
 }
 
 function spielPausiert() {
+    if (typeof koopAktiv === "function" && koopAktiv() && (koop.partnerPausiert || run.koopFertig)) return true;
     return !hauptmenue.classList.contains("versteckt") || !einstellungenFenster.classList.contains("versteckt") ||
         (run && run.phase === "tag" && !segenFenster.classList.contains("versteckt"));
 }
@@ -4191,9 +4255,32 @@ function zeigeHauptmenue() {
 
 function zeigeMenueSeite(seite) {
     $("menue-start").classList.toggle("versteckt", seite !== "start");
+    $("menue-art").classList.toggle("versteckt", seite !== "art");
+    $("menue-koop").classList.toggle("versteckt", seite !== "koop");
     $("menue-modi").classList.toggle("versteckt", seite !== "modi");
     if (seite === "modi") renderModusKarten();
+    if (seite === "koop") renderKoopLobby();
 }
+
+// Spielen: erst Solo oder Duo
+$("art-solo-bild").appendChild(pixelIcon("👤", 96));
+$("art-duo-bild").appendChild(pixelIcon("👥", 96));
+$("art-solo").addEventListener("click", () => {
+    Klang.klick(10);
+    zeigeMenueSeite("modi");
+});
+$("art-duo").addEventListener("click", () => {
+    Klang.klick(10);
+    zeigeMenueSeite("koop");
+});
+$("art-zurueck").addEventListener("click", () => zeigeMenueSeite("start"));
+$("koop-zurueck").addEventListener("click", () => zeigeMenueSeite("art"));
+$("koop-einstellung-kopieren").addEventListener("click", () => {
+    if (!koop.code) return;
+    if (navigator.clipboard) navigator.clipboard.writeText(koop.code);
+    zeigeToast(t("📋 Code kopiert: ") + koop.code);
+});
+$("koop-einstellung-neu").addEventListener("click", () => koopNeuerCode());
 
 function menueSeiteModiOffen() {
     return !hauptmenue.classList.contains("versteckt") && !$("menue-modi").classList.contains("versteckt");
@@ -4299,6 +4386,8 @@ function renderModusKarten() {
 }
 
 function spieleModus(sandbox) {
+    // Aus einem Koop-Spiel heraus: erst das Koop-Spiel verlassen
+    if (typeof koop !== "undefined" && koop.imSpiel) koopVerlassen(false);
     if (sandbox && !hatSandbox()) {
         Klang.fehler();
         zeigeToast(t("🔒 Endlos kaufst du im Mondteich (Reiter Spielmodi) für ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten."));
@@ -4415,6 +4504,7 @@ function renderEinstellungen() {
     document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
         ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
+    if (typeof renderKoopEinstellung === "function") renderKoopEinstellung();
     // Endlos: von Hand speichern (gespeichert wird ausserdem automatisch)
     const endlosAktiv = run && run.sandbox && run.phase !== "runEnde";
     $("endlos-speichern-zeile").classList.toggle("versteckt", !endlosAktiv);
@@ -4489,11 +4579,11 @@ function loescheSpielstand() {
 
 menueSpielen.addEventListener("click", () => {
     Klang.klick(20);
-    zeigeMenueSeite("modi");
+    zeigeMenueSeite("art");
 });
 $("menue-zurueck").addEventListener("click", () => {
     Klang.klick(10);
-    zeigeMenueSeite("start");
+    zeigeMenueSeite("art");
 });
 $("menue-einstellungen").addEventListener("click", () => oeffneEinstellungen(true));
 $("menue-beenden").addEventListener("click", () => {
@@ -4756,12 +4846,16 @@ karteAufgeben.addEventListener("click", () => {
         ]),
         knoepfe: [
             { text: t("Weiterspielen"), klasse: "knopf-gruen" },
-            { text: t("🏳️ Run beenden"), klasse: "knopf-rot", aktion: () => beendeRun(0, true) }
+            { text: t("🏳️ Run beenden"), klasse: "knopf-rot", aktion: () => {
+                if (run.koop) koopSende("ende");
+                beendeRun(0, true);
+            } }
         ]
     });
 });
 // Neuer Run (bzw. frisch vorbereiteter Tag 1) uebernimmt alle Upgrades, Tarotkarten und ausgeruesteten Karten
-prestigeWeiter.addEventListener("click", () => starteNeuenRun(run.sandbox)); // gleicher Modus wie zuletzt
+// gleicher Modus wie zuletzt (im Koop: zurueck in die Lobby, der Host startet den naechsten Run)
+prestigeWeiter.addEventListener("click", () => (run.koop ? koopZurueckZurLobby(false) : starteNeuenRun(run.sandbox)));
 
 // Sandbox-Prestige: kleines Fenster, dann beginnt die Sandbox von vorn (ueber den Mondteich)
 function frageNeuanfang() {
@@ -4844,12 +4938,13 @@ function speichereRun() {
     const daten = {
         version: RUN_SPEICHER_VERSION,
         anzahlFelder: felder.length,
+        feldSlots: felder.map(f => f.slot),
         felder: run.sandbox ? felder.map(feldStand) : null,
         gespeichertAm: Date.now(),
         run: { ...rest, pflanzen: pflanzen.map(p => ({ id: p.id, freigeschaltet: p.freigeschaltet, level: p.level })) }
     };
     try {
-        localStorage.setItem(runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
+        localStorage.setItem(run.koop ? koopRunKey(run.sandbox, run.koopSlot) : runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
         if (run.sandbox) letzteSandboxSicherung = performance.now();
     } catch (fehler) {
         console.warn(t("Run konnte nicht gespeichert werden"), fehler);
@@ -5085,7 +5180,10 @@ registriereHaken("anzeige", () => {
     clearTimeout(runSpeicherTimer);
     runSpeicherTimer = setTimeout(speichereRun, 300);
 });
-registriereHaken("runEnde", () => loescheRunSpeicher(run.sandbox, run.slot || 1));
+registriereHaken("runEnde", () => {
+    if (run.koop) koopLoescheEigenenRun(run.sandbox, run.koopSlot);
+    else loescheRunSpeicher(run.sandbox, run.slot || 1);
+});
 // Die Sandbox zusaetzlich alle 20 Sekunden sichern (falls das Spiel abstuerzt)
 setInterval(() => {
     if (run && run.sandbox && run.phase === "tag" && !spielPausiert()) speichereRun();
