@@ -752,7 +752,8 @@ const HAUSTIER_EFFEKTE = {
     funkeln: { abstandMs: 700, symbol: "✨", klasse: "effekt-symbol" },
     flammen: { abstandMs: 3500, symbol: "🔥", klasse: "effekt-symbol" },
     sterne: { abstandMs: 800, symbol: "⭐", klasse: "effekt-symbol" },
-    schnee: { abstandMs: 700, symbol: "❄️", klasse: "effekt-symbol" }
+    schnee: { abstandMs: 700, symbol: "❄️", klasse: "effekt-symbol" },
+    bloecke: { abstandMs: 900, symbol: "🟫", klasse: "effekt-symbol" }
 };
 let haustierEffektMs = 0;
 let haustierIdleMs = 6000;
@@ -781,6 +782,20 @@ function haustierAtem(farben, anzahl) {
 
 // Eigene Animationen der legendaeren Haustiere (kommen alle paar Sekunden, wenn das Tier ruht)
 const HAUSTIER_IDLE = {
+    // Blockmensch: haut dreimal auf den Boden, Bloecke splittern, am Ende ein kleiner Freudensprung
+    block: () => {
+        const rect = haustier.bild.getBoundingClientRect();
+        const x = rect.left + rect.width * (haustier.richtung < 0 ? 0.2 : 0.8);
+        const y = rect.bottom - 6;
+        [0, 260, 520].forEach((versatz, i) => setTimeout(() => {
+            haustier.bild.animate([{ rotate: "0deg" }, { rotate: (haustier.richtung < 0 ? -8 : 8) + "deg" }, { rotate: "0deg" }],
+                { duration: 220, easing: "ease-out" });
+            partikel(x, y, ["#8a5a2c", "#5fb03c", "#9aa0a8", "#6b3f1d"], i === 2 ? 16 : 7, i === 2 ? 55 : 30);
+            Klang.blockLaut(i === 2);
+        }, versatz));
+        setTimeout(() => haustier.bild.animate([{ translate: "0 0" }, { translate: "0 -14px" }, { translate: "0 0" }],
+            { duration: 380, easing: "ease-out" }), 820);
+    },
     feuer: () => { haustierAtem(["#ffd93d", "#ff8a2a", "#e8434a"], 18); Klang.plinkoNagel(1); },
     frost: () => { haustierAtem(["#ffffff", "#bff0ff", "#5aa9e6"], 18); Klang.plinkoNagel(6); },
     teufel: () => {
@@ -1371,7 +1386,8 @@ function haustierFreutSich() {
 
 function haustierLaut() {
     const skin = aktuellerSkin();
-    if (skin.laut === "wuff") Klang.wuff(skin.stimme || 1);
+    if (skin.laut === "block") Klang.blockLaut();
+    else if (skin.laut === "wuff") Klang.wuff(skin.stimme || 1);
     else if (skin.laut === "blubb" || skin.art === "manta") Klang.blubb();
     else Klang.miau(skin.stimme || 1);
 }
@@ -1507,6 +1523,7 @@ function futterSymbol() {
     if (stil.fuchs) return "🍗";
     if (stil.drache) return "🌶️";
     if (skin.art === "maedchen") return "🍰";
+    if (skin.art === "blockmensch") return "🍎";
     return "🐟";
 }
 

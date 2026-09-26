@@ -1198,6 +1198,10 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#ffc98a", 2: "#f0923a", 3: "#c0601a", 4: "#fff4e2", 5: "#2e1a09", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "kuerbiskatze", name: t("Kürbiskatze"), art: "katze", stil: { kuerbishut: true }, quelle: "dlc", paket: "unterstuetzer",
         farben: { 1: "#4a4a5a", 2: "#2e2e38", 3: "#1c1c24", 4: "#55556a", 5: "#f08a24", 6: "#ff9aa8", 7: "#0b0b10" } },
+    // Blockmensch im Skin von BastiGHG (mit Erlaubnis): Kloetzchen-Figur mit Hoodie, baut ab und zu Bloecke ab
+    { id: "basti", name: t("Blockbauer Basti"), art: "blockmensch", laut: "block", quelle: "dlc", paket: "unterstuetzer",
+        idle: "block", effekt: "bloecke",
+        farben: { 1: "#26262c", 2: "#4a2e1a", 3: "#2c3550", 4: "#e6b088", 5: "#3a6ad0", 6: "#7a3ab0", 7: "#140c1a", 8: "#55287e" } },
 
     // ----- Legendaer (einzeln, mit Effekten) -----
     { id: "axolotl", name: t("Axolotl Blubbi"), art: "katze", stil: { axolotl: true, keineStreifen: true }, laut: "blubb",

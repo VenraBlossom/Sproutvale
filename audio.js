@@ -619,6 +619,15 @@ const Klang = {
             this.rauschStoss(jetzt + versatz, 0.07, 0.08, 900, this.sfxBus, 0.05, "bandpass");
         });
     },
+    // Blockmensch: dumpfes "Tock" wie ein Block, der abgebaut wird (gross = der Block bricht)
+    blockLaut(gross = false) {
+        if (!this.bereit()) return;
+        const jetzt = this.ctx.currentTime;
+        const h = 0.9 + Math.random() * 0.2;
+        this.plopp(jetzt, 220 * h, 140 * h, 0.07, gross ? 0.32 : 0.22, "square");
+        this.rauschStoss(jetzt, 0.05, gross ? 0.1 : 0.06, 1200, this.sfxBus, 0.04, "bandpass");
+        if (gross) this.plopp(jetzt + 0.08, 160 * h, 90 * h, 0.1, 0.25, "square");
+    },
     // Mantarochen/Axolotl/Pinguin: weiches, blubberndes Glucksen
     blubb() {
         if (!this.bereit()) return;

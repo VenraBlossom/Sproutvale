@@ -2185,6 +2185,69 @@ function mantaRaster(pose, bild, blinzelt) {
     return p.raster;
 }
 
+// Blockmensch (Kloetzchen-Stil, von der Seite): eckiger Kopf, Hoodie, Hose, Schuhe. Arme und Beine schwingen beim Laufen.
+// Farben: 1 Schuhe, 2 Haare, 3 Hose, 4 Haut, 5 Augen, 6 Hoodie, 7 Umriss, 8 Hoodie dunkel (Aermel hinten)
+function blockKopf(p, x, y, geschlossen) {
+    // 6x6 Wuerfel: Haare oben und hinten, Gesicht nach rechts
+    p.rechteck(x, y, 6, 6, "4");
+    p.rechteck(x, y, 6, 2, "2");
+    p.rechteck(x, y, 2, 4, "2");
+    p.punkt(x + 5, y + 2, "2");
+    if (geschlossen) {
+        p.punkt(x + 4, y + 3, "7");
+    } else {
+        p.punkt(x + 3, y + 3, "w");
+        p.punkt(x + 4, y + 3, "5");
+    }
+    p.punkt(x + 4, y + 5, "7");
+    p.punkt(x + 5, y + 5, "7");
+}
+
+function blockmenschRaster(pose, bild, blinzelt) {
+    const p = pixelRaster();
+    const geschlossen = blinzelt || pose === "schlafen";
+
+    if (pose === "stehen" || pose === "laufen") {
+        const schritt = pose === "laufen" ? bild : -1;
+        const schwung = schritt < 0 ? 0 : [2, 0, -2, 0][schritt];
+        const wippen = schritt === 1 || schritt === 3 ? -1 : 0;
+        // hinteres Bein und hinterer Arm (dunkler)
+        p.rechteck(11 - schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
+        p.rechteck(11 - schwung / 2, 14, 2, 1, "1");
+        p.rechteck(11 - schwung, 7 + wippen, 2, 4, "8");
+        // Koerper (Hoodie) mit Bauchtasche
+        p.rechteck(10, 7 + wippen, 4, 4, "6");
+        p.rechteck(11, 9 + wippen, 3, 1, "8");
+        // vorderes Bein
+        p.rechteck(11 + schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
+        p.rechteck(11 + schwung / 2, 14, 2, 1, "1");
+        // vorderer Arm mit Hand
+        p.rechteck(11 + schwung, 7 + wippen, 2, 3, "6");
+        p.rechteck(11 + schwung, 10 + wippen, 2, 1, "4");
+        blockKopf(p, 9, 1 + wippen, geschlossen);
+    } else if (pose === "sitzen") {
+        // Beine nach vorne, Haende auf den Knien
+        p.rechteck(10, 9, 4, 4, "6");
+        p.rechteck(11, 11, 3, 1, "8");
+        p.rechteck(12, 13, 5, 2, "3");
+        p.rechteck(17, 13, 1, 2, "1");
+        p.rechteck(13, 10, 2, 2, "6");
+        p.rechteck(15, 12, 2, 1, "4");
+        blockKopf(p, 9, 3, geschlossen);
+    } else {
+        // liegt auf dem Ruecken, beim Liegen wippt ein Fuss
+        const schlaeft = pose === "schlafen";
+        p.rechteck(2, 11, 6, 2, "3");
+        p.rechteck(1, schlaeft ? 11 : 10 - bild, 1, 2, "1");
+        p.rechteck(8, 10, 5, 3, "6");
+        p.rechteck(9, 12, 4, 1, "8");
+        p.rechteck(10, 9, 2, 1, "4");
+        blockKopf(p, 13, 8, geschlossen);
+    }
+    p.umriss("7");
+    return p.raster;
+}
+
 const haustierUrlCache = {};
 
 function haustierUrl(skin, pose, bild, blinzelt) {
@@ -2194,6 +2257,7 @@ function haustierUrl(skin, pose, bild, blinzelt) {
     if (!haustierUrlCache[schluessel]) {
         const raster = skin.art === "manta" ? mantaRaster(pose, nummer, blinzelt)
             : skin.art === "maedchen" ? maedchenRaster(pose, nummer, blinzelt)
+            : skin.art === "blockmensch" ? blockmenschRaster(pose, nummer, blinzelt)
             : skin.art === "pinguin" ? pinguinRaster(pose, nummer, blinzelt)
                 : katzenRaster(pose, nummer, blinzelt, skin.stil);
         const zeilen = raster.map(zeile => zeile.map(farbe => farbe || ".").join(""));

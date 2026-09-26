@@ -2038,6 +2038,7 @@ Object.assign(UEBERSETZUNG, {
     "Schaltet Roulette auf dem Markt frei: Setz auf Rot, Schwarz, Gerade, Ungerade oder die grüne 0.": "Unlocks Roulette at the market: bet on Red, Black, Even, Odd or the green 0.",
     "Schaltet Blackjack auf dem Markt frei: Spiel gegen den Dealer, wer näher an 21 kommt.": "Unlocks Blackjack at the market: play against the dealer, whoever gets closer to 21.",
     "+1 Spiel pro Pause bei allen Glücksspielen.": "+1 game per break for all gambling games.",
+    "Blockbauer Basti": "Blockbuilder Basti",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
