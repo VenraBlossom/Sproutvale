@@ -154,6 +154,8 @@ function kraeheKommt() {
     const eintrag = { el: kraehe, feld, restMs: stehlZeitMs(), gelandet: false, weg: false, x: startX, y: startY };
     feld.kraehe = eintrag;
     tagesPlan.kraehenHeute += 1;
+    // Vogelscheuche: die erste Kraehe des Tages wird mitten im Anflug verjagt und macht in der Luft kehrt
+    const scheuche = level("vogelscheuche") > 0 && tagesPlan.kraehenHeute === 1;
     Klang.kraehe();
 
     const landeX = ziel.x;
@@ -168,6 +170,10 @@ function kraeheKommt() {
         kraehe.style.left = eintrag.x + "px";
         kraehe.style.top = eintrag.y + "px";
         setzeSpriteBild(kraehe, Math.floor(t * 10) % 2 ? "kraehe_flug2" : "kraehe_flug1", 4);
+        if (scheuche && t >= 0.55) {
+            vogelscheucheBuh(eintrag, startX);
+            return;
+        }
         if (t < 1) {
             setTimeout(flieg, 16);
             return;
@@ -176,14 +182,6 @@ function kraeheKommt() {
         setzeSpriteBild(kraehe, "kraehe", 4);
         kraehe.classList.add("gelandet");
         setzeTipp(kraehe, t("Krähe! Klick sie weg, bevor sie die Pflanze stiehlt."));
-        // Die Vogelscheuche verscheucht jeden Tag die erste Kraehe von allein
-        if (level("vogelscheuche") > 0 && tagesPlan.kraehenHeute === 1) {
-            setTimeout(() => {
-                if (eintrag.weg) return;
-                zeigeSchwebeText(eintrag.x, eintrag.y - 30, t("🧑‍🌾 Vogelscheuche!"), "#8a5a2b", false);
-                verscheucheKraehe(eintrag);
-            }, 700);
-        }
     }
     kraehe.addEventListener("pointerdown", event => {
         if (event.button !== 0 || spielPausiert()) return;
@@ -209,6 +207,22 @@ function verscheucheKraehe(eintrag) {
     fliegeKraeheWeg(eintrag);
 }
 
+// Die Vogelscheuche ruft "Buh!", wackelt mit den Armen, die Kraehe erschrickt in der Luft und fliegt zurueck
+function vogelscheucheBuh(eintrag, herkunftX) {
+    const scheuche = hofEbene.querySelector('.deko[data-deko="vogelscheuche"]');
+    if (scheuche) {
+        scheuche.classList.remove("scheuche-buh");
+        void scheuche.offsetWidth;
+        scheuche.classList.add("scheuche-buh");
+        const r = scheuche.getBoundingClientRect();
+        zeigeSchwebeText(r.left + r.width / 2, r.top - 10, t("🧑‍🌾 Buh!"), "#8a5a2b", true);
+    }
+    zeigeSchwebeText(eintrag.x, eintrag.y - 34, "❗", "#e8434a", true);
+    partikel(eintrag.x, eintrag.y, ["#1c1b24", "#3a3a4a", "#ffffff"], 14, 60);
+    eintrag.fluchtX = herkunftX < window.innerWidth / 2 ? -80 : window.innerWidth + 80;
+    verscheucheKraehe(eintrag);
+}
+
 function fliegeKraeheWeg(eintrag) {
     eintrag.weg = true;
     const kraehe = eintrag.el;
@@ -216,7 +230,7 @@ function fliegeKraeheWeg(eintrag) {
     setzeTipp(kraehe, null);
     const startX = eintrag.x;
     const startY = eintrag.y;
-    const zielX = startX < window.innerWidth / 2 ? -80 : window.innerWidth + 80;
+    const zielX = eintrag.fluchtX !== undefined ? eintrag.fluchtX : startX < window.innerWidth / 2 ? -80 : window.innerWidth + 80;
     kraehe.style.transform = zielX < startX ? "scaleX(-1)" : "";
     const startZeit = performance.now();
     function weg() {

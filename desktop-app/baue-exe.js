@@ -60,35 +60,47 @@ function packeRar(ordner, rarDatei) {
     execFileSync(WINRAR, ["a", "-r", "-ep1", "-m5", "-idq", rarDatei, ordner], { stdio: "inherit" });
 }
 
+// Macht aus assets/Icon.png ein Windows-Icon mit allen ueblichen Groessen (scharf in Taskleiste, Explorer und Desktop)
 function erstelleIcon() {
-    const png256 = path.join(BUILD, "icon-256.png");
-    const befehl = [
-        "Add-Type -AssemblyName System.Drawing;",
-        `$q = [System.Drawing.Image]::FromFile('${path.join(PROJEKT, "assets", "Icon.png")}');`,
-        "$b = New-Object System.Drawing.Bitmap 256, 256;",
-        "$g = [System.Drawing.Graphics]::FromImage($b);",
-        "$g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;",
-        "$g.DrawImage($q, 0, 0, 256, 256);",
-        `$b.Save('${png256}', [System.Drawing.Imaging.ImageFormat]::Png);`,
-        "$g.Dispose(); $b.Dispose(); $q.Dispose();"
-    ].join(" ");
-    execFileSync("powershell.exe", ["-NoProfile", "-Command", befehl], { stdio: "inherit" });
+    const groessen = [16, 24, 32, 48, 64, 128, 256];
+    const quelle = path.join(PROJEKT, "assets", "Icon.png");
+    const befehl = ["Add-Type -AssemblyName System.Drawing;", `$q = [System.Drawing.Image]::FromFile('${quelle}');`];
+    groessen.forEach(g => {
+        const ziel = path.join(BUILD, "icon-" + g + ".png");
+        befehl.push(
+            `$b = New-Object System.Drawing.Bitmap ${g}, ${g};`,
+            "$gr = [System.Drawing.Graphics]::FromImage($b);",
+            "$gr.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic;",
+            "$gr.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality;",
+            `$gr.DrawImage($q, 0, 0, ${g}, ${g});`,
+            `$b.Save('${ziel}', [System.Drawing.Imaging.ImageFormat]::Png);`,
+            "$gr.Dispose(); $b.Dispose();"
+        );
+    });
+    befehl.push("$q.Dispose();");
+    execFileSync("powershell.exe", ["-NoProfile", "-Command", befehl.join(" ")], { stdio: "inherit" });
 
-    const bild = fs.readFileSync(png256);
-    const kopf = Buffer.alloc(22);
-    kopf.writeUInt16LE(0, 0);      // reserviert
-    kopf.writeUInt16LE(1, 2);      // Typ: Icon
-    kopf.writeUInt16LE(1, 4);      // Anzahl Bilder
-    kopf.writeUInt8(0, 6);         // Breite 256 (0 = 256)
-    kopf.writeUInt8(0, 7);         // Hoehe 256
-    kopf.writeUInt8(0, 8);         // Farbpalette
-    kopf.writeUInt8(0, 9);         // reserviert
-    kopf.writeUInt16LE(1, 10);     // Farbebenen
-    kopf.writeUInt16LE(32, 12);    // Bits pro Pixel
-    kopf.writeUInt32LE(bild.length, 14);
-    kopf.writeUInt32LE(22, 18);    // Start der Bilddaten
+    const bilder = groessen.map(g => fs.readFileSync(path.join(BUILD, "icon-" + g + ".png")));
+    const kopf = Buffer.alloc(6 + 16 * bilder.length);
+    kopf.writeUInt16LE(0, 0);                 // reserviert
+    kopf.writeUInt16LE(1, 2);                 // Typ: Icon
+    kopf.writeUInt16LE(bilder.length, 4);     // Anzahl Bilder
+    let start = kopf.length;
+    bilder.forEach((bild, i) => {
+        const g = groessen[i];
+        const o = 6 + 16 * i;
+        kopf.writeUInt8(g >= 256 ? 0 : g, o);      // Breite (0 = 256)
+        kopf.writeUInt8(g >= 256 ? 0 : g, o + 1);  // Hoehe
+        kopf.writeUInt8(0, o + 2);                 // Farbpalette
+        kopf.writeUInt8(0, o + 3);                 // reserviert
+        kopf.writeUInt16LE(1, o + 4);              // Farbebenen
+        kopf.writeUInt16LE(32, o + 6);             // Bits pro Pixel
+        kopf.writeUInt32LE(bild.length, o + 8);
+        kopf.writeUInt32LE(start, o + 12);
+        start += bild.length;
+    });
     const ico = path.join(BUILD, "icon.ico");
-    fs.writeFileSync(ico, Buffer.concat([kopf, bild]));
+    fs.writeFileSync(ico, Buffer.concat([kopf, ...bilder]));
     return ico;
 }
 

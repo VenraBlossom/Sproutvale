@@ -7988,3 +7988,544 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     0%, 100% { filter: drop-shadow(0 0 3px #ff6a2a) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)); }
     50% { filter: drop-shadow(0 0 8px #ffb060) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.15); }
 }
+
+/* Feedback per Discord */
+.feedback-discord {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feedback-titel {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--holz-dunkel);
+}
+
+.discord-karte {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #5865f2, #4752c4);
+    border: 3px solid #2f3799;
+    border-radius: 10px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.discord-logo {
+    font-size: 2em;
+}
+
+.discord-klein {
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.discord-name {
+    font-size: 1.5em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    user-select: text;
+}
+
+.discord-karte .knopf {
+    margin-left: auto;
+}
+
+.discord-oeffnen {
+    align-self: flex-start;
+    padding: 10px 18px;
+    font-size: 1.1em;
+}
+
+/* Vogelscheuche verjagt die erste Kraehe: sie wackelt kraeftig */
+.deko.scheuche-buh {
+    animation: scheuche-buh 0.7s ease-in-out;
+    transform-origin: 50% 100%;
+}
+
+@keyframes scheuche-buh {
+    0%, 100% { rotate: 0deg; scale: 1; }
+    20% { rotate: -12deg; scale: 1.12; }
+    40% { rotate: 12deg; scale: 1.12; }
+    60% { rotate: -8deg; }
+    80% { rotate: 6deg; }
+}
+
+/* ============================================================
+   HAUPTMENUE (neu): Lichtstrahlen, leuchtendes Logo mit Glanz, federnde Knoepfe, Tiefe mit der Maus
+   ============================================================ */
+
+#hauptmenue {
+    --mx: 0;
+    --my: 0;
+    background-size: 106% 106%;
+    background-position: calc(50% + var(--mx) * 12px) calc(50% + var(--my) * 8px);
+}
+
+/* warmer Morgenschein oben, dunkler Rand unten */
+#hauptmenue::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% -10%, rgba(255, 214, 140, 0.55), transparent 55%),
+        linear-gradient(to bottom, transparent 60%, rgba(20, 40, 10, 0.35));
+}
+
+#menue-strahlen {
+    position: absolute;
+    left: 50%;
+    top: 34%;
+    width: 220vmax;
+    height: 220vmax;
+    margin: -110vmax 0 0 -110vmax;
+    pointer-events: none;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 248, 210, 0.12) 0deg 5deg, transparent 5deg 16deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0 12%, transparent 42%);
+    mask-image: radial-gradient(circle, #000 0 12%, transparent 42%);
+    animation: strahlen-drehen 120s linear infinite;
+}
+
+@keyframes strahlen-drehen {
+    to { transform: rotate(360deg); }
+}
+
+#menue-wolken {
+    transform: translate(calc(var(--mx) * 18px), calc(var(--my) * 6px));
+}
+
+#menue-start {
+    gap: 30px;
+    transform: translate(calc(var(--mx) * -10px), calc(var(--my) * -6px));
+    transition: transform 0.2s ease-out;
+}
+
+.logo-buehne {
+    position: relative;
+    animation: logo-einflug 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, logo-schweben 4.5s ease-in-out 0.9s infinite;
+}
+
+@keyframes logo-einflug {
+    0% { transform: translateY(-80px) scale(0.7); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+#menue-logo {
+    display: block;
+    height: min(50vh, 520px);
+    animation: none;
+    box-shadow: 0 0 0 4px var(--holz-dunkel), 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+.logo-schein {
+    position: absolute;
+    inset: -14%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 238, 160, 0.6), rgba(255, 238, 160, 0) 65%);
+    filter: blur(10px);
+    animation: logo-schein 3.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes logo-schein {
+    50% { opacity: 0.55; transform: scale(1.06); }
+}
+
+/* Glanzstreifen, der alle paar Sekunden ueber das Logo laeuft */
+.logo-glanz {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, 0.45) 50%, transparent 62%) no-repeat;
+    background-size: 250% 100%;
+    background-position: 160% 0;
+    animation: logo-glanz 6s ease-in-out 1.4s infinite;
+}
+
+@keyframes logo-glanz {
+    0% { background-position: 160% 0; }
+    22% { background-position: -60% 0; }
+    100% { background-position: -60% 0; }
+}
+
+#menue-start .menue-knoepfe {
+    width: 330px;
+    gap: 14px;
+}
+
+#hauptmenue .menue-knopf {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    padding: 12px 24px;
+    font-size: 1.35em;
+    font-weight: 600;
+    box-shadow: 0 5px 0 rgba(46, 26, 9, 0.8), 0 10px 22px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    animation: knopf-einblenden 0.5s ease-out both;
+}
+
+#hauptmenue .menue-knopf:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.03);
+    filter: brightness(1.08);
+    box-shadow: 0 8px 0 rgba(46, 26, 9, 0.8), 0 16px 30px rgba(0, 0, 0, 0.35);
+}
+
+#hauptmenue .menue-knopf:active:not(:disabled) {
+    transform: translateY(2px) scale(0.99);
+    box-shadow: 0 2px 0 rgba(46, 26, 9, 0.8), 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* Glanz, der beim Drueberfahren ueber den Knopf wischt */
+#hauptmenue .menue-knopf::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.45s ease;
+    pointer-events: none;
+}
+
+#hauptmenue .menue-knopf:hover::after {
+    left: 120%;
+}
+
+#menue-start .menue-knopf:nth-child(1) { animation-delay: 0.45s; }
+#menue-start .menue-knopf:nth-child(2) { animation-delay: 0.6s; }
+#menue-start .menue-knopf:nth-child(3) { animation-delay: 0.75s; }
+
+@keyframes knopf-einblenden {
+    0% { transform: translateY(24px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+#hauptmenue .menue-haupt {
+    font-size: 1.7em;
+    padding: 14px 24px;
+}
+
+/* goldene, leuchtende Funken */
+.menue-funke {
+    position: absolute;
+    bottom: -10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #fff6a0;
+    box-shadow: 0 0 8px 3px rgba(255, 230, 120, 0.8);
+    animation: menue-funke linear forwards;
+    pointer-events: none;
+}
+
+@keyframes menue-funke {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+    15% { opacity: 1; }
+    80% { opacity: 0.9; }
+    100% { transform: translate(var(--drift, 0), -80vh) scale(1.1); opacity: 0; }
+}
+
+/* ============================================================
+   RAKETEN-STARTRAMPE (neu): Abendhimmel, Stahlturm mit Arm, gezeichnete Rakete, Scheinwerfer, Betonplattform
+   ============================================================ */
+
+#marktstand[data-bauweise="feuerwerk"] #plant-button-bild {
+    visibility: hidden;
+}
+
+[data-bauweise="feuerwerk"] .bau-abendhimmel {
+    left: -24%;
+    right: -24%;
+    top: -78%;
+    bottom: 4%;
+    border-radius: 50% 50% 16% 16%;
+    background:
+        radial-gradient(circle at 20% 30%, #ffffff 0 1px, transparent 2px),
+        radial-gradient(circle at 78% 22%, #fff6a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 64% 40%, #ffffff 0 1px, transparent 2px),
+        radial-gradient(ellipse at 50% 90%, rgba(255, 150, 80, 0.75) 0%, rgba(160, 70, 140, 0.55) 40%, rgba(40, 30, 90, 0.4) 62%, transparent 72%);
+}
+
+[data-bauweise="feuerwerk"] .bau-turm {
+    left: 4%;
+    bottom: 12%;
+    width: 17%;
+    height: 112%;
+    z-index: 1;
+    background:
+        repeating-linear-gradient(45deg, transparent 0 8px, #d0402f 8px 11px),
+        repeating-linear-gradient(-45deg, transparent 0 8px, #d0402f 8px 11px);
+    border-left: 5px solid #8a2a20;
+    border-right: 5px solid #8a2a20;
+    box-shadow: 3px 0 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Verbindungsarm vom Turm zur Rakete */
+[data-bauweise="feuerwerk"] .bau-arm {
+    left: 19%;
+    top: 8%;
+    width: 22%;
+    height: 5%;
+    z-index: 1;
+    background: repeating-linear-gradient(90deg, #8a2a20 0 4px, #d0402f 4px 10px);
+    border: 2px solid #5a1a14;
+    border-radius: 2px;
+}
+
+[data-bauweise="feuerwerk"] .bau-rakete {
+    left: 37%;
+    width: 26%;
+    bottom: 17%;
+    height: 90%;
+    z-index: 2;
+    background: linear-gradient(90deg, #b8c0cc 0%, #ffffff 35%, #eef1f6 60%, #9aa4b4 100%);
+    border: 3px solid #2a2e3a;
+    border-radius: 50% 50% 14% 14% / 26% 26% 6% 6%;
+    animation: rakete-bereit2 2.6s ease-in-out infinite;
+}
+
+@keyframes rakete-bereit2 {
+    50% { transform: translateY(-2px); }
+}
+
+#marktstand.bau-klick[data-bauweise="feuerwerk"] .bau-rakete {
+    animation: rakete-ruckeln 0.2s linear;
+}
+
+[data-bauweise="feuerwerk"] .bau-rakete span {
+    position: absolute;
+}
+
+/* rote Spitze */
+[data-bauweise="feuerwerk"] .rakete-spitze {
+    left: -3px;
+    right: -3px;
+    top: -3px;
+    height: 24%;
+    background: linear-gradient(90deg, #a8232a, #ff5a4a 45%, #c02a32);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    border: 3px solid #2a2e3a;
+    border-bottom: none;
+}
+
+/* roter Streifen in der Mitte */
+[data-bauweise="feuerwerk"] .rakete-streifen {
+    left: 0;
+    right: 0;
+    top: 62%;
+    height: 7%;
+    background: #e8434a;
+}
+
+/* Bullauge mit Glanz */
+[data-bauweise="feuerwerk"] .rakete-fenster {
+    left: 50%;
+    top: 34%;
+    width: 46%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0 12%, #9fe0ff 22%, #2f6fb8 70%, #1b3f73);
+    border: 3px solid #c9a04a;
+    box-shadow: 0 0 6px rgba(159, 224, 255, 0.8);
+}
+
+/* Flossen */
+[data-bauweise="feuerwerk"] .rakete-flosse {
+    bottom: -4%;
+    width: 42%;
+    height: 26%;
+    background: linear-gradient(#ff5a4a, #a8232a);
+    border: 3px solid #2a2e3a;
+}
+
+[data-bauweise="feuerwerk"] .rakete-flosse.links {
+    left: -36%;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    border: none;
+}
+
+[data-bauweise="feuerwerk"] .rakete-flosse.rechts {
+    right: -36%;
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+    border: none;
+}
+
+/* Triebwerk unter der Rakete */
+[data-bauweise="feuerwerk"] .bau-flamme {
+    left: 50%;
+    bottom: 5%;
+    width: 16%;
+    height: 16%;
+    margin-left: -8%;
+    z-index: 1;
+    background: radial-gradient(ellipse at 50% 15%, #ffffff 0 18%, #fff6a0 30%, #ffb02a 50%, #ff4a1a 70%, transparent 72%);
+    clip-path: polygon(10% 0, 90% 0, 50% 100%);
+    filter: drop-shadow(0 0 6px #ffb02a);
+}
+
+[data-bauweise="feuerwerk"] .bau-rauch {
+    bottom: 10%;
+    z-index: 3;
+}
+
+/* Betonplattform mit Warnstreifen */
+[data-bauweise="feuerwerk"] .bau-rampe {
+    left: -6%;
+    right: -6%;
+    bottom: 0;
+    height: 13%;
+    z-index: 2;
+    background:
+        repeating-linear-gradient(45deg, #ffd93d 0 8px, #1d1d24 8px 16px) top / 100% 30% no-repeat,
+        linear-gradient(#9aa0a8, #6a7078);
+    border: 3px solid #2a2e34;
+    border-radius: 4px 4px 2px 2px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* zwei Scheinwerfer, die langsam hin und her schwenken */
+[data-bauweise="feuerwerk"] .bau-scheinwerfer {
+    bottom: 12%;
+    width: 0;
+    height: 0;
+    z-index: 0;
+}
+
+[data-bauweise="feuerwerk"] .bau-scheinwerfer.links { left: 12%; }
+[data-bauweise="feuerwerk"] .bau-scheinwerfer.rechts { right: 6%; }
+
+[data-bauweise="feuerwerk"] .bau-scheinwerfer::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    bottom: 0;
+    width: 28px;
+    height: calc(var(--zelle) * 1.8);
+    background: linear-gradient(to top, rgba(255, 246, 200, 0.55), rgba(255, 246, 200, 0));
+    clip-path: polygon(40% 100%, 60% 100%, 100% 0, 0 0);
+    transform-origin: 50% 100%;
+    animation: scheinwerfer-schwenk 5s ease-in-out infinite alternate;
+}
+
+[data-bauweise="feuerwerk"] .bau-scheinwerfer.rechts::before {
+    animation-delay: -2.5s;
+}
+
+@keyframes scheinwerfer-schwenk {
+    from { transform: rotate(-22deg); }
+    to { transform: rotate(22deg); }
+}
+
+#marktstand[data-bauweise="feuerwerk"] #kombo-anzeige {
+    bottom: calc(150% + 10px);
+}
+
+/* ---------- Alle legendaeren Gebaeude: weicher Schatten am Boden ---------- */
+#marktstand[data-bauweise] .laden-bau::after {
+    content: "";
+    position: absolute;
+    left: -6%;
+    right: -6%;
+    bottom: -8%;
+    height: 14%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(20, 40, 10, 0.4), transparent 70%);
+}
+
+/* ---------- Manege: Scheinwerferkegel von oben und Glitzer ---------- */
+[data-bauweise="zirkus"] .bau-spot {
+    filter: drop-shadow(0 0 10px rgba(255, 246, 180, 0.8));
+}
+
+/* ---------- Hexenhuette: leuchtendes Fenster im Dach ---------- */
+[data-bauweise="hexe"] .bau-huette::before {
+    content: "";
+    position: absolute;
+    left: 14%;
+    top: 12%;
+    width: 16%;
+    height: 18%;
+    background: radial-gradient(circle, #d8ffb0, #6fd04a 70%);
+    border: 2px solid #120a18;
+    border-radius: 50% 50% 2px 2px;
+    box-shadow: 0 0 10px #8dff7a;
+    animation: trank-leuchten 3s ease-in-out infinite;
+}
+
+/* ---------- Leuchtturm: ein Stueck Meer am Fels ---------- */
+[data-bauweise="leuchtturm"] .bau-fels::after {
+    content: "";
+    position: absolute;
+    left: -14%;
+    right: -14%;
+    bottom: -10px;
+    height: 14px;
+    z-index: -1;
+    border-radius: 50%;
+    background: linear-gradient(#5aa9e6, #2a6a9a);
+    box-shadow: 0 0 0 2px #1b3f73;
+}
+
+/* Startrampe: Schild und Zaehler stehen unten auf der Plattform, damit die Rakete frei bleibt */
+#marktstand[data-bauweise="feuerwerk"] #plant-button-bild {
+    display: none;
+}
+
+#marktstand[data-bauweise="feuerwerk"] #plant-button {
+    justify-content: flex-end;
+    padding-bottom: 2%;
+    gap: 2px;
+}
+
+[data-bauweise="feuerwerk"] .bau-rakete {
+    left: 35%;
+    width: 30%;
+    bottom: 26%;
+    height: 82%;
+}
+
+[data-bauweise="feuerwerk"] .rakete-flosse {
+    bottom: -2%;
+    width: 48%;
+    height: 30%;
+}
+
+[data-bauweise="feuerwerk"] .rakete-flosse.links { left: -44%; }
+[data-bauweise="feuerwerk"] .rakete-flosse.rechts { right: -44%; }
+
+[data-bauweise="feuerwerk"] .bau-flamme {
+    bottom: 14%;
+}
+
+[data-bauweise="feuerwerk"] .bau-abendhimmel {
+    background:
+        radial-gradient(circle at 20% 30%, #ffffff 0 1px, transparent 2px),
+        radial-gradient(circle at 78% 22%, #fff6a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 64% 40%, #ffffff 0 1px, transparent 2px),
+        radial-gradient(ellipse at 50% 88%, rgba(255, 196, 120, 0.6) 0%, rgba(255, 150, 170, 0.35) 42%, transparent 70%);
+}
+
+/* Rakete steht hoeher, damit die Flossen ueber dem Schild zu sehen sind */
+[data-bauweise="feuerwerk"] .bau-rakete {
+    bottom: 40%;
+    height: 72%;
+}
+
+[data-bauweise="feuerwerk"] .bau-flamme {
+    bottom: 29%;
+    height: 13%;
+}
+
+[data-bauweise="feuerwerk"] .bau-arm {
+    top: 2%;
+}

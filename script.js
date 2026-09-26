@@ -355,7 +355,7 @@ function erstelleRunZustand(sandbox = false) {
         phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
         tag: 1,
         gold: 10 * metaLevel("startgold") + 5 * kuschel("hase"),
-        skillpunkte: 25 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
+        skillpunkte: 60 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
         energie: 0,
         tagesMaxEnergie: 0,
         bonusEnergie: 0,
@@ -490,7 +490,7 @@ function glueckBonus() {
 }
 
 function klicksProSamen() {
-    const abzug = 4 * level("aussaat") + 2 * metaLevel("flinkeFinger") + aufrunden(tw("kraft")) + 4 * segen("flink") +
+    const abzug = 3 * level("aussaat") + 2 * metaLevel("flinkeFinger") + aufrunden(tw("kraft")) + 4 * segen("flink") +
         kuschel("frosch") + werkzeugWert("saatbeutel") + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, KONFIG.startKlicksProSamen - abzug);
     return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
@@ -1401,7 +1401,9 @@ function feldTipp(feld) {
 }
 
 function pflanzeSamen(feld) {
-    const pflanze = zufall(run.pflanzen.filter(p => p.freigeschaltet));
+    // Neuere Pflanzen kommen oefter: jede Stufe ist 3-mal so wahrscheinlich wie die davor
+    const freie = run.pflanzen.filter(p => p.freigeschaltet);
+    const pflanze = gewichteterZufall(freie, p => Math.pow(3, p.index));
 
     let variante = wuerfleVariante();
     if (run.tagesBoni.goldeneSamen > 0) {
@@ -3509,6 +3511,10 @@ function pflanzenUpgradeFrei(pflanze, upgrade) {
 function schalteSternFrei(def) {
     if (def.art === "pflanze") {
         const pflanze = run.pflanzen.find(p => p.id === def.pflanze);
+        // Erfahrung: eine neue Pflanze startet mit der hoechsten Ertrag-Stufe deiner bisherigen Pflanzen,
+        // dadurch ist sie sofort mehr wert als die alten und Freischalten lohnt sich immer
+        const bisher = Math.max(0, ...run.pflanzen.filter(p => p.freigeschaltet).map(p => p.level.ertrag));
+        pflanze.level.ertrag = Math.max(pflanze.level.ertrag, bisher);
         pflanze.freigeschaltet = true;
         zeigeBanner(pflanze.emoji, pflanze.name + t(" freigeschaltet!"), t("Wächst ab jetzt auf deinen Feldern"), "#2e9e2e", 2400);
         neuePflanzeFeier(pflanze);
@@ -3955,6 +3961,23 @@ function frageModusReset(sandbox) {
     }
     const teilchen = $("menue-teilchen");
     const farben = ["#ffc2da", "#ff94be", "#ffffff", "#fff6a0", "#a3dc6f"];
+    // Goldene Funken steigen langsam auf
+    setInterval(() => {
+        if (hauptmenue.classList.contains("versteckt") || document.hidden || teilchen.children.length > 40) return;
+        const funke = el("div", "menue-funke");
+        funke.style.left = 10 + Math.random() * 80 + "%";
+        funke.style.animationDuration = 5 + Math.random() * 4 + "s";
+        funke.style.setProperty("--drift", (Math.random() - 0.5) * 120 + "px");
+        teilchen.appendChild(funke);
+        setTimeout(() => funke.remove(), 9500);
+    }, 650);
+    // Etwas Tiefe: Inhalt, Wolken und Hintergrund folgen leicht der Maus
+    hauptmenue.addEventListener("pointermove", event => {
+        const mx = (event.clientX / window.innerWidth) * 2 - 1;
+        const my = (event.clientY / window.innerHeight) * 2 - 1;
+        hauptmenue.style.setProperty("--mx", mx.toFixed(3));
+        hauptmenue.style.setProperty("--my", my.toFixed(3));
+    });
     setInterval(() => {
         if (hauptmenue.classList.contains("versteckt") || document.hidden || teilchen.children.length > 26) return;
         const blatt = el("div", "menue-blatt");
@@ -3983,7 +4006,7 @@ function renderEinstellungen() {
     // Ohne laufenden Spielstand (Hauptmenue beim Start) gibt es noch keine Statistik
     const reiter = [
         { id: "erfolge", text: t("🏆 Erfolge") },
-        { id: "kodex", text: t("📖 Kodex") },
+        hauptmenue.classList.contains("versteckt") ? { id: "kodex", text: t("📖 Kodex") } : null,
         run ? { id: "statistik", text: t("📊 Statistik") } : null,
         { id: "audio", text: t("🎵 Klang") },
         { id: "anzeige", text: t("👁️ Anzeige") },
@@ -4124,33 +4147,59 @@ if (window.sproutvaleDesktop && window.sproutvaleDesktop.speicher) {
     const hinweis = $("speicher-hinweis");
     hinweis.classList.remove("versteckt");
     hinweis.textContent = t("Dein Spielstand liegt in: ") + window.sproutvaleDesktop.speicher.pfad() +
-        ". Neue Version? Kopiere den Ordner \"save\" einfach neben die neue Sproutvale.exe.";
+        t(". Neue Version? Kopiere den Ordner \"save\" einfach neben die neue Sproutvale.exe.");
     $("speicher-oeffnen").addEventListener("click", () => window.sproutvaleDesktop.speicher.oeffnen());
-    $("import-zeile").classList.remove("versteckt");
-    $("spielstand-importieren").addEventListener("click", frageImport);
 }
 
-// Import: Ordner oeffnen, Dateien hineinkopieren, dann neu laden (die Dateien haben beim Start Vorrang)
-function frageImport() {
-    window.sproutvaleDesktop.speicher.oeffnen();
+// ---------- SPIELSTAND LADEN: Dateien auswaehlen (geht im Browser und in der Desktop-App) ----------
+const IMPORT_DATEIEN = {
+    "fortschritt.json": "sproutvale_meta",
+    "sandbox-fortschritt.json": "sproutvale_meta_sandbox",
+    "run.json": "sproutvale_run",
+    "sandbox.json": "sproutvale_sandbox",
+    "einstellungen.json": "sproutvale_einstellungen",
+    "kaeufe.dat": "sproutvale_kaeufe"
+};
+
+$("spielstand-importieren").addEventListener("click", () => $("import-dateien").click());
+$("import-dateien").addEventListener("change", async event => {
+    const dateien = [...event.target.files];
+    event.target.value = "";
+    const gefunden = [];
+    for (const datei of dateien) {
+        const schluessel = IMPORT_DATEIEN[datei.name.toLowerCase()];
+        if (!schluessel) continue;
+        const text = await datei.text();
+        try {
+            JSON.parse(text);
+            gefunden.push({ name: datei.name, schluessel, text });
+        } catch (fehler) {
+            console.warn("Datei ist kein gueltiger Spielstand", datei.name);
+        }
+    }
+    if (gefunden.length === 0) {
+        Klang.fehler();
+        zeigeToast(t("Keine passende Spielstand-Datei gefunden (fortschritt.json, run.json, sandbox.json, kaeufe.dat …)."));
+        return;
+    }
     zeigePopup({
-        titel: t("📥 Spielstand importieren"),
+        titel: t("📥 Spielstand laden?"),
         breite: 560,
         inhalt: el("div", "warn-inhalt", null, [
-            el("p", null, t("1. Der Spielstand-Ordner hat sich gerade geöffnet.")),
-            el("p", null, "2. Kopiere deine gesicherten Dateien hinein (fortschritt.json, run.json, sandbox.json, kaeufe.dat ...) und überschreibe die alten."),
-            el("p", null, t("3. Klicke danach auf \"Jetzt laden\". Dein aktueller Stand wird dabei nicht mehr gespeichert."))
+            el("p", null, t("Diese Dateien ersetzen deinen aktuellen Stand:")),
+            el("p", null, gefunden.map(g => "📄 " + g.name).join("   ")),
+            el("p", null, t("Danach startet das Spiel neu."))
         ]),
         knoepfe: [
             { text: t("Abbrechen"), klasse: "knopf" },
-            { text: t("📂 Ordner öffnen"), klasse: "knopf", bleibtOffen: true, aktion: () => window.sproutvaleDesktop.speicher.oeffnen() },
             { text: t("✅ Jetzt laden"), klasse: "knopf-gruen", aktion: () => {
                 speichernGesperrt = true;
-                location.reload();
+                gefunden.forEach(g => localStorage.setItem(g.schluessel, g.text));
+                setTimeout(() => location.reload(), 300);
             } }
         ]
     });
-}
+});
 
 // Lautstaerke: Regler oder Klick aufs Symbol (stumm / wieder die vorige Lautstaerke)
 const musikStumm = $("musik-stumm");
@@ -4600,57 +4649,16 @@ function hauptSchleife(jetzt) {
     requestAnimationFrame(hauptSchleife);
 }
 
-// ---------- FEEDBACK (Einstellungen, auch im Spiel) ----------
-// Ohne eigenen Server kann das Spiel keine E-Mail selbst verschicken. "Senden" oeffnet darum das E-Mail-Programm
-// mit fertigem Betreff "#12345 - Feedback - Sproutvale". Die Ticketnummer ist zufaellig (5 Ziffern).
-const FEEDBACK_MAIL = "venra.business@gmx.de";
-const FEEDBACK_ARTEN = [
-    { id: "fehler", text: t("🐞 Fehler") },
-    { id: "idee", text: t("💡 Idee") },
-    { id: "lob", text: t("💖 Lob") },
-    { id: "sonstiges", text: t("💬 Sonstiges") }
-];
-let feedbackArt = "fehler";
-
-function renderFeedbackArten() {
-    renderReiter($("feedback-arten"), FEEDBACK_ARTEN, feedbackArt, id => {
-        feedbackArt = id;
-        renderFeedbackArten();
-    });
-}
-renderFeedbackArten();
-
-function feedbackNachricht() {
-    const ticket = String(Math.floor(10000 + Math.random() * 90000));
-    const art = FEEDBACK_ARTEN.find(a => a.id === feedbackArt).text.replace(/^\S+ /, "");
-    const kontakt = $("feedback-mail").value.trim();
-    const betreff = "#" + ticket + t(" - Feedback - Sproutvale");
-    const text = t("Art: ") + art + "\n" +
-        t("Version: ") + SPIEL_VERSION + (window.sproutvaleDesktop ? t(" (Desktop)") : t(" (Browser)")) + "\n" +
-        (run ? t("Modus: ") + (run.sandbox ? t("Sandbox") : "Standard") + t(", Tag ") + run.tag + t(", Rechnungen ") + run.bezahlteRechnungen + "\n" : "") +
-        (kontakt ? t("Kontakt: ") + kontakt + "\n" : "") + "\n" + $("feedback-text").value.trim();
-    return { ticket, betreff, text };
-}
-
-$("feedback-senden").addEventListener("click", () => {
-    if ($("feedback-text").value.trim().length < 3) {
-        Klang.fehler();
-        zeigeToast("Schreib bitte erst ein paar Worte.");
-        return;
-    }
-    const n = feedbackNachricht();
-    window.open("mailto:" + FEEDBACK_MAIL + "?subject=" + encodeURIComponent(n.betreff) + "&body=" + encodeURIComponent(n.text));
-    $("feedback-info").textContent = t("Ticket #") + n.ticket + t(": Dein E-Mail-Programm sollte sich jetzt öffnen. Klappt das nicht, ") +
-        t("nutze „Text kopieren“ und schick den Text an ") + FEEDBACK_MAIL + ".";
-    Klang.banner();
-});
-
-$("feedback-kopieren").addEventListener("click", () => {
-    const n = feedbackNachricht();
-    const alles = t("An: ") + FEEDBACK_MAIL + t("\nBetreff: ") + n.betreff + "\n\n" + n.text;
-    navigator.clipboard.writeText(alles).then(
-        () => { $("feedback-info").textContent = t("Kopiert! Füge den Text in eine E-Mail an ") + FEEDBACK_MAIL + t(" ein (Ticket #") + n.ticket + ")."; },
-        () => { $("feedback-info").textContent = t("Kopieren ging nicht. Bitte schick deinen Text an ") + FEEDBACK_MAIL + "."; }
+// ---------- FEEDBACK: per Discord an VenraBlossom ----------
+$("feedback-version").textContent = SPIEL_VERSION;
+$("discord-oeffnen").addEventListener("click", () => window.open("https://discord.com/users/218383099443150849", "_blank"));
+$("discord-kopieren").addEventListener("click", () => {
+    navigator.clipboard.writeText("VenraBlossom").then(
+        () => {
+            zeigeToast(t("📋 Kopiert! Füge den Namen auf Discord bei „Freund hinzufügen“ ein."));
+            Klang.kaufen();
+        },
+        () => zeigeToast(t("Kopieren ging nicht. Der Name ist: VenraBlossom"))
     );
 });
 

@@ -168,6 +168,7 @@ function renderDeko() {
     aufgestellteDeko().forEach((deko, index) => {
         const sprite = deko.farben ? spriteVariante("deko_" + deko.id, deko.sprite, deko.farben) : deko.sprite;
         const bild = hofSprite(sprite, DEKO_SLOTS[index].x, "deko");
+        bild.dataset.deko = deko.id;
         if (deko.effekt) bild.classList.add("deko-" + deko.effekt);
         if (deko.partikel) bild.dataset.partikel = deko.partikel.join(",");
         setzeTipp(bild, deko.name);
@@ -323,7 +324,8 @@ registriereHaken("samen", () => {
 
 // Jedes legendaere Gebaeude besteht aus eigenen Teilen (Aussehen in style.css, Abschnitt LEGENDAERE GEBAEUDE)
 const LADEN_BAUTEILE = {
-    feuerwerk: ["bau-turm", "bau-rampe", "bau-rauch", "bau-flamme", "bau-kiste rechts"],
+    feuerwerk: ["bau-abendhimmel", "bau-scheinwerfer links", "bau-scheinwerfer rechts", "bau-turm", "bau-arm", "bau-flamme",
+        "bau-rakete", "bau-rauch", "bau-rampe", "bau-kiste rechts"],
     zirkus: ["bau-spot", "bau-zelt", "bau-vorhang links", "bau-vorhang rechts", "bau-manege", "bau-wimpel", "bau-seeball"],
     sternwarte: ["bau-nachthimmel", "bau-turmhaus", "bau-sockel", "bau-teleskop", "bau-kuppel", "bau-orbit"],
     hexe: ["bau-huette", "bau-dach", "bau-kessel", "bau-blasen"],
@@ -343,6 +345,8 @@ function baueLaden(laden) {
     const bau = el("div", "laden-bau");
     LADEN_BAUTEILE[bauweise].forEach(klassen => bau.appendChild(el("div", klassen)));
     if (bauweise === "feuerwerk") {
+        bau.querySelector(".bau-rakete").append(el("span", "rakete-spitze"), el("span", "rakete-streifen"), el("span", "rakete-fenster"),
+            el("span", "rakete-flosse links"), el("span", "rakete-flosse rechts"));
         const rauch = bau.querySelector(".bau-rauch");
         for (let i = 0; i < 4; i++) {
             const wolke = el("span");
@@ -379,7 +383,7 @@ function baueLaden(laden) {
 
 // Oberkante des Gebaeudes (Dach, Zelt oder Kuppel), dort starten die Idle-Effekte
 function ladenSpitze() {
-    const teil = marktstand.querySelector(".bau-turm, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne") || plantButton;
+    const teil = marktstand.querySelector(".bau-rakete, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne") || plantButton;
     const rect = teil.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + 6, rect };
 }
