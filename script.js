@@ -97,7 +97,7 @@ function leereLebenszeit() {
     return {
         gold: 0, ernten: 0, jackpots: 0, spezial: 0, sterne: 0, klicks: 0, streicheln: 0, tage: 0, rechnungen: 0,
         gluehwuermchen: 0, streichelGold: 0, sternensamen: 0, bossRechnungen: 0, kraehen: 0, goldregen: 0,
-        gluecksspielSiege: 0, maxWerkzeuge: 0, runs: 0, maxTag: 0, maxMeilensteine: 0,
+        gluecksspielSiege: 0, maxWerkzeuge: 0, runs: 0, maxTag: 0, maxMeilensteine: 0, spielzeitMs: 0,
         hoechsterGewinn: 0, maxKombo: 0, maxFelder: 0, maxPflanzen: 0
     };
 }
@@ -1187,16 +1187,20 @@ function aktualisiereHimmel(dtMs) {
     nachtSchleier.style.opacity = nacht * 0.45;
     wolkenEl.style.filter = "brightness(" + (1 - nacht * 0.55) * (trueb ? 0.75 : 1) + ")";
 
-    // Landschaft "Kosmische Nacht": der Himmel ist immer Nacht (Sterne, Mond, Fensterlichter)
-    if (gewaehlteKosmetik("landschaft").ewigeNacht) {
-        himmelEl.style.background = "linear-gradient(#070620, #1d1450 55%, #3a2170)";
+    // Landschaft "Kosmische Nacht": kosmischer Sternenhimmel. Statt der Sonne zieht ein grosser Stern ueber den Himmel,
+    // der Mond kommt wie immer erst am Abend.
+    const kosmisch = Boolean(gewaehlteKosmetik("landschaft").ewigeNacht);
+    const sonnenBild = kosmisch ? "grosserstern" : "sonne";
+    if (sonneEl.dataset.bild !== sonnenBild) {
+        sonneEl.dataset.bild = sonnenBild;
+        setzeSpriteBild(sonneEl, sonnenBild, HOF_PIXEL);
+        sonneEl.classList.toggle("grosser-stern", kosmisch);
+    }
+    if (kosmisch) {
+        himmelEl.style.background = "linear-gradient(" + mischeFarbe("#0e0a36", "#070620", nacht) + ", " +
+            mischeFarbe("#4a2a8a", "#2a1a5a", nacht) + ")";
         himmelEl.style.filter = "";
-        sonneEl.style.opacity = 0;
-        mondEl.style.left = "12%";
-        mondEl.style.top = gipfel + 14 + "px";
-        mondEl.style.opacity = 1;
         himmelSterne.style.opacity = 1;
-        fensterLichter.style.opacity = 1;
         wolkenEl.style.filter = "brightness(0.35)";
     }
 }
@@ -1248,8 +1252,8 @@ function zeichneMenueHintergrund() {
         // Himmel wie am Vormittag im Spiel (Kosmische Nacht: Sternenhimmel mit Mond)
         const nacht = gewaehlteKosmetik("landschaft").ewigeNacht;
         const himmel = g.createLinearGradient(0, 0, 0, hofY + hofH * 0.5);
-        himmel.addColorStop(0, nacht ? "#070620" : "#5fb0ea");
-        himmel.addColorStop(1, nacht ? "#3a2170" : "#cfeefb");
+        himmel.addColorStop(0, nacht ? "#0e0a36" : "#5fb0ea");
+        himmel.addColorStop(1, nacht ? "#4a2a8a" : "#cfeefb");
         g.fillStyle = himmel;
         g.fillRect(0, 0, W, hofY + hofH);
         if (nacht) {
@@ -1258,7 +1262,7 @@ function zeichneMenueHintergrund() {
                 g.fillStyle = zufallsZahl() < 0.7 ? "#fff6d8" : "#c9b0f5";
                 g.fillRect(Math.floor(zufallsZahl() * W), Math.floor(zufallsZahl() * (hofY + hofH * 0.4)), 1, 1);
             }
-            g.drawImage(spriteLeinwand("mond"), Math.round(W * 0.12), Math.round(H * 0.06));
+            g.drawImage(spriteLeinwand("grosserstern"), Math.round(W * 0.8), Math.round(H * 0.06));
         } else {
             g.drawImage(spriteLeinwand("sonne"), Math.round(W * 0.8), Math.round(H * 0.06));
         }
@@ -1326,17 +1330,6 @@ function zeichneLandschaften() {
         el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
         fensterLichter.appendChild(el);
     });
-    // Kosmische Nacht: Zeiger der grossen Uhr (echte Uhrzeit)
-    hofEbene.querySelectorAll(".hof-uhr").forEach(e => e.remove());
-    if (hofSzene.uhr) {
-        const u = hofSzene.uhr;
-        const uhr = el("div", "hof-uhr", null, [el("div", "uhr-stunde"), el("div", "uhr-minute"), el("div", "uhr-mitte")]);
-        uhr.style.left = (u.x / hofSzene.breite) * 100 + "%";
-        uhr.style.top = (u.y / hofSzene.hoehe) * 100 + "%";
-        uhr.style.setProperty("--radius", (u.r / hofSzene.breite) * kopf.width + "px");
-        hofEbene.appendChild(uhr);
-        stelleHofUhr();
-    }
     // Laternen und Pilze leuchten den ganzen Tag ein wenig, nachts sieht man es staerker
     hofEbene.querySelectorAll(".hof-leuchten").forEach(e => e.remove());
     hofSzene.leuchten.forEach((licht, i) => {
@@ -1354,18 +1347,6 @@ function zeichneLandschaften() {
     letzteHimmelZeit = -1;
     haken("landschaftGezeichnet", hofSzene);
 }
-
-// Stunden- und Minutenzeiger der Uhr in der Kosmischen Nacht auf die aktuelle Uhrzeit stellen
-function stelleHofUhr() {
-    const uhr = hofEbene.querySelector(".hof-uhr");
-    if (!uhr) return;
-    const jetzt = new Date();
-    const minuten = jetzt.getMinutes() + jetzt.getSeconds() / 60;
-    const stunden = (jetzt.getHours() % 12) + minuten / 60;
-    uhr.querySelector(".uhr-stunde").style.rotate = stunden * 30 + "deg";
-    uhr.querySelector(".uhr-minute").style.rotate = minuten * 6 + "deg";
-}
-setInterval(stelleHofUhr, 1000);
 
 let landschaftTimer = null;
 window.addEventListener("resize", () => {
@@ -3284,7 +3265,7 @@ function zeigeRechnungsFrage() {
             el("p", "rechnung-klein", t("Oder du beendest den Run jetzt und bekommst +") + zahl(mondbluetenJetzt()) + t(" Mondblüten."))
         ]),
         knoepfe: [
-            { text: t("🏳️ Run beenden"), klasse: "knopf-rot", aktion: () => {
+            { text: t("🏳️ Run beenden"), klasse: "knopf-rot", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
                 run.rechnungOffen = false;
                 run.tag += 1; // der heutige Tag zaehlt als gespielt
                 beendeRun(0, true);
@@ -4243,12 +4224,17 @@ function renderModusKarten() {
         else statusText = t("Tag ") + stand.r.tag + " · " + (modus.sandbox ? (stand.r.meilensteine || 0) + t(" Meilensteine")
             : stand.r.bezahlteRechnungen + (stand.r.bezahlteRechnungen === 1 ? t(" Rechnung") : t(" Rechnungen")));
         const mondblueten = frei ? profilMondblueten(modus.sandbox) : 0;
+        const spielzeit = frei ? (modus.sandbox ? endlosMeta(endlosSlot()) : storyMeta()).lebenszeit.spielzeitMs : 0;
+        const stats = frei && stand && !stand.neu
+            ? el("div", "modus-stats", "🪙 " + zahl(stand.r.gold || 0) + t(" Gold") + " · ⏱ " + spielzeitText(spielzeit))
+            : frei && spielzeit > 60000 ? el("div", "modus-stats", "⏱ " + spielzeitText(spielzeit)) : null;
         karte.append(...[
             frei ? info : null,
             el("div", "modus-bild", null, [pixelIcon(frei ? modus.symbol : "🔒", 96)]),
             el("div", "modus-name", modus.name),
             el("div", "modus-text", modus.text),
             el("div", "modus-status", statusText),
+            stats,
             frei ? el("div", "modus-mondblueten", null, [spriteIcon("mondbluete"), el("span", null, zahl(mondblueten) + t(" Mondblüten"))]) : null,
             el("div", "modus-los", !frei ? t("Gesperrt") : !stand || stand.neu ? t("▶ Starten") : t("▶ Weiterspielen"))
         ].filter(Boolean));
@@ -4957,6 +4943,18 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
     speichereMeta();
 }
 
+// Spielzeit lesbar: "2 Std. 15 Min." bzw. "15 Min."
+function spielzeitText(ms) {
+    const minuten = Math.floor((ms || 0) / 60000);
+    const stunden = Math.floor(minuten / 60);
+    return stunden > 0 ? tf("{0} Std. {1} Min.", stunden, minuten % 60) : tf("{0} Min.", minuten);
+}
+
+// Story-Fortschritt, auch wenn gerade Endlos laeuft
+function storyMeta() {
+    return metaProfil === "standard" ? meta : metaRuhend || meta;
+}
+
 // ---------- ENDLOS: 3 SPEICHERSTAENDE ----------
 
 function endlosSlotStand(slot) {
@@ -4979,11 +4977,14 @@ function zeigeEndlosSlots() {
     let schliesse = () => {};
     for (let slot = 1; slot <= ENDLOS_SLOTS; slot++) {
         const { r, m, leer } = endlosSlotStand(slot);
-        const info = leer ? t("Leer")
-            : (r ? t("Tag ") + r.tag + " · " + (r.meilensteine || 0) + t(" Meilensteine") : t("Neuer Anfang")) +
-                " · " + zahl(m.mondblueten || 0) + t(" Mondblüten");
+        const zeilen = leer ? [el("span", null, t("Leer"))] : [
+            el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold")
+                : t("Neuer Anfang")),
+            el("span", "endlos-slot-klein", "⏱ " + spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs) +
+                " · 🌸 " + zahl(m.mondblueten || 0) + t(" Mondblüten"))
+        ];
         const zeile = el("div", "endlos-slot" + (slot === endlosSlot() ? " aktiv" : ""), null, [
-            el("div", "endlos-slot-text", null, [el("b", null, t("Speicherstand ") + slot), el("span", null, info)])
+            el("div", "endlos-slot-text", null, [el("b", null, t("Speicherstand ") + slot), ...zeilen])
         ]);
         const los = el("button", "knopf knopf-gruen", leer ? t("+ Neues Spiel") : t("▶ Weiterspielen"));
         los.addEventListener("click", () => {
@@ -5061,6 +5062,7 @@ function hauptSchleife(jetzt) {
     letzteZeit = jetzt;
 
     if (!spielPausiert()) {
+        meta.lebenszeit.spielzeitMs = (meta.lebenszeit.spielzeitMs || 0) + dtMs;
         if (run.phase === "tag") {
             aktualisiereWachstum(dtMs);
             aktualisiereHelfer(dtMs);

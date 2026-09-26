@@ -1396,6 +1396,17 @@ SPRITE_PIXEL.sonne = Array.from({ length: 15 }, (_, y) => Array.from({ length: 1
     const d = Math.hypot(x - 7, y - 7);
     return d <= 4.6 ? "w" : d <= 6.1 ? "v" : d <= 7.3 ? "Y" : ".";
 }).join(""));
+// Grosser Stern (statt der Sonne in der Kosmischen Nacht): heller Kern, vier lange Strahlen, kurze Strahlen dazwischen
+SPRITE_PIXEL.grosserstern = Array.from({ length: 15 }, (_, y) => Array.from({ length: 15 }, (_, x) => {
+    const dx = Math.abs(x - 7);
+    const dy = Math.abs(y - 7);
+    const d = Math.hypot(dx, dy);
+    if (d <= 2.2) return "w";
+    if (d <= 3.4) return "z";
+    if ((dx === 0 && dy <= 7) || (dy === 0 && dx <= 7)) return dx + dy > 5 ? "F" : "z";
+    if (dx === dy && dx <= 4) return "F";
+    return ".";
+}).join(""));
 // Mondbluete: eine einzelne Kirschbluete in Lavendel (5 Bluetenblaetter mit Kerbe, gelbe Staubblaetter)
 SPRITE_PIXEL.mondbluete = (() => {
     const g = 15;
@@ -2497,8 +2508,7 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         pixel(cx - 1, y - 1, "#ffd84a", 3, 1);
     }
 
-    // Kosmische Nacht: Planet mit Ring am Himmel und ein grosser Uhrturm (die Zeiger kommen als eigenes Element dazu)
-    let uhr = null;
+    // Kosmische Nacht: Planet mit Ring am Himmel
     if (F.kosmos) {
         const px = Math.round(W * 0.86);
         const py = Math.round(bodenY * 0.62);
@@ -2514,45 +2524,11 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         }
         leuchten.push({ x: px - 4, y: py - 4, b: 9, h: 9, farbe: "rgba(200, 160, 255, 0.6)" });
 
-        const ux = Math.round(W * 0.585);
-        const r = 7;
-        const mitteY = bodenY - 3;
-        // Turm (Stein), Fenster, Sockel
-        const unten = bodenY + 11;
-        pixel(ux - 6, mitteY, "#2a2f62", 13, unten - mitteY);
-        pixel(ux - 5, mitteY + 1, "#3a3f7a", 11, unten - mitteY - 1);
-        pixel(ux - 1, unten - 5, "#1d1840", 3, 5);
-        pixel(ux - 4, unten - 7, "#ffd35a", 2, 2);
-        pixel(ux + 3, unten - 7, "#ffd35a", 2, 2);
-        leuchten.push({ x: ux - 4, y: unten - 7, b: 9, h: 2, farbe: "rgba(255, 211, 90, 0.8)" });
-        // Spitzdach mit Stern
-        for (let i = 0; i < 5; i++) pixel(ux - 6 + i, mitteY - r - 1 - i, "#4a2a8a", 13 - 2 * i, 1);
-        pixel(ux, mitteY - r - 7, "#fff6a0");
-        pixel(ux - 1, mitteY - r - 6, "#fff6a0", 3, 1);
-        // Zifferblatt: goldener Rand, heller Grund, Striche fuer 12, 3, 6 und 9
-        for (let y = -r - 1; y <= r + 1; y++) {
-            for (let x = -r - 1; x <= r + 1; x++) {
-                const d = Math.hypot(x, y);
-                if (d <= r + 1.2) pixel(ux + x, mitteY + y, d > r + 0.2 ? "#ffd84a" : d > r - 0.7 ? "#c9a030" : "#fff6d8");
-            }
-        }
-        pixel(ux, mitteY - r + 1, "#2a1d5a");
-        pixel(ux, mitteY + r - 1, "#2a1d5a");
-        pixel(ux - r + 1, mitteY, "#2a1d5a");
-        pixel(ux + r - 1, mitteY, "#2a1d5a");
-        leuchten.push({ x: ux - r - 1, y: mitteY - r - 1, b: 2 * r + 3, h: 2 * r + 3, farbe: "rgba(255, 216, 74, 0.55)" });
-        uhr = { x: ux + 0.5, y: mitteY + 0.5, r };
     }
 
     // Hintere Reihe: Baeume und Buesche am Wiesenrand
-    [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => {
-        if (F.kosmos && Math.abs(bx - 0.585) < 0.05) return; // Platz fuer den Uhrturm
-        bild(F.baum, W * bx, bodenY + 6);
-    });
-    [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => {
-        if (F.kosmos && Math.abs(bx - 0.585) < 0.05) return; // Platz fuer den Uhrturm
-        bild(F.busch, W * bx, bodenY + 8);
-    });
+    [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => bild(F.baum, W * bx, bodenY + 6));
+    [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => bild(F.busch, W * bx, bodenY + 8));
 
     // Gebaeude
     const haus = bild("bauernhaus", hausX, H - 8);
@@ -2569,7 +2545,7 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     bild("heu", scheune.x - 6, H - 13);
     bild("heu", scheune.x + scheune.sprite.width + 2, H - 8);
     bild(F.busch, W * 0.46, H - 7);
-    if (!F.kosmos) bild(F.busch, W * 0.55, H - 7);
+    bild(F.busch, W * 0.55, H - 7);
     if (F.schneeDaecher) {
         // Schnee auf den Daechern
         for (let x = 1; x < 23; x++) pixel(haus.x + x, haus.y + Math.max(1, 8 - Math.min(x, 22 - x)) - 1, "#ffffff");
@@ -2651,8 +2627,7 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         ],
         // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
         haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height },
-        leuchten,
-        uhr
+        leuchten
     };
 }
 

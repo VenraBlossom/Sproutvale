@@ -1314,8 +1314,8 @@ const HOF_THEMEN = [
     { id: "wueste", name: t("Oase"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "zauberwald", name: t("Zauberwald"), quelle: "dlc", paket: "einzeln", funkeln: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"],
         irrlichter: ["#9fe8ff", "#c9b0f5", "#b8f07a"], falter: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"] },
-    // ewigeNacht = der Himmel ist immer Nacht (Sterne, Mond, Fensterlichter), uhr = grosser Uhrturm mit der echten Uhrzeit
-    { id: "kosmos", name: t("Kosmische Nacht"), quelle: "dlc", paket: "einzeln", ewigeNacht: true, uhr: true, sternschnuppen: true,
+    // ewigeNacht = kosmischer Sternenhimmel, statt der Sonne zieht ein grosser Stern ueber den Himmel (der Mond kommt wie immer nachts)
+    { id: "kosmos", name: t("Kosmische Nacht"), quelle: "dlc", paket: "einzeln", ewigeNacht: true, sternschnuppen: true,
         funkeln: ["#fff6a0", "#9fe8ff", "#c9b0f5", "#ffffff"] },
     // feuerwerk = Farben der Raketen, die ueber dem Hof in den Himmel steigen und zerplatzen
     { id: "feuerwerk", name: t("Feuerwerksfest"), quelle: "dlc", paket: "einzeln", funkeln: ["#ffd84a", "#ff8a4a"],

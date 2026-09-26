@@ -10024,48 +10024,9 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: 0 auto 8px;
 }
 
-/* ---------- Kosmische Nacht: grosse Uhr mit echter Uhrzeit ---------- */
-.hof-uhr {
-    position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.uhr-stunde,
-.uhr-minute {
-    position: absolute;
-    left: -3px;
-    width: 6px;
-    background: #2a1d5a;
-    border-radius: 2px;
-    transform-origin: 50% 100%;
-    box-shadow: 0 0 0 1px rgba(255, 246, 216, 0.4);
-}
-
-.uhr-stunde {
-    height: calc(var(--radius) * 0.55);
-    bottom: 0;
-}
-
-.uhr-minute {
-    left: -2px;
-    width: 4px;
-    height: calc(var(--radius) * 0.85);
-    bottom: 0;
-    background: #6a2a8a;
-}
-
-.uhr-mitte {
-    position: absolute;
-    left: -5px;
-    top: -5px;
-    width: 10px;
-    height: 10px;
-    background: #ffd84a;
-    border: 2px solid #2a1d5a;
-    border-radius: 50%;
+/* Kosmische Nacht: grosser Stern statt Sonne */
+#sonne.grosser-stern {
+    filter: drop-shadow(0 0 12px rgba(159, 216, 255, 0.95)) drop-shadow(0 0 4px #ffffff);
 }
 
 /* ---------- Endlos: Speicherstaende ---------- */
@@ -10149,4 +10110,21 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-color: #3e2412;
     box-shadow: inset 0 2px 0 #d9a066, inset 0 -3px 0 #6b4220, 0 3px 0 #2e1a09;
     text-shadow: 1px 1px 0 #3e2412;
+}
+
+/* Rechnung faellig: "Run beenden" links in die Ecke, "Bezahlen" rechts */
+.rechnung-frage .popup-knoepfe .knopf-rot {
+    margin-right: auto;
+}
+
+/* Stats auf den Modus-Karten und bei den Endlos-Speicherstaenden */
+.modus-stats {
+    font-size: 0.85em;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+.endlos-slot-klein {
+    font-size: 0.85em;
+    opacity: 0.8;
 }

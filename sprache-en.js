@@ -1909,6 +1909,8 @@ Object.assign(UEBERSETZUNG, {
     "💾 Endlos speichern": "💾 Save Endless",
     "Jetzt speichern": "Save now",
     "Zuletzt gespielt": "Last played",
+    "{0} Std. {1} Min.": "{0} h {1} min",
+    "{0} Min.": "{0} min",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
