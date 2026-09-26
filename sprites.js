@@ -2185,9 +2185,19 @@ function mantaRaster(pose, bild, blinzelt) {
     return p.raster;
 }
 
-// Blockmensch (Kloetzchen-Stil, von der Seite): eckiger Kopf, Hoodie, Hose, Schuhe. Arme und Beine schwingen beim Laufen.
-// Farben: 1 Schuhe, 2 Haare, 3 Hose, 4 Haut, 5 Augen, 6 Hoodie, 7 Umriss, 8 Hoodie dunkel (Aermel hinten)
-function blockKopf(p, x, y, geschlossen) {
+// Blockmensch (Kloetzchen-Stil, von der Seite): eckiger Kopf, Oberteil, Hose, Schuhe. Arme und Beine schwingen beim Laufen.
+// Farben: 1 Schuhe, 2 Haare/Kapuze, 3 Hose, 4 Haut, 5 Augen, 6 Oberteil, 7 Umriss, 8 Oberteil dunkel (hinten),
+//         h Haende, k Kragen/Borte. stil: anzug (Kragen + Krawatte), kapuze (Kapuze mit Borte, Gesicht im Schatten)
+function blockKopf(p, x, y, geschlossen, stil) {
+    if (stil.kapuze) {
+        // Kapuze ganz um den Kopf, vorne eine goldene Borte, das Gesicht liegt im Schatten, die Augen leuchten
+        p.rechteck(x, y, 6, 6, "2");
+        p.rechteck(x + 2, y + 2, 4, 4, "4");
+        p.rechteck(x + 1, y + 1, 5, 1, "k");
+        p.rechteck(x + 1, y + 1, 1, 5, "k");
+        if (!geschlossen) p.punkt(x + 4, y + 3, "5");
+        return;
+    }
     // 6x6 Wuerfel: Haare oben und hinten, Gesicht nach rechts
     p.rechteck(x, y, 6, 6, "4");
     p.rechteck(x, y, 6, 2, "2");
@@ -2203,7 +2213,20 @@ function blockKopf(p, x, y, geschlossen) {
     p.punkt(x + 5, y + 5, "7");
 }
 
-function blockmenschRaster(pose, bild, blinzelt) {
+// Vorderseite des Oberteils: Bauchtasche (Hoodie), Kragen mit Krawatte (Anzug) oder Borte (Kapuzenmantel)
+function blockOberteil(p, y, stil) {
+    if (stil.anzug) {
+        p.punkt(12, y, "k");
+        p.punkt(13, y, "k");
+        p.rechteck(13, y + 1, 1, 2, "2");
+    } else if (stil.kapuze) {
+        p.rechteck(13, y, 1, 4, "k");
+    } else {
+        p.rechteck(11, y + 2, 3, 1, "8");
+    }
+}
+
+function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
     const p = pixelRaster();
     const geschlossen = blinzelt || pose === "schlafen";
 
@@ -2215,25 +2238,25 @@ function blockmenschRaster(pose, bild, blinzelt) {
         p.rechteck(11 - schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
         p.rechteck(11 - schwung / 2, 14, 2, 1, "1");
         p.rechteck(11 - schwung, 7 + wippen, 2, 4, "8");
-        // Koerper (Hoodie) mit Bauchtasche
+        // Koerper
         p.rechteck(10, 7 + wippen, 4, 4, "6");
-        p.rechteck(11, 9 + wippen, 3, 1, "8");
+        blockOberteil(p, 7 + wippen, stil);
         // vorderes Bein
         p.rechteck(11 + schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
         p.rechteck(11 + schwung / 2, 14, 2, 1, "1");
         // vorderer Arm mit Hand
         p.rechteck(11 + schwung, 7 + wippen, 2, 3, "6");
-        p.rechteck(11 + schwung, 10 + wippen, 2, 1, "4");
-        blockKopf(p, 9, 1 + wippen, geschlossen);
+        p.rechteck(11 + schwung, 10 + wippen, 2, 1, "h");
+        blockKopf(p, 9, 1 + wippen, geschlossen, stil);
     } else if (pose === "sitzen") {
         // Beine nach vorne, Haende auf den Knien
         p.rechteck(10, 9, 4, 4, "6");
-        p.rechteck(11, 11, 3, 1, "8");
+        blockOberteil(p, 9, stil);
         p.rechteck(12, 13, 5, 2, "3");
         p.rechteck(17, 13, 1, 2, "1");
         p.rechteck(13, 10, 2, 2, "6");
-        p.rechteck(15, 12, 2, 1, "4");
-        blockKopf(p, 9, 3, geschlossen);
+        p.rechteck(15, 12, 2, 1, "h");
+        blockKopf(p, 9, 3, geschlossen, stil);
     } else {
         // liegt auf dem Ruecken, beim Liegen wippt ein Fuss
         const schlaeft = pose === "schlafen";
@@ -2241,8 +2264,8 @@ function blockmenschRaster(pose, bild, blinzelt) {
         p.rechteck(1, schlaeft ? 11 : 10 - bild, 1, 2, "1");
         p.rechteck(8, 10, 5, 3, "6");
         p.rechteck(9, 12, 4, 1, "8");
-        p.rechteck(10, 9, 2, 1, "4");
-        blockKopf(p, 13, 8, geschlossen);
+        p.rechteck(10, 9, 2, 1, "h");
+        blockKopf(p, 13, 8, geschlossen, stil);
     }
     p.umriss("7");
     return p.raster;
@@ -2257,7 +2280,7 @@ function haustierUrl(skin, pose, bild, blinzelt) {
     if (!haustierUrlCache[schluessel]) {
         const raster = skin.art === "manta" ? mantaRaster(pose, nummer, blinzelt)
             : skin.art === "maedchen" ? maedchenRaster(pose, nummer, blinzelt)
-            : skin.art === "blockmensch" ? blockmenschRaster(pose, nummer, blinzelt)
+            : skin.art === "blockmensch" ? blockmenschRaster(pose, nummer, blinzelt, skin.stil)
             : skin.art === "pinguin" ? pinguinRaster(pose, nummer, blinzelt)
                 : katzenRaster(pose, nummer, blinzelt, skin.stil);
         const zeilen = raster.map(zeile => zeile.map(farbe => farbe || ".").join(""));

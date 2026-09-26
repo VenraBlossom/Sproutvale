@@ -782,6 +782,18 @@ function haustierAtem(farben, anzahl) {
 
 // Eigene Animationen der legendaeren Haustiere (kommen alle paar Sekunden, wenn das Tier ruht)
 const HAUSTIER_IDLE = {
+    // Papa P: die Augen gluehen auf, Funken stieben von den Flammen-Haenden, dann ein kurzes Nicken
+    papa: () => {
+        const kopf = haustierKopf();
+        haustier.bild.animate([{ filter: "brightness(1)" }, { filter: "brightness(1.6) drop-shadow(0 0 6px #ff2a1a)" }, { filter: "brightness(1)" }],
+            { duration: 900, easing: "ease-in-out" });
+        const rect = haustier.bild.getBoundingClientRect();
+        partikel(rect.left + rect.width / 2, rect.top + rect.height * 0.6, ["#ffd23a", "#ff6a0a", "#ff2a1a"], 12, 40);
+        feuerwerkRing(kopf.x, kopf.y, ["#ff2a1a", "#ffd23a"], 8, 18);
+        setTimeout(() => haustier.bild.animate([{ translate: "0 0" }, { translate: "0 3px" }, { translate: "0 0" }],
+            { duration: 300, easing: "ease-out" }), 700);
+        Klang.blockLaut(true);
+    },
     // Blockmensch: haut dreimal auf den Boden, Bloecke splittern, am Ende ein kleiner Freudensprung
     block: () => {
         const rect = haustier.bild.getBoundingClientRect();

@@ -4441,8 +4441,8 @@ function renderModusKarten() {
         ].filter(Boolean));
         karte.addEventListener("click", event => {
             if (event.target === info) return;
-            if (modus.sandbox && frei) zeigeEndlosSlots();
-            else spieleModus(modus.sandbox);
+            // Endlos: direkt der gewaehlte Speicherstand (auswaehlen kann man bei "Speicherstaende")
+            spieleModus(modus.sandbox);
         });
 
         // Story: Spielstand loeschen. Endlos: die Speicherstaende (jeder mit eigenem Loeschen-Knopf)

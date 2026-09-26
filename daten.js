@@ -1198,10 +1198,15 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#ffc98a", 2: "#f0923a", 3: "#c0601a", 4: "#fff4e2", 5: "#2e1a09", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "kuerbiskatze", name: t("Kürbiskatze"), art: "katze", stil: { kuerbishut: true }, quelle: "dlc", paket: "unterstuetzer",
         farben: { 1: "#4a4a5a", 2: "#2e2e38", 3: "#1c1c24", 4: "#55556a", 5: "#f08a24", 6: "#ff9aa8", 7: "#0b0b10" } },
-    // Blockmensch im Skin von BastiGHG (mit Erlaubnis): Kloetzchen-Figur mit Hoodie, baut ab und zu Bloecke ab
-    { id: "basti", name: t("Blockbauer"), art: "blockmensch", laut: "block", quelle: "dlc", paket: "unterstuetzer",
+    // Blockmenschen in den Skins von BastiGHG und Papaplatte (mit Erlaubnis), Kloetzchen-Figuren mit eigenen Animationen
+    { id: "basti", name: "787", art: "blockmensch", stil: { anzug: true }, laut: "block", quelle: "dlc", paket: "unterstuetzer",
         idle: "block", effekt: "bloecke",
-        farben: { 1: "#26262c", 2: "#4a2e1a", 3: "#2c3550", 4: "#e6b088", 5: "#3a6ad0", 6: "#7a3ab0", 7: "#140c1a", 8: "#55287e" } },
+        farben: { 1: "#16161c", 2: "#1d4f8f", 3: "#22222a", 4: "#c3c3c3", 5: "#99d9ea", 6: "#2c2c36", 7: "#050508", 8: "#1c1c24",
+            h: "#c3c3c3", k: "#efefef" } },
+    { id: "papap", name: "Papa P", art: "blockmensch", stil: { kapuze: true }, laut: "block", stimme: 0.8, quelle: "dlc", paket: "unterstuetzer",
+        idle: "papa", effekt: "flammen",
+        farben: { 1: "#fff700", 2: "#332a28", 3: "#ff6a0a", 4: "#0a0808", 5: "#ff2a1a", 6: "#403633", 7: "#140e0c", 8: "#292126",
+            h: "#ffd23a", k: "#c8a83e" } },
 
     // ----- Legendaer (einzeln, mit Effekten) -----
     { id: "axolotl", name: t("Axolotl"), art: "katze", stil: { axolotl: true, keineStreifen: true }, laut: "blubb",
