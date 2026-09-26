@@ -176,6 +176,30 @@ requestAnimationFrame(hauptSchleife);
 
 $("menue-version").textContent = SPIEL_VERSION;
 
+// Auto-Patcher (Desktop-App): ein neues Update ist geladen, jetzt neu laden?
+if (window.sproutvaleDesktop && window.sproutvaleDesktop.update) {
+    let gefragt = false;
+    window.sproutvaleDesktop.update.wennBereit(version => {
+        if (gefragt) return;
+        gefragt = true;
+        Klang.geschenk();
+        zeigePopup({
+            titel: t("✨ Update bereit"),
+            farbe: "#2e9e2e",
+            breite: 480,
+            inhalt: tf("Sproutvale {0} ist geladen. Jetzt neu starten? Dein Spielstand bleibt erhalten.", version),
+            knoepfe: [
+                { text: t("Später") },
+                { text: t("🔄 Jetzt aktualisieren"), klasse: "knopf-gruen", aktion: () => {
+                    speichereRun();
+                    speichereMeta();
+                    window.sproutvaleDesktop.update.anwenden();
+                } }
+            ]
+        });
+    });
+}
+
 // Profil (oben rechts im Hauptmenue)
 $("profil-knopf").addEventListener("click", oeffneProfil);
 $("profil-schliessen").addEventListener("click", schliesseProfil);

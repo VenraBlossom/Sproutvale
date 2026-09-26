@@ -12,6 +12,8 @@
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const https = require("https");
+const crypto = require("crypto");
 const steam = require("./steam");
 
 // Wo liegt das Spiel? 1) Umgebungsvariable, 2) spielordner.txt neben der .exe (Entwickler-Version),
@@ -25,10 +27,149 @@ function spielOrdner() {
         kandidaten.push(path.join(process.resourcesPath, "spiel"));
     }
     kandidaten.push(path.resolve(__dirname, ".."));
-    return kandidaten.find(ordner => fs.existsSync(path.join(ordner, "index.html"))) || kandidaten[kandidaten.length - 1];
+    const ordner = kandidaten.find(o => fs.existsSync(path.join(o, "index.html"))) || kandidaten[kandidaten.length - 1];
+    // Release-Version: ein fertig geladenes, neueres Update hat Vorrang
+    if (istReleaseOrdner(ordner)) {
+        const update = neuestesUpdate();
+        if (update && vergleicheVersion(update.version, liesVersion(ordner)) > 0) return update.ordner;
+    }
+    return ordner;
 }
 
-const ORDNER = spielOrdner();
+// ---------- AUTO-PATCHER (nur Release-Version) ----------
+// Beim Start wird auf GitHub nach dem neuesten Versions-Tag (vX.Y.Z-alpha) geschaut. Ist er neuer, werden nur die
+// geaenderten Spieldateien geladen (Vergleich ueber die Git-Pruefsumme) und in %APPDATA%/Sproutvale/updates/<version>
+// abgelegt. Das Spiel fragt dann, ob es neu laden soll. Spielstaende liegen woanders und bleiben unberuehrt.
+// Ist das Repo nicht oeffentlich oder kein Internet da, passiert einfach nichts.
+const UPDATE_REPO = "VenraBlossom/Sproutvale";
+const UPDATE_ORDNER = path.join(app.getPath("userData"), "updates");
+const UPDATE_AUSLASSEN = [/^desktop-app\//, /^\.github\//, /^\.claude\//, /^\.git/, /\.md$/i, /^docs\//];
+
+function istReleaseOrdner(ordner) {
+    return app.isPackaged && !process.env.SPROUTVALE_ORDNER && path.resolve(ordner) === path.resolve(process.resourcesPath, "spiel");
+}
+
+// "Alpha 0.7.2" oder "v0.7.2-alpha" -> [0, 7, 2]
+function versionTeile(text) {
+    const treffer = String(text || "").match(/(\d+)\.(\d+)\.(\d+)/);
+    return treffer ? treffer.slice(1).map(Number) : null;
+}
+
+function vergleicheVersion(a, b) {
+    const x = versionTeile(a);
+    const y = versionTeile(b);
+    if (!x || !y) return 0;
+    for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i];
+    return 0;
+}
+
+function liesVersion(ordner) {
+    try {
+        const daten = fs.readFileSync(path.join(ordner, "daten.js"), "utf8");
+        const treffer = daten.match(/SPIEL_VERSION\s*=\s*"([^"]+)"/);
+        return treffer ? treffer[1] : "";
+    } catch (fehler) {
+        return "";
+    }
+}
+
+function neuestesUpdate() {
+    try {
+        return fs.readdirSync(UPDATE_ORDNER)
+            .filter(name => fs.existsSync(path.join(UPDATE_ORDNER, name, "fertig.txt")))
+            .map(name => ({ version: name, ordner: path.join(UPDATE_ORDNER, name) }))
+            .sort((a, b) => vergleicheVersion(b.version, a.version))[0] || null;
+    } catch (fehler) {
+        return null;
+    }
+}
+
+function holeDaten(url, alsJson) {
+    return new Promise((ok, fehler) => {
+        const anfrage = https.get(url, { headers: { "User-Agent": "Sproutvale-Updater" }, timeout: 15000 }, antwort => {
+            if (antwort.statusCode >= 300 && antwort.statusCode < 400 && antwort.headers.location) {
+                antwort.resume();
+                holeDaten(antwort.headers.location, alsJson).then(ok, fehler);
+                return;
+            }
+            if (antwort.statusCode !== 200) {
+                antwort.resume();
+                fehler(new Error("HTTP " + antwort.statusCode + " bei " + url));
+                return;
+            }
+            const teile = [];
+            antwort.on("data", teil => teile.push(teil));
+            antwort.on("end", () => {
+                const puffer = Buffer.concat(teile);
+                try {
+                    ok(alsJson ? JSON.parse(puffer.toString("utf8")) : puffer);
+                } catch (e) {
+                    fehler(e);
+                }
+            });
+        });
+        anfrage.on("timeout", () => anfrage.destroy(new Error("Zeitueberschreitung")));
+        anfrage.on("error", fehler);
+    });
+}
+
+// Git-Pruefsumme einer Datei (so kann man ohne Download sehen, ob sie sich geaendert hat)
+function gitSha(puffer) {
+    return crypto.createHash("sha1").update("blob " + puffer.length + "\0").update(puffer).digest("hex");
+}
+
+async function suchePatch() {
+    if (!istReleaseOrdner(ORDNER) && !process.env.SPROUTVALE_UPDATE_TEST) return;
+    const lokal = liesVersion(ORDNER);
+    const tags = await holeDaten("https://api.github.com/repos/" + UPDATE_REPO + "/tags?per_page=100", true);
+    const neuester = tags.map(tag => tag.name).filter(name => /^v\d+\.\d+\.\d+/.test(name))
+        .sort((a, b) => vergleicheVersion(b, a))[0];
+    if (!neuester || vergleicheVersion(neuester, lokal) <= 0) return;
+    const version = neuester.replace(/^v/, "");
+    const ziel = path.join(UPDATE_ORDNER, version);
+    if (fs.existsSync(path.join(ziel, "fertig.txt"))) {
+        meldeUpdate(version);
+        return;
+    }
+    const baum = await holeDaten("https://api.github.com/repos/" + UPDATE_REPO + "/git/trees/" + encodeURIComponent(neuester) + "?recursive=1", true);
+    const dateien = (baum.tree || []).filter(e => e.type === "blob" && !UPDATE_AUSLASSEN.some(muster => muster.test(e.path)));
+    if (dateien.length === 0 || !dateien.some(e => e.path === "index.html")) return;
+    const temp = ziel + ".laden";
+    fs.rmSync(temp, { recursive: true, force: true });
+    for (const eintrag of dateien) {
+        const zielDatei = path.join(temp, ...eintrag.path.split("/"));
+        fs.mkdirSync(path.dirname(zielDatei), { recursive: true });
+        // Unveraendert? Dann aus dem aktuellen Spielordner kopieren statt laden
+        const alteDatei = path.join(ORDNER, ...eintrag.path.split("/"));
+        if (fs.existsSync(alteDatei) && gitSha(fs.readFileSync(alteDatei)) === eintrag.sha) {
+            fs.copyFileSync(alteDatei, zielDatei);
+            continue;
+        }
+        const inhalt = await holeDaten("https://raw.githubusercontent.com/" + UPDATE_REPO + "/" + encodeURIComponent(neuester) + "/" +
+            eintrag.path.split("/").map(encodeURIComponent).join("/"), false);
+        if (gitSha(inhalt) !== eintrag.sha) throw new Error("Pruefsumme stimmt nicht: " + eintrag.path);
+        fs.writeFileSync(zielDatei, inhalt);
+    }
+    fs.writeFileSync(path.join(temp, "fertig.txt"), neuester + "\n" + new Date().toISOString());
+    fs.rmSync(ziel, { recursive: true, force: true });
+    fs.renameSync(temp, ziel);
+    // Alte Updates aufraeumen (nur das neueste behalten)
+    try {
+        fs.readdirSync(UPDATE_ORDNER).filter(name => name !== version).forEach(name =>
+            fs.rmSync(path.join(UPDATE_ORDNER, name), { recursive: true, force: true }));
+    } catch (e) {
+        // egal
+    }
+    meldeUpdate(version);
+}
+
+let bereitesUpdate = null;
+function meldeUpdate(version) {
+    bereitesUpdate = version;
+    if (fenster && !fenster.isDestroyed()) fenster.webContents.send("update-bereit", version);
+}
+
+let ORDNER = spielOrdner();
 let fenster = null;
 
 // ---------- SPIELSTAND-ORDNER "save" ----------
@@ -253,7 +394,7 @@ function erstelleFenster() {
 // Auto-Neuladen: Aenderungen an Spieldateien laden das Fenster neu (nicht in desktop-app, .claude usw.)
 // Nur in der Entwickler-Version (in der Release-Version aendert sich nichts).
 function beobachteSpielordner() {
-    if (ORDNER === path.join(process.resourcesPath || "", "spiel")) return;
+    if (ORDNER === path.join(process.resourcesPath || "", "spiel") || ORDNER.startsWith(UPDATE_ORDNER)) return;
     const ignorieren = ["desktop-app", ".claude", "node_modules", ".git"];
     let timer = null;
     try {
@@ -277,10 +418,21 @@ ipcMain.on("vollbild", () => {
 ipcMain.on("steam-erfolg", (_event, id) => steam.erfolg(id));
 ipcMain.on("steam-status", (_event, text) => steam.status(text));
 
+// Update anwenden: Spielordner neu bestimmen und das Fenster mit den neuen Dateien laden
+ipcMain.on("update-anwenden", () => {
+    const neu = spielOrdner();
+    if (neu === ORDNER || !fenster) return;
+    ORDNER = neu;
+    fenster.loadFile(path.join(ORDNER, "index.html"));
+});
+ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
+
 app.whenReady().then(() => {
     steam.starte();
     erstelleFenster();
     beobachteSpielordner();
+    // Nach dem Start in Ruhe nach einem Update schauen (Fehler sind egal, dann eben beim naechsten Mal)
+    setTimeout(() => suchePatch().catch(fehler => console.warn("Update-Suche:", fehler.message)), 4000);
 });
 
 app.on("window-all-closed", () => app.quit());

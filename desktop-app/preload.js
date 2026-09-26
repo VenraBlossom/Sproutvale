@@ -7,6 +7,15 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("sproutvaleDesktop", {
     beenden: () => ipcRenderer.send("beenden"),
+    // Auto-Patcher: meldet ein fertig geladenes Update; anwenden laedt das Spiel mit den neuen Dateien
+    update: {
+        wennBereit: rueckruf => {
+            ipcRenderer.on("update-bereit", (_event, version) => rueckruf(String(version)));
+            const schon = ipcRenderer.sendSync("update-status");
+            if (schon) rueckruf(String(schon));
+        },
+        anwenden: () => ipcRenderer.send("update-anwenden")
+    },
     vollbild: () => ipcRenderer.send("vollbild"),
     steam: {
         erfolg: id => ipcRenderer.send("steam-erfolg", String(id)),
