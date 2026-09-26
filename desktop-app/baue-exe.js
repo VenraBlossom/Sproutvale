@@ -106,11 +106,17 @@ function erstelleIcon() {
 
 function erstelleVerknuepfung(exe) {
     const lnk = path.join(PROJEKT, "Sproutvale.lnk");
+    // Windows merkt sich Icons ueber den Pfad: jede Version bekommt eine eigene Icon-Datei,
+    // sonst zeigt die Verknuepfung nach einem neuen Icon.png weiter das alte Bild
+    fs.readdirSync(BUILD).filter(n => /^verknuepfung-\d+\.ico$/.test(n)).forEach(n => fs.rmSync(path.join(BUILD, n)));
+    const icon = path.join(BUILD, "verknuepfung-" + Date.now() + ".ico");
+    fs.copyFileSync(path.join(BUILD, "icon.ico"), icon);
+    fs.rmSync(lnk, { force: true });
     const befehl = [
         "$s = (New-Object -ComObject WScript.Shell).CreateShortcut('" + lnk + "');",
         "$s.TargetPath = '" + exe + "';",
         "$s.WorkingDirectory = '" + path.dirname(exe) + "';",
-        "$s.IconLocation = '" + exe + ",0';",
+        "$s.IconLocation = '" + icon + ",0';",
         "$s.Description = 'Sproutvale starten';",
         "$s.Save();"
     ].join(" ");

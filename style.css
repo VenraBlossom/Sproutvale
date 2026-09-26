@@ -9389,3 +9389,59 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         inset 0 6px 0 0 #8a5426,
         0 6px 0 0 rgba(30, 16, 6, 0.45);
 }
+
+/* ============================================================
+   BESONDERE SAMENLAEDEN ALS PIXEL-GRAFIK (laeden-pixel.js)
+   ============================================================ */
+
+#marktstand[data-bauweise] .laden-bau > *:not(.laden-pixelbild) {
+    display: none;
+}
+
+.laden-pixelbild {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 124%;
+    height: auto;
+    transform: translateX(-50%);
+    image-rendering: pixelated;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 0 rgba(20, 40, 10, 0.25));
+}
+
+/* kurzer Hopser beim Klicken */
+#marktstand.bau-klick .laden-pixelbild {
+    animation: laden-hopser 0.18s ease-out;
+}
+
+@keyframes laden-hopser {
+    40% { transform: translateX(-50%) scale(1.03, 0.97); }
+}
+
+/* Schild und Zaehler stehen bei allen besonderen Laeden unten, das Gebaeude bleibt frei */
+#marktstand[data-bauweise] #plant-button-bild {
+    display: none;
+}
+
+#marktstand[data-bauweise] #plant-button {
+    justify-content: flex-end;
+    padding-bottom: 3%;
+    gap: 2px;
+}
+
+#marktstand[data-bauweise] #kombo-anzeige {
+    bottom: calc(175% + 10px);
+}
+
+/* Vorschau im Haus */
+.laden-vorschau-pixel {
+    width: 86%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.laden-vorschau[class*="vorschau-bau-"] {
+    background: none;
+    animation: none;
+}

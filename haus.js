@@ -355,50 +355,44 @@ function baueLaden(laden) {
     marktstand.classList.toggle("bau-ruhig", Boolean(bauweise) && laden.paket === "unterstuetzer");
     marktstand.querySelectorAll(".laden-bau").forEach(e => e.remove());
     if (!bauweise) return;
+    // Das Gebaeude ist eine Pixel-Grafik (laeden-pixel.js), legendaere wechseln ihre Animationsbilder
     const bau = el("div", "laden-bau");
-    LADEN_BAUTEILE[bauweise].forEach(klassen => bau.appendChild(el("div", klassen)));
-    if (bauweise === "feuerwerk") {
-        bau.querySelector(".bau-rakete").append(el("span", "rakete-spitze"), el("span", "rakete-streifen"), el("span", "rakete-fenster"),
-            el("span", "rakete-flosse links"), el("span", "rakete-flosse rechts"));
-        const rauch = bau.querySelector(".bau-rauch");
-        for (let i = 0; i < 4; i++) {
-            const wolke = el("span");
-            wolke.style.animationDelay = -i * 0.55 + "s";
-            rauch.appendChild(wolke);
-        }
-    }
-    if (bauweise === "zirkus") {
-        const wimpel = bau.querySelector(".bau-wimpel");
-        ["#ffd93d", "#5aa9e6", "#a3dc6f", "#ff8fb1", "#ffd93d", "#5aa9e6", "#a3dc6f"].forEach(farbe => {
-            const w = el("span");
-            w.style.background = farbe;
-            wimpel.appendChild(w);
-        });
-    }
-    if (bauweise === "sternwarte") {
-        bau.querySelector(".bau-orbit").append(el("span"), el("span", "mond"));
-    }
-    if (bauweise === "hexe") {
-        const blasen = bau.querySelector(".bau-blasen");
-        for (let i = 0; i < 6; i++) {
-            const blase = el("span");
-            blase.style.animationDelay = -i * 0.4 + "s";
-            blase.style.left = (i % 3 - 1) * 7 + "px";
-            blase.style.setProperty("--dx", (i % 2 ? 6 : -6) + "px");
-            blasen.appendChild(blase);
-        }
-    }
-    if (bauweise === "leuchtturm") {
-        bau.querySelector(".bau-moewe").appendChild(el("span"));
-    }
+    const bild = document.createElement("img");
+    bild.className = "laden-pixelbild";
+    bild.alt = "";
+    bild.draggable = false;
+    bild.src = ladenPixelBild(bauweise, 0);
+    bau.appendChild(bild);
     marktstand.appendChild(bau);
+}
+
+// Animationsbilder der legendaeren Laeden weiterschalten
+let ladenBildNummer = 0;
+setInterval(() => {
+    const bild = marktstand.querySelector(".laden-pixelbild");
+    const def = LADEN_PIXEL[marktstand.dataset.bauweise];
+    if (!bild || !def || def.bilder < 2 || document.hidden) return;
+    ladenBildNummer = (ladenBildNummer + 1) % def.bilder;
+    bild.src = ladenPixelBild(marktstand.dataset.bauweise, ladenBildNummer);
+}, 220);
+
+// Ein Punkt auf der Pixel-Grafik (in Raster-Pixeln) als Bildschirm-Koordinate
+function ladenPunkt(px, py) {
+    const bild = marktstand.querySelector(".laden-pixelbild");
+    const def = LADEN_PIXEL[marktstand.dataset.bauweise];
+    if (!bild || !def) {
+        const r = plantButton.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + 6, rect: r };
+    }
+    const r = bild.getBoundingClientRect();
+    return { x: r.left + (px / LADEN_PIXEL_BREITE) * r.width, y: r.top + (py / def.hoehe) * r.height, rect: r };
 }
 
 // Oberkante des Gebaeudes (Dach, Zelt oder Kuppel), dort starten die Idle-Effekte
 function ladenSpitze() {
-    const teil = marktstand.querySelector(".bau-rakete, .bau-zelt, .bau-kuppel, .bau-dach, .bau-laterne, .bau-wasser") || plantButton;
-    const rect = teil.getBoundingClientRect();
-    return { x: rect.left + rect.width / 2, y: rect.top + 6, rect };
+    const def = LADEN_PIXEL[marktstand.dataset.bauweise];
+    const [px, py] = def && def.spitze ? def.spitze : [16, 2];
+    return ladenPunkt(px, py);
 }
 
 // Feuerwerk: Teilchen fliegen gleichmaessig im Kreis auseinander und sinken dann leicht
@@ -497,14 +491,12 @@ function ladenIdle(laden) {
             marktstand.classList.add("bau-trick");
         }
     } else if (laden.bauweise === "sternwarte") {
-        const rohr = marktstand.querySelector(".bau-teleskop");
-        const r = rohr ? rohr.getBoundingClientRect() : spitze.rect;
-        miniSchnuppe(r.right, r.top, 1);
+        const rohr = ladenPunkt(26, 5);
+        miniSchnuppe(rohr.x, rohr.y, 1);
     } else if (laden.bauweise === "hexe") {
         // Der Kessel blubbert ueber, ab und zu wackelt der Hut
-        const kessel = marktstand.querySelector(".bau-kessel");
-        const r = kessel ? kessel.getBoundingClientRect() : spitze.rect;
-        partikel(r.left + r.width / 2, r.top, laden.funken, 12, 55);
+        const kessel = ladenPunkt(27, 38);
+        partikel(kessel.x, kessel.y, laden.funken, 12, 55);
         if (Math.random() < 0.5) {
             marktstand.classList.remove("bau-trick");
             void marktstand.offsetWidth;
@@ -515,9 +507,8 @@ function ladenIdle(laden) {
         marktstand.classList.remove("bau-trick");
         void marktstand.offsetWidth;
         marktstand.classList.add("bau-trick");
-        const wasser = marktstand.querySelector(".bau-wasser");
-        const r = wasser ? wasser.getBoundingClientRect() : spitze.rect;
-        partikel(r.left + r.width / 2, r.top + r.height * 0.4, laden.funken, 8, 35);
+        const wasser = ladenPunkt(16, 23);
+        partikel(wasser.x, wasser.y, laden.funken, 8, 35);
     } else if (laden.bauweise === "leuchtturm") {
         // Das Licht blitzt kurz hell auf
         marktstand.classList.remove("bau-trick");
@@ -746,7 +737,13 @@ function kosmetikBild(kategorie, eintrag) {
         case "samenladen": {
             const laden = el("div", "laden-vorschau" + (eintrag.klasse ? " vorschau-" + eintrag.klasse : "") +
                 (eintrag.bauweise ? " vorschau-bau-" + eintrag.bauweise : ""));
-            if (eintrag.bild) laden.appendChild(pixelIcon(eintrag.bild, 32, "laden-vorschau-bild"));
+            if (eintrag.bauweise && LADEN_PIXEL[eintrag.bauweise]) {
+                const bild = document.createElement("img");
+                bild.className = "laden-vorschau-pixel";
+                bild.alt = "";
+                bild.src = ladenPixelBild(eintrag.bauweise, 0);
+                laden.appendChild(bild);
+            } else if (eintrag.bild) laden.appendChild(pixelIcon(eintrag.bild, 32, "laden-vorschau-bild"));
             laden.style.setProperty("--m1", eintrag.markise[0]);
             laden.style.setProperty("--m2", eintrag.markise[1]);
             laden.style.setProperty("--h1", eintrag.holz[0]);
