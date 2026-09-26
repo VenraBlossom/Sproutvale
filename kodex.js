@@ -19,34 +19,34 @@ function kodexEintraege(reiter) {
                     bild: { sprite: p.id }, name: p.name, anzahl: k.pflanzen[p.id] || 0,
                     text: t("Grundwert ") + zahl(p.verkaufswert) + t(" Gold, ") + sekText(p.sekProStufe * 3) + t(" bis zur Ernte.") +
                         (p.eigenschaftText ? " " + p.eigenschaftText : ""),
-                    zaehler: "geerntet",
+                    zaehler: t("geerntet"),
                     extra: t("🏅 Meisterschaft ") + stufe + "/" + MEISTER_SCHWELLEN.length +
                         (stufe > 0 ? " (+" + Math.round(MEISTER_BONUS * 100 * stufe) + t("% Wert)") : "") +
                         (naechste ? t(" · nächste bei ") + zahl(naechste) : t(" · Maximum!"))
                 };
             });
         case "varianten":
-            return VARIANTEN.map(v => ({ bild: { emoji: v.badge }, name: v.titel, anzahl: k.varianten[v.id] || 0, text: v.beschreibung, zaehler: "geerntet" }));
+            return VARIANTEN.map(v => ({ bild: { emoji: v.badge }, name: v.titel, anzahl: k.varianten[v.id] || 0, text: v.beschreibung, zaehler: t("geerntet") }));
         case "wetter":
-            return WETTER.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.wetter[w.id] || 0, text: w.text, zaehler: "erlebt" }));
+            return WETTER.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.wetter[w.id] || 0, text: w.text, zaehler: t("erlebt") }));
         case "werkzeuge":
             return WERKZEUGE.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.werkzeuge[w.id] || 0,
-                text: t("Stufe 1: ") + w.text(werkzeugWertFuer(w, 1)) + t(" Stufe 5: ") + w.text(werkzeugWertFuer(w, 5)), zaehler: "gekauft" }));
+                text: t("Stufe 1: ") + w.text(werkzeugWertFuer(w, 1)) + t(" Stufe 5: ") + w.text(werkzeugWertFuer(w, 5)), zaehler: t("gekauft") }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
-                text: z.text, zaehler: "erlebt" }));
+                text: z.text, zaehler: t("erlebt") }));
         case "segen":
             return SEGEN.map(s => ({ bild: { emoji: s.badge }, name: s.name, anzahl: (k.segen || {})[s.id] || 0, text: s.text, zaehler: t("gewählt") }));
         case "boss":
-            return BOSS_REGELN.map(b => ({ bild: { emoji: b.symbol }, name: b.name, anzahl: k.boss[b.id] || 0, text: b.text, zaehler: "besiegt" }));
+            return BOSS_REGELN.map(b => ({ bild: { emoji: b.symbol }, name: b.name, anzahl: k.boss[b.id] || 0, text: b.text, zaehler: t("besiegt") }));
         default: {
             const l = meta.lebenszeit;
             return [
-                { bild: { sprite: "kraehe" }, name: t("Krähe"), anzahl: l.kraehen, text: t("Stiehlt Pflanzen, wenn du sie nicht wegklickst. Die Vogelscheuche hilft."), zaehler: "verscheucht" },
-                { bild: { emoji: "🌠" }, name: t("Sternschnuppe"), anzahl: l.sterne, text: t("Fang sie für doppeltes Gold."), zaehler: "gefangen" },
-                { bild: { emoji: "🪲" }, name: t("Glühwürmchen"), anzahl: l.gluehwuermchen, text: t("Kommen am Abend und verlängern den Tag."), zaehler: "gefangen" },
-                { bild: { emoji: "🌧️" }, name: t("Goldregen"), anzahl: l.goldregen, text: t("Ganz selten regnet es goldene Saat."), zaehler: "erlebt" },
-                { bild: { emoji: "🐾" }, name: t("Streicheleinheiten"), anzahl: l.streicheln, text: t("Dein Begleiter freut sich über jede."), zaehler: "gestreichelt" }
+                { bild: { sprite: "kraehe" }, name: t("Krähe"), anzahl: l.kraehen, text: t("Stiehlt Pflanzen, wenn du sie nicht wegklickst. Die Vogelscheuche hilft."), zaehler: t("verscheucht") },
+                { bild: { emoji: "🌠" }, name: t("Sternschnuppe"), anzahl: l.sterne, text: t("Fang sie für doppeltes Gold."), zaehler: t("gefangen") },
+                { bild: { emoji: "🪲" }, name: t("Glühwürmchen"), anzahl: l.gluehwuermchen, text: t("Kommen am Abend und verlängern den Tag."), zaehler: t("gefangen") },
+                { bild: { emoji: "🌧️" }, name: t("Goldregen"), anzahl: l.goldregen, text: t("Ganz selten regnet es goldene Saat."), zaehler: t("erlebt") },
+                { bild: { emoji: "🐾" }, name: t("Streicheleinheiten"), anzahl: l.streicheln, text: t("Dein Begleiter freut sich über jede."), zaehler: t("gestreichelt") }
             ];
         }
     }

@@ -1773,6 +1773,13 @@ Object.assign(UEBERSETZUNG, {
     "Diese Dateien ersetzen deinen aktuellen Stand:": "These files replace your current progress:",
     "Danach startet das Spiel neu.": "The game restarts afterwards.",
     "🧑‍🌾 Buh!": "🧑‍🌾 Boo!",
+    "besiegt": "defeated",
+    "erlebt": "experienced",
+    "geerntet": "harvested",
+    "gefangen": "caught",
+    "gekauft": "bought",
+    "gestreichelt": "petted",
+    "verscheucht": "scared away",
     " ab": " ",
     " ein": " ",
     " enthalten": " "

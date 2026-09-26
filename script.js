@@ -1174,6 +1174,79 @@ function erstelleHimmel() {
 // Hof (Kopfbereich im Spiel, 5x vergroesserte Pixel) und Tal (Hauptmenue, 4x)
 let hofSzene = null;
 
+// Hauptmenue: dieselbe Pixel-Welt wie im Spiel. Oben Himmel mit Sonne und Wolken, in der Mitte der Hof
+// (passend zur gewaehlten Landschaft), unten die Wiese mit Ackerfeldern links und rechts vom Weg.
+function zeichneMenueHintergrund() {
+    const P = HOF_PIXEL;
+    const W = Math.ceil(window.innerWidth / P);
+    const H = Math.ceil(window.innerHeight / P);
+    const thema = gewaehlteKosmetik("landschaft").id;
+    const hofH = Math.round(H * 0.42);
+    const hofY = Math.round(H * 0.2);
+    const hof = zeichneHof(W, hofH, thema);
+    const hofBild = new Image();
+    hofBild.onload = () => {
+        const leinwand = document.createElement("canvas");
+        leinwand.width = W;
+        leinwand.height = H;
+        const g = leinwand.getContext("2d");
+        g.imageSmoothingEnabled = false;
+
+        // Himmel wie am Vormittag im Spiel
+        const himmel = g.createLinearGradient(0, 0, 0, hofY + hofH * 0.5);
+        himmel.addColorStop(0, "#5fb0ea");
+        himmel.addColorStop(1, "#cfeefb");
+        g.fillStyle = himmel;
+        g.fillRect(0, 0, W, hofY + hofH);
+        g.drawImage(spriteLeinwand("sonne"), Math.round(W * 0.8), Math.round(H * 0.06));
+        const wolke = spriteLeinwand("wolke");
+        [[0.06, 0.07], [0.3, 0.03], [0.55, 0.1], [0.9, 0.16], [0.72, 0.02]].forEach(([x, y]) =>
+            g.drawImage(wolke, Math.round(W * x), Math.round(H * y)));
+
+        g.drawImage(hofBild, 0, hofY);
+
+        // Wiese unter dem Zaun (dieselben Grasfliesen wie im Spiel)
+        const wieseY = hofY + hofH;
+        const grasName = SPRITE_ABWANDLUNGEN["gras_" + thema] ? "gras_" + thema : "gras";
+        g.fillStyle = g.createPattern(spriteLeinwand(grasName), "repeat");
+        g.fillRect(0, wieseY, W, H - wieseY);
+
+        // Weg in der Mitte
+        const wegB = Math.round(W * 0.07);
+        const wegX = Math.round(W / 2 - wegB / 2);
+        g.fillStyle = "#c9a46a";
+        g.fillRect(wegX, wieseY, wegB, H - wieseY);
+        g.fillStyle = "#b08a55";
+        g.fillRect(wegX, wieseY, 1, H - wieseY);
+        g.fillRect(wegX + wegB - 1, wieseY, 1, H - wieseY);
+        for (let y = wieseY + 3; y < H; y += 4) {
+            g.fillStyle = "rgba(120, 85, 45, 0.25)";
+            g.fillRect(wegX + 1, y, wegB - 2, 1);
+        }
+
+        // Ackerfelder mit Pflanzen links und rechts vom Weg
+        const erde = spriteLeinwand("erde");
+        const pflanzen = ["weizen", "karotte", "kartoffel", "erdbeere", "tomate", "mais", "kuerbis", "sonnenblume"];
+        const feld = erde.width;
+        const abstand = 3;
+        for (let reihe = 0; reihe < 3; reihe++) {
+            const y = wieseY + 6 + reihe * (feld + abstand);
+            if (y + feld > H) break;
+            for (let spalte = 0; spalte < 12; spalte++) {
+                const seite = spalte < 6 ? -1 : 1;
+                const i = spalte < 6 ? spalte : spalte - 6;
+                const x = seite < 0 ? wegX - 4 - (i + 1) * (feld + abstand) : wegX + wegB + 4 + i * (feld + abstand);
+                if (x < -feld || x > W) continue;
+                g.drawImage(erde, x, y);
+                const art = pflanzen[(reihe * 5 + spalte * 3) % pflanzen.length];
+                if ((reihe + spalte) % 4 !== 3) g.drawImage(spriteLeinwand(art), x, y);
+            }
+        }
+        hauptmenue.style.backgroundImage = "url(" + leinwand.toDataURL() + ")";
+    };
+    hofBild.src = hof.url;
+}
+
 function zeichneLandschaften() {
     const kopf = topBar.getBoundingClientRect();
     hofSzene = zeichneHof(kopf.width / HOF_PIXEL, kopf.height / HOF_PIXEL, gewaehlteKosmetik("landschaft").id);
@@ -1188,7 +1261,7 @@ function zeichneLandschaften() {
         el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
         fensterLichter.appendChild(el);
     });
-    hauptmenue.style.backgroundImage = "url(" + zeichneTal(window.innerWidth / 4, window.innerHeight / 4) + ")";
+    zeichneMenueHintergrund();
     letzteHimmelZeit = -1;
     haken("landschaftGezeichnet", hofSzene);
 }
@@ -3948,13 +4021,13 @@ function frageModusReset(sandbox) {
 // Wolken und Teilchen im Hauptmenue
 (function schmueckeHauptmenue() {
     const wolken = $("menue-wolken");
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 4; i++) {
         const wolke = document.createElement("img");
         wolke.alt = "";
         wolke.classList.add("menue-wolke");
-        setzeSpriteBild(wolke, "wolke", 4 + Math.floor(Math.random() * 3));
-        wolke.style.top = 3 + Math.random() * 30 + "%";
-        const dauer = 70 + Math.random() * 70;
+        setzeSpriteBild(wolke, "wolke", 5);
+        wolke.style.top = 3 + Math.random() * 16 + "%";
+        const dauer = 160 + Math.random() * 120;
         wolke.style.animationDuration = dauer + "s";
         wolke.style.animationDelay = -Math.random() * dauer + "s";
         wolken.appendChild(wolke);
@@ -3971,15 +4044,9 @@ function frageModusReset(sandbox) {
         teilchen.appendChild(funke);
         setTimeout(() => funke.remove(), 9500);
     }, 650);
-    // Etwas Tiefe: Inhalt, Wolken und Hintergrund folgen leicht der Maus
-    hauptmenue.addEventListener("pointermove", event => {
-        const mx = (event.clientX / window.innerWidth) * 2 - 1;
-        const my = (event.clientY / window.innerHeight) * 2 - 1;
-        hauptmenue.style.setProperty("--mx", mx.toFixed(3));
-        hauptmenue.style.setProperty("--my", my.toFixed(3));
-    });
+
     setInterval(() => {
-        if (hauptmenue.classList.contains("versteckt") || document.hidden || teilchen.children.length > 26) return;
+        if (hauptmenue.classList.contains("versteckt") || document.hidden || teilchen.children.length > 40) return;
         const blatt = el("div", "menue-blatt");
         blatt.style.left = Math.random() * 100 + "%";
         blatt.style.background = zufall(farben);
@@ -3987,7 +4054,7 @@ function frageModusReset(sandbox) {
         blatt.style.setProperty("--drift", (Math.random() - 0.3) * 260 + "px");
         teilchen.appendChild(blatt);
         setTimeout(() => blatt.remove(), 13500);
-    }, 420);
+    }, 700);
 })();
 
 let aktiverEinstellungsReiter = "audio";

@@ -8529,3 +8529,162 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
 [data-bauweise="feuerwerk"] .bau-arm {
     top: 2%;
 }
+
+/* ============================================================
+   HAUPTMENUE (ruhig): gemalter Hintergrund, sanftes Logo, wenig Bewegung
+   ============================================================ */
+
+#hauptmenue {
+}
+
+#hauptmenue::before {
+    background: radial-gradient(ellipse at 50% 42%, rgba(255, 255, 255, 0.25), transparent 55%);
+}
+
+#hauptmenue::after {
+    background: radial-gradient(ellipse at 50% 45%, transparent 60%, rgba(30, 50, 20, 0.22) 100%);
+}
+
+#menue-wolken,
+#menue-start {
+    transform: none;
+}
+
+.logo-buehne {
+    animation: logo-einflug 0.8s cubic-bezier(0.2, 1.3, 0.4, 1) both, logo-sanft 7s ease-in-out 0.8s infinite;
+}
+
+@keyframes logo-sanft {
+    50% { transform: translateY(-4px); }
+}
+
+#menue-logo {
+    box-shadow: 0 0 0 4px var(--holz-dunkel), 0 16px 40px rgba(40, 60, 30, 0.35);
+}
+
+/* weiche, langsame Wolken */
+.menue-wolke-weich {
+    position: absolute;
+    left: -30%;
+    width: calc(240px * var(--groesse, 1));
+    height: calc(70px * var(--groesse, 1));
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.85);
+    filter: blur(1px);
+    animation: menue-wolke linear infinite;
+}
+
+.menue-wolke-weich::before,
+.menue-wolke-weich::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+}
+
+.menue-wolke-weich::before {
+    left: 18%;
+    top: -45%;
+    width: 42%;
+    height: 110%;
+}
+
+.menue-wolke-weich::after {
+    left: 48%;
+    top: -28%;
+    width: 34%;
+    height: 90%;
+}
+
+/* Knoepfe: kein Glanzwischer mehr */
+#hauptmenue .menue-knopf::after {
+    display: none;
+}
+
+/* Hauptmenue: Glanz auf den Knoepfen wieder an (nur das Mitbewegen mit der Maus bleibt aus) */
+#hauptmenue .menue-knopf::after {
+    display: block;
+}
+
+.logo-buehne {
+    animation: logo-einflug 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, logo-schweben 4.5s ease-in-out 0.9s infinite;
+}
+
+/* Hauptmenue: Pixel-Welt aus dem Spiel statt gemaltem Bild */
+#hauptmenue {
+    background-color: #86c457;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+#hauptmenue::before {
+    background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.18), transparent 55%);
+}
+
+/* ---------- Hauptmenue-Knoepfe als Holzschilder (passend zum Pixel-Look) ---------- */
+#hauptmenue .menue-knopf {
+    padding: 13px 26px;
+    font-size: 1.4em;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #fff6dc;
+    text-shadow: 2px 2px 0 #3b2210;
+    background:
+        radial-gradient(circle at 11px 11px, #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 11px) 11px, #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
+        radial-gradient(circle at 11px calc(100% - 11px), #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 11px) calc(100% - 11px), #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
+        repeating-linear-gradient(0deg, transparent 0 9px, rgba(90, 50, 20, 0.18) 9px 11px),
+        linear-gradient(#d09554, #a8692f);
+    border: 4px solid #3b2210;
+    border-radius: 10px;
+    box-shadow:
+        inset 0 3px 0 rgba(255, 228, 176, 0.65),
+        inset 0 -5px 0 rgba(70, 36, 12, 0.35),
+        0 6px 0 #2e1a09,
+        0 12px 22px rgba(0, 0, 0, 0.35);
+}
+
+#hauptmenue .menue-haupt {
+    font-size: 1.75em;
+    color: #ffffff;
+    text-shadow: 2px 2px 0 #1f4a12;
+    background:
+        radial-gradient(circle at 12px 12px, #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 12px) 12px, #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
+        radial-gradient(circle at 12px calc(100% - 12px), #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
+        repeating-linear-gradient(0deg, transparent 0 9px, rgba(30, 70, 15, 0.16) 9px 11px),
+        linear-gradient(#95d95e, #58a02f);
+    border-color: #1f4a12;
+    box-shadow:
+        inset 0 3px 0 rgba(220, 255, 180, 0.75),
+        inset 0 -5px 0 rgba(20, 60, 10, 0.35),
+        0 6px 0 #143008,
+        0 12px 24px rgba(0, 0, 0, 0.35),
+        0 0 0 0 rgba(184, 240, 122, 0);
+    animation: knopf-einblenden 0.5s ease-out both, menue-puls2 2.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes menue-puls2 {
+    50% { filter: brightness(1.08); box-shadow: inset 0 3px 0 rgba(220, 255, 180, 0.75), inset 0 -5px 0 rgba(20, 60, 10, 0.35), 0 6px 0 #143008, 0 12px 24px rgba(0, 0, 0, 0.35), 0 0 22px 4px rgba(184, 240, 122, 0.55); }
+}
+
+#hauptmenue .menue-knopf:hover:not(:disabled) {
+    box-shadow:
+        inset 0 3px 0 rgba(255, 228, 176, 0.75),
+        inset 0 -5px 0 rgba(70, 36, 12, 0.35),
+        0 9px 0 #2e1a09,
+        0 18px 30px rgba(0, 0, 0, 0.35);
+}
+
+#hauptmenue .menue-haupt:hover:not(:disabled) {
+    box-shadow:
+        inset 0 3px 0 rgba(220, 255, 180, 0.85),
+        inset 0 -5px 0 rgba(20, 60, 10, 0.35),
+        0 9px 0 #143008,
+        0 18px 30px rgba(0, 0, 0, 0.35),
+        0 0 24px 4px rgba(184, 240, 122, 0.6);
+}
