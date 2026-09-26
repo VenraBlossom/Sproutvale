@@ -10725,3 +10725,73 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     background: #141638;
     border-top: 3px solid #4a3f9a;
 }
+
+/* ---------- Einstellungen: Sprache ---------- */
+.sprach-karten {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+.sprach-karte {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    font-size: 1.2em;
+    justify-content: flex-start;
+}
+.sprach-karte.aktiv {
+    box-shadow: 0 0 0 3px #5fb03c inset, 0 3px 0 var(--holz-dunkel);
+}
+.sprach-flagge {
+    font-size: 1.8em;
+}
+.sprach-name {
+    flex: 1;
+    text-align: left;
+    font-weight: 700;
+}
+.sprach-haken {
+    color: #2e9e2e;
+    font-weight: 900;
+}
+
+/* ---------- Feedback: Discord-Server ---------- */
+.discord-server {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #5865f2, #7c4fb3);
+    color: #fff;
+    border: 3px solid #2a2f7a;
+}
+.discord-server-titel {
+    font-size: 1.3em;
+    font-weight: 800;
+    text-shadow: 1px 1px 0 #1b1f5a;
+}
+.discord-server p {
+    margin: 6px 0 10px;
+}
+
+.sprach-flagge {
+    width: 48px;
+    height: 32px;
+    border: 2px solid #3a2412;
+    border-radius: 3px;
+    flex: 0 0 auto;
+}
+.flagge-de {
+    background: linear-gradient(#1e1e1e 0 33.3%, #dd2a2a 33.3% 66.6%, #ffcc1a 66.6%);
+}
+.flagge-en {
+    background:
+        linear-gradient(#c8102e, #c8102e) center / 100% 20% no-repeat,
+        linear-gradient(#c8102e, #c8102e) center / 14% 100% no-repeat,
+        linear-gradient(#fff, #fff) center / 100% 36% no-repeat,
+        linear-gradient(#fff, #fff) center / 26% 100% no-repeat,
+        linear-gradient(33.7deg, transparent 45%, #fff 45% 55%, transparent 55%),
+        linear-gradient(-33.7deg, transparent 45%, #fff 45% 55%, transparent 55%),
+        #012169;
+}

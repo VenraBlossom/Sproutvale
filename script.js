@@ -4553,6 +4553,7 @@ function renderEinstellungen() {
         { id: "audio", text: t("🎵 Klang") },
         { id: "anzeige", text: t("👁️ Anzeige") },
         { id: "steuerung", text: t("⌨️ Tasten") },
+        { id: "sprache", text: t("🌍 Sprache") },
         { id: "spielstand", text: t("💾 Spielstand") },
         { id: "feedback", text: t("💌 Feedback") }
     ].filter(Boolean);
@@ -5346,6 +5347,7 @@ function hauptSchleife(jetzt) {
 // ---------- FEEDBACK: per Discord an VenraBlossom ----------
 $("feedback-version").textContent = SPIEL_VERSION;
 $("discord-oeffnen").addEventListener("click", () => window.open("https://discord.com/users/218383099443150849", "_blank"));
+$("discord-server").addEventListener("click", () => window.open("https://discord.gg/vmzYDU5/", "_blank"));
 $("discord-kopieren").addEventListener("click", () => {
     navigator.clipboard.writeText("VenraBlossom").then(
         () => {

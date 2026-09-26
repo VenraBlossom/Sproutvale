@@ -183,10 +183,6 @@
             </div>
 
             <div class="einstellungs-seite" data-seite="anzeige">
-                <div class="einstellung">
-                    <span>🌍 Sprache / Language</span>
-                    <select id="sprache-wahl"></select>
-                </div>
                 <label class="einstellung schalter-zeile">
                     <span>📳 Bildschirm-Wackeln</span>
                     <input type="checkbox" data-option="wackeln">
@@ -231,6 +227,12 @@
                 <div class="statistik-rahmen" id="statistik-content"></div>
             </div>
 
+            <div class="einstellungs-seite" data-seite="sprache">
+                <div class="feedback-titel">🌍 Sprache / Language</div>
+                <p class="einstellung-hinweis">Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.</p>
+                <div class="sprach-karten" id="sprache-wahl"></div>
+            </div>
+
             <div class="einstellungs-seite" data-seite="feedback">
                 <div class="feedback-discord">
                     <div class="feedback-titel">💬 Feedback &amp; Hilfe</div>
@@ -244,6 +246,11 @@
                         <button class="knopf" id="discord-kopieren">📋 Kopieren</button>
                     </div>
                     <button class="knopf knopf-gruen discord-oeffnen" id="discord-oeffnen">💬 Auf Discord schreiben</button>
+                    <div class="discord-server">
+                        <div class="discord-server-titel">🎉 Tritt dem Discord-Server bei!</div>
+                        <p>Neuigkeiten, Vorschau auf neue Inhalte, Fehler melden und mit anderen Spielern quatschen.</p>
+                        <button class="knopf knopf-lila" id="discord-server">🚀 Discord-Server beitreten</button>
+                    </div>
                     <p class="einstellung-hinweis">Bei Fehlern hilft es sehr, wenn du deine Version mitschickst: <b id="feedback-version"></b></p>
                 </div>
             </div>

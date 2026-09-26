@@ -177,20 +177,24 @@ requestAnimationFrame(hauptSchleife);
 $("menue-version").textContent = SPIEL_VERSION;
 
 // Sprache waehlen: speichern und neu laden (alle Texte werden beim Start uebersetzt)
+// Grosse Karten mit Flagge (per CSS gezeichnet, Windows zeigt keine Flaggen-Emojis); die aktive Sprache hat einen Haken
 (function spracheWahl() {
     const wahl = $("sprache-wahl");
     SPRACHEN.forEach(s => {
-        const option = document.createElement("option");
-        option.value = s.id;
-        option.textContent = s.name;
-        wahl.appendChild(option);
-    });
-    wahl.value = SPRACHE;
-    wahl.addEventListener("change", () => {
-        einstellungen.sprache = wahl.value;
-        speichereEinstellungen();
-        speichereRun();
-        speichereMeta();
-        location.reload();
+        const aktiv = s.id === SPRACHE;
+        const karte = el("button", "knopf sprach-karte" + (aktiv ? " aktiv" : ""), null, [
+            el("span", "sprach-flagge flagge-" + s.id),
+            el("span", "sprach-name", s.name),
+            el("span", "sprach-haken", aktiv ? "✔" : "")
+        ]);
+        karte.addEventListener("click", () => {
+            if (s.id === SPRACHE) return;
+            einstellungen.sprache = s.id;
+            speichereEinstellungen();
+            speichereRun();
+            speichereMeta();
+            location.reload();
+        });
+        wahl.appendChild(karte);
     });
 })();
