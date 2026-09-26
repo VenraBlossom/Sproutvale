@@ -1328,7 +1328,7 @@ const DEKO_OBJEKTE = [
     { id: "kuerbislaterne", name: t("Kürbislaterne"), sprite: "kuerbislaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer" },
     { id: "pilzhaus", name: t("Pilzhäuschen"), sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
     { id: "windmuehle", name: t("Windmühle"), sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
-    { id: "lagerfeuer", name: t("Lagerfeuer"), sprite: "lagerfeuer", quelle: "dlc", paket: "einzeln", effekt: "feuer",
+    { id: "lagerfeuer", name: t("Lagerfeuer"), sprite: "lagerfeuer", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer",
         partikel: ["#ffd93d", "#ff8a2a", "#ffffff"] },
     { id: "feenbrunnen", name: t("Feenbrunnen"), sprite: "brunnen", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
         farben: { T: "#8d6bd6", U: "#b48cff", Q: "#ff9ad5" }, partikel: ["#ff9ad5", "#c9b0f5", "#ffffff"] },
