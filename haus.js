@@ -711,7 +711,7 @@ function ladenIdle(laden) {
 // Landung eines Wurfs: kleine Explosion (Feuerwerk), Konfetti (Zirkus) oder Sternenglitzer (Sternwarte)
 function wurfAnkunft(x, y, laden, istSamen) {
     if (laden.bauweise === "feuerwerk") {
-        feuerwerkRing(x, y, istSamen ? laden.ankunft : [zufall(laden.ankunft), "#ffffff"], istSamen ? 18 : 6, istSamen ? 38 : 14);
+        feuerwerkRing(x, y, istSamen ? laden.ankunft : [zufall(laden.ankunft), "#ffffff"], istSamen ? 18 : 8, istSamen ? 38 : 18);
         if (istSamen) Klang.plinkoNagel(2);
     } else if (laden.bauweise === "mondteich") {
         // Blasen platzen auf dem Feld und ziehen kleine Wasserringe
@@ -722,7 +722,7 @@ function wurfAnkunft(x, y, laden, istSamen) {
         setTimeout(() => ring.remove(), 900);
         partikel(x, y, laden.ankunft, istSamen ? 10 : 3, istSamen ? 30 : 12);
     } else if (laden.bauweise === "sternwarte" || laden.bauweise === "leuchtturm") {
-        feuerwerkRing(x, y, laden.ankunft, istSamen ? 10 : 4, istSamen ? 26 : 10);
+        feuerwerkRing(x, y, laden.ankunft, istSamen ? 14 : 7, istSamen ? 34 : 16);
     } else {
         partikel(x, y, laden.ankunft, istSamen ? 18 : 4, istSamen ? 70 : 25);
     }

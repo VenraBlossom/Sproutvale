@@ -2231,8 +2231,9 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
             const vy = zielY - startY - Math.cos(t * Math.PI) * Math.PI * bogen;
             kugel.style.transform = "rotate(" + (Math.atan2(vy, vx) + Math.PI / 2) + "rad)";
         }
-        if (laden.spur && ++spurZaehler % 3 === 0) {
-            partikel(parseFloat(kugel.style.left), parseFloat(kugel.style.top), laden.spur, 1, 8);
+        // Sternwarte und Rakete ziehen eine dichte Funkenspur hinter sich her
+        if (laden.spur && ++spurZaehler % (laden.spurDicht ? 1 : 3) === 0) {
+            partikel(parseFloat(kugel.style.left), parseFloat(kugel.style.top), laden.spur, laden.spurDicht ? 2 : 1, laden.spurDicht ? 12 : 8);
         }
 
         if (t < 1) {
