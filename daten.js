@@ -1234,6 +1234,10 @@ const HAUSTIER_SKINS = [
     { id: "maedchen", name: t("Katzenmädchen"), art: "maedchen", stimme: 1.35, quelle: "dlc", paket: "einzeln", effekt: "herzen",
         idle: "tanz", aura: "#ff9ad5",
         farben: { 1: "#ffffff", 2: "#5a3222", 3: "#3a3a5a", 4: "#ffe2cf", 5: "#b0402a", 6: "#ff9aa8", 7: "#2a1610" } },
+    { id: "kitty", name: t("Kitty"), art: "katze", stil: { schleife: true, keineStreifen: true }, stimme: 1.3,
+        quelle: "dlc", paket: "einzeln", effekt: "herzen",
+        idle: "schleife", aura: "#ff4a6a",
+        farben: { 1: "#ffffff", 2: "#fbfbff", 3: "#dcdce8", 4: "#ffffff", 5: "#1e1016", 6: "#ffb3c0", 7: "#8a8aa0" } },
     { id: "manta", name: t("Mantarochen"), art: "manta", laut: "blubb", quelle: "dlc", paket: "einzeln", effekt: "blasen",
         idle: "manta", aura: "#5aa9e6", schwebt: true,
         farben: { 1: "#9fd8ff", 2: "#3b6a9e", 3: "#264a75", 4: "#eef6ff", 5: "#0f1a2a", 6: "#ff9aa8", 7: "#122238" } }
@@ -1345,6 +1349,9 @@ const DEKO_OBJEKTE = [
     { id: "heuwagen", name: t("Heuwagen"), sprite: "heuwagen", quelle: "dlc", paket: "unterstuetzer" },
     { id: "briefkasten", name: t("Briefkasten"), sprite: "briefkasten", quelle: "dlc", paket: "unterstuetzer" },
     { id: "steinlaterne", name: t("Steinlaterne"), sprite: "steinlaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
+    { id: "schubkarre", name: t("Blumen-Schubkarre"), sprite: "schubkarre", quelle: "dlc", paket: "unterstuetzer" },
+    { id: "wegweiser", name: t("Wegweiser"), sprite: "wegweiser", quelle: "dlc", paket: "unterstuetzer" },
+    { id: "sonnenschirm", name: t("Sonnenschirm"), sprite: "sonnenschirm", quelle: "dlc", paket: "unterstuetzer", effekt: "wackeln" },
     { id: "kuerbislaterne", name: t("Kürbislaterne"), sprite: "kuerbislaterne", quelle: "dlc", paket: "unterstuetzer", effekt: "feuer" },
     { id: "pilzhaus", name: t("Pilzhäuschen"), sprite: "pilzhaus", quelle: "dlc", paket: "unterstuetzer", effekt: "leuchten" },
     { id: "windmuehle", name: t("Windmühle"), sprite: "muehle", quelle: "dlc", paket: "einzeln", fluegel: true },
@@ -1357,7 +1364,11 @@ const DEKO_OBJEKTE = [
     { id: "koiteich", name: t("Koi-Teich"), sprite: "koiteich_0", quelle: "dlc", paket: "einzeln", effekt: "glitzern",
         ablauf: "01234567" },
     { id: "gluecksdrache", name: t("Glücksdrache"), sprite: "gluecksdrache_0", quelle: "dlc", paket: "einzeln",
-        ablauf: "0000000000100000000233332000000000100000000000233320000", partikel: ["#ffd84a", "#ff8a2a", "#ff4a4a"] }
+        ablauf: "0000000000100000000233332000000000100000000000233320000", partikel: ["#ffd84a", "#ff8a2a", "#ff4a4a"] },
+    { id: "windspiel", name: t("Windspiel"), sprite: "windspiel_0", quelle: "dlc", paket: "einzeln",
+        ablauf: "0123012301230000000000", partikel: ["#bff0ff", "#ffffff", "#fff6a0"] },
+    { id: "sternteleskop", name: t("Sternenteleskop"), sprite: "sternteleskop_0", quelle: "dlc", paket: "einzeln",
+        ablauf: "0011223300112233", partikel: ["#fff6a0", "#ffffff", "#8fa2f0"] }
 ];
 
 // Musik: "auto" spielt je nach Tageszeit (nur Lieder, die du hast). Die Noten stehen in audio.js (LIEDER).
@@ -1480,6 +1491,14 @@ const KUGEL_SKINS = [
         farben: { Y: "#ffd6c0", y: "#e0907a", k: "#6a3020", w: "#fff4ee" } },
     { id: "laterne", name: t("Laternensaat"), quelle: "dlc", paket: "einzeln", form: "laterne", klasse: "muenzen-laterne",
         farben: { Y: "#ff5a4a", y: "#b8232a", k: "#4a0a0a", w: "#ffb0a0", E: "#ffd84a" }, funken: ["#ffd84a", "#ff5a4a", "#ff9a3a"] },
+    { id: "schneeflocke", name: t("Schneeflockensaat"), quelle: "dlc", paket: "unterstuetzer", form: "schneeflocke",
+        farben: { Y: "#e8f6ff", y: "#8fc0e0", k: "#2a4a6a", w: "#ffffff" } },
+    { id: "bonbon", name: t("Bonbonsaat"), quelle: "dlc", paket: "unterstuetzer", form: "bonbon",
+        farben: { Y: "#ff9ad5", y: "#d0508a", k: "#5a1a3a", w: "#ffe6f4" } },
+    { id: "mondsichel", name: t("Mondsichelsaat"), quelle: "dlc", paket: "einzeln", form: "mondsichel", klasse: "muenzen-mondsichel",
+        farben: { Y: "#fff6c0", y: "#d8c070", k: "#2a2a5a", w: "#ffffff" }, funken: ["#fff6c0", "#ffffff", "#8fa2f0"] },
+    { id: "blitz", name: t("Blitzsaat"), quelle: "dlc", paket: "einzeln", form: "blitz", klasse: "muenzen-blitz",
+        farben: { Y: "#fff05a", y: "#e0a800", k: "#3a2a00", w: "#ffffff" }, funken: ["#fff05a", "#ffffff", "#9fe8ff"] },
     { id: "planet", name: t("Planetensaat"), quelle: "dlc", paket: "einzeln", form: "planet", klasse: "muenzen-planet",
         farben: { Y: "#9a8aff", y: "#5a4ad0", k: "#1a1450", w: "#e0dcff", E: "#ffd6a0", e: "#c08a5a" },
         funken: ["#ffffff", "#9ad6ff", "#ffd6a0"] }
@@ -1499,7 +1518,11 @@ const RAHMEN_SKINS = [
     { id: "blaetter", name: t("Blätterrahmen"), quelle: "erspielt", bedingungText: t("Bringe eine Pflanze auf Meisterschaft 3"),
         bedingung: () => PFLANZEN_VORLAGEN.some(p => meisterStufe(p.id) >= 3), css: "rahmen-blaetter" },
     { id: "herz", name: t("Herzrahmen"), quelle: "dlc", paket: "unterstuetzer", css: "rahmen-herz" },
-    { id: "kosmos", name: t("Kosmosrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-kosmos" }
+    { id: "kosmos", name: t("Kosmosrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-kosmos" },
+    { id: "wolken", name: t("Wolkenrahmen"), quelle: "dlc", paket: "unterstuetzer", css: "rahmen-wolken" },
+    { id: "honig", name: t("Honigrahmen"), quelle: "dlc", paket: "unterstuetzer", css: "rahmen-honig" },
+    { id: "glitzer", name: t("Glitzerrahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-glitzer" },
+    { id: "aurora", name: t("Polarlicht-Rahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-aurora" }
 ];
 
 // Pflanzen-Looks: tauschen die Blattfarben (G hell, g mittel, d dunkel) aller Pflanzen-Sprites aus.

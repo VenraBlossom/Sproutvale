@@ -467,14 +467,19 @@ setInterval(() => {
     const look = gewaehlteKosmetik("pflanzen");
     const effekt = look.effekt && PFLANZEN_EFFEKTE[look.effekt];
     if (!effekt) return;
-    const reif = run.felder.filter(f => !f.leer && f.fertig);
-    if (reif.length === 0) return;
-    const anzahl = Math.min(3, Math.ceil(reif.length / 4));
+    const pflanzen = run.felder.filter(f => !f.leer);
+    if (pflanzen.length === 0) return;
+    const anzahl = Math.min(4, Math.ceil(pflanzen.length / 3));
     for (let i = 0; i < anzahl; i++) {
-        const rect = zufall(reif).el.spriteEl.getBoundingClientRect();
+        const rect = zufall(pflanzen).el.spriteEl.getBoundingClientRect();
         effekt.reif(rect.left + rect.width * (0.2 + Math.random() * 0.6), rect.top + rect.height * (0.15 + Math.random() * 0.5), look);
     }
-}, 700);
+    // Sternenpflanzen: ab und zu zieht eine kleine Sternschnuppe ueber den Acker
+    if (look.effekt === "sterne" && Math.random() < 0.12) {
+        const rect = zufall(pflanzen).el.spriteEl.getBoundingClientRect();
+        miniSchnuppe(rect.left + rect.width / 2, rect.top, Math.random() < 0.5 ? 1 : -1);
+    }
+}, 600);
 
 function steigendesTeilchen(x, y, farben) {
     const funke = el("div", "deko-funke");
@@ -786,6 +791,13 @@ const HAUSTIER_IDLE = {
     },
     geist: () => {
         haustier.bild.animate([{ opacity: 0.72 }, { opacity: 0.08 }, { opacity: 0.08 }, { opacity: 0.72 }], { duration: 1800, easing: "ease-in-out" });
+    },
+    schleife: () => {
+        haustier.bild.animate([{ translate: "0 0" }, { translate: "0 -14px" }, { translate: "0 0" }, { translate: "0 -6px" }, { translate: "0 0" }],
+            { duration: 700, easing: "ease-out" });
+        const kopf = haustierKopf();
+        zeigeHerzen(kopf.x, kopf.y, 4);
+        feuerwerkRing(kopf.x, kopf.y - 4, ["#ff4a6a", "#ffb3c0", "#ffffff"], 10, 22);
     },
     tanz: () => {
         haustier.bild.animate([{ scale: "1 1" }, { scale: "-1 1" }, { scale: "1 1" }, { scale: "-1 1" }, { scale: "1 1" }],

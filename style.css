@@ -9840,3 +9840,181 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     height: 22px;
     margin: -11px 0 0 -5px;
 }
+
+/* ============================================================
+   0.6: ANIMIERTE LEGENDAERE LOOKS
+   ============================================================ */
+
+/* Kristallpflanzen: ein Glasglanz wandert ueber die Pflanze (wie beim Kristallboden) */
+body.pflanzen-kristall .feld-sprite:not([hidden]) {
+    -webkit-mask-image: linear-gradient(115deg, #000 40%, rgba(0, 0, 0, 0.45) 48%, #000 52%, rgba(0, 0, 0, 0.7) 56%, #000 60%);
+    mask-image: linear-gradient(115deg, #000 40%, rgba(0, 0, 0, 0.45) 48%, #000 52%, rgba(0, 0, 0, 0.7) 56%, #000 60%);
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    animation: glas-glanz 3.2s linear infinite;
+}
+
+body.pflanzen-kristall .feld-sprite.wachsen:not([hidden]) {
+    animation: wachsen 0.3s ease-out, glas-glanz 3.2s linear infinite;
+}
+
+body.pflanzen-kristall .feld.feld-fertig .feld-sprite:not([hidden]) {
+    animation: wippen 1.2s ease-in-out infinite, kristall-schimmer 2.2s ease-in-out infinite, glas-glanz 3.2s linear infinite;
+}
+
+@keyframes glas-glanz {
+    from { -webkit-mask-position: 150% 0; mask-position: 150% 0; }
+    to { -webkit-mask-position: -150% 0; mask-position: -150% 0; }
+}
+
+/* Glutblaetter: brennen ein wenig (flackern und zucken in der Hitze) */
+body.pflanzen-glut .feld-sprite:not([hidden]) {
+    animation: glut-glimmen 1.8s ease-in-out infinite, glut-flackern 0.24s steps(2) infinite;
+}
+
+body.pflanzen-glut .feld-sprite.wachsen:not([hidden]) {
+    animation: wachsen 0.3s ease-out, glut-flackern 0.24s steps(2) infinite;
+}
+
+body.pflanzen-glut .feld.feld-fertig .feld-sprite:not([hidden]) {
+    animation: wippen 1.2s ease-in-out infinite, glut-glimmen 0.9s ease-in-out infinite, glut-flackern 0.24s steps(2) infinite;
+}
+
+@keyframes glut-flackern {
+    from { scale: 1 1; }
+    to { scale: 1.02 1.05; }
+}
+
+/* Sternenpflanzen: sanftes Sternenlicht, das zwischen Gold und Blau wechselt */
+body.pflanzen-sterne .feld-sprite:not([hidden]) {
+    animation: sterne-pflanze-licht 2.4s ease-in-out infinite;
+}
+
+body.pflanzen-sterne .feld-sprite.wachsen:not([hidden]) {
+    animation: wachsen 0.3s ease-out, sterne-pflanze-licht 2.4s ease-in-out infinite;
+}
+
+body.pflanzen-sterne .feld.feld-fertig .feld-sprite:not([hidden]) {
+    animation: wippen 1.2s ease-in-out infinite, sterne-pflanze 1.6s ease-in-out infinite;
+}
+
+@keyframes sterne-pflanze-licht {
+    0%, 100% { filter: drop-shadow(0 0 4px #9fb0ff) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)); }
+    50% { filter: drop-shadow(0 0 8px #fff6a0) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.12); }
+}
+
+/* Sternenboden: ab und zu zieht eine Sternschnuppe ueber jedes Feld */
+body.felder-sterne .feld:not(.kauf-kachel)::before {
+    content: "";
+    position: absolute;
+    top: 18%;
+    left: 0;
+    width: 34%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 246, 160, 0.9), #ffffff);
+    box-shadow: 0 0 6px #fff6a0;
+    rotate: 20deg;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    animation: boden-schnuppe 7s linear infinite;
+}
+
+body.felder-sterne .feld:nth-child(3n)::before { animation-delay: -2.3s; top: 30%; }
+body.felder-sterne .feld:nth-child(3n+1)::before { animation-delay: -4.6s; top: 12%; }
+body.felder-sterne .feld:nth-child(5n)::before { animation-duration: 9s; }
+
+@keyframes boden-schnuppe {
+    0%, 82% { translate: -40% 0; opacity: 0; }
+    84% { opacity: 1; }
+    96% { opacity: 1; }
+    100% { translate: 190% 60%; opacity: 0; }
+}
+
+/* Sternenboden: die Sterne funkeln versetzt und wandern ganz langsam */
+body.felder-sterne .feld:not(.kauf-kachel)::after {
+    animation: funkeln 1.8s ease-in-out infinite, sterne-wandern 12s linear infinite;
+}
+
+@keyframes sterne-wandern {
+    0%, 100% { background-position: 0 0, 0 0, 0 0, 0 0; }
+    50% { background-position: 3px -2px, -2px 3px, 2px 2px, -3px -1px; }
+}
+
+/* Legendaere Saat: Mondsichel (sanftes Mondlicht) und Blitz (zuckt) */
+body.muenzen-mondsichel .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-mondsichel {
+    animation: mondsichel-licht 2.4s ease-in-out infinite;
+}
+
+body.muenzen-mondsichel .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, mondsichel-licht 2.4s ease-in-out infinite;
+}
+
+@keyframes mondsichel-licht {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 246, 192, 0.8)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    50% { filter: drop-shadow(0 0 11px rgba(143, 162, 240, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.15); }
+}
+
+body.muenzen-blitz .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-blitz {
+    animation: blitz-zucken 1.6s steps(1) infinite;
+}
+
+body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, blitz-zucken 1.6s steps(1) infinite;
+}
+
+@keyframes blitz-zucken {
+    0%, 70%, 80%, 100% { filter: drop-shadow(0 0 4px #fff05a) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    72%, 78% { filter: drop-shadow(0 0 14px #9fe8ff) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.6); }
+}
+
+/* Neue Kuschel-Rahmen */
+.rahmen-wolken {
+    border-color: #9fd8ff !important;
+    background-image:
+        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.95) 0 7px, transparent 8px),
+        radial-gradient(circle at 22% 8%, rgba(255, 255, 255, 0.95) 0 5px, transparent 6px),
+        radial-gradient(circle at 85% 92%, rgba(255, 255, 255, 0.95) 0 7px, transparent 8px),
+        radial-gradient(circle at 75% 94%, rgba(255, 255, 255, 0.95) 0 5px, transparent 6px),
+        linear-gradient(#e8f6ff, #ffffff) !important;
+}
+
+.rahmen-honig {
+    border-color: #e0a800 !important;
+    border-style: double !important;
+    background-image:
+        radial-gradient(circle at 50% 0, rgba(255, 217, 61, 0.55) 0 10px, transparent 11px),
+        linear-gradient(#fff4c8, #ffe89a) !important;
+}
+
+.rahmen-glitzer {
+    border-color: #ff9ad5 !important;
+    background-image:
+        radial-gradient(circle at 15% 20%, #ffffff 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 80% 30%, #fff6a0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 30% 80%, #ffd6f0 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 70% 75%, #ffffff 0 1.5px, transparent 2.5px),
+        linear-gradient(135deg, rgba(255, 154, 213, 0.15), rgba(143, 162, 240, 0.15)) !important;
+    animation: glitzer-rahmen 1.6s ease-in-out infinite !important;
+}
+
+@keyframes glitzer-rahmen {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 154, 213, 0.6); background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+    50% { box-shadow: 0 0 16px rgba(255, 246, 160, 0.95); background-position: 2px -2px, -2px 2px, 2px 1px, -1px -2px, 0 0; }
+}
+
+.rahmen-aurora {
+    border-color: #7ae0a0 !important;
+    background-image: linear-gradient(120deg, rgba(122, 224, 160, 0.3), rgba(143, 162, 240, 0.3), rgba(200, 110, 232, 0.3), rgba(122, 224, 160, 0.3)) !important;
+    background-size: 300% 100% !important;
+    animation: aurora-rahmen 5s linear infinite !important;
+}
+
+@keyframes aurora-rahmen {
+    0% { background-position: 0 0; border-color: #7ae0a0; box-shadow: 0 0 10px rgba(122, 224, 160, 0.7); }
+    50% { background-position: 150% 0; border-color: #8fa2f0; box-shadow: 0 0 14px rgba(143, 162, 240, 0.8); }
+    100% { background-position: 300% 0; border-color: #7ae0a0; box-shadow: 0 0 10px rgba(122, 224, 160, 0.7); }
+}

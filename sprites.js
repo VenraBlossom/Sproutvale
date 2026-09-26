@@ -985,6 +985,52 @@ const SPRITE_PIXEL = {
         ".yyYyyYyyYyyYyyYy.",
         "..yyyyyyyyyyyyyy.."
     ],
+    // Deko (episch): Schubkarre mit Blumen, Wegweiser, Sonnenschirm
+    schubkarre: [
+        "...R..Y..t..R...",
+        "..gGgGgGgGgGgG..",
+        ".VVVVVVVVVVVVVVD",
+        ".VWWWWWWWWWWWWVD",
+        "..VWWWWWWWWWWV.D",
+        "...VVVVVVVVVV...",
+        "..kk.......D..D.",
+        ".k88k......D..D.",
+        ".k88k...........",
+        "..kk............"
+    ],
+    wegweiser: [
+        ".....DD.....",
+        ".WWWWWWWWV..",
+        ".WkkWkWkWWV.",
+        ".WWWWWWWWV..",
+        ".....DD.....",
+        "..VWWWWWWW..",
+        ".VWkWkkWkW..",
+        "..VWWWWWWW..",
+        ".....DD.....",
+        ".....DD.....",
+        ".....DD.....",
+        ".....DD.....",
+        ".....DD.....",
+        ".....DD.....",
+        "....gDDg....",
+        "...gggggg..."
+    ],
+    sonnenschirm: [
+        "......kk......",
+        "....RRwwRR....",
+        "..RRwwRRwwRR..",
+        ".RwwRRwwRRwwR.",
+        "RRwwRRwwRRwwRR",
+        "......DD......",
+        "......DD......",
+        "......DD......",
+        "......DD......",
+        "....VVDDVV....",
+        "......DD......",
+        "......DD......",
+        "....DDDDDD...."
+    ],
     // Kuerbislaterne mit leuchtendem Gesicht
     kuerbislaterne: [
         ".....Gg.....",
@@ -1430,6 +1476,59 @@ for (let n = 0; n < 8; n++) {
     SPRITE_PIXEL["koiteich_" + n] = raster.map(z => z.join(""));
 }
 
+// Windspiel (legendaere Deko): Pfosten mit Arm, drei Klangstaebe schwingen hin und her
+for (let n = 0; n < 4; n++) {
+    const B = 12;
+    const H = 16;
+    const r = Array.from({ length: H }, () => Array(B).fill("."));
+    const setze = (x, y, c) => { if (x >= 0 && x < B && y >= 0 && y < H) r[y][x] = c; };
+    for (let y = 1; y < H - 1; y++) setze(2, y, "D");
+    for (let x = 1; x < 4; x++) setze(x, H - 1, "D");
+    for (let x = 2; x < 11; x++) setze(x, 1, "D");
+    setze(10, 0, "Y");
+    const schwung = [0, 1, 0, -1][n];
+    [[5, 5, "z"], [7, 7, "Q"], [9, 6, "z"]].forEach(([x, laenge, farbe], i) => {
+        const s = i === 1 ? -schwung : schwung;
+        setze(x, 2, "k");
+        setze(x + (s > 0 ? 1 : s < 0 ? -1 : 0) * 0, 3, "k");
+        for (let y = 4; y < 4 + laenge; y++) setze(x + (y > 5 ? s : 0), y, farbe);
+        setze(x + s, 4 + laenge, "8");
+    });
+    // Kleines Glitzern am unteren Ende, wenn die Staebe aneinanderstossen
+    if (n === 1) setze(8, 10, "w");
+    if (n === 3) setze(6, 9, "w");
+    SPRITE_PIXEL["windspiel_" + n] = r.map(z => z.join(""));
+}
+
+// Sternenteleskop (legendaere Deko): Fernrohr auf einem Dreibein, darueber funkeln Sterne
+for (let n = 0; n < 4; n++) {
+    const B = 14;
+    const H = 16;
+    const r = Array.from({ length: H }, () => Array(B).fill("."));
+    const setze = (x, y, c) => { if (x >= 0 && x < B && y >= 0 && y < H) r[y][x] = c; };
+    // Rohr schraeg nach oben rechts
+    for (let i = 0; i < 9; i++) {
+        const x = 2 + i;
+        const y = 11 - Math.round(i * 0.7);
+        setze(x, y, i > 6 ? "z" : "q");
+        setze(x, y + 1, i > 6 ? "Q" : "x");
+    }
+    setze(6, 8, "Y"); setze(6, 9, "Y");
+    setze(11, 4, "z"); setze(11, 5, "w");
+    // Dreibein
+    for (let i = 0; i < 4; i++) {
+        setze(6 - i, 11 + i, "D");
+        setze(6, 11 + i, "D");
+        setze(6 + i, 11 + i, "D");
+    }
+    // Funkelnde Sterne (wechseln je Bild)
+    [[[12, 1], [9, 0]], [[13, 3], [10, 1]], [[12, 0], [8, 2]], [[13, 2], [11, 0]]][n].forEach(([x, y], i) => {
+        setze(x, y, i === 0 ? "v" : "w");
+    });
+    if (n % 2 === 0) { setze(12, 2, "Y"); }
+    SPRITE_PIXEL["sternteleskop_" + n] = r.map(z => z.join(""));
+}
+
 SPRITE_PIXEL.mond = Array.from({ length: 13 }, (_, y) => Array.from({ length: 13 }, (_, x) => {
     const aussen = Math.hypot(x - 6, y - 6);
     const schnitt = Math.hypot(x - 9, y - 4);
@@ -1707,6 +1806,14 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         p.punkt(mx + 1, oben - 1, "Y");
         p.punkt(mx + 2, oben - 2, "Y");
         p.punkt(mx + 2, oben - 3, "v");
+    }
+    // Rote Schleife am vorderen Ohr (Kitty)
+    if (stil.schleife) {
+        p.punkt(mx + 1, oben - 3, "R");
+        p.punkt(mx + 1, oben - 2, "R");
+        p.punkt(mx + 3, oben - 3, "R");
+        p.punkt(mx + 3, oben - 2, "R");
+        p.punkt(mx + 2, oben - 2, "r");
     }
     if (stil.kuerbishut) {
         p.ellipse(cx - 0.4, oben - 0.2, 2.4, 1.4, "O");
@@ -2558,6 +2665,62 @@ SPRITE_PIXEL.form_planet = [
     "....kkkk....",
     "............",
     "............"
+];
+SPRITE_PIXEL.form_schneeflocke = [
+    ".....kk.....",
+    ".kk..YY..kk.",
+    ".kYk.YY.kYk.",
+    "..kYkYYkYk..",
+    "...kYZZYk...",
+    "kYYYZZZZYYYk",
+    "kyyyZZZZyyyk",
+    "...kyZZyk...",
+    "..kykyykyk..",
+    ".kyk.yy.kyk.",
+    ".kk..yy..kk.",
+    ".....kk....."
+];
+SPRITE_PIXEL.form_bonbon = [
+    "............",
+    "............",
+    "kk........kk",
+    "kYk.kkkk.kYk",
+    "kYYkYwYYkYYk",
+    ".kYkYZZYkYk.",
+    ".kYkZZZZkYk.",
+    "kyykyZZykyyk",
+    "kyk.kkkk.kyk",
+    "kk........kk",
+    "............",
+    "............"
+];
+SPRITE_PIXEL.form_mondsichel = [
+    "...kkkk.....",
+    ".kkYYYYk....",
+    "kYwYYkk.....",
+    "kYwYk...kk..",
+    "kYYk...kZZk.",
+    "kYYk...kZZk.",
+    "kYYk....kk..",
+    "kYyYk.......",
+    "kyYyYkk.....",
+    ".kkyyyyk....",
+    "...kkkk.....",
+    "............"
+];
+SPRITE_PIXEL.form_blitz = [
+    "......kkkk..",
+    ".....kYYk...",
+    "....kYwk....",
+    "...kYwk.....",
+    "..kYZZkkkk..",
+    ".kYZZZZZYk..",
+    ".kkkkZZYk...",
+    "....kYYk....",
+    "...kYyk.....",
+    "..kYyk......",
+    ".kyk........",
+    ".kk........."
 ];
 SPRITE_PIXEL.form_blatt = [
     "........kkk.",
