@@ -258,6 +258,7 @@ const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [
 const SHOP_UPGRADES = [
     { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9, max: 22,
         beschreibung: t("-1 Klick pro Samen."),
+        erledigt: () => (klicksAmMinimum() ? t("die geringste Klickzahl pro Samen (mehr geht nicht)") : null),
         info: () => klicksProSamen() + t(" Klicks pro Samen") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,
         beschreibung: t("+25 Energie pro Tag."),
@@ -571,7 +572,7 @@ const SKILLS = [
     shopStern("s_marktschreier", "hof", [0, 1180], "s_duengerabo", 5000),
     shopStern("s_regentonne", "hof", [220, 1400], "wurmhumus", 2500),
     shopStern("s_vogelhaus", "hof", [-220, 1620], "s_laterne", 1800),
-    shopStern("s_saatsortiment", "hof", [0, 1620], "vorratskammer", 4000),
+    shopStern("s_saatsortiment", "hof", [0, 1400], "s_marktschreier", 4000),
     shopStern("s_saatband", "hof", [-440, 1620], "nachtwache", 1500),
     shopStern("s_obstkorb", "hof", [220, 1620], "s_regentonne", 5000),
     stern("lagerhaus", "hof", "🏚️", [440, 1180], "zinsen", t("Lagerhaus"), 2500, 2.3, 4,
@@ -587,10 +588,6 @@ const SKILLS = [
     stern("wurmhumus", "hof", "🪱", [220, 1180], "gewaechshaus", t("Wurmhumus"), 1600, 1, 1,
         t("Gedüngte Felder geben dreifaches statt doppeltes Gold."),
         () => (level("wurmhumus") > 0 ? t("x3 Gold auf gedüngten Feldern") : t("x2 Gold auf gedüngten Feldern"))),
-    stern("vorratskammer", "hof", "🥫", [0, 1400], "s_marktschreier", t("Vorratskammer"), 1200, 1, 1,
-        t("Saaten, die bei Feierabend noch liegen, werden automatisch eingesammelt statt zu verfallen."),
-        () => (level("vorratskammer") > 0 ? t("Aktiv") : t("Nicht aktiv")),
-        { erledigt: () => (istVerstaerkt("tod") ? t("Der Tod (Tarotkarte, verbessert und ausgerüstet)") : null) }),
     stern("erntefest", "hof", "🎪", [440, 1400], "lagerhaus", t("Erntefest"), 900, 3, 3,
         t("Am Rechnungstag (jeder 5. Tag) gibt es +100% Gold aus allen Ernten."),
         () => "+" + prozentText(level("erntefest")) + t(" Gold am Rechnungstag"))
@@ -705,7 +702,7 @@ const STERN_KURZ = {
     morgentau: t("Morgens schneller wachsen"), doppelwurf: t("Zweiter Samen"), zinsen: t("Zinsen bei Feierabend"),
     wetterfrosch: t("Mehr gutes Wetter"), abendsonne: t("Abends mehr Gold"), lagerhaus: t("Höhere Zinsen erlaubt"),
     nachtwache: t("Glühwürmchen: mehr Energie"), gewaechshaus: t("Bewässert: mehr Gold"), wurmhumus: t("Gedüngt: x3 statt x2 Gold"),
-    vorratskammer: t("Liegende Saat wird eingesammelt"), erntefest: t("Rechnungstag: mehr Gold"),
+    erntefest: t("Rechnungstag: mehr Gold"),
     muenzwurf: t("Glücksspiel: Münzwurf"), gacha: t("Glücksspiel: Slotmaschine"), rubbellos: t("Glücksspiel: Rubbellose"),
     huehnerrennen: t("Glücksspiel: Hühnerrennen"), plinko: t("Glücksspiel: Samen-Plinko"),
     jahresrad: t("Jahreszeiten stärker"), bluetenzauber: t("Frühling: bunte Saat"), sonnenernte: t("Sommer: mehr Gold"),
@@ -820,7 +817,7 @@ const SEGEN = [
     { id: "wissen", badge: "📚", name: t("Wissensdurst"), text: t("+15% Chance, dass eine Sternensaat doppelt zählt.") },
     { id: "glueckspilz", badge: "🍄", name: t("Glückspilz"), text: t("+2% Chance auf epische Saaten.") },
     { id: "wachstum", badge: "🌿", name: t("Wachstumsschub"), text: t("Alle Pflanzen wachsen 10% schneller.") },
-    { id: "sternenstaub", badge: "🌠", name: t("Sternenstaub"), text: t("Sternschnuppen kommen 30% öfter und geben 3 Sekunden länger doppeltes Gold.") },
+    { id: "sternenstaub", badge: "🌠", name: t("Sternschnuppenregen"), text: t("Sternschnuppen kommen 30% öfter und geben 3 Sekunden länger doppeltes Gold.") },
     { id: "rhythmus", badge: "🥁", name: t("Rhythmusgefühl"), text: t("+0,1 Sek. Zeit für die Kombo.") },
     { id: "nachteule", badge: "🦉", name: t("Nachteule"), text: t("Glühwürmchen kommen doppelt so oft.") },
     { id: "tierfreund", badge: "🐾", name: t("Tierfreund"), text: t("Deinen Begleiter zu streicheln gibt doppelt so viel Gold.") },
@@ -1766,25 +1763,28 @@ const KUSCHEL_NACH_ID = Object.fromEntries(KUSCHELTIERE.map(k => [k.id, k]));
 // Dafuer: Sternensplitter fuer den Sternenfall-Shop UND jeder Sternenfall verdoppelt alle zukuenftigen Mondblueten (x2, x4, x8 ...).
 
 const STERNENFALL_KONFIG = {
-    mindestMondblueten: 1500,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
-    splitterTeiler: 150           // Sternensplitter = Wurzel(verdiente Mondblueten / 150)
+    mindestMondblueten: 1000,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
+    splitterTeiler: 60            // Sternensplitter = Wurzel(verdiente Mondblueten / 60)
 };
 
 const STERNENFALL_UPGRADES = [
-    { id: "sternenregen", name: t("Sternenregen"), symbol: "🌠", basiskosten: 1, faktor: 1.6, max: Infinity,
+    { id: "sternenregen", name: t("Sternenregen"), symbol: "🌠", basiskosten: 1, faktor: 1.35, max: Infinity,
         beschreibung: t("+25% Gold aus allen Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 25 * lvl + t("% Gold") },
-    { id: "sternensaat", name: t("Sternensaat"), symbol: "✨", basiskosten: 1, faktor: 1.7, max: Infinity,
+    { id: "sternensaat", name: t("Sternensaat"), symbol: "✨", basiskosten: 1, faktor: 1.4, max: Infinity,
         beschreibung: t("+10% Sternensamen aus Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 10 * lvl + t("% Sternensamen") },
-    { id: "mondmagnet", name: t("Mondmagnet"), symbol: "🌙", basiskosten: 2, faktor: 1.8, max: Infinity,
+    { id: "mondmagnet", name: t("Mondmagnet"), symbol: "🌙", basiskosten: 1, faktor: 1.45, max: Infinity,
         beschreibung: t("+10% Mondblüten am Ende jedes Runs. Unendlich oft kaufbar."), info: lvl => "+" + 10 * lvl + t("% Mondblüten") },
-    { id: "ewigerfruehling", name: t("Ewiger Frühling"), symbol: "🌸", basiskosten: 2, faktor: 1.9, max: 10,
+    { id: "ewigerfruehling", name: t("Ewiger Frühling"), symbol: "🌸", basiskosten: 1, faktor: 1.5, max: 10,
         beschreibung: t("Alle Pflanzen wachsen 5% schneller."), info: lvl => "+" + 5 * lvl + t("% Wachstum") },
-    { id: "glueckstern", name: t("Glücksstern"), symbol: "⭐", basiskosten: 2, faktor: 2, max: 5,
+    { id: "glueckstern", name: t("Glücksstern"), symbol: "⭐", basiskosten: 1, faktor: 1.6, max: 5,
         beschreibung: t("+3% Glück bei allen Glücksspielen."), info: lvl => "+" + 3 * lvl + t("% Glück") },
-    { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 4, faktor: 2.5, max: 3,
+    { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 2, faktor: 2, max: 3,
         beschreibung: t("Jeder Run startet mit einem zufälligen Werkzeug."), info: lvl => lvl + t(" Werkzeuge zum Start") },
-    { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 3, faktor: 3, max: 3,
-        beschreibung: t("Jeder Sternenfall schenkt dir 3 Kuschel-Gutscheine."), info: lvl => 3 * lvl + t(" Gutscheine pro Sternenfall") }
+    { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 2, faktor: 2, max: 3,
+        beschreibung: t("Jeder Sternenfall schenkt dir 3 Kuschel-Gutscheine."), info: lvl => 3 * lvl + t(" Gutscheine pro Sternenfall") },
+    { id: "dauerklick", name: t("Dauerklick"), symbol: "🖱️", basiskosten: 1, faktor: 1, max: 1,
+        beschreibung: t("Halte die Maus auf dem Samenladen gedrückt: Er klickt von allein, 15-mal pro Sekunde."),
+        info: lvl => (lvl > 0 ? t("Aktiv") : t("Nicht aktiv")) }
 ];
 
 // ---------- SPIELMODI ----------

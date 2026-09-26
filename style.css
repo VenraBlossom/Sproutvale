@@ -10420,3 +10420,11 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     pointer-events: none;
     animation: funkeln 2s ease-in-out infinite;
 }
+
+/* Aufgehobene Saat und Sternensamen: Zahlen 1,8-mal so gross */
+.schwebe-text.schwebe-aufheben {
+    font-size: 2.52em;
+}
+.schwebe-text.schwebe-gross.schwebe-aufheben {
+    font-size: 3.42em;
+}

@@ -519,6 +519,12 @@ function glueckBonus() {
         0.05 * kuschel("manta") + 0.03 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
 }
 
+// Weniger Klicks pro Samen geht nicht mehr (weitere Stufen "Schnellere Aussaat" bringen nichts)
+function klicksAmMinimum() {
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, segen("flink")) + gachaBonus("klicks");
+    return (KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel")) <= KONFIG.minKlicksProSamen;
+}
+
 function klicksProSamen() {
     const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, segen("flink")) + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
@@ -2276,10 +2282,11 @@ function wackleBildschirm(staerke) {
     fieldGrid.animate(schritte, { duration: 350 });
 }
 
-function zeigeSchwebeText(x, y, text, farbe, gross) {
+function zeigeSchwebeText(x, y, text, farbe, gross, klasse) {
     if (!gross && fxLayer.querySelectorAll(".schwebe-text").length > 25) return;
     const el = document.createElement("div");
     el.classList.add("schwebe-text");
+    if (klasse) el.classList.add(klasse);
     if (gross) el.classList.add("schwebe-gross");
     el.textContent = text;
     el.style.left = x + "px";
@@ -2437,7 +2444,7 @@ function sammleEin(loot) {
     if (loot.typ === "stern") {
         gibSternensamen(loot.wert);
         aktualisiereTopBar();
-        zeigeSchwebeText(loot.x, loot.y, "+" + zahl(loot.wert), "#4a5fc0", false);
+        zeigeSchwebeText(loot.x, loot.y, "+" + zahl(loot.wert), "#4a5fc0", false, "schwebe-aufheben");
         Klang.xp();
         partikel(loot.x, loot.y, ["#8fa2f0", "#fff6d8"], 5, 30);
         fliegeZuAnzeige(loot, skillpointDisplay);
@@ -2458,7 +2465,7 @@ function sammleEin(loot) {
     }
     const symbol = einstellungen.farbenblind && loot.raritaetIndex > 0 ? raritaet.symbol + " " : "";
     const text = loot.anzeige || symbol + (istJackpot ? t("JACKPOT! ") : "") + "+" + zahl(loot.wert);
-    zeigeSchwebeText(loot.x, loot.y, text, loot.anzeige ? "#e0507a" : raritaet.rand, loot.raritaetIndex >= 3);
+    zeigeSchwebeText(loot.x, loot.y, text, loot.anzeige ? "#e0507a" : raritaet.rand, loot.raritaetIndex >= 3, "schwebe-aufheben");
 
     Klang.muenze(loot.raritaetIndex);
     partikel(loot.x, loot.y, [raritaet.farbe, "#fff6c2"], istJackpot ? 24 : 5, istJackpot ? 120 : 30);
@@ -3265,9 +3272,9 @@ function beendeTag() {
         run.felder.filter(f => f.fertig && !f.kraehe).forEach(f => ernteFeld(f, true, 1));
     }
 
-    // Feierabend: liegengebliebene Saaten verfallen (ausser mit "Der Tod" oder der Vorratskammer)
+    // Feierabend: liegengebliebene Saaten verfallen (ausser mit "Der Tod")
     [...lootKugeln].forEach(loot => {
-        if (hatTarot("tod") || level("vorratskammer") > 0) sammleEin(loot);
+        if (hatTarot("tod")) sammleEin(loot);
         else lassVerfallen(loot);
     });
 
@@ -3725,13 +3732,14 @@ function stufenText(stufe, max) {
 function upgradeKarte(def, waehrung) {
     const lvl = level(def.id);
     const kosten = kostenMitFaktor(def.basiskosten, def.faktor, lvl);
-    const istMax = lvl >= def.max;
+    const erledigt = def.erledigt && def.erledigt();
+    const istMax = lvl >= def.max || Boolean(erledigt);
 
     return erstelleKarte({
         titel: def.name + " (" + stufenText(lvl, def.max) + ")",
         beschreibung: def.beschreibung,
-        info: t("Aktuell: ") + def.info(),
-        knopfText: istMax ? t("Maximal") : preisText(kosten, waehrung),
+        info: erledigt ? t("✔ Abgeschlossen: Du hast schon ") + erledigt + "." : t("Aktuell: ") + def.info(),
+        knopfText: erledigt ? t("✔ Abgeschlossen") : istMax ? t("Maximal") : preisText(kosten, waehrung),
         aktiv: !istMax && darfEinkaufen() && guthaben(waehrung) >= kosten,
         onKauf: () => kaufeUpgrade(def, waehrung)
     });
@@ -3740,6 +3748,7 @@ function upgradeKarte(def, waehrung) {
 function kaufeUpgrade(def, waehrung) {
     const kosten = kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
     if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < kosten) return;
+    if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
     bezahle(waehrung, kosten);
     run.level[def.id] = level(def.id) + 1;
@@ -3908,7 +3917,13 @@ function istKnotenMax(id) {
 }
 
 function istVorgaengerErfuellt(vor, vorMax) {
+    // Ein erledigter Stern zaehlt erst, wenn man bis zu ihm gekommen ist
+    const vorDef = SKILL_NACH_ID[vor];
+    if (vorDef && istSternErledigt(vorDef)) return istKnotenOffen(vorDef);
     return vorMax ? istKnotenMax(vor) : istKnotenGekauft(vor);
+}
+function istSternErledigt(def) {
+    return Boolean(def.erledigt && def.erledigt());
 }
 
 function istKnotenOffen(def) {
@@ -3920,7 +3935,7 @@ function knotenKosten(def) {
 }
 
 function knotenSicht(def) {
-    if (istKnotenGekauft(def.id) || istKnotenOffen(def)) return "sichtbar";
+    if ((istKnotenGekauft(def.id) && !istSternErledigt(def)) || istKnotenOffen(def)) return "sichtbar";
     const vor = SKILL_NACH_ID[def.vor];
     return vor && istKnotenOffen(vor) ? "schatten" : "versteckt";
 }
@@ -4096,7 +4111,8 @@ function renderSkilltree() {
             linie.setAttribute("y1", vor.pos[1]);
             linie.setAttribute("x2", def.pos[0]);
             linie.setAttribute("y2", def.pos[1]);
-            linie.classList.add(istKnotenGekauft(def.id) ? "linie-voll" : istKnotenOffen(def) ? "linie-offen" : "linie-gesperrt");
+            const voll = istSternErledigt(def) ? istKnotenOffen(def) : istKnotenGekauft(def.id);
+            linie.classList.add(voll ? "linie-voll" : istKnotenOffen(def) ? "linie-offen" : "linie-gesperrt");
             sternbildLinien.appendChild(linie);
         }
 
@@ -4883,7 +4899,38 @@ neuanfangKnopf.addEventListener("click", frageNeuanfang);
 // pointerdown statt click: reagiert schon beim Runterdruecken, fuehlt sich beim schnellen Klicken direkter an
 plantButton.addEventListener("pointerdown", event => {
     if (event.button === 0) klickSamenladen(false, event.clientX, event.clientY);
+    if (event.button === 0) starteDauerklick(event);
 });
+
+// Dauerklick: gedrueckt halten klickt 15-mal pro Sekunde (erst nach einer kurzen Pause, damit Einzelklicks normal bleiben)
+const DAUERKLICK_PRO_SEK = 15;
+let dauerklick = null;
+function starteDauerklick(event) {
+    stoppeDauerklick();
+    if (sfLevel("dauerklick") <= 0) return;
+    dauerklick = { x: event.clientX, y: event.clientY, timer: null };
+    dauerklick.start = setTimeout(() => {
+        if (!dauerklick) return;
+        dauerklick.timer = setInterval(() => {
+            if (!dauerklick || !run || run.phase !== "tag" || spielPausiert()) return;
+            klickSamenladen(false, dauerklick.x, dauerklick.y);
+        }, 1000 / DAUERKLICK_PRO_SEK);
+    }, 250);
+}
+function stoppeDauerklick() {
+    if (!dauerklick) return;
+    clearTimeout(dauerklick.start);
+    clearInterval(dauerklick.timer);
+    dauerklick = null;
+}
+plantButton.addEventListener("pointermove", event => {
+    if (dauerklick) {
+        dauerklick.x = event.clientX;
+        dauerklick.y = event.clientY;
+    }
+});
+["pointerup", "pointerleave", "pointercancel"].forEach(typ => plantButton.addEventListener(typ, stoppeDauerklick));
+window.addEventListener("blur", stoppeDauerklick);
 
 // ---------- RUN-SPIELSTAND ----------
 // Der laufende Run wird zwischen den Tagen gespeichert (nach jedem Einkauf, Segen, Gluecksspiel ...).
