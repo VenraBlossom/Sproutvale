@@ -1434,9 +1434,10 @@ function ernteMitCursor(x, y) {
     treffer.forEach(t => {
         if (klickFeld(t.feld)) geerntet += 1;
     });
+    // Wachsende Pflanze anklicken: nur genau diese eine waechst ein Stueck (der Cursor-Kreis zaehlt hier nicht)
     run.felder
         .filter(feld => !feld.leer && !feld.fertig && !feld.kraehe &&
-            abstandZuRechteck(x, y, feld.el.feldDiv.getBoundingClientRect()) <= radius)
+            abstandZuRechteck(x, y, feld.el.feldDiv.getBoundingClientRect()) === 0)
         .forEach(schubsWachstum);
     if (geerntet >= 2) {
         const farbe = geerntet >= 9 ? "#d9452c" : geerntet >= 4 ? "#e08a00" : "#2e9e2e";
