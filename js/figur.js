@@ -1064,9 +1064,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
         for (let y = 0; y < 6; y++) k.rechteck(x0, y0 + y, breite, 1, farben[(y - anim + 12) % 6]);
         k.rechteck(x0, y0 + 5.5, breite, 0.5, "8");
         k.fein(x0 + 1, y0 + 1, "k");
-    } else if (form === "pyjama") {    } else if (form === "pyjama") {
-        for (let y = 0.5; y < 6; y += 1.5) k.feinLinie(x0, y0 + y, x0 + breite - 0.5, y0 + y, "k");
-        if (blick === "vorne") [1.5, 3, 4.5].forEach(y => k.fein(mitte - 0.5, y0 + y, "w"));
     }
 }
 

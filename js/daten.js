@@ -2514,7 +2514,6 @@ const FIGUR_TEILE = {
         { id: "kimono", name: t("Kimono"), ...EPISCH, form: "kimono", farben: { 6: "#e8566a", 8: "#b83a4c", k: "#f4d060" } },
         { id: "matrose", name: t("Matrosenhemd"), ...EPISCH, form: "matrose", farben: { 6: "#f6f6fa", 8: "#d0d0dc", k: "#2a3a7a", p: "#d9302a" } },
         { id: "weste", name: t("Weste"), ...EPISCH, form: "weste", farben: { 6: "#6b3f1d", 8: "#4a2a12", k: "#f4f0e8" } },
-        { id: "pyjama", name: t("Schlafanzug"), ...EPISCH, form: "pyjama", farben: { 6: "#8ab8f0", 8: "#6a98d0", k: "#f4f8ff" } },
         { id: "jacke", name: t("Jacke"), ...EPISCH, form: "jacke", farben: { 6: "#4a6a9a", 8: "#344e78", k: "#f4f4f4", p: "#d4a02a" } },
         { id: "ringel", name: t("Ringelshirt"), ...EPISCH, form: "ringel", farben: { 6: "#f4f4f4", 8: "#d0d0dc", k: "#2a4a9a" } },
         { id: "regenmantel", name: t("Regenmantel"), ...EPISCH, form: "regenmantel", farben: { 6: "#f5d547", 8: "#c8a820", k: "#3a3a44" } },
