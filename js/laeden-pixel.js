@@ -398,6 +398,131 @@ const LADEN_PIXEL = {
         return b.fertig();
     } },
 
+    // ===== neue epische Laeden =====
+    gemuesewagen: { hoehe: 36, bilder: 1, zeichne() {
+        const b = neuesPixelBild(36);
+        // Deichsel und Griff
+        b.poly([[26, 24], [31, 20], [31, 21], [27, 26]], "#7a5230");
+        // Gemuese oben drauf (liegt hinter der Kiste)
+        b.ell(9, 16, 4, 3, "#6cc24a");
+        b.ell(15, 15, 4, 4, "#e8434a");
+        b.ell(21, 16, 4, 3, "#f08a24");
+        b.ell(12, 13, 3, 3, "#8fd05c");
+        b.ell(19, 12, 2.5, 2.5, "#e8434a");
+        // Kiste
+        b.r(3, 17, 24, 11, "#b87a3e");
+        for (let y = 20; y < 28; y += 3) b.dr(4, y, 22, 1, "#8f6139");
+        b.dr(4, 17, 22, 1, "#d8a060");
+        // Raeder
+        b.ell(9, 30, 4, 4, "#6a4a2a");
+        b.ell(22, 30, 4, 4, "#6a4a2a");
+        b.dr(8, 29, 3, 3, "#c8a878"); b.dr(21, 29, 3, 3, "#c8a878");
+        // Glanz und Blaetter
+        b.p(14, 13, "#ffb0a0"); b.p(18, 11, "#ffb0a0");
+        b.dr(20, 13, 2, 1, "#4f9a34"); b.dr(8, 14, 2, 1, "#4f9a34");
+        b.p(21, 12, "#6cc24a"); b.p(15, 11, "#4f9a34");
+        // Preisschild
+        b.dr(11, 21, 8, 4, "#fff1d6");
+        b.dr(12, 22, 2, 1, "#3a2a1a"); b.dr(15, 22, 3, 1, "#3a2a1a"); b.dr(12, 23, 5, 1, "#8a7a6a");
+        return b.fertig();
+    } },
+
+    teehaus: { hoehe: 40, bilder: 1, zeichne() {
+        const b = neuesPixelBild(40);
+        // Sockel und Stufen
+        b.r(4, 35, 24, 3, "#8a8e96");
+        b.r(12, 33, 8, 2, "#a8aeb6");
+        // Haus
+        b.r(6, 20, 20, 13, "#e8d8b8");
+        for (let x = 6; x < 26; x += 5) b.dr(x, 20, 1, 13, "#8a5a2c");
+        // Papiertueren mit Gitter
+        b.dr(12, 23, 8, 10, "#fff6e8");
+        for (let x = 12; x < 20; x += 3) b.dr(x, 23, 1, 10, "#c8a878");
+        for (let y = 23; y < 33; y += 3) b.dr(12, y, 8, 1, "#c8a878");
+        // geschwungenes Dach
+        b.dach(1, 31, 19, 8, "#3a4a6a");
+        b.r(0, 18, 32, 2, "#2a3a5a");
+        b.r(0, 17, 2, 1, "#2a3a5a"); b.r(30, 17, 2, 1, "#2a3a5a");
+        b.dr(14, 9, 4, 1, "#5a6a8a");
+        for (let x = 4; x < 29; x += 3) b.auf(x, 16, "#4a5a7a");
+        // rote Laterne
+        b.dr(7, 22, 1, 2, "#3a2a1a");
+        b.dell(7, 26, 2, 2.5, "#e8434a");
+        b.p(7, 25, "#ffb0a0");
+        // Kirschblueten-Zweig
+        [[24, 23], [26, 22], [25, 25], [27, 24]].forEach(([x, y]) => b.p(x, y, "#ff8fb8"));
+        b.p(25, 24, "#ffd6ea");
+        return b.fertig();
+    } },
+
+    // ===== neue legendaere Laeden (animiert) =====
+    riesenrad: { spitze: [16, 18], hoehe: 46, bilder: 8, zeichne(bild) {
+        const b = neuesPixelBild(46);
+        // Kassenhaeuschen unten
+        b.r(9, 37, 14, 8, "#e8434a");
+        b.dach(8, 24, 37, 33, "#fff6e8");
+        b.dr(12, 39, 8, 3, "#3a2a2a");
+        b.dr(13, 40, 6, 1, "#ffd84a");
+        for (let x = 9; x < 23; x += 4) b.auf(x, 44, "#c02a32");
+        // Stuetzen
+        b.poly([[15, 18], [17, 18], [10, 37], [8, 37]], "#6a7078");
+        b.poly([[15, 18], [17, 18], [24, 37], [22, 37]], "#6a7078");
+        // Rad: Ring und Speichen (dreht sich)
+        const cx = 16, cy = 18, r = 13;
+        for (let a = 0; a < 72; a++) {
+            const w = (a / 72) * Math.PI * 2;
+            b.p(cx + Math.cos(w) * r, cy + Math.sin(w) * r, "#d8dce4");
+        }
+        const dreh = (bild / 8) * (Math.PI / 4);
+        for (let i = 0; i < 8; i++) {
+            const w = dreh + (i / 8) * Math.PI * 2;
+            for (let d = 2; d < r; d++) b.p(cx + Math.cos(w) * d, cy + Math.sin(w) * d, "#a8aeb6");
+        }
+        b.dell(cx, cy, 1.6, 1.6, "#ffd84a");
+        // Gondeln haengen immer nach unten
+        const farben = ["#e8434a", "#5aa9e6", "#ffd84a", "#7ed957", "#ff8fb8", "#a877e0", "#f08a24", "#5affc8"];
+        for (let i = 0; i < 8; i++) {
+            const w = dreh + (i / 8) * Math.PI * 2;
+            const gx = Math.round(cx + Math.cos(w) * r), gy = Math.round(cy + Math.sin(w) * r);
+            b.dr(gx - 1, gy, 3, 1, "#3a3a44");
+            b.dr(gx - 1, gy + 1, 3, 2, farben[i]);
+            b.p(gx - 1, gy + 1, "#ffffff");
+        }
+        // Lichterkette blinkt
+        for (let i = 0; i < 12; i++) {
+            const w = (i / 12) * Math.PI * 2;
+            if ((i + bild) % 3 === 0) b.p(cx + Math.cos(w) * (r + 1), cy + Math.sin(w) * (r + 1), "#fff3b0");
+        }
+        return b.fertig();
+    } },
+
+    ufo: { spitze: [16, 14], hoehe: 44, bilder: 4, zeichne(bild) {
+        const b = neuesPixelBild(44);
+        const hoch = [0, -1, 0, 1][bild];
+        // Wiese unten
+        b.r(0, 41, 32, 3, "#5fb03c");
+        b.dr(0, 41, 32, 1, "#8fd05c");
+        // Lichtstrahl (breiter nach unten), darin schwebt ein kleiner Samen
+        for (let y = 20 + hoch; y < 41; y++) {
+            const halb = 3 + (y - 20) * 0.35;
+            b.dr(16 - halb, y, halb * 2, 1, "rgba(141, 255, 122, 0.28)");
+        }
+        const sy = 34 - bild * 2;
+        b.dr(15, sy, 2, 2, "#ffd84a"); b.p(15, sy, "#fff6c0");
+        // Kuppel und Untertasse
+        b.ell(16, 12 + hoch, 6, 5, "#9fe0ff", true);
+        b.ell(16, 16 + hoch, 15, 4, "#a8aeb6");
+        b.dr(3, 17 + hoch, 26, 1, "#6a7078");
+        b.p(13, 9 + hoch, "#ffffff"); b.p(14, 8 + hoch, "#ffffff");
+        // kleiner Pilot
+        b.dell(16, 11 + hoch, 2, 1.8, "#8dff7a");
+        b.p(15, 11 + hoch, "#1a1a1a"); b.p(17, 11 + hoch, "#1a1a1a");
+        // Lichter am Rand laufen reihum
+        const lichter = [5, 9, 13, 19, 23, 27];
+        lichter.forEach((x, i) => b.p(x, 16 + hoch, (i + bild) % 3 === 0 ? "#ff5a5a" : (i + bild) % 3 === 1 ? "#ffd84a" : "#5affc8"));
+        return b.fertig();
+    } },
+
     leuchtturm: { spitze: [16, 6], hoehe: 50, bilder: 4, zeichne(bild) {
         const b = neuesPixelBild(50);
         // Meer und Felsen

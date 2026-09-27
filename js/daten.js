@@ -1802,7 +1802,17 @@ const SAMENLADEN_SKINS = [
         wurf: "wurf-blase", spur: ["#8dff7a", "#c9ffb0"], ankunft: ["#8dff7a", "#b48cff", "#c9ffb0", "#ffffff"] },
     { id: "leuchtturm", name: t("Leuchtturm"), titel: t("Leuchtturm"), quelle: "dlc", paket: "einzeln", markise: ["#e8434a", "#fff6e8"],
         holz: ["#6a7078", "#4a5058"], klasse: "laden-leuchtturm", bauweise: "leuchtturm", bild: "⚓", funken: ["#fff3b0", "#ffffff", "#9fe8ff"],
-        wurf: "wurf-licht", spur: ["#fff3b0", "#ffffff"], ankunft: ["#fff3b0", "#ffffff", "#9fe8ff", "#5aa9e6"] }
+        wurf: "wurf-licht", spur: ["#fff3b0", "#ffffff"], ankunft: ["#fff3b0", "#ffffff", "#9fe8ff", "#5aa9e6"] },
+    { id: "gemuesewagen", name: t("Gemüsewagen"), quelle: "dlc", paket: "unterstuetzer", markise: ["#e8843a", "#fff1d6"], holz: ["#b87a3e", "#9e6530"],
+        bauweise: "gemuesewagen", funken: ["#f08a24", "#6cc24a", "#e8434a"] },
+    { id: "teehaus", name: t("Teehaus"), quelle: "dlc", paket: "unterstuetzer", markise: ["#3a4a6a", "#f4ecd8"], holz: ["#c8a878", "#a88858"],
+        bauweise: "teehaus", funken: ["#ff8fb8", "#ffffff", "#a3dc6f"] },
+    { id: "riesenrad", name: t("Riesenrad"), titel: t("Riesenrad"), quelle: "dlc", paket: "einzeln", markise: ["#e8434a", "#fff6e8"],
+        holz: ["#5a5a6a", "#3a3a4a"], bauweise: "riesenrad", bild: "🎡", funken: ["#e8434a", "#ffd84a", "#5aa9e6", "#7ed957", "#ff8fb8"],
+        wurf: "wurf-bunt", ankunft: ["#e8434a", "#ffd84a", "#5aa9e6", "#7ed957", "#ff8fb8"] },
+    { id: "ufo", name: t("Ufo-Landeplatz"), titel: t("Ufo"), quelle: "dlc", paket: "einzeln", markise: ["#5a6a7a", "#9fe0ff"],
+        holz: ["#6a7078", "#4a5058"], bauweise: "ufo", bild: "🛸", funken: ["#8dff7a", "#9fe0ff", "#ffffff"],
+        wurf: "wurf-licht", spur: ["#8dff7a", "#ffffff"], ankunft: ["#8dff7a", "#9fe0ff", "#ffffff", "#5affc8"] }
 ];
 
 // Felder: Farben der Erde (B hell, b Furche, c Kruemel). klasse = zusaetzlicher Look (style.css)
@@ -1871,7 +1881,19 @@ const KUGEL_SKINS = [
         farben: { Y: "#fff05a", y: "#e0a800", k: "#3a2a00", w: "#ffffff" }, funken: ["#fff05a", "#ffffff", "#9fe8ff"] },
     { id: "planet", name: t("Planetensaat"), quelle: "dlc", paket: "einzeln", form: "planet", klasse: "muenzen-planet",
         farben: { Y: "#9a8aff", y: "#5a4ad0", k: "#1a1450", w: "#e0dcff", E: "#ffd6a0", e: "#c08a5a" },
-        funken: ["#ffffff", "#9ad6ff", "#ffd6a0"] }
+        funken: ["#ffffff", "#9ad6ff", "#ffd6a0"] },
+    { id: "komet", name: t("Kometensaat"), quelle: "dlc", paket: "einzeln", form: "komet", klasse: "muenzen-komet",
+        farben: { Y: "#bfe8ff", y: "#5aa9e6", k: "#14305a", w: "#ffffff", E: "#9fe0ff", e: "#5a8ae8" }, funken: ["#ffffff", "#9fe0ff", "#5a8ae8"] },
+    { id: "diamant", name: t("Diamantsaat"), quelle: "dlc", paket: "einzeln", form: "diamant", klasse: "muenzen-diamant",
+        farben: { Y: "#eaf8ff", y: "#9ad0e8", k: "#1d3a4a", w: "#ffffff" }, funken: ["#ffffff", "#bff0ff", "#ffd6f0"] },
+    { id: "drachenei", name: t("Dracheneisaat"), quelle: "dlc", paket: "einzeln", form: "drachenei", klasse: "muenzen-drachenei",
+        farben: { Y: "#7ad05a", y: "#3f8a32", k: "#14360e", w: "#d8ffc0", E: "#ffcf4a" }, funken: ["#ffcf4a", "#ff8a2a", "#ff4a1a"] },
+    { id: "erdbeere", name: t("Erdbeersaat"), quelle: "dlc", paket: "unterstuetzer", form: "erdbeere",
+        farben: { Y: "#ff5a6a", y: "#c02a3a", k: "#4a0a14", w: "#ffe0a0", E: "#5fb03c", e: "#2e7a2a" } },
+    { id: "wuerfel", name: t("Würfelsaat"), quelle: "dlc", paket: "unterstuetzer", form: "wuerfel",
+        farben: { Y: "#fff8ee", y: "#d8ccb8", k: "#3a3024", w: "#ffffff" } },
+    { id: "tropfen", name: t("Tautropfensaat"), quelle: "dlc", paket: "unterstuetzer", form: "tropfen",
+        farben: { Y: "#9ad6ff", y: "#4a9ad0", k: "#143a5a", w: "#ffffff" } }
 ];
 
 // Rahmen der Kuscheltier-Karten im Mondteich

@@ -2877,7 +2877,18 @@ Object.assign(UEBERSETZUNG, {
     "Für immer: Sterne im Stellarium kosten 10% weniger.": "Forever: stars in the Stellarium cost 10% less.",
     "Pechsträhne": "Bad Luck",
     "Jede Saat ist gewöhnlich.": "Every drop is common.",
-    "Für immer: +2% Chance auf epische Saat.": "Forever: +2% chance for epic drops."
+    "Für immer: +2% Chance auf epische Saat.": "Forever: +2% chance for epic drops.",
+    "Kometensaat": "Comet Seeds",
+    "Diamantsaat": "Diamond Seeds",
+    "Dracheneisaat": "Dragon Egg Seeds",
+    "Erdbeersaat": "Strawberry Seeds",
+    "Würfelsaat": "Dice Seeds",
+    "Tautropfensaat": "Dewdrop Seeds",
+    "Gemüsewagen": "Veggie Cart",
+    "Teehaus": "Tea House",
+    "Riesenrad": "Ferris Wheel",
+    "Ufo-Landeplatz": "UFO Landing Pad",
+    "Ufo": "UFO"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

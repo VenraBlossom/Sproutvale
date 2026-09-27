@@ -11837,3 +11837,42 @@ body.erntefieber::after {
 .mondphase.herausforderung .mondphase-bonus {
     font-size: 0.75em;
 }
+
+/* Neue legendaere Saat: Komet (leuchtet und zieht), Diamant (funkelt), Drachenei (wackelt, gluehende Adern) */
+body.muenzen-komet .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-komet {
+    animation: komet-schein 1.8s ease-in-out infinite;
+}
+body.muenzen-komet .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, komet-schein 1.8s ease-in-out infinite;
+}
+@keyframes komet-schein {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(159, 224, 255, 0.8)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); translate: 0 0; }
+    50% { filter: drop-shadow(0 0 12px rgba(200, 240, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); translate: 2px -1px; }
+}
+body.muenzen-diamant .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-diamant {
+    animation: diamant-funkeln 2.2s steps(4) infinite;
+}
+body.muenzen-diamant .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, diamant-funkeln 2.2s steps(4) infinite;
+}
+@keyframes diamant-funkeln {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    25% { filter: drop-shadow(0 0 8px rgba(191, 240, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.25); }
+    50% { filter: drop-shadow(0 0 5px rgba(255, 214, 240, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    75% { filter: drop-shadow(0 0 9px rgba(255, 255, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.3); }
+}
+body.muenzen-drachenei .loot-kugel:not(.loot-stern),
+.vorschau-muenzen-drachenei {
+    animation: drachenei-wackeln 1.4s ease-in-out infinite;
+}
+body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
+    animation: loot-schweben 1.2s ease-in-out infinite, drachenei-wackeln 1.4s ease-in-out infinite;
+}
+@keyframes drachenei-wackeln {
+    0%, 60%, 100% { rotate: 0deg; filter: drop-shadow(0 0 3px rgba(255, 138, 42, 0.6)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    70% { rotate: -12deg; }
+    80% { rotate: 10deg; filter: drop-shadow(0 0 10px rgba(255, 170, 60, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+    90% { rotate: -6deg; }
+}

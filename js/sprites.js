@@ -2925,6 +2925,90 @@ SPRITE_PIXEL.form_laterne = [
     ".....EE.....",
     "....E..E...."
 ];
+SPRITE_PIXEL.form_komet = [
+    "............",
+    "........kkk.",
+    ".......kYwYk",
+    "EE....kYwZYk",
+    ".EEe.kYZZZyk",
+    "..eEEkYZZZyk",
+    "...eEEkYZyk.",
+    "....eEEkkk..",
+    "......ee....",
+    "............",
+    "............",
+    "............"
+];
+SPRITE_PIXEL.form_diamant = [
+    "............",
+    "..kkkkkkkk..",
+    ".kwYwYYwYyk.",
+    "kwYYwYYYYyyk",
+    "kkkkkkkkkkkk",
+    ".kYYZZZZyyk.",
+    "..kYZZZZyk..",
+    "...kYZZyk...",
+    "....kYyk....",
+    ".....kk.....",
+    "............",
+    "............"
+];
+SPRITE_PIXEL.form_drachenei = [
+    "....kkkk....",
+    "...kYwYYk...",
+    "..kYwYEYyk..",
+    "..kYYEZEyk..",
+    ".kYEYZZZYyk.",
+    ".kYYZZZZEyk.",
+    ".kEYZZZZYyk.",
+    ".kYYEZZEyyk.",
+    "..kYYYYEyk..",
+    "..kyYYYyyk..",
+    "...kkyykk...",
+    "....kkkk...."
+];
+SPRITE_PIXEL.form_erdbeere = [
+    "....EkkE....",
+    "..EEeEEeEE..",
+    ".kkEEeeEEkk.",
+    ".kYwYYYYYyk.",
+    "kYwYwYYwYyyk",
+    "kYYYZZZYYwyk",
+    "kYwYZZZYYyyk",
+    ".kYYYZYYwyk.",
+    ".kYwYYYYyk..",
+    "..kYYwYyk...",
+    "...kyyyk....",
+    "....kkk....."
+];
+SPRITE_PIXEL.form_wuerfel = [
+    "............",
+    ".kkkkkkkkkk.",
+    ".kwwYYYYYyk.",
+    ".kwZYYYYZyk.",
+    ".kYYYYYYYyk.",
+    ".kYYYZZYYyk.",
+    ".kYYYZZYYyk.",
+    ".kYYYYYYYyk.",
+    ".kYZYYYYZyk.",
+    ".kyyyyyyyyk.",
+    ".kkkkkkkkkk.",
+    "............"
+];
+SPRITE_PIXEL.form_tropfen = [
+    ".....kk.....",
+    ".....kk.....",
+    "....kYYk....",
+    "....kwYk....",
+    "...kwYYyk...",
+    "..kwYYYYyk..",
+    "..kYYZZYyk..",
+    ".kYYZZZZYyk.",
+    ".kYYZZZZYyk.",
+    ".kYYYZZYyyk.",
+    "..kyYYYyyk..",
+    "...kkkkkk..."
+];
 SPRITE_PIXEL.form_planet = [
     "....kkkk....",
     "..kkYwYYkk..",
