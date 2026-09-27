@@ -11356,3 +11356,24 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 24px;
     line-height: 32px;
 }
+/* Patch Notes: alle Versionen, das Fenster scrollt */
+.patchnotes-fenster .popup-inhalt {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.patchnotes {
+    text-align: left;
+}
+.patchnotes-version {
+    margin: 12px 0 4px;
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #6b4220;
+    border-bottom: 2px solid rgba(107, 66, 32, 0.25);
+}
+.patchnotes-version:first-child {
+    margin-top: 0;
+}
+.patchnotes-version.neueste {
+    color: #2e9e2e;
+}

@@ -388,18 +388,24 @@ aktualisiereAlles();
 zeigeHauptmenue();
 requestAnimationFrame(hauptSchleife);
 
-// "Was ist neu?": Klick auf die Versionsnummer, und nach einem Update einmal von selbst (nicht beim allerersten Start)
+// Patch Notes: Klick auf die Versionsnummer, und nach einem Update einmal von selbst (nicht beim allerersten Start).
+// Alle Versionen untereinander (neueste oben), das Fenster scrollt.
 function zeigeNeuigkeiten() {
-    const eintrag = NEUIGKEITEN[0];
+    const inhalt = el("div", "patchnotes");
+    NEUIGKEITEN.forEach((eintrag, i) => {
+        inhalt.appendChild(el("div", "patchnotes-version" + (i === 0 ? " neueste" : ""), eintrag.version));
+        inhalt.appendChild(el("ul", "neuigkeiten-liste", null, eintrag.punkte.map(punkt => el("li", null, punkt))));
+    });
     zeigePopup({
-        titel: "📜 " + tf("Neu in {0}", eintrag.version),
+        titel: t("📜 Patch Notes"),
         farbe: "#2e9e2e",
-        breite: 600,
-        inhalt: el("ul", "neuigkeiten-liste", null, eintrag.punkte.map(punkt => el("li", null, punkt))),
+        breite: 640,
+        klasse: "patchnotes-fenster",
+        inhalt,
         knoepfe: [{ text: t("Weiter spielen"), klasse: "knopf-gruen" }]
     });
 }
-$("menue-version").textContent = SPIEL_VERSION + " · " + t("📜 Was ist neu?");
+$("menue-version").textContent = SPIEL_VERSION + " · " + t("Patch Notes");
 $("menue-version").addEventListener("click", zeigeNeuigkeiten);
 if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
     const schonGespielt = (meta.lebenszeit && meta.lebenszeit.tage > 0) || meta.mondblueten > 0;

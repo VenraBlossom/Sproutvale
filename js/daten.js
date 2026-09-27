@@ -86,19 +86,80 @@ function klemme(wert, min, max) {
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
 const SPIEL_VERSION = "Alpha 0.9.1";
 
-// "Was ist neu?" (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
+// Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.1", punkte: [
         t("Duo läuft viel flüssiger: Figuren werden schneller gezeichnet."),
         t("Duo: Der Lobby-Code ist versteckt (Anzeigen per Klick), Beitritt mit Namen, der Host kann Mitspieler rauswerfen."),
         t("Duo: Felder kosten doppelt so viel wie solo."),
-        t("Mehr Mondblüten für bezahlte Rechnungen: schon der erste Run bringt ein spürbares Upgrade."),
         t("Duo: Rechnungen früher bezahlen geht jetzt auch zu zweit."),
+        t("Mehr Mondblüten für bezahlte Rechnungen: schon der erste Run bringt ein spürbares Upgrade."),
         t("Neue Figur-Teile: Cargohose, Zerrissene Jeans, Sandalen, Cowboystiefel (episch), Lavahose und Blitzschuhe (legendär)."),
         t("Spielstand als Datei sichern (Einstellungen, Spielstand)."),
         t("Neue Einstellung: Im Hintergrund stumm."),
+        t("Patch Notes: Klick auf die Versionsnummer im Hauptmenü."),
         t("Figuren laufen rechts, Begleiter links auf dem Hof."),
         t("Viele fehlende englische Texte ergänzt, Regengeräusch im Menü behoben.")
+    ] },
+    { version: "Alpha 0.9.0", punkte: [
+        t("Rechnungen früher bezahlen: pro Tag früher wird der nächste Segen 10% stärker, und der Run wird kürzer."),
+        t("Mondteich und Sternenfall deutlich stärker: Mondblüten x3 pro Sternenfall, mehr Sternensplitter, die Sense steht ganz vorne."),
+        t("Mondteich nach dem Run einklappbar: Markt und Stellarium ansehen, bevor du neu startest."),
+        t("Die Mondphase oben ist anklickbar und führt zur Auswahl."),
+        t("Deine Figur hat eine kleine Aura, der Heiligenschein ist ein richtiger Ring, Arme beim Jubeln seitlich am Kopf."),
+        t("Das Wetter-Banner kommt nicht mehr beim Laden eines Spielstands.")
+    ] },
+    { version: "Alpha 0.8.1", punkte: [
+        t("Der Samenladen läuft heiß: ab 10 Klicks pro Sekunde zählt jeder weitere Klick zu drei Vierteln (mit Glühen und Dampf). Die Sense ist ausgenommen.")
+    ] },
+    { version: "Alpha 0.8.0", punkte: [
+        t("Profil mit eigener Figur: Charakter-Editor mit vielen Teilen, Accessoires, Flügeln und legendären Animationen."),
+        t("Deine Figur läuft über den Hof, mit Idle-Animationen, Herzen und Emotes (Rechtsklick)."),
+        t("Duo: Wiedereinstieg in Story und Endlos, Figur und Begleiter des Mitspielers laufen mit."),
+        t("Eigene Pixel-Symbole statt Emojis, neue Deko und neue Begleiter."),
+        t("Auto-Patcher in der Desktop-App: Updates werden beim Start geladen."),
+        t("Balancing der Wirtschaft: neue Pflanzen lohnen sich mehr, Weizen dominiert nicht mehr.")
+    ] },
+    { version: "Alpha 0.7.2", punkte: [
+        t("Roulette und Blackjack im eigenen Glücksspiel-Bereich des Markts."),
+        t("Die Sense: Maus auf dem Samenladen gedrückt halten klickt von allein."),
+        t("Die Mondphase wird oben angezeigt, der Mondteich hat einen Nacht-Look."),
+        t("Duo stabiler: Wiederverbinden, Erkennen von Abbrüchen, Geduld bei wackligem WLAN.")
+    ] },
+    { version: "Alpha 0.7.1", punkte: [
+        t("Duo: Wiedereinstieg direkt ins laufende Endlos-Spiel auf der eigenen Seite.")
+    ] },
+    { version: "Alpha 0.7.0", punkte: [
+        t("Online-Duo: spiel mit einem Freund per Lobby-Code, jeder auf seiner Seite des Hofs."),
+        t("Story und Endlos, Endlos mit 3 eigenen Speicherständen."),
+        t("Am Zahltag entscheidest du: Rechnung bezahlen oder Run beenden."),
+        t("Infoknöpfe oben mit festhaltbaren Infokarten, legendäre Landschaft Kosmische Nacht.")
+    ] },
+    { version: "Alpha 0.6.1", punkte: [
+        t("Erfolge zum Abholen, getrennt für Story und Endlos."),
+        t("Slotmaschine statt Gacha, Münzwurf mit Kopf und Zahl."),
+        t("Werkzeuge zeigen ihre Wirkung in Prozent, neue Kuscheltiere, Deko, Münzen und Rahmen."),
+        t("Klick auf wachsende Pflanzen lässt sie schneller wachsen.")
+    ] },
+    { version: "Alpha 0.5.2", punkte: [
+        t("Samenläden als eigene Pixel-Gebäude, neue Saat- und Pflanzen-Skins, neue Deko und Landschaften."),
+        t("Legendäre Pflanzen-Looks mit eigenen Ernte-Effekten.")
+    ] },
+    { version: "Alpha 0.5.1", punkte: [
+        t("Neues Hauptmenü im Pixel-Stil mit Holzschild-Knöpfen.")
+    ] },
+    { version: "Alpha 0.4.0", punkte: [
+        t("Sproutvale gibt es auf Englisch."),
+        t("Neuer Himmels-Ast im Stellarium, neue Markt-Stände, Kodex-Segen und neue Skins.")
+    ] },
+    { version: "Alpha 0.3.0", punkte: [
+        t("Neue Segen, Erfolge und Feld-Skins, Jahreszeiten-Ast und Kodex-Belohnungen.")
+    ] },
+    { version: "Alpha 0.2.1", punkte: [
+        t("Fehler behoben: Das Markt-Fenster war immer sichtbar.")
+    ] },
+    { version: "Alpha 0.2.0", punkte: [
+        t("Erste veröffentlichte Version: neuer Markt, neue Schrift, Feedback über Discord, Vollbild.")
     ] }
 ];
 
