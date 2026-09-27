@@ -877,6 +877,8 @@ img.icon {
     border: 3px solid var(--holz-dunkel);
     border-radius: 6px;
     pointer-events: none;
+    font-variant-numeric: tabular-nums; /* Ziffern gleich breit: das Schild wackelt nicht, wenn die Zahl steigt */
+    transform-origin: 50% 100%;
 }
 
 #kombo-balken {
@@ -895,8 +897,13 @@ img.icon {
 
 #kombo-anzeige[data-stufe="2"] { color: #2e9e2e; }
 #kombo-anzeige[data-stufe="3"] { color: #7c2fc2; font-size: 1.1em; }
-#kombo-anzeige[data-stufe="4"] { color: #d97a00; font-size: 1.2em; animation: puls 0.4s ease-in-out infinite; }
-#kombo-anzeige[data-stufe="5"] { color: #d9452c; font-size: 1.3em; animation: puls 0.3s ease-in-out infinite; }
+#kombo-anzeige[data-stufe="4"] { color: #d97a00; font-size: 1.2em; animation: kombo-puls 0.4s ease-in-out infinite; }
+#kombo-anzeige[data-stufe="5"] { color: #d9452c; font-size: 1.3em; animation: kombo-puls 0.3s ease-in-out infinite; }
+/* Puls, der die Mitte behaelt (sonst ueberschreibt scale das translateX und das Schild springt links/rechts) */
+@keyframes kombo-puls {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.06); }
+}
 #kombo-anzeige[data-stufe="3"] #kombo-fuellung { background-color: #7c2fc2; }
 #kombo-anzeige[data-stufe="4"] #kombo-fuellung { background-color: #d97a00; }
 #kombo-anzeige[data-stufe="5"] #kombo-fuellung { background-color: #d9452c; }
