@@ -2500,7 +2500,8 @@ Object.assign(UEBERSETZUNG, {
     "Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab.": "Balancing: Legendary Drops give x25 instead of x50 gold until the 2nd bill. Runs depend less on early luck.",
     "Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert.": "Endless: after a restart your save stays in the Moon Pond.",
     "Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da.": "Moon phases can be chosen in the Moon Pond in Endless too (they apply to Story), the moon icon at the top is always there.",
-    "Kitty": "Kitty"
+    "Kitty": "Kitty",
+    "Der Begleiter Schleifenkatze heißt jetzt Kitty.": "The companion Bow Cat is now called Kitty."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

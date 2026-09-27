@@ -91,7 +91,8 @@ const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
         t("Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab."),
         t("Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert."),
-        t("Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da.")
+        t("Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da."),
+        t("Der Begleiter Schleifenkatze heißt jetzt Kitty.")
     ] },
     { version: "Alpha 0.9.2", punkte: [
         t("Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).")
