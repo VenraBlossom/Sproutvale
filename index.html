@@ -13,6 +13,7 @@
     <div id="intro">
         <div id="intro-buehne">
             <canvas id="intro-leinwand" width="640" height="360"></canvas>
+            <div class="intro-crt"></div>
             <div class="intro-schirm">
                 <img class="intro-logo" src="assets/Venray Studios.png" alt="">
                 <div class="intro-text" data-kein-i18n>Venray Studios <span>presents</span></div>
@@ -339,9 +340,9 @@
                 <div class="logo-glanz"></div>
             </div>
             <div class="menue-knoepfe">
-                <button class="knopf knopf-gruen menue-knopf menue-haupt" id="menue-spielen">▶ Spielen</button>
-                <button class="knopf menue-knopf" id="menue-einstellungen">⚙️ Einstellungen</button>
-                <button class="knopf menue-knopf" id="menue-beenden">🚪 Beenden</button>
+                <button class="knopf knopf-gruen menue-knopf menue-haupt" id="menue-spielen"><span class="menue-symbol" data-symbol="spielen"></span><span>Spielen</span></button>
+                <button class="knopf menue-knopf" id="menue-einstellungen"><span class="menue-symbol" data-symbol="zahnrad"></span><span>Einstellungen</span></button>
+                <button class="knopf menue-knopf" id="menue-beenden"><span class="menue-symbol" data-symbol="tuer"></span><span>Beenden</span></button>
             </div>
         </div>
         <div class="menue-inhalt versteckt" id="menue-art">
@@ -364,18 +365,18 @@
                     </button>
                 </div>
             </div>
-            <button class="knopf menue-knopf" id="art-zurueck">← Zurück</button>
+            <button class="knopf menue-knopf" id="art-zurueck"><span class="menue-symbol" data-symbol="zurueck"></span><span>Zurück</span></button>
         </div>
         <div class="menue-inhalt versteckt" id="menue-koop">
             <div class="menue-schild">👥 Duo</div>
             <div id="koop-inhalt"></div>
-            <button class="knopf menue-knopf" id="koop-zurueck">← Zurück</button>
+            <button class="knopf menue-knopf" id="koop-zurueck"><span class="menue-symbol" data-symbol="zurueck"></span><span>Zurück</span></button>
         </div>
         <div class="menue-inhalt versteckt" id="menue-modi">
             <div class="menue-schild">Wähle deinen Spielmodus</div>
             <div id="menue-guthaben"></div>
             <div class="modus-reihe" id="modus-reihe"></div>
-            <button class="knopf menue-knopf" id="menue-zurueck">← Zurück</button>
+            <button class="knopf menue-knopf" id="menue-zurueck"><span class="menue-symbol" data-symbol="zurueck"></span><span>Zurück</span></button>
         </div>
         <div id="menue-version"></div>
         <button id="menue-zeitung" class="menue-zeitung" title="Patch Notes"></button>

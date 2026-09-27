@@ -2443,7 +2443,7 @@ function engelRaster(pose, bild, blinzelt) {
     const bob = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : [0, 0, -1, -1][katzenAnim % 4];
     const y0 = (sitzt ? 1 : 0) + bob;
     // Fluegelschlag: 0 = ausgebreitet, 3 = hochgeschlagen (im Sitzen nur leicht)
-    const flap = sitzt ? [0, 1, 0, 1][katzenAnim % 4] : [0, 2, 3, 1][katzenAnim % 4];
+    const flap = sitzt ? [0, 2, 1, 2][katzenAnim % 4] : [0, 3, 5, 2][katzenAnim % 4];
     const cx = 22;
 
     // ---- Fluegel links und rechts (gespiegelt), Federreihen mit grauen Kanten ----
@@ -2452,8 +2452,8 @@ function engelRaster(pose, bild, blinzelt) {
         const wx = cx + seite * 4, wy = 13 + y0;
         const sp = x => (seite < 0 ? x : ENGEL_B - 1 - x);
         spitzen.forEach(([sx, sy], i) => {
-            const hoch = flap * (1.6 - i * 0.3);
-            const tx = sp(sx + flap * 0.8), ty = sy - hoch + y0 + (sitzt ? 3 : 0);
+            const hoch = flap * (1.5 - i * 0.28);
+            const tx = sp(sx + flap * 1.1), ty = sy - hoch + y0 + (sitzt ? 3 : 0);
             linie(wx, wy, tx, ty, 3, "W");
             linie(wx, wy + 1, tx + seite * -1, ty + 1, 1, i % 2 ? "V" : "v");
         });
@@ -3399,6 +3399,51 @@ const PIXEL_SYMBOL_DATEN = {
         ".obbdbbbo.",
         ".odbbbdbo.",
         ".oooooooo."]],
+    // Hauptmenue-Knoepfe
+    spielen: [{ o: "#1f4a12", W: "#ffffff", w: "#d8f0c8" }, [
+        "..oo......",
+        "..oWo.....",
+        "..oWWo....",
+        "..oWWWo...",
+        "..oWWWWo..",
+        "..oWWWwo..",
+        "..oWWwo...",
+        "..oWwo....",
+        "..owo.....",
+        "..oo......"]],
+    zahnrad: [{ o: "#3a2412", G: "#e8e0d0", g: "#b8a888", k: "#3a2412" }, [
+        "...o..o...",
+        "..oGooGo..",
+        ".oGGGGGGo.",
+        "ooGGggGGoo",
+        "oGGgkkgGGo",
+        "oGGgkkgGGo",
+        "ooGGggGGoo",
+        ".oGGGGGGo.",
+        "..oGooGo..",
+        "...o..o..."]],
+    tuer: [{ o: "#3a2412", D: "#9a6634", d: "#6b4220", G: "#ffd23a", L: "#fff6c0" }, [
+        "..oooooo..",
+        ".oDDDDDDo.",
+        ".oDdDDdDo.",
+        ".oDdDDdDo.",
+        ".oDDDDDDo.",
+        ".oDdDDGDo.",
+        ".oDdDDdDo.",
+        ".oDDDDDDo.",
+        ".oDDDDDDo.",
+        "oooooooooo"]],
+    zurueck: [{ o: "#3a2412", W: "#fff6dc", w: "#e0c89a" }, [
+        "..........",
+        "....oo....",
+        "...oWo....",
+        "..oWWoooo.",
+        ".oWWWWWWWo",
+        ".oWWWwwwwo",
+        "..oWwoooo.",
+        "...owo....",
+        "....oo....",
+        ".........."]],
     // Kristall (Premium-Waehrung)
     kristall: [{ o: "#1d3a6a", C: "#6ad0ff", c: "#3a9ae0", W: "#ffffff" }, [
         "..oooooo..",

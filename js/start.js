@@ -760,7 +760,11 @@ aktualisiereProfilKnopf();
 
     function maleBewegt(zeit) {
         // Neon flackert manchmal kurz
-        if (Math.sin(zeit * 13) < -0.93) px(0, 14, B, 3, "rgba(20,8,32,0.8)");
+        if (Math.sin(zeit * 13) < -0.93) {
+            // nur links und rechts vom grossen Automaten (sonst liegt das Flackern ueber ihm)
+            px(0, 14, A.x - 14, 3, "rgba(20,8,32,0.8)");
+            px(A.x + A.w + 14, 14, B - A.x - A.w - 14, 3, "rgba(20,8,32,0.8)");
+        }
         // Kleine Bildschirme am Rand: Monster laufen hin und her, dazu Scanlines und Schein auf dem Teppich
         const farben = ["#7ed957", "#ffcf4a", "#4ad0ff", "#ff5ad0"];
         // nur links und rechts neben dem grossen Automaten malen (sonst liegen die Bilder darueber)
@@ -880,3 +884,8 @@ aktualisiereProfilKnopf();
 
 // Wer jetzt (vor dem Release) spielt, wird als Beta-Tester gemerkt (eigene Datei, bleibt fuer immer)
 merkeBetaTester();
+
+// Hauptmenue-Knoepfe: handgezeichnete Pixel-Symbole statt Emojis
+document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
+    platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, 28));
+});

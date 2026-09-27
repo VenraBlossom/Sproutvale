@@ -3011,7 +3011,8 @@ Object.assign(UEBERSETZUNG, {
     "Level geben keine Spielvorteile mehr, nur Auren (alle 10 Level stärker). Regenbogen-Aura läuft jetzt richtig durch.": "Levels no longer give gameplay advantages, only auras (stronger every 10 levels). The rainbow aura now cycles properly.",
     "Neue Preise: legendäre Skins 50 Kristalle, Unterstützer-Paket 4,99 €. Nur Kosmetik, kein Pay-to-Win.": "New prices: legendary skins 50 crystals, Supporter Pack 4.99 €. Cosmetic only, no pay-to-win.",
     "Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen.": "All emojis in the game are now pixel art. Lobby codes only have 5 characters.",
-    "Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.": "Fixes: crows could not land, Glowshroom House could not be selected, aura was lost when loading."
+    "Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.": "Fixes: crows could not land, Glowshroom House could not be selected, aura was lost when loading.",
+    "Spielen": "Play"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
