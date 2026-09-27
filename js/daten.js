@@ -84,10 +84,13 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Alpha 1.0.0";
+const SPIEL_VERSION = "Alpha 1.0.1";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Alpha 1.0.1", punkte: [
+        t("Story-Spielstand löschen (Hauptmenü) setzt jetzt den ganzen Story-Fortschritt zurück. Kosmetik, Käufe, Profil, Bauernrang, Einstellungen und Endlos bleiben.")
+    ] },
     { version: "Alpha 1.0.0", punkte: [
         t("Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank)."),
         t("Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe."),

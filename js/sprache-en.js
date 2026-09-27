@@ -2744,7 +2744,8 @@ Object.assign(UEBERSETZUNG, {
     "🌾 Story komplett löschen?": "🌾 Delete Story completely?",
     "ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. ": "WARNING: this deletes all Story progress: Moonpetals, Moon Pond upgrades, tarot, plushies, Starfall, achievements, statistics and mastery. ",
     "Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos.": "Only cosmetics, purchased content, your profile, your settings and Endless are kept.",
-    "🌾 Story komplett zurückgesetzt": "🌾 Story completely reset"
+    "🌾 Story komplett zurückgesetzt": "🌾 Story completely reset",
+    "Story-Spielstand löschen (Hauptmenü) setzt jetzt den ganzen Story-Fortschritt zurück. Kosmetik, Käufe, Profil, Bauernrang, Einstellungen und Endlos bleiben.": "Deleting the Story save (main menu) now resets all Story progress. Cosmetics, purchases, profile, Farmer Rank, settings and Endless are kept."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
