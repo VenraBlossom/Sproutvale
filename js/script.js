@@ -3518,6 +3518,7 @@ function beendeRun(offenerBetrag, freiwillig) {
 
     schliessePanels();
     zeigeTagesKarte("runEnde", { offenerBetrag, mondblueten, neuerRekord, freiwillig, tage });
+    speichereEndlosNeuanfang();
     meldeAnDesktop("status", t("Im Mondteich"));
     aktualisiereAlles();
 }
@@ -4476,7 +4477,7 @@ function menueSeiteModiOffen() {
 function modusStand(sandbox) {
     const live = run && run.sandbox === sandbox && (!sandbox || (run.slot || 1) === endlosSlot()) && run.phase !== "runEnde";
     const daten = live ? null : leseRunSpeicher(sandbox);
-    const r = live ? run : daten && daten.run;
+    const r = live ? run : daten && daten.run && daten.run.phase !== "runEnde" ? daten.run : null;
     if (!r) return null;
     return {
         r,
@@ -4488,7 +4489,7 @@ function modusStand(sandbox) {
 }
 
 function modusInfoText(sandbox, stand) {
-    if (!stand) return sandbox ? t("Noch nichts gespeichert. Endlos beginnt bei Tag 1.") : t("Noch kein Run gespeichert. Er beginnt bei Tag 1.");
+    if (!stand) return sandbox ? t("Kein laufender Hof. Der nächste Endlos-Run beginnt bei Tag 1, Mondblüten und Upgrades bleiben erhalten.") : t("Noch kein Run gespeichert. Er beginnt bei Tag 1.");
     const r = stand.r;
     const z = JAHRESZEITEN[jahreszeitIndex(r.tag)];
     const zeilen = [
@@ -5217,6 +5218,17 @@ function speichereRun() {
     }
 }
 
+// Endlos nach einem Neuanfang: "im Mondteich" speichern. Wer das Spiel jetzt schliesst, landet beim naechsten Mal
+// wieder im Mondteich dieses Speicherstands (vorher war der Stand weg, und das Spiel sprang zurueck in Story).
+function speichereEndlosNeuanfang() {
+    if (speichernGesperrt || !run || !run.sandbox || run.koop || run.phase !== "runEnde") return;
+    try {
+        localStorage.setItem(runSpeicherKey(true, run.slot || 1), JSON.stringify(runDaten()));
+    } catch (fehler) {
+        console.warn(t("Run konnte nicht gespeichert werden"), fehler);
+    }
+}
+
 function loescheRunSpeicher(sandbox = run && run.sandbox, slot = run && run.sandbox ? run.slot || 1 : endlosSlot()) {
     try {
         localStorage.removeItem(runSpeicherKey(Boolean(sandbox), slot));
@@ -5251,7 +5263,8 @@ function ladeRun(sandbox = false) {
         pflanze.freigeschaltet = gespeichert.freigeschaltet;
         pflanze.level = { ...pflanze.level, ...gespeichert.level };
     });
-    Object.assign(neu, { phase: "vorTag", felder: [], zielFeld: null, samenUnterwegs: false, klickZaehler: 0, wetter: null });
+    const imMondteich = sandbox && rest.phase === "runEnde"; // Endlos: nach einem Neuanfang gespeichert
+    Object.assign(neu, { phase: imMondteich ? "runEnde" : "vorTag", felder: [], zielFeld: null, samenUnterwegs: false, klickZaehler: 0, wetter: null });
     delete neu.lebenszeitSicherung; // aus alten Spielstaenden
     // Werkzeuge, die es nicht mehr gibt (z.B. Gartenhandschuhe), fallen aus alten Spielstaenden heraus
     neu.werkzeuge = (neu.werkzeuge || []).filter(id => WERKZEUG_NACH_ID[id]);
@@ -5268,7 +5281,10 @@ function ladeRun(sandbox = false) {
     for (let i = 0; i < Math.max(1, daten.anzahlFelder || 1); i++) erstelleFeld();
     prestigeShop.classList.add("versteckt");
     segenFenster.classList.add("versteckt");
-    if (sandbox) {
+    if (imMondteich) {
+        // Nach dem Neuanfang: Tageskarte "Neuanfang" mit dem Knopf zum Mondteich, der neue Run startet von dort
+        zeigeTagesKarte("runEnde", run.karte ? run.karte.daten : {});
+    } else if (sandbox) {
         // Die Sandbox laeuft sofort weiter, an derselben Tageszeit und mit denselben Pflanzen
         const tagMs = run.tagMs || 0;
         starteTag(true);
@@ -5365,7 +5381,7 @@ function storyMeta() {
 function endlosSlotStand(slot) {
     const live = run && run.sandbox && (run.slot || 1) === slot && run.phase !== "runEnde";
     const daten = live ? null : leseRunSpeicher(true, slot);
-    const r = live ? run : daten && daten.run;
+    const r = live ? run : daten && daten.run && daten.run.phase !== "runEnde" ? daten.run : null;
     const m = endlosMeta(slot);
     const leer = !r && !(m.lebenszeit && m.lebenszeit.tage) && !m.mondblueten;
     return { r, m, leer };

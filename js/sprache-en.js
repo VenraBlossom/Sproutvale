@@ -2491,7 +2491,8 @@ Object.assign(UEBERSETZUNG, {
     "Erste veröffentlichte Version: neuer Markt, neue Schrift, Feedback über Discord, Vollbild.": "First released version: new market, new font, feedback via Discord, fullscreen.",
     "📜 Patch Notes": "📜 Patch notes",
     "Patch Notes": "Patch notes",
-    "Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).": "Patch notes: read up on every version since Alpha 0.2.0 (click the version number in the main menu)."
+    "Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).": "Patch notes: read up on every version since Alpha 0.2.0 (click the version number in the main menu).",
+    "Kein laufender Hof. Der nächste Endlos-Run beginnt bei Tag 1, Mondblüten und Upgrades bleiben erhalten.": "No farm in progress. The next Endless run starts at day 1, your Moonpetals and upgrades are kept."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
