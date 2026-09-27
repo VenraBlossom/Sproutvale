@@ -1341,6 +1341,7 @@ const HOF_STILE = [
 
 // ---------- DORFZEITUNG (eine Schlagzeile am Feierabend, nur zum Schmunzeln) ----------
 const DORFZEITUNG = [
+    () => (typeof aktuellesFest === "function" && aktuellesFest() ? aktuellesFest().zeitung : null),
     () => t("Bürgermeister verwechselt Kürbis mit Hut. Trägt ihn trotzdem weiter."),
     () => t("Krähen gründen Gewerkschaft. Fordern mehr Weizen und weniger Vogelscheuchen."),
     () => t("Wanderhändler schwört: Seine Taschenuhr ist „fast neu“."),
@@ -1361,6 +1362,29 @@ const DORFZEITUNG = [
     (m, r) => r.felder.length < 8 ? null : tf("Hof zählt jetzt {0} Felder. Maulwürfe beantragen Mitsprache.", r.felder.length),
     (m, r) => (m.lebenszeit.streicheln || 0) < 100 ? null : tf("Begleiter wurde schon {0}-mal gestreichelt. Fordert trotzdem mehr.", zahl(m.lebenszeit.streicheln || 0))
 ];
+
+// ---------- FEIERTAGE (nach echtem Datum, nur Deko und Zeitungs-Schlagzeilen) ----------
+// von/bis = [Monat, Tag]. hof = Zusatz fuer die Hof-Landschaft (siehe HOF_FARBEN in sprites.js)
+const FESTE = [
+    { id: "halloween", symbol: "🎃", name: t("Halloween"), von: [10, 24], bis: [11, 2], hof: { kuerbisse: true },
+        zeitung: t("Kürbisse tauchen über Nacht überall auf. Niemand weiß, wer sie geschnitzt hat.") },
+    { id: "winterfest", symbol: "🎄", name: t("Winterfest"), von: [12, 15], bis: [12, 30], hof: { schneeDaecher: true },
+        zeitung: t("Winterfest! Die Dächer tragen Schnee, der Begleiter trägt einen Schal (angeblich).") },
+    { id: "neujahr", symbol: "🎆", name: t("Neujahr"), von: [12, 31], bis: [1, 6], hof: { schneeDaecher: true },
+        zeitung: t("Frohes neues Jahr! Der Bürgermeister verspricht mehr Weizen und weniger Rechnungen. Wie jedes Jahr.") },
+    { id: "valentin", symbol: "💝", name: t("Valentinstag"), von: [2, 12], bis: [2, 16], hof: {},
+        zeitung: t("Valentinstag: Zwei Karotten im Beet nebenan wurden Hand in Hand gesichtet.") },
+    { id: "ostern", symbol: "🥚", name: t("Frühlingsfest"), von: [4, 1], bis: [4, 21], hof: {},
+        zeitung: t("Frühlingsfest! Ein Hase versteckt bunte Eier. Die Hühner sind beleidigt.") }
+];
+function aktuellesFest(datum = new Date()) {
+    const wert = (m, d) => m * 100 + d;
+    const heute = wert(datum.getMonth() + 1, datum.getDate());
+    return FESTE.find(f => {
+        const von = wert(...f.von), bis = wert(...f.bis);
+        return von <= bis ? heute >= von && heute <= bis : heute >= von || heute <= bis;
+    }) || null;
+}
 
 // ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------
 const ERNTEFIEBER_KONFIG = { chance: 0.07, abTag: 3, dauerMs: 12000, tempo: 6 };
@@ -1680,6 +1704,8 @@ const HOF_THEMEN = [
     { id: "fruehling", name: t("Frühlingshof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "winter", name: t("Winterhof"), quelle: "dlc", paket: "unterstuetzer" },
     { id: "wueste", name: t("Oase"), quelle: "dlc", paket: "unterstuetzer" },
+    { id: "zucker", name: t("Zuckerland"), quelle: "dlc", paket: "unterstuetzer", falter: ["#ff9ad5", "#9ae0ff", "#fff6a0"] },
+    { id: "lavendel", name: t("Lavendelfeld"), quelle: "dlc", paket: "unterstuetzer", falter: ["#b48cff", "#ffffff", "#fff6a0"] },
     { id: "zauberwald", name: t("Zauberwald"), quelle: "dlc", paket: "einzeln", funkeln: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"],
         irrlichter: ["#9fe8ff", "#c9b0f5", "#b8f07a"], falter: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"] },
     // ewigeNacht = kosmischer Sternenhimmel, statt der Sonne zieht ein grosser Stern ueber den Himmel (der Mond kommt wie immer nachts)

@@ -1428,6 +1428,12 @@ const SPRITE_ABWANDLUNGEN = {
     busch_kosmos: { basis: "busch", farben: { G: "#4a7ad0", g: "#fff6a0", d: "#1d2a6a" } },
     gras_kosmos: { basis: "gras", farben: { h: "#2a4070", H: "#304a80", j: "#263c68", J: "#6a7ac0" } },
     baum_sommer: { basis: "baum", farben: { G: "#5cc03a", g: "#3a9a2a", d: "#1f6a1a" } },
+    baum_zucker: { basis: "baum", farben: { G: "#ff9ad5", g: "#ffd6f0", d: "#d05a9a", K: "#fff6f0" } },
+    busch_zucker: { basis: "busch", farben: { G: "#9ae0ff", g: "#ffffff", d: "#5aa9e6" } },
+    gras_zucker: { basis: "gras", farben: { h: "#ffc2e0", H: "#ffd6ea", j: "#f0aad0", J: "#9ae0ff" } },
+    baum_lavendel: { basis: "baum", farben: { G: "#8fb85a", g: "#6a9a3a", d: "#3f6a2a" } },
+    busch_lavendel: { basis: "busch", farben: { G: "#b48cff", g: "#d6c0ff", d: "#6a4ab0" } },
+    gras_lavendel: { basis: "gras", farben: { h: "#8a9a5a", H: "#9aaa6a", j: "#7a8a4e", J: "#b48cff" } },
     busch_sommer: { basis: "busch", farben: { G: "#6ccc4a", g: "#e8434a", d: "#2f7a2a" } },
     gras_sommer: { basis: "gras", farben: { h: "#7cc84a", H: "#90d85a", j: "#6ab43e", J: "#ffd84a" } },
     baum_feuerwerk: { basis: "baum", farben: { G: "#ff8a9a", g: "#e8435a", d: "#a82a3a", K: "#4a2a1a" } },
@@ -2631,6 +2637,16 @@ const HOF_FARBEN = {
         blumen: ["#e8434a", "#ffd84a", "#ff8fb1", "#ffffff", "#e8434a"], baum: "baum_feuerwerk", busch: "busch_feuerwerk",
         chinesisch: true
     },
+    zucker: {
+        berge: ["#c8a0e8", "#d8b8f4"], schnee: "#ffffff", huegel: ["#ff9ad5", "#ffb8e0"], nadel: ["#9ae0ff", "#c0eeff"],
+        wiese: ["#ffc2e0", "#ffd6ea", "#ffcae4"], halm: "#f0aad0", weg: ["#fff6f0", "#ffe8d8"],
+        blumen: ["#9ae0ff", "#fff6a0", "#ffffff", "#b48cff", "#ff6a9a"], baum: "baum_zucker", busch: "busch_zucker"
+    },
+    lavendel: {
+        berge: ["#a8a0d8", "#bab4e4"], schnee: "#ffffff", huegel: ["#8a6ad0", "#9a7ae0"], nadel: ["#5a7a3a", "#6a8a44"],
+        wiese: ["#9aaa6a", "#aaba7a", "#a0b070"], halm: "#7a8a4e", weg: ["#d8c8a0", "#e8dab8"],
+        blumen: ["#b48cff", "#9a6ae0", "#d6c0ff", "#b48cff", "#ffffff"], baum: "baum_lavendel", busch: "busch_lavendel", sonnenblumen: true
+    },
     winter: {
         berge: ["#9aa8c8", "#b8c4dc"], schnee: "#ffffff", huegel: ["#c9d6e6", "#dde8f4"], nadel: ["#2f5a4a", "#3b6b58"],
         wiese: ["#e8f0f8", "#ffffff", "#dde8f2"], halm: "#c9d6e6", weg: ["#b8c4d0", "#d0dae4"],
@@ -2639,7 +2655,9 @@ const HOF_FARBEN = {
 };
 
 function zeichneHof(breite, hoehe, thema = "standard") {
-    const F = HOF_FARBEN[thema] || HOF_FARBEN.standard;
+    // Feiertage (echtes Datum) legen etwas Deko ueber jede Landschaft: Kuerbisse an Halloween, Schnee zu Weihnachten
+    const fest = typeof aktuellesFest === "function" ? aktuellesFest() : null;
+    const F = { ...(HOF_FARBEN[thema] || HOF_FARBEN.standard), ...(fest ? fest.hof : {}) };
     const W = Math.max(64, Math.round(breite));
     const H = Math.max(32, Math.round(hoehe));
     const leinwand = document.createElement("canvas");

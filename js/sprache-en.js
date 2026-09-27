@@ -2901,7 +2901,19 @@ Object.assign(UEBERSETZUNG, {
     "◀ Neuere": "◀ Newer",
     "Ältere ▶": "Older ▶",
     "📰 Neuigkeiten": "📰 News",
-    "📰 Neuigkeiten: Was ist neu in Sproutvale?": "📰 News: what's new in Sproutvale?"
+    "📰 Neuigkeiten: Was ist neu in Sproutvale?": "📰 News: what's new in Sproutvale?",
+    "Zuckerland": "Candyland",
+    "Lavendelfeld": "Lavender Field",
+    "Halloween": "Halloween",
+    "Winterfest": "Winter Festival",
+    "Neujahr": "New Year",
+    "Valentinstag": "Valentine's Day",
+    "Frühlingsfest": "Spring Festival",
+    "Kürbisse tauchen über Nacht überall auf. Niemand weiß, wer sie geschnitzt hat.": "Pumpkins appear everywhere overnight. Nobody knows who carved them.",
+    "Winterfest! Die Dächer tragen Schnee, der Begleiter trägt einen Schal (angeblich).": "Winter Festival! The roofs wear snow, the companion wears a scarf (allegedly).",
+    "Frohes neues Jahr! Der Bürgermeister verspricht mehr Weizen und weniger Rechnungen. Wie jedes Jahr.": "Happy New Year! The mayor promises more wheat and fewer bills. Like every year.",
+    "Valentinstag: Zwei Karotten im Beet nebenan wurden Hand in Hand gesichtet.": "Valentine's Day: two carrots in the next bed were seen holding hands.",
+    "Frühlingsfest! Ein Hase versteckt bunte Eier. Die Hühner sind beleidigt.": "Spring Festival! A bunny hides colourful eggs. The chickens are offended."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

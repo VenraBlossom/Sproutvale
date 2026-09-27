@@ -453,6 +453,17 @@ $("menue-zeitung").appendChild(pixelIcon("📰", 40));
 $("menue-zeitung").addEventListener("click", () => zeigeNeuigkeiten(0));
 setzeTipp($("menue-zeitung"), t("📰 Neuigkeiten: Was ist neu in Sproutvale?"));
 aktualisiereZeitungKnopf();
+
+// Feiertag: kleines Banner im Hauptmenue (einmal pro Tag)
+(function festAnkuendigen() {
+    const fest = aktuellesFest();
+    if (!fest) return;
+    const heute = new Date().toDateString();
+    if (meta.festGesehen === heute) return;
+    meta.festGesehen = heute;
+    speichereMeta();
+    setTimeout(() => zeigeBanner(fest.symbol, fest.name + "!", fest.zeitung, "#b8862b", 4200), 1500);
+})();
 $("menue-version").textContent = SPIEL_VERSION + " · " + t("Patch Notes");
 $("menue-version").addEventListener("click", () => zeigeNeuigkeiten(0));
 if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
