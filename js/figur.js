@@ -1375,11 +1375,19 @@ function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
 
 const figuren = [];
 
+// Wo auf dem Hof gelaufen wird (in Prozent der Breite): Spieler rechts, Begleiter links
+const FIGUR_BEREICH = { mensch: [56, 86], begleiter: [14, 44] };
+function figurBereich(art) {
+    return FIGUR_BEREICH[art === "mensch" ? "mensch" : "begleiter"];
+}
+
 function neueFigur(art, optionen) {
     const f = {
-        art, x: 36 + Math.random() * 28, zielX: 50, richtung: 1, zustand: "stehen", zustandMs: 2000, bild: 0, bildMs: 0,
+        art, x: 0, zielX: 50, richtung: 1, zustand: "stehen", zustandMs: 2000, bild: 0, bildMs: 0,
         blinzelMs: 2500, blinzeltBis: 0, idleMs: 9000 + Math.random() * 6000, zzzMs: 0, effektMs: 0, ...optionen
     };
+    const [von, bis] = figurBereich(art);
+    f.x = von + Math.random() * (bis - von);
     const huelle = el("div", "hof-objekt hof-figur " + (art === "mensch" ? "figur-mensch" : "figur-begleiter") + (f.partner ? " figur-partner" : ""));
     if (art === "mensch") {
         f.bildEl = erstelleFigurBild(HOF_PIXEL - 1); // etwas groesser als der Begleiter
@@ -1451,7 +1459,7 @@ function naechsterFigurZustand(f) {
     const nacht = typeof tageszeit !== "undefined" && tageszeit > 0.85 && tageszeit < 1.2;
     const wurf = Math.random();
     const dauer = (min, max) => min + Math.random() * (max - min);
-    const bereich = f.art === "mensch" ? [33, 68] : [34, 66];
+    const bereich = figurBereich(f.art);
     if (f.art === "begleiter") {
         if (f.zustand === "sitzen" && wurf < 0.45) figurLaufeZu(f, bereich[0] + Math.random() * (bereich[1] - bereich[0]));
         else if (f.zustand === "liegen" && wurf < (nacht ? 0.8 : 0.4)) figurPose(f, "schlafen", dauer(8000, 14000));

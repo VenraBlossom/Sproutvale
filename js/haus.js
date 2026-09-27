@@ -1204,7 +1204,7 @@ function renderHaus(inhalt) {
 // Kleine Zustaende: sitzen, laufen, stehen, liegen, schlafen (nachts lieber schlafen)
 
 const haustier = {
-    el: null, bild: null, x: 50, zielX: 50, richtung: 1,
+    el: null, bild: null, x: 30, zielX: 30, richtung: 1,
     zustand: "sitzen", zustandMs: 3000, bildNummer: 0, bildMs: 0,
     blinzelMs: 2500, blinzeltBis: 0, zzzMs: 0, letzteUrl: "", hilfeMs: 0, ball: null
 };
@@ -1284,7 +1284,7 @@ function laufeZu(ziel) {
 function laufeZuNeuemPlatz() {
     let ziel;
     do {
-        ziel = 36 + Math.random() * 28;
+        ziel = FIGUR_BEREICH.begleiter[0] + Math.random() * (FIGUR_BEREICH.begleiter[1] - FIGUR_BEREICH.begleiter[0]);
     } while (Math.abs(ziel - haustier.x) < 6);
     laufeZu(ziel);
 }

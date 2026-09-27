@@ -672,7 +672,7 @@ function feldKosten(seite = eigeneSeite()) {
     const felder = seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length;
     const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
-        Math.pow(0.85, segen("sparsam")));
+        Math.pow(0.85, segen("sparsam")) * (run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
 function rechnungsBetrag(nummer) {
