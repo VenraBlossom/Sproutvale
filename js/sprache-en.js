@@ -2636,7 +2636,15 @@ Object.assign(UEBERSETZUNG, {
     "Wähle ": "Choose ",
     " verschiedene Segen": " different blessings",
     " vor dem Zahltag": " before payday",
-    "Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen.": "More achievements: higher tiers in almost every chain and new chains for Farmer Rank, blessings and early paid bills."
+    "Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen.": "More achievements: higher tiers in almost every chain and new chains for Farmer Rank, blessings and early paid bills.",
+    "🟫 Fruchtbarer Boden {0}!": "🟫 Fertile Soil {0}!",
+    "🟫 Fruchtbarer Boden {0}/{1}: +{2}% Gold": "🟫 Fertile Soil {0}/{1}: +{2}% gold",
+    "Bodenkunde": "Soil Science",
+    "Fruchtbarer Boden: Felder brauchen pro Stufe 5 Ernten weniger, um besser zu werden (30, dann 25, 20, 15).": "Fertile Soil: fields need 5 fewer harvests per level to improve (30, then 25, 20, 15).",
+    " Ernten pro Boden-Stufe": " harvests per soil level",
+    "Boden wird schneller fruchtbar": "Soil gets fertile faster",
+    " Ernten pro Stufe": " harvests per level",
+    "Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde.": "New mechanic Fertile Soil: every field improves through harvests (up to level 5, +10% gold per level), plus the Soil Science star."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -89,6 +89,7 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde."),
         t("Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen."),
         t("3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus."),
         t("Langzeit-Ziele: Bauernrang (jede Ernte gibt Erfahrung, jeder Rang +1% Gold für immer), Mondphasen bis Sternenmond VI, Meisterschaft bis Stufe 12."),
@@ -717,6 +718,9 @@ const SKILLS = [
         t("Jeder Tag beginnt mit 15 Kombo pro Stufe (Stufe 5: gleich x3)."),
         () => 15 * level("morgenkombo") + t(" Kombo zum Tagesstart"), { autoPos: true }),
 
+    stern("bodenkunde", "hof", "🟫", [0, 1620], "duengen", t("Bodenkunde"), 800, 2.5, 3,
+        t("Fruchtbarer Boden: Felder brauchen pro Stufe 5 Ernten weniger, um besser zu werden (30, dann 25, 20, 15)."),
+        () => bodenErntenProStufe() + t(" Ernten pro Boden-Stufe"), { autoPos: true }),
     stern("feldkunde", "hof", "📚", [440, 1620], "erntefest", t("Feldkunde"), 6000, 1.5, Infinity,
         t("Alle Pflanzen wachsen 2% schneller. Unendlich oft kaufbar."),
         () => "+" + 2 * level("feldkunde") + t("% Wachstum"), { autoPos: true }),
@@ -915,7 +919,8 @@ const STERN_KURZ = {
     g_gold: t("Grundwert Gold"), g_sterne: t("Grundwert Sternensamen"), g_energie: t("Grundwert Energie"),
     g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich"),
     saatkette: t("Feld sofort neu bepflanzt"), goldenestunde: t("Kurz vor Feierabend mehr Gold"), morgenkombo: t("Tag startet mit Kombo"),
-    feldkunde: t("Schneller wachsen · unendlich"), sternenmeer: t("Mehr Sternensamen · unendlich")
+    feldkunde: t("Schneller wachsen · unendlich"), sternenmeer: t("Mehr Sternensamen · unendlich"),
+    bodenkunde: t("Boden wird schneller fruchtbar")
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -949,7 +954,8 @@ const STERN_WIRKUNG = {
     g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
     g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles"),
     saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo"),
-    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 3 * s + t("% Sternensamen")
+    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 3 * s + t("% Sternensamen"),
+    bodenkunde: s => (30 - 5 * s) + t(" Ernten pro Stufe")
 };
 
 SKILLS.forEach(def => {

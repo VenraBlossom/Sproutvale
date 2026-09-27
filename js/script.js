@@ -1494,13 +1494,16 @@ function erstelleFeld(slot = naechsterSlot(null)) {
     balkenInnen.classList.add("fortschritt-innen");
     balkenAussen.appendChild(balkenInnen);
 
-    feldDiv.append(varianteEl, markerEl, spriteEl, nameEl, balkenAussen);
+    const bodenEl = document.createElement("div");
+    bodenEl.classList.add("feld-boden");
+    feldDiv.append(varianteEl, markerEl, spriteEl, nameEl, balkenAussen, bodenEl);
 
     run.felder.push({
         index, slot, pflanze: null, variante: null, stufe: 0, fortschrittMs: 0, fertig: false, leer: true,
         reserviert: false, ernteKlicksRest: 0, bewaessert: false, geduengt: false,
-        el: { feldDiv, varianteEl, markerEl, spriteEl, nameEl, balkenInnen }
+        el: { feldDiv, varianteEl, markerEl, spriteEl, nameEl, balkenInnen, bodenEl }
     });
+    zeigeBoden(run.felder[run.felder.length - 1]);
 }
 
 // Ein Listener fuer den ganzen Acker. Tagsueber erntet der Cursor-Kreis alle fertigen Pflanzen,
@@ -1689,6 +1692,35 @@ function aktualisiereFeldMarker(feld) {
 }
 
 // Hinweistext eines bepflanzten Feldes (Tooltip)
+// ---------- FRUCHTBARER BODEN ----------
+// Jedes Feld wird durch Ernten besser (nur in diesem Run): alle BODEN_ERNTEN Ernten eine Stufe, hoechstens 5.
+// Jede Stufe gibt +10% Gold auf diesem Feld. Der Stern "Bodenkunde" macht es schneller.
+const BODEN_ERNTEN = 30;
+const BODEN_MAX = 5;
+function bodenErntenProStufe() {
+    return BODEN_ERNTEN - 5 * level("bodenkunde");
+}
+function bodenStufe(feld) {
+    const ernten = (run.boden && run.boden[feld.slot]) || 0;
+    return Math.min(BODEN_MAX, Math.floor(ernten / bodenErntenProStufe()));
+}
+function zeigeBoden(feld) {
+    const stufe = bodenStufe(feld);
+    if (!feld.el.bodenEl) return;
+    feld.el.bodenEl.textContent = stufe > 0 ? "●".repeat(stufe) : "";
+    feld.el.feldDiv.classList.toggle("boden-voll", stufe >= BODEN_MAX);
+}
+function zaehleBodenErnte(feld, x, y, direkt) {
+    run.boden = run.boden || {};
+    const vorher = bodenStufe(feld);
+    run.boden[feld.slot] = (run.boden[feld.slot] || 0) + 1;
+    const jetzt = bodenStufe(feld);
+    if (jetzt > vorher) {
+        zeigeBoden(feld);
+        if (!direkt) zeigeSchwebeText(x, y - 60, tf("🟫 Fruchtbarer Boden {0}!", jetzt), "#8a5a2a", true);
+    }
+}
+
 function feldTipp(feld) {
     const p = feld.pflanze;
     let text = p.emoji + " " + p.name + " · " + zahl(verkaufswert(p)) + t(" Gold Grundwert");
@@ -1696,6 +1728,8 @@ function feldTipp(feld) {
     if (eigenschaftText(p)) text += "\n" + eigenschaftText(p);
     if (feld.bewaessert) text += t("\n💧 Bewässert: wächst schneller");
     if (feld.geduengt) text += t("\n🪱 Gedüngt: doppeltes Gold");
+    const boden = bodenStufe(feld);
+    text += "\n" + tf("🟫 Fruchtbarer Boden {0}/{1}: +{2}% Gold", boden, BODEN_MAX, 10 * boden);
     text += t("\n👆 Anklicken: wächst ein kleines Stück schneller");
     return text;
 }
@@ -1837,6 +1871,7 @@ function berechneErnte(feld) {
         raritaetIndex = Math.max(raritaetIndex, mindestRaritaet);
 
         const multi = raritaetsMulti(raritaetIndex) * goldMulti() * (feld.geduengt ? (level("wurmhumus") > 0 ? 3 : 2) : 1) *
+            (1 + 0.1 * bodenStufe(feld)) *
             (feld.bewaessert ? 1 + 0.5 * level("gewaechshaus") : 1) * erntefest * (run.rauschMs > 0 ? 3 : 1) *
             (variante.goldMulti || 1) * (run.goldBuffMs > 0 ? 2 : 1) * mondschein * nebel *
             (riesig || 1) * (sichel || 1) * wertAnteil * abend * vollmond * morgen * riesenwuchs *
@@ -1882,6 +1917,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     }
 
     const { beute, riesig, sichel } = berechneErnte(feld);
+    zaehleBodenErnte(feld, x, y, direkt);
     haken("ernte", feld);
     beute.forEach(teil => {
         if (direkt) gutschreibenGold(aufrunden(teil.wert * goldFaktor), teil.raritaetIndex);

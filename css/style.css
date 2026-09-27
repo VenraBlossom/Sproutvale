@@ -11386,3 +11386,19 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 0.75em;
     color: #ffe89a;
 }
+
+/* Fruchtbarer Boden: kleine Punkte oben links am Feld (1 bis 5), volles Feld glueht leicht */
+.feld-boden {
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    font-size: 9px;
+    letter-spacing: -1px;
+    color: #ffd23a;
+    text-shadow: 0 0 2px #4a2f15, 1px 1px 0 #4a2f15;
+    pointer-events: none;
+    z-index: 3;
+}
+.feld.boden-voll {
+    box-shadow: inset 0 0 10px rgba(255, 210, 58, 0.45);
+}
