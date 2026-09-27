@@ -2925,7 +2925,9 @@ Object.assign(UEBERSETZUNG, {
     " Herausforderungen": " challenges",
     "-mal das Erntefieber": " Harvest Fevers",
     "Spiele ": "Play ",
-    " verschiedene Hof-Stile": " different farm styles"
+    " verschiedene Hof-Stile": " different farm styles",
+    "{0} Kristalle": "{0} Crystals",
+    " (100 Kristalle = {0}). Nur Optik, kein Pay-to-Win. Kaufen geht, sobald Sproutvale auf Steam ist.": " (100 crystals = {0}). Cosmetic only, no pay-to-win. Buying is possible once Sproutvale is on Steam."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

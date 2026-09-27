@@ -1662,16 +1662,22 @@ const HAUSTIER_AKTIONEN = [
 //   Gewoehnlich (weiss)    = quelle "frei"
 //   Ungewoehnlich (gruen)  = quelle "erspielt" (bedingung im Spiel erfuellen)
 //   Episch (lila)          = quelle "dlc", paket "unterstuetzer" (Unterstuetzer-Paket inkl. Sandbox)
-//   Legendaer (gelb)       = quelle "dlc", paket "einzeln" (aufwaendig/animiert, einzeln kaufbar fuer LEGENDAER_PREIS)
+//   Legendaer (gelb)       = quelle "dlc", paket "einzeln" (aufwaendig/animiert, einzeln fuer LEGENDAER_KRISTALLE Kristalle)
+// Spaeter auf Steam: Spiel 4,99 €, Unterstuetzer-Paket 4,99 €, Kristalle 100 pro 1 € (nur Kosmetik, kein Pay-to-Win).
 
 const DLC_PAKETE = {
     unterstuetzer: {
-        name: t("Unterstützer-Paket"), preis: 7.99,
+        name: t("Unterstützer-Paket"), preis: 4.99,
         inhalt: t("Endlos sofort und alle epischen Inhalte: Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, ") +
             t("Münzen, Kuschel-Rahmen und Pflanzen-Looks")
     }
 };
-const LEGENDAER_PREIS = 0.99;
+const LEGENDAER_KRISTALLE = 50;
+const KRISTALLE_PRO_EURO = 100;
+
+function kristallText(menge) {
+    return "💎 " + tf("{0} Kristalle", zahl(menge));
+}
 
 // Seltenheit eines Kosmetik-Eintrags (Index in KUSCHEL_RARITAETEN: 0 gewoehnlich, 1 ungewoehnlich, 3 episch, 4 legendaer)
 function kosmetikSeltenheit(eintrag) {
@@ -1688,7 +1694,7 @@ function euro(preis) {
 // Text fuer den Preis eines DLC-Inhalts
 function dlcPreisText(eintrag) {
     if (eintrag.paket === "unterstuetzer") return t("Im ") + DLC_PAKETE.unterstuetzer.name + t(" enthalten");
-    return euro(eintrag.preis || LEGENDAER_PREIS);
+    return kristallText(eintrag.kristalle || LEGENDAER_KRISTALLE);
 }
 
 const KOSMETIK_KATEGORIEN = [
@@ -2272,7 +2278,7 @@ const SANDBOX_KONFIG = {
 
 // ---------- PROFIL: EIGENE FIGUR (Charakter-Editor im Hauptmenue) ----------
 // Die Figur laeuft wie der Begleiter ueber den Hof (etwas groesser, etwas weiter hinten). Sie droppt nichts und hat
-// keine Spiel-Effekte, nur Aussehen. Gewoehnlich = frei, episch = Unterstuetzer-Paket, legendaer = einzeln (0,99 €).
+// keine Spiel-Effekte, nur Aussehen. Gewoehnlich = frei, episch = Unterstuetzer-Paket, legendaer = einzeln (50 Kristalle).
 // fx (nur Aussehen): rgb (Farben laufen durch), geist (durchsichtig, schwebt), glow (leuchtet, fxFarbe),
 //     funkeln (kleine Sterne), flamme (flackert und gluet), schweben (wippt sanft auf und ab)
 // Farb-Buchstaben: Haut 4/s/r/m, Augen 5, Haare 2/h, Oberteil 6/8/k, Hose 3/9, Schuhe 1/l, Hut a/b/c

@@ -1197,8 +1197,8 @@ function renderHaus(inhalt) {
         const paket = DLC_PAKETE.unterstuetzer;
         inhalt.appendChild(el("div", "panel-hinweis leise",
             t("💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. ") + paket.name + ": " + paket.inhalt +
-            t(". Legendäre Inhalte mit Animationen gibt es einzeln für je ") + euro(LEGENDAER_PREIS) +
-            t(". Kaufen geht, sobald Sproutvale auf Steam ist.")));
+            " (" + euro(paket.preis) + ")" + t(". Legendäre Inhalte mit Animationen gibt es einzeln für je ") + kristallText(LEGENDAER_KRISTALLE) +
+            tf(" (100 Kristalle = {0}). Nur Optik, kein Pay-to-Win. Kaufen geht, sobald Sproutvale auf Steam ist.", euro(1))));
     }
 }
 

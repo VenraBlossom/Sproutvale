@@ -90,7 +90,7 @@ window.debug = {
     pose(zustand) { wechsleHaustierZustand(zustand, 8000); },
     // z.B. debug.variante("kristall"), alle neuen Pflanzen werden diese Variante. debug.variante(null) zum Ausschalten
     variante(id) { debugVariante = id; },
-    // Unterstuetzer-Paket (7,99 €, alle epischen Inhalte + Sandbox) an/aus: debug.dlc(true)
+    // Unterstuetzer-Paket (4,99 €, alle epischen Inhalte + Sandbox) an/aus: debug.dlc(true)
     dlc(an = true) { meta.dlc = an; speichereMeta(); wendeKosmetikAn(); },
     // Alle legendaeren Einzel-Inhalte freischalten: debug.einzelDlc()
     einzelDlc() {
