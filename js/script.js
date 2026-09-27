@@ -120,7 +120,7 @@ function leererMetaStand() {
         erfolge: {}, erfolgeAbgeholt: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
         sternenfaelle: 0, sternensplitter: 0, sternenfallUpgrades: {}, mondbluetenSeitSternenfall: 0,
         sandbox: false, dlc: false, freigeschaltet: {}, kosmetik: leereKosmetik(),
-        mondphase: 0, mondphaseFrei: 0, mondphaseGesehen: 0,
+        mondphase: 0, mondphaseFrei: 0, mondphaseGesehen: 0, herausforderung: null, herausforderungen: {},
         profil: { name: "", teile: { ...FIGUR_STANDARD } }
     };
 }
@@ -151,7 +151,8 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 sternenfallUpgrades: { ...daten.sternenfallUpgrades },
                 freigeschaltet: { ...daten.freigeschaltet },
                 kosmetik: { ...leereKosmetik(), ...daten.kosmetik },
-                profil: { name: (daten.profil && daten.profil.name) || "", teile: { ...FIGUR_STANDARD, ...(daten.profil && daten.profil.teile) } }
+                // ganzes Profil behalten (Name, Aussehen, Aura ...), nur fehlende Teile auffuellen
+                profil: { ...daten.profil, name: (daten.profil && daten.profil.name) || "", teile: { ...FIGUR_STANDARD, ...(daten.profil && daten.profil.teile) } }
             };
             // Alte Spielstaende: schon freie Mondphasen gelten als gesehen (kein Ausrufezeichen fuer Altes)
             if (daten.mondphaseGesehen === undefined) stand.mondphaseGesehen = stand.mondphaseFrei || 0;
@@ -392,6 +393,7 @@ function erstelleRunZustand(sandbox = false) {
         id: naechsteRunId++,
         sandbox,
         mondphase: sandbox ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0),
+        herausforderung: sandbox ? null : meta.herausforderung || null,
         phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
         tag: 1,
         gold: 25 * metaLevel("startgold") + 5 * kuschel("hase"),
@@ -477,6 +479,14 @@ function level(id) {
 }
 
 // Stufe eines Segens; dazu kommt der Bonus fuer frueh bezahlte Rechnungen (run.segenExtra, z.B. +0,3 = 30% staerker)
+// Laufende Herausforderung (1 = aktiv) und geschaffte Herausforderungen (1 = dauerhafter Bonus)
+function hf(id) {
+    return run && run.herausforderung === id ? 1 : 0;
+}
+function hfGeschafft(id) {
+    return meta.herausforderungen && meta.herausforderungen[id] ? 1 : 0;
+}
+
 // Gewaehlter Hof-Stil dieses Runs (1 = aktiv)
 function stil(id) {
     return run && run.stil === id ? 1 : 0;
@@ -553,7 +563,7 @@ function energieMax() {
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
     energie *= (1 + metaWert("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
     energie *= 1 + werkzeugWert("taschenuhr");
-    energie *= 1 + 0.2 * stil("fruehaufsteher");
+    energie *= (1 + 0.2 * stil("fruehaufsteher")) * (1 - 0.4 * hf("kurzetage")) * (1 + 0.1 * hfGeschafft("kurzetage"));
     // Pakte
     energie *= Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit")) * (1 + 0.25 * segen("nachtschicht"));
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
@@ -570,8 +580,9 @@ function raritaetsChancen() {
     // Am Anfang gibt es nur gewoehnliche Saat: jede Farbe schaltet ihr Stern im Stellarium erst frei (Stufe 1)
     const gruen = (level("gruen") > 0 ? 0.12 + 0.03 * level("gruen") : 0) + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
-    const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling + 0.03 * stil("gluecksritter");
+    const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling + 0.03 * stil("gluecksritter") + 0.02 * hfGeschafft("pech");
     const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + 0.03 * segen("hochrisiko") + 0.01 * stil("gluecksritter") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
+    if (hf("pech")) return [1, 0, 0, 0, 0];
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
@@ -693,7 +704,7 @@ function feldKosten(seite = eigeneSeite()) {
     const felder = seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length;
     const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
-        Math.pow(0.85, segen("sparsam")) * Math.pow(0.8, segen("feldarbeit")) * (run.koop ? KOOP_ANFORDERUNG : 1));
+        Math.pow(0.85, segen("sparsam")) * Math.pow(0.8, segen("feldarbeit")) * (1 + 2 * hf("teurefelder")) * (1 - 0.1 * hfGeschafft("teurefelder")) * (run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
 function rechnungsBetrag(nummer) {
@@ -833,7 +844,7 @@ function meisterBonus() {
 }
 
 function verkaufswert(pflanze) {
-    const weizenbauer = stil("weizenbauer") ? (pflanze.id === "weizen" ? 1.8 : 0.9) : 1;
+    const weizenbauer = (stil("weizenbauer") ? (pflanze.id === "weizen" ? 1.8 : 0.9) : 1) * (pflanze.id === "weizen" ? 1 + 0.5 * hfGeschafft("nurweizen") : 1);
     return aufrunden(weizenbauer * (pflanze.verkaufswert + level("erntekorb")) * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
         (1 + level("pg_" + pflanze.id)));
 }
@@ -3188,8 +3199,9 @@ segenKnopf.addEventListener("click", () => {
 // ---------- SEGEN (nach jeder bezahlten Rechnung, Pflicht-Auswahl) ----------
 
 function segenAuswahlAnzahl() {
-    if (run.mondphase >= 4 && !run.segenBoss) return 3;
-    return (kuschel("phoenix") > 0 || run.segenBoss) ? 4 : 3;
+    const extra = hfGeschafft("ohnesegen");
+    if (run.mondphase >= 4 && !run.segenBoss) return 3 + extra;
+    return ((kuschel("phoenix") > 0 || run.segenBoss) ? 4 : 3) + extra;
 }
 
 // Kurze Sperre nach dem Oeffnen: Wer gerade noch schnell auf den Samenladen klickt, waehlt sonst aus Versehen einen Segen
@@ -3198,6 +3210,14 @@ let segenSperreBis = 0;
 
 // auswahl: gespeicherte Auswahl (nach dem Laden eines Spielstands), sonst wird neu gewuerfelt
 function zeigeSegenAuswahl(auswahl) {
+    if (hf("ohnesegen") && !run.sandbox) {
+        run.segenAuswahl = null;
+        run.segenAusstehend = false;
+        run.segenBoss = false;
+        run.segenWarteschlange = 0;
+        segenFenster.classList.add("versteckt");
+        return;
+    }
     // Segen mit "max" (z.B. Flinke Haende) verschwinden aus der Auswahl, wenn man sie so oft hat
     const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && (run.segen[s.id] || 0) >= s.max));
     if (!auswahl) {
@@ -3452,6 +3472,7 @@ function zahleRechnung(faellig) {
     run.gold -= koopEigenerAnteil(faellig);
     run.bezahlteRechnungen += 1;
     meta.lebenszeit.rechnungen += 1;
+    pruefeHerausforderung();
     gibBauernXp(40 + 30 * run.bezahlteRechnungen);
     run.gnadenRechnung = 0;
     run.rechnungsRabatt = 0;
@@ -3749,6 +3770,16 @@ function starteNeuenRun(sandbox = false) {
     aktualisiereAlles();
 }
 
+function pruefeHerausforderung() {
+    const h = HERAUSFORDERUNGEN.find(x => x.id === run.herausforderung);
+    if (!h || run.bezahlteRechnungen < h.ziel || hfGeschafft(h.id)) return;
+    if (!meta.herausforderungen) meta.herausforderungen = {};
+    meta.herausforderungen[h.id] = true;
+    speichereMeta();
+    zeigeBanner("🏆", tf("Herausforderung geschafft: {0}", h.name), h.belohnung, "#7c4fb3", 4000);
+    Klang.stern();
+}
+
 function zeigeStilAuswahl() {
     const angebot = mische([...HOF_STILE]).slice(0, 3);
     const reihe = el("div", "stil-karten");
@@ -3877,6 +3908,9 @@ function renderTagesKarte() {
         }
     }
 
+    const aktHf = HERAUSFORDERUNGEN.find(x => x.id === run.herausforderung);
+    if (aktHf && !run.sandbox) html += `<p class="karte-stil">${aktHf.symbol} <b>${t("Herausforderung")} ${aktHf.name}:</b> ${aktHf.regel} ` +
+        `(${hfGeschafft(aktHf.id) ? t("schon geschafft") : tf("Ziel: {0} Rechnungen", aktHf.ziel)})</p>`;
     const hofStil = HOF_STILE.find(s => s.id === run.stil);
     if (hofStil && !run.sandbox) html += `<p class="karte-stil">${hofStil.symbol} <b>${hofStil.name}:</b> ${hofStil.text}</p>`;
     tagesKarteInhalt.innerHTML = html;
@@ -4138,6 +4172,12 @@ function kaufeUpgrade(def, waehrung) {
     if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
     if (vorigePflanzeFehlt(def)) return;
+    // Herausforderung "Nur Weizen": keine neuen Pflanzen
+    if (hf("nurweizen") && def.id.startsWith("p_") && def.id !== "p_weizen" && run.pflanzen.some(p => "p_" + p.id === def.id)) {
+        Klang.fehler();
+        zeigeToast(t("🌾 Herausforderung „Nur Weizen“: keine neuen Pflanzen."));
+        return;
+    }
     bezahle(waehrung, kosten);
     run.level[def.id] = level(def.id) + 1;
     if (def.id === "stellarium") {
@@ -4372,7 +4412,7 @@ function istKnotenOffen(def) {
 
 function knotenKosten(def) {
     // Mondteich "Sternenkarte": alle Sterne billiger
-    return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)) * (1 - 0.03 * metaLevel("sternenkarte"))));
+    return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)) * (1 - 0.03 * metaLevel("sternenkarte")) * (1 - 0.1 * hfGeschafft("blind"))));
 }
 
 function knotenSicht(def) {
@@ -5269,6 +5309,7 @@ function oeffnePanel(panel) {
 // Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
 function stellariumFrei() {
     if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
+    if (hf("blind")) return false;
     return meta.stellariumFrei || (run && run.koop) || level("stellarium") > 0;
 }
 

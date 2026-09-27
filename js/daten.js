@@ -1315,6 +1315,18 @@ const HAENDLER_WAREN = [
     { id: "gluecksklee", name: t("Glücksklee"), symbol: "🍀", preis: 0.3, text: t("Am nächsten Tag ist jede Saat mindestens ungewöhnlich.") }
 ];
 
+// ---------- HERAUSFORDERUNGEN (Mondteich > Spielmodi, ab 3 Runs) ----------
+// Ein Story-Run mit einer Einschraenkung. Wer dabei genug Rechnungen bezahlt, bekommt fuer immer einen Bonus.
+const HERAUSFORDERUNGEN = [
+    { id: "nurweizen", symbol: "🌾", ziel: 3, name: t("Nur Weizen"), regel: t("Du kannst keine neuen Pflanzen freischalten."), belohnung: t("Für immer: Weizen ist 50% mehr wert.") },
+    { id: "ohnesegen", symbol: "🚫", ziel: 4, name: t("Ohne Segen"), regel: t("Nach Rechnungen gibt es keine Segen."), belohnung: t("Für immer: 1 Segen mehr zur Auswahl.") },
+    { id: "kurzetage", symbol: "⏳", ziel: 3, name: t("Kurze Tage"), regel: t("-40% Energie an jedem Tag."), belohnung: t("Für immer: +10% Energie.") },
+    { id: "teurefelder", symbol: "🧱", ziel: 3, name: t("Harter Boden"), regel: t("Neue Felder kosten dreimal so viel."), belohnung: t("Für immer: Felder kosten 10% weniger.") },
+    { id: "blind", symbol: "🙈", ziel: 3, name: t("Sternenlos"), regel: t("Das Stellarium bleibt den ganzen Run zu."), belohnung: t("Für immer: Sterne im Stellarium kosten 10% weniger.") },
+    { id: "pech", symbol: "🐈‍⬛", ziel: 3, name: t("Pechsträhne"), regel: t("Jede Saat ist gewöhnlich."), belohnung: t("Für immer: +2% Chance auf epische Saat.") }
+];
+const HERAUSFORDERUNG_AB_RUNS = 3;
+
 // ---------- HOF-STILE (ab dem 2. Run waehlt man zu Beginn jedes Story-Runs 1 von 3) ----------
 const HOF_STILE = [
     { id: "weizenbauer", symbol: "🌾", name: t("Weizenbauer"), text: t("Weizen ist 80% mehr wert, alle anderen Pflanzen 10% weniger.") },

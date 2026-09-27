@@ -11829,3 +11829,11 @@ body.erntefieber::after {
     from { opacity: 0.6; }
     to { opacity: 1; }
 }
+
+/* Herausforderungen im Mondteich */
+.mondphase.herausforderung.geschafft {
+    border-color: #3f8a32;
+}
+.mondphase.herausforderung .mondphase-bonus {
+    font-size: 0.75em;
+}

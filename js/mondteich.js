@@ -522,6 +522,40 @@ function renderMondphasen() {
     prestigeInhalt.appendChild(kasten);
 }
 
+function renderHerausforderungen() {
+    const m = storyMeta();
+    const kasten = el("div", "mondphasen-kasten");
+    kasten.appendChild(el("div", "mondphasen-titel", t("🏆 Herausforderungen")));
+    if ((m.lebenszeit.runs || 0) < HERAUSFORDERUNG_AB_RUNS) {
+        kasten.appendChild(el("div", "mondphasen-hinweis", tf("🔒 Erscheinen nach {0} Runs.", HERAUSFORDERUNG_AB_RUNS)));
+        prestigeInhalt.appendChild(kasten);
+        return;
+    }
+    kasten.appendChild(el("div", "mondphasen-hinweis", t("Ein Story-Run mit einer Einschränkung. Schaffst du das Ziel, gibt es für immer einen Bonus. ") +
+        t("Klick nochmal auf die gewählte, um sie abzuwählen. Gilt ab dem nächsten Story-Run.")));
+    const reihe = el("div", "mondphasen-reihe");
+    HERAUSFORDERUNGEN.forEach(h => {
+        const aktiv = m.herausforderung === h.id;
+        const geschafft = m.herausforderungen && m.herausforderungen[h.id];
+        const knopf = el("button", "mondphase herausforderung" + (aktiv ? " aktiv" : "") + (geschafft ? " geschafft" : ""), null, [
+            el("div", "mondphase-symbol", h.symbol),
+            el("div", "mondphase-name", h.name),
+            el("div", "mondphase-text", h.regel + " " + tf("Ziel: {0} Rechnungen.", h.ziel)),
+            el("div", "mondphase-bonus", (geschafft ? "✅ " : "🎁 ") + h.belohnung)
+        ]);
+        knopf.addEventListener("click", () => {
+            m.herausforderung = aktiv ? null : h.id;
+            speichereMeta();
+            if (run.phase === "vorTag" && run.tag === 1 && !run.sandbox && !run.koop) starteNeuenRun(false);
+            Klang.stern();
+            oeffnePrestigeShop();
+        });
+        reihe.appendChild(knopf);
+    });
+    kasten.appendChild(reihe);
+    prestigeInhalt.appendChild(kasten);
+}
+
 function renderSpielmodi() {
     prestigeInfo.textContent = t("Spielmodi verändern die Regeln eines Runs.");
     // Im Duo startet nur der Host neue Runs, und zwar aus der Lobby
@@ -537,6 +571,7 @@ function renderSpielmodi() {
         return;
     }
     renderMondphasen(); // gelten nur fuer Story, sind aber auch aus Endlos heraus waehlbar
+    renderHerausforderungen();
     // Neue Mondphasen sind jetzt gesehen (das Ausrufezeichen verschwindet beim naechsten Oeffnen)
     if (neueMondphase()) {
         storyMeta().mondphaseGesehen = storyMeta().mondphaseFrei || 0;
