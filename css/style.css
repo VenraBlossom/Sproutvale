@@ -11650,12 +11650,59 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0;
     pointer-events: none;
 }
+/* Buehne immer 16:9 und bildschirmfuellend, damit Logo und Text genau auf dem Automaten-Bildschirm liegen */
+#intro-buehne {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100vw, 177.78vh);
+    height: max(100vh, 56.25vw);
+    transform: translate(-50%, -50%);
+}
 #intro-leinwand {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     image-rendering: pixelated;
     display: block;
+}
+/* Bildschirm: 160/62/320/206 von 640x360 */
+.intro-schirm {
+    position: absolute;
+    left: 25%;
+    top: 17.22%;
+    width: 50%;
+    height: 57.22%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4%;
+    opacity: 0;
+    overflow: hidden;
+}
+.intro-schirm::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 4px);
+    box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+}
+.intro-logo {
+    height: 58%;
+    border-radius: 8px;
+}
+.intro-text {
+    font-family: "Pixelify Sans", sans-serif;
+    font-weight: 700;
+    color: #f4f0ff;
+    text-shadow: 0 0 10px #b58cff;
+    font-size: min(4.2vh, 2.4vw);
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+.intro-text span {
+    color: #ffcf4a;
 }
 /* ---------- CRT-Filter (Einstellungen) ---------- */
 #crt-filter {

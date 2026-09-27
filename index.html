@@ -11,7 +11,13 @@
 <body>
     <!-- Intro: Arcade-Automat schaltet sich ein und zeigt das Studio-Logo (Klick ueberspringt) -->
     <div id="intro">
-        <canvas id="intro-leinwand" width="480" height="270"></canvas>
+        <div id="intro-buehne">
+            <canvas id="intro-leinwand" width="640" height="360"></canvas>
+            <div class="intro-schirm">
+                <img class="intro-logo" src="assets/Venray Studios.png" alt="">
+                <div class="intro-text" data-kein-i18n>Venray Studios <span>presents</span></div>
+            </div>
+        </div>
     </div>
     <div id="crt-filter"></div>
     <!-- Kopfbereich: Himmel (Tageszeit), Sonne/Mond, Wolken, Hof-Landschaft, Haustier und Deko, oben die Holzleiste -->
