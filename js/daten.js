@@ -86,6 +86,20 @@ function klemme(wert, min, max) {
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
 const SPIEL_VERSION = "Alpha 0.9.0";
 
+// "Was ist neu?" (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
+const NEUIGKEITEN = [
+    { version: "Alpha 0.10.0", punkte: [
+        t("Duo läuft viel flüssiger: Figuren werden schneller gezeichnet."),
+        t("Duo: Der Lobby-Code ist versteckt (Anzeigen per Klick), Beitritt mit Namen, der Host kann Mitspieler rauswerfen."),
+        t("Duo: Felder kosten doppelt so viel wie solo."),
+        t("Mehr Mondblüten für bezahlte Rechnungen: schon der erste Run bringt ein spürbares Upgrade."),
+        t("Spielstand als Datei sichern (Einstellungen, Spielstand)."),
+        t("Neue Einstellung: Im Hintergrund stumm."),
+        t("Figuren laufen rechts, Begleiter links auf dem Hof."),
+        t("Viele fehlende englische Texte ergänzt, Regengeräusch im Menü behoben.")
+    ] }
+];
+
 const KONFIG = {
     klickGrenzeProSek: 10,            // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt weniger
     klickUeberGrenze: 0.75,           // (Autoklicker bleiben staerker, aber man muss keinen benutzen; die Sense ist ausgenommen)

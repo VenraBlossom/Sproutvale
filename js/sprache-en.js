@@ -2431,7 +2431,10 @@ Object.assign(UEBERSETZUNG, {
     "🪙 Gold": "🪙 Gold",
     "💌 Feedback": "💌 Feedback",
     "Story": "Story",
-    "🔕 Im Hintergrund stumm": "🔕 Mute in background"
+    "🔕 Im Hintergrund stumm": "🔕 Mute in background",
+    "📤 Spielstand sichern": "📤 Back up save",
+    "Als Datei speichern": "Save as file",
+    "📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen.": "📤 Save backed up. Use “Load save” to bring it back."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -557,6 +557,10 @@ function koopEmpfange(n) {
         case "emote":
             zeigePartnerEmote(n.id);
             break;
+        case "frueh":
+            // Der Mitspieler hat die Rechnung frueher bezahlt (mit dem Gold beider): hier genauso
+            if (koopAktiv()) bezahleFrueher(false);
+            break;
         case "gekickt":
             if (koop.rolle !== "gast") break;
             zeigeToast(t("🥾 Der Host hat dich aus der Lobby entfernt."));

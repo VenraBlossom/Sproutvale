@@ -1450,7 +1450,7 @@ function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
 const figuren = [];
 
 // Wo auf dem Hof gelaufen wird (in Prozent der Breite): Spieler rechts, Begleiter links
-const FIGUR_BEREICH = { mensch: [56, 86], begleiter: [14, 44] };
+const FIGUR_BEREICH = { mensch: [56, 76], begleiter: [34, 50] }; // Spieler nicht vor der Scheune, Begleiter nicht im Teich
 function figurBereich(art) {
     return FIGUR_BEREICH[art === "mensch" ? "mensch" : "begleiter"];
 }

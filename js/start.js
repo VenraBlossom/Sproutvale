@@ -388,7 +388,25 @@ aktualisiereAlles();
 zeigeHauptmenue();
 requestAnimationFrame(hauptSchleife);
 
-$("menue-version").textContent = SPIEL_VERSION;
+// "Was ist neu?": Klick auf die Versionsnummer, und nach einem Update einmal von selbst (nicht beim allerersten Start)
+function zeigeNeuigkeiten() {
+    const eintrag = NEUIGKEITEN[0];
+    zeigePopup({
+        titel: "📜 " + tf("Neu in {0}", eintrag.version),
+        farbe: "#2e9e2e",
+        breite: 600,
+        inhalt: el("ul", "neuigkeiten-liste", null, eintrag.punkte.map(punkt => el("li", null, punkt))),
+        knoepfe: [{ text: t("Weiter spielen"), klasse: "knopf-gruen" }]
+    });
+}
+$("menue-version").textContent = SPIEL_VERSION + " · " + t("📜 Was ist neu?");
+$("menue-version").addEventListener("click", zeigeNeuigkeiten);
+if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
+    const schonGespielt = (meta.lebenszeit && meta.lebenszeit.tage > 0) || meta.mondblueten > 0;
+    meta.neuigkeitenGesehen = SPIEL_VERSION;
+    speichereMeta();
+    if (schonGespielt && NEUIGKEITEN[0].version === SPIEL_VERSION) setTimeout(zeigeNeuigkeiten, 600);
+}
 
 // Auto-Patcher (Desktop-App): ein neues Update ist geladen, jetzt neu laden?
 if (window.sproutvaleDesktop && window.sproutvaleDesktop.update) {

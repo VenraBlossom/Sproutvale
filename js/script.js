@@ -3338,14 +3338,19 @@ function zahleRechnung(faellig) {
 // (der Run wird kuerzer), und der naechste Segen wird pro Tag, den man frueher bezahlt, 10% staerker.
 const FRUEH_BEZAHLT_BONUS = 0.1;
 
+// Im Duo zaehlt das Gold beider zusammen, und es gilt fuer beide (der Mitspieler bekommt eine Nachricht)
 function kannFrueherBezahlen() {
-    if (!run || run.sandbox || run.koop || run.phase !== "vorTag" || run.gnadenRechnung || run.rechnungOffen) return false;
+    if (!run || run.sandbox || run.phase !== "vorTag" || run.gnadenRechnung || run.rechnungOffen) return false;
     if (run.segenAuswahl || run.segenAusstehend) return false;
-    return run.gold >= naechsteRechnung().betrag;
+    if (run.koop && (typeof koop === "undefined" || !koop.verbunden || koop.ichBereit)) return false;
+    return koopGesamtGold() >= naechsteRechnung().betrag;
 }
 
-function bezahleFrueher() {
-    if (!kannFrueherBezahlen()) return;
+// selbst = false: der Mitspieler hat im Duo frueher bezahlt, hier wird nur mitgezogen
+function bezahleFrueher(selbst = true) {
+    if (selbst && !kannFrueherBezahlen()) return;
+    if (!selbst && (run.phase !== "vorTag" || run.rechnungOffen || run.sandbox)) return;
+    if (selbst && run.koop) koopSende("frueh");
     const rechnung = naechsteRechnung();
     const tageFrueher = rechnung.tageBis;
     zahleRechnung(rechnung.betrag);
@@ -3355,7 +3360,9 @@ function bezahleFrueher() {
     zeigeBanner("🧾", t("Früher bezahlt!"), tf("{0} Tage früher: der nächste Segen ist {1}% stärker", tageFrueher,
         Math.round(run.fruehBonus * 100)), "#2e9e2e", 3200);
     speichereMeta();
-    zeigeSegenAuswahl();
+    // Waehlt man gerade noch einen Segen (nur im Duo moeglich), kommt der neue danach
+    if (run.segenAuswahl) run.segenWarteschlange = (run.segenWarteschlange || 0) + 1;
+    else zeigeSegenAuswahl();
     renderTagesKarte();
     aktualisiereAlles();
     speichereRun();
@@ -3649,7 +3656,7 @@ function renderTagesKarte() {
 
     tagesKarteInhalt.innerHTML = html;
     const fruehKnopf = tagesKarteInhalt.querySelector(".karte-frueh-bezahlen");
-    if (fruehKnopf) fruehKnopf.addEventListener("click", bezahleFrueher);
+    if (fruehKnopf) fruehKnopf.addEventListener("click", () => bezahleFrueher());
 
     const istRunEnde = modus === "runEnde";
     karteShop.classList.toggle("versteckt", istRunEnde);
@@ -4825,6 +4832,29 @@ const IMPORT_DATEIEN = {
     "kaeufe.dat": "sproutvale_kaeufe"
 };
 
+// Alles in EINER Datei sichern (alle Spielstaende, Mondteich, Kaeufe, Einstellungen); "Spielstand laden" liest sie wieder ein
+const SICHERUNG_TYP = "sproutvale-sicherung";
+$("spielstand-exportieren").addEventListener("click", () => {
+    speichereRun();
+    speichereMeta();
+    const daten = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const schluessel = localStorage.key(i);
+        if (schluessel && schluessel.startsWith("sproutvale_")) daten[schluessel] = localStorage.getItem(schluessel);
+    }
+    const datei = new Blob([JSON.stringify({ typ: SICHERUNG_TYP, version: SPIEL_VERSION, datum: new Date().toISOString(), daten })],
+        { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(datei);
+    link.download = "sproutvale-spielstand-" + new Date().toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+    Klang.kaufen();
+    zeigeToast(t("📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen."));
+});
+
 $("spielstand-importieren").addEventListener("click", () => $("import-dateien").click());
 $("import-dateien").addEventListener("change", async event => {
     const dateien = [...event.target.files];
@@ -4832,6 +4862,20 @@ $("import-dateien").addEventListener("change", async event => {
     const gefunden = [];
     for (const datei of dateien) {
         const name = datei.name.toLowerCase();
+        // Sicherung aus "Spielstand sichern": alles in einer Datei
+        if (name.startsWith("sproutvale-spielstand")) {
+            try {
+                const inhalt = JSON.parse(await datei.text());
+                if (inhalt.typ === SICHERUNG_TYP && inhalt.daten) {
+                    Object.entries(inhalt.daten).forEach(([schluessel, text]) => {
+                        if (schluessel.startsWith("sproutvale_") && typeof text === "string") gefunden.push({ name: datei.name, schluessel, text });
+                    });
+                }
+            } catch (fehler) {
+                console.warn("Datei ist kein gueltiger Spielstand", datei.name);
+            }
+            continue;
+        }
         const endlos = name.match(/^persistedsavefile_([1-3])\.json$/);
         if (endlos) {
             // Endlos-Speicherstand: Fortschritt und Hof stehen zusammen in einer Datei
@@ -4865,7 +4909,7 @@ $("import-dateien").addEventListener("change", async event => {
         breite: 560,
         inhalt: el("div", "warn-inhalt", null, [
             el("p", null, t("Diese Dateien ersetzen deinen aktuellen Stand:")),
-            el("p", null, gefunden.map(g => "📄 " + g.name).join("   ")),
+            el("p", null, [...new Set(gefunden.map(g => g.name))].map(name => "📄 " + name).join("   ")),
             el("p", null, t("Danach startet das Spiel neu."))
         ]),
         knoepfe: [

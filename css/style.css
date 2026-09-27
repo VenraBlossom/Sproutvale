@@ -7515,7 +7515,20 @@ h1, h2, h3,
     color: #fff6dc;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
     opacity: 0.85;
-    pointer-events: none;
+    cursor: pointer;
+}
+#menue-version:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+.neuigkeiten-liste {
+    text-align: left;
+    margin: 0;
+    padding-left: 22px;
+    line-height: 1.5;
+}
+.neuigkeiten-liste li {
+    margin-bottom: 4px;
 }
 
 /* Feedback-Formular in den Einstellungen */
