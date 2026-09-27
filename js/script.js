@@ -564,7 +564,7 @@ function raritaetsChancen() {
 function glueckChance() { return 0.05 * level("glueck") + 0.1 * level("glueck2") + werkzeugWert("kleeblatt") + gachaBonus("glueck"); }
 function helferKlicksProSek() { return level("eichhoernchen") + 2 * level("eichhoernchen2") + 0.5 * kuschel("eichhoernchen"); }
 function edelsteinBonus() { return 0.1 * level("edelstein"); }
-function sternensamenProKlick() { return KONFIG.sternensamenProKlick + level("sternenklick") + segen("klingeling"); }
+function sternensamenProKlick() { return KONFIG.sternensamenProKlick + 0.25 * level("sternenklick") + 0.5 * segen("klingeling"); }
 function spatzIntervallSek() { return level("saatspatz") > 0 ? 20 / level("saatspatz") : Infinity; }
 function bienenIntervallSek() { return level("biene") > 0 ? 12 / level("biene") / (1 + 0.5 * level("bienenkoenigin")) : Infinity; }
 function magnetStaerke() { return 40 * level("magnetfeld"); }
@@ -625,11 +625,16 @@ function klickGold() {
     return Math.max(1, Math.round(verkaufswert(bestePflanze()) * 0.002 * level("kasse") * goldMulti()));
 }
 
+// Artenvielfalt: jede weitere freigeschaltete Pflanze gibt allen Pflanzen +12% Gold (neue Pflanzen lohnen sich immer)
+function artenvielfalt() {
+    return run && run.pflanzen ? 0.12 * Math.max(0, run.pflanzen.filter(p => p.freigeschaltet).length - 1) : 0;
+}
+
 function goldMulti() {
     const summe = 1 + 0.15 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
-        0.25 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") +
+        0.40 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
     return summe * Math.pow(2, level("goldmarie")) * Math.pow(1.1, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
@@ -745,7 +750,7 @@ function mondbluetenJetzt() {
 function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 : 0) {
     let summe = 0;
     for (let i = 1; i <= anzahl; i++) summe += i * i;
-    const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.10 * sfLevel("mondmagnet")) *
+    const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.15 * sfLevel("mondmagnet")) *
         (1 + MONDPHASE_BONUS * mondphase);
     return aufrunden(summe * bonus * Math.pow(2, meta.sternenfaelle));
 }
@@ -764,7 +769,7 @@ function meisterStufe(pflanzenId) {
 
 function verkaufswert(pflanze) {
     return aufrunden(pflanze.verkaufswert * ertragMulti(pflanze) * (1 + MEISTER_BONUS * meisterStufe(pflanze.id)) *
-        (1 + 3 * level("pg_" + pflanze.id)));
+        (1 + level("pg_" + pflanze.id)));
 }
 
 // Erntehase (Stellarium): erntet regelmaessig eine fertige Pflanze
@@ -820,7 +825,7 @@ function wachstumsTempo() {
 }
 
 function wachstumsTempoOhneJahreszeit() {
-    return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.05 * sfLevel("ewigerfruehling") +
+    return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.08 * sfLevel("ewigerfruehling") +
         gachaBonus("wachstum");
 }
 
@@ -2001,7 +2006,11 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
 
     // Jeder eigene Klick, der Fortschritt wirft, gibt Sternensamen (Helfer-Klicks nicht)
     if (!vonHelfer) {
-        gibSternensamen(sternensamenProKlick());
+        // Bruchteile werden gesammelt (z.B. 0,5 pro Klick = 1 Sternensamen je 2 Klicks)
+        run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick();
+        const ganze = Math.floor(run.sternKlickRest);
+        run.sternKlickRest -= ganze;
+        if (ganze > 0) gibSternensamen(ganze);
         zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     }
 
