@@ -657,18 +657,12 @@ mondphaseDisplay.addEventListener("click", () => {
 
 // Nach dem Run: Mondteich einklappen, um Markt, Stellarium usw. in Ruhe anzuschauen (kaufen geht erst im neuen Run)
 const prestigeEinklappen = $("prestige-einklappen");
-const mondteichAusklappen = $("mondteich-ausklappen");
 setzeTipp(prestigeEinklappen, t("Mondteich einklappen: Markt, Stellarium und Hof ansehen, bevor du neu startest (kaufen geht erst im neuen Run)"));
 prestigeEinklappen.addEventListener("click", () => {
     schliessePrestigeShop();
-    mondteichAusklappen.classList.remove("versteckt");
-    zeigeToast(t("👀 Nur ansehen: Kaufen und Klicken geht erst im neuen Run."));
-});
-mondteichAusklappen.addEventListener("click", () => {
-    mondteichAusklappen.classList.add("versteckt");
-    oeffnePrestigeShop();
+    // Zurueck in den Mondteich geht es ueber den leuchtenden Teich im Hof
+    zeigeToast(t("👀 Nur ansehen: Kaufen geht erst im neuen Run. Klick auf den leuchtenden Mondteich, um weiterzumachen."));
 });
 registriereHaken("anzeige", () => {
     prestigeEinklappen.classList.toggle("versteckt", run.phase !== "runEnde");
-    if (run.phase !== "runEnde" || !prestigeShop.classList.contains("versteckt")) mondteichAusklappen.classList.add("versteckt");
 });

@@ -3012,7 +3012,8 @@ Object.assign(UEBERSETZUNG, {
     "Neue Preise: legendäre Skins 50 Kristalle, Unterstützer-Paket 4,99 €. Nur Kosmetik, kein Pay-to-Win.": "New prices: legendary skins 50 crystals, Supporter Pack 4.99 €. Cosmetic only, no pay-to-win.",
     "Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen.": "All emojis in the game are now pixel art. Lobby codes only have 5 characters.",
     "Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.": "Fixes: crows could not land, Glowshroom House could not be selected, aura was lost when loading.",
-    "Spielen": "Play"
+    "Spielen": "Play",
+    "👀 Nur ansehen: Kaufen geht erst im neuen Run. Klick auf den leuchtenden Mondteich, um weiterzumachen.": "👀 Just looking: buying is only possible in the new run. Click the glowing Moon Pond to continue."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

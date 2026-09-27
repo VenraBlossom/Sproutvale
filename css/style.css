@@ -11316,14 +11316,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: 6px auto 0;
     font-size: 15px;
 }
-#mondteich-ausklappen {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 60;
-    font-size: 18px;
-}
 .prestige-fuss { gap: 10px; }
 .debug-wahl {
     display: inline-flex;
@@ -12277,9 +12269,12 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     to { opacity: 1; }
 }
 
-/* Eingeklappter Mondteich: rechts neben der Tageskarte (sonst liegt er ueber ihrer Lasche) */
-#mondteich-ausklappen {
-    top: calc(var(--kopf-hoehe) + 8px);
-    left: calc(50% + 256px);
-    transform: none;
+
+/* Mondteich im Hof leuchtet etwas staerker, wenn man hinein kann */
+.teich.leuchtet {
+    filter: drop-shadow(0 0 8px #e0d0ff) drop-shadow(0 0 18px #a877e0) drop-shadow(0 0 3px #ffffff);
+    animation: teich-leuchten-stark 1.6s ease-in-out infinite;
+}
+@keyframes teich-leuchten-stark {
+    50% { filter: drop-shadow(0 0 14px #f4eeff) drop-shadow(0 0 30px #b98cf0) drop-shadow(0 0 5px #ffffff) brightness(1.1); }
 }
