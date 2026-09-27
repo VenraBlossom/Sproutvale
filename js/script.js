@@ -1970,7 +1970,7 @@ function waehleZielFeld() {
 
 let kassenTextZaehler = 0;
 
-// Samenladen laeuft heiss: ueber KONFIG.klickGrenzeProSek eigenen Klicks pro Sekunde zaehlt jeder Klick nur noch halb.
+// Samenladen laeuft heiss: ueber KONFIG.klickGrenzeProSek eigenen Klicks pro Sekunde zaehlt jeder Klick etwas weniger.
 // Normale Spieler merken nichts, sehr schnelle Klicker und Autoklicker bleiben stark, aber nicht mehr ohne Grenze.
 const eigeneKlickZeiten = [];
 let ladenHeissBis = 0;
