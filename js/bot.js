@@ -145,6 +145,17 @@ const BOT = {
         }
     }
 
+    // Stand an das Hauptspiel melden (unten links im Bot-Schild), damit man sieht, was er gerade tut
+    function meldeStand() {
+        let text;
+        if (!koop.verbunden) text = "🤖 verbindet … " + (koop.status || "");
+        else if (!koopAktiv()) text = "🤖 in der Lobby, wartet auf den Start";
+        else text = "🤖 Tag " + run.tag + " · " + (run.phase === "tag" ? "spielt" : run.koopFertig ? "Feierabend" : koop.ichBereit ? "bereit" : "kauft ein") +
+            " · " + zahl(run.gold) + " Gold · " + run.felder.length + " Felder · " + run.gesamt.klicks + " Klicks";
+        try { window.parent.postMessage({ sproutvaleBot: text }, "*"); } catch (fehler) { /* kein Hauptspiel */ }
+    }
+    setInterval(meldeStand, 1000);
+
     setInterval(() => {
         const jetzt = performance.now();
         if (!beigetreten) {

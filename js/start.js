@@ -163,7 +163,7 @@ window.debug = {
         const rahmen = el("iframe", "debug-bot-rahmen");
         rahmen.src = location.pathname + "?bot=" + sauber;
         document.body.appendChild(rahmen);
-        const schild = el("div", "debug-bot-schild", null, [el("span", null, "🤖 Bot spielt mit (" + sauber + ")")]);
+        const schild = el("div", "debug-bot-schild", null, [el("span", "debug-bot-status", "🤖 Bot startet (" + sauber + ") …")]);
         const weg = el("button", "knopf", "✕");
         weg.addEventListener("click", () => debug.botWeg());
         schild.appendChild(weg);
@@ -366,6 +366,13 @@ window.addEventListener("keydown", event => {
     event.stopPropagation();
     zeigeDebugFenster();
 }, true);
+
+// Stand des Test-Bots (bot.js) im Schild unten links anzeigen
+window.addEventListener("message", event => {
+    if (!event.data || typeof event.data.sproutvaleBot !== "string") return;
+    const status = document.querySelector(".debug-bot-status");
+    if (status) status.textContent = event.data.sproutvaleBot;
+});
 
 // ---------- START ----------
 

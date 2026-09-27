@@ -11254,11 +11254,14 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 2px 10px;
     min-width: 0;
 }
-/* Der Bot spielt in einem zweiten Spiel ausserhalb des Bildschirms (muss gezeichnet werden, sonst laeuft es nicht) */
+/* Der Bot spielt in einem zweiten Spiel, fast unsichtbar ueber dem Bild. Nicht ausserhalb des Bildschirms:
+   dort bremst der Browser den Rahmen so stark, dass der Bot nichts mehr tut */
 .debug-bot-rahmen {
     position: fixed;
-    left: -4000px;
+    left: 0;
     top: 0;
+    opacity: 0.001;
+    z-index: 1;
     width: 1280px;
     height: 720px;
     border: 0;
