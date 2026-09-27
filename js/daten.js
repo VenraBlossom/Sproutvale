@@ -1709,6 +1709,7 @@ const KOSMETIK_KATEGORIEN = [
     { id: "deko", name: t("Deko"), symbol: "🪴" },
     { id: "musik", name: t("Musik"), symbol: "🎵" },
     { id: "samenladen", name: t("Samenladen"), symbol: "🏪" },
+    { id: "haus", name: t("Haus"), symbol: "🏠" },
     { id: "felder", name: t("Felder"), symbol: "sprite:sym_beet" },
     { id: "kugeln", name: t("Münzen"), symbol: "🪙" },
     { id: "rahmen", name: t("Kuschel-Rahmen"), symbol: "🖼️" },
@@ -1860,6 +1861,26 @@ const SAMENLADEN_SKINS = [
     { id: "ufo", name: t("Ufo-Landeplatz"), titel: t("Ufo"), quelle: "dlc", paket: "einzeln", markise: ["#5a6a7a", "#9fe0ff"],
         holz: ["#6a7078", "#4a5058"], bauweise: "ufo", bild: "🛸", funken: ["#8dff7a", "#9fe0ff", "#ffffff"],
         wurf: "wurf-licht", spur: ["#8dff7a", "#ffffff"], ankunft: ["#8dff7a", "#9fe0ff", "#ffffff", "#5affc8"] }
+];
+
+// Bauernhaus oben links (Kosmetik "Haus"): farben = neue Farben fuer die Buchstaben im Bauernhaus-Sprite
+// (T Dachkante, U Dach, L/l Dachmuster, W Wand, V Sockel, D Tuer, F Fensterglas), extra = kleine Pixel-Details,
+// fenster = Fenster leuchten immer (Farbe), funken = Funken ums Haus, rauch = Farbe vom Schornstein-Rauch
+const HAUS_SKINS = [
+    { id: "standard", name: t("Bauernhaus"), quelle: "frei", farben: {} },
+    { id: "blaudach", name: t("Blaues Dach"), quelle: "erspielt", bedingungText: t("Bezahle insgesamt 15 Rechnungen"), bedingung: () => meta.lebenszeit.rechnungen >= 15, farben: { T: "#2a4a7a", U: "#3f6aa8", L: "#35609a", l: "#2a4a7a" } },
+    { id: "steinhaus", name: t("Steinhaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#a8aeb6", V: "#7a8088", T: "#3a3f4a", U: "#555c6a", L: "#4a505c", l: "#3a3f4a" }, extra: "efeu" },
+    { id: "blockhaus", name: t("Blockhütte"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#9a6634", V: "#6b4220", T: "#2a4a20", U: "#4a7a3a", L: "#3f6a30", l: "#2a4a20" }, extra: "balken" },
+    { id: "kirschbluete", name: t("Kirschblütenhaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#fff0f4", V: "#e0c0cc", T: "#c84a7a", U: "#ff9ac0", L: "#ff7aa8", l: "#c84a7a" }, extra: "blueten" },
+    { id: "lebkuchen", name: t("Lebkuchenhaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#b8703a", V: "#8a4a1a", T: "#e0d0c8", U: "#fff6f0", L: "#ff8fa3", l: "#e0d0c8", D: "#6b2a10" }, extra: "zuckerguss" },
+    { id: "strandhaus", name: t("Strandhaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#f0f8ff", V: "#c8d8e8", T: "#146a7a", U: "#2ab0c0", L: "#1a8a9a", l: "#146a7a", D: "#2ab0c0" }, extra: "rettungsring" },
+    { id: "bonbonhaus", name: t("Bonbonhaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#ffd6ea", V: "#f0aad0", T: "#3a8ac8", U: "#9ae0ff", L: "#6ac0f0", l: "#3a8ac8", D: "#ff6a9a" }, extra: "streusel" },
+    { id: "mitternacht", name: t("Mitternachtshaus"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#3a2a5a", V: "#2a1d44", T: "#2a1a5a", U: "#5a3aa0", L: "#4a2f8a", l: "#2a1a5a", F: "#ffe89a" }, extra: "sterne" },
+    { id: "winterhaus", name: t("Winterhütte"), quelle: "dlc", paket: "unterstuetzer", farben: { W: "#e8d0a8", V: "#b8a080", F: "#ffe0a0" }, extra: "schnee" },
+    { id: "hexenhaus", name: t("Hexenhaus"), quelle: "dlc", paket: "einzeln", farben: { W: "#4a3a4a", V: "#3a2a3a", T: "#1d1030", U: "#3a2250", L: "#2a1a40", l: "#1d1030", F: "#8dff7a", D: "#2a1a1a" }, extra: "moos", fenster: "rgba(141, 255, 122, 0.9)", funken: ["#8dff7a", "#c9b0f5", "#c9ffb0"], rauch: "#8dff7a" },
+    { id: "mondhaus", name: t("Mondhaus"), quelle: "dlc", paket: "einzeln", farben: { W: "#d8e4ff", V: "#a8b8e0", T: "#1d2a6a", U: "#2a4a9a", L: "#3a5ab0", l: "#1d2a6a", F: "#9fe0ff" }, extra: "mond", fenster: "rgba(159, 224, 255, 0.95)", funken: ["#9fe0ff", "#ffffff", "#8fa2f0"], rauch: "#c9d6ff" },
+    { id: "sternwarte", name: t("Sternenhaus"), quelle: "dlc", paket: "einzeln", farben: { W: "#2a2f6e", V: "#1d2250", T: "#141840", U: "#3a3f7a", L: "#fff6a0", l: "#141840", F: "#fff6a0", D: "#1d2250" }, extra: "sterne", fenster: "rgba(255, 246, 160, 0.95)", funken: ["#fff6a0", "#ffe89a", "#ffffff"] },
+    { id: "goldhaus", name: t("Goldenes Haus"), quelle: "dlc", paket: "einzeln", farben: { W: "#ffd84a", V: "#c89a10", T: "#8a5a08", U: "#e0a800", L: "#ffcf4a", l: "#8a5a08", D: "#8a5a08", F: "#fff6c0" }, extra: "glanz", fenster: "rgba(255, 240, 160, 0.95)", funken: ["#ffd93d", "#fff3b0", "#ffffff"] }
 ];
 
 // Felder: Farben der Erde (B hell, b Furche, c Kruemel). klasse = zusaetzlicher Look (style.css)

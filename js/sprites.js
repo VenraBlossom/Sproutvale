@@ -2707,6 +2707,45 @@ const HOF_FARBEN = {
     }
 };
 
+// Kleine Pixel-Details fuer Haus-Skins (Koordinaten im 24x18-Bauernhaus: Dach Zeilen 0-8, Wand 9-16, Fenster 4-5 und 18-19)
+function zeichneHausExtra(extra, p) {
+    const punkte = (liste, farbe) => liste.forEach(([x, y]) => p(x, y, farbe));
+    if (extra === "efeu") {
+        punkte([[2, 10], [2, 11], [3, 12], [2, 13], [3, 14], [2, 15], [2, 16]], "#4f9a34");
+        punkte([[3, 11], [2, 14], [21, 13], [21, 14], [20, 15], [21, 16]], "#6cc24a");
+    } else if (extra === "balken") {
+        for (let y = 10; y <= 16; y += 2) for (let x = 2; x <= 21; x++) {
+            const fenster = (x >= 3 && x <= 6 || x >= 17 && x <= 20) && y >= 10 && y <= 13;
+            if (!fenster && !(x >= 10 && x <= 13)) p(x, y, "#6b4220");
+        }
+    } else if (extra === "blueten") {
+        punkte([[6, 4], [10, 2], [14, 5], [18, 6], [9, 6], [12, 3], [16, 3]], "#fff0f6");
+        punkte([[7, 5], [13, 6], [11, 4]], "#ffd6ea");
+    } else if (extra === "zuckerguss") {
+        for (let x = 2; x <= 21; x += 2) p(x, 9, "#fff6f0");
+        for (let x = 3; x <= 21; x += 4) p(x, 10, "#fff6f0");
+        [[3, 15, "#ff5a6a"], [7, 10, "#7ed957"], [16, 10, "#5aa9e6"], [20, 15, "#ffd84a"], [8, 15, "#ff8fb1"]].forEach(([x, y, f]) => p(x, y, f));
+    } else if (extra === "rettungsring") {
+        [[15, 11, "#e8434a"], [16, 11, "#ffffff"], [14, 12, "#e8434a"], [17, 12, "#ffffff"], [15, 13, "#ffffff"], [16, 13, "#e8434a"]].forEach(([x, y, f]) => p(x, y, f));
+    } else if (extra === "streusel") {
+        [[5, 6, "#ff6a9a"], [9, 4, "#ffd84a"], [13, 3, "#7ed957"], [16, 5, "#ff6a9a"], [19, 7, "#b48cff"], [11, 7, "#ffd84a"], [7, 7, "#ffffff"]].forEach(([x, y, f]) => p(x, y, f));
+    } else if (extra === "sterne") {
+        punkte([[7, 5], [12, 3], [17, 6], [10, 6], [15, 4]], "#fff6a0");
+        punkte([[12, 2], [11, 3], [13, 3], [12, 4]], "#fff6a0");
+    } else if (extra === "schnee") {
+        for (let x = 1; x < 23; x++) p(x, Math.max(1, 8 - Math.min(x, 22 - x)) - 1, "#ffffff");
+        for (let x = 2; x <= 21; x += 3) p(x, 9, "#dff6ff");
+    } else if (extra === "moos") {
+        punkte([[3, 7], [5, 5], [19, 7], [8, 16], [15, 16], [2, 12]], "#5a8a3a");
+        punkte([[17, 0], [16, 0]], "#8dff7a");
+    } else if (extra === "mond") {
+        punkte([[8, 3], [7, 4], [7, 5], [8, 6], [9, 6]], "#fff3c0");
+        punkte([[15, 4], [17, 6]], "#ffffff");
+    } else if (extra === "glanz") {
+        punkte([[4, 11], [18, 11], [11, 12], [6, 5], [14, 3]], "#ffffff");
+    }
+}
+
 function zeichneHof(breite, hoehe, thema = "standard") {
     // Feiertage (echtes Datum) legen etwas Deko ueber jede Landschaft: Kuerbisse an Halloween, Schnee zu Weihnachten
     const fest = typeof aktuellesFest === "function" ? aktuellesFest() : null;
@@ -2836,8 +2875,15 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => bild(F.baum, W * bx, bodenY + 6));
     [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => bild(F.busch, W * bx, bodenY + 8));
 
-    // Gebaeude
-    const haus = bild("bauernhaus", hausX, H - 8);
+    // Gebaeude (das Bauernhaus kann einen Haus-Skin haben)
+    const hausSkin = typeof gewaehlteKosmetik === "function" && typeof HAUS_SKINS !== "undefined" ? gewaehlteKosmetik("haus") : null;
+    const hausSprite = hausSkin && Object.keys(hausSkin.farben || {}).length
+        ? spriteVariante("bauernhaus_" + hausSkin.id, "bauernhaus", hausSkin.farben) : "bauernhaus";
+    const haus = bild(hausSprite, hausX, H - 8);
+    if (hausSkin && hausSkin.extra) zeichneHausExtra(hausSkin.extra, (x, y, farbe) => pixel(haus.x + x, haus.y + y, farbe));
+    if (hausSkin && hausSkin.fenster) {
+        [[4, 11], [18, 11]].forEach(([x, y]) => leuchten.push({ x: haus.x + x, y: haus.y + y, b: 2, h: 2, farbe: hausSkin.fenster }));
+    }
     if (F.sonnenblumen) {
         bild("sonnenblume", hausX + 25, H - 7);
         bild("sonnenblume", hausX + 34, H - 8);

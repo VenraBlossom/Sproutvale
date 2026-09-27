@@ -105,7 +105,7 @@ function leereLebenszeit() {
 function leereKosmetik() {
     return {
         haustier: "rot", landschaft: "standard", deko: ["vogelscheuche"], musik: "auto",
-        samenladen: "standard", felder: "standard", kugeln: "standard", rahmen: "standard", pflanzen: "standard"
+        samenladen: "standard", felder: "standard", kugeln: "standard", rahmen: "standard", pflanzen: "standard", haus: "standard"
     };
 }
 
@@ -287,7 +287,7 @@ function merkeBetaTester() {
 
 function dlcListen() {
     return { haustier: HAUSTIER_SKINS, landschaft: HOF_THEMEN, deko: DEKO_OBJEKTE, musik: MUSIK_TITEL, samenladen: SAMENLADEN_SKINS,
-        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS };
+        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS, haus: HAUS_SKINS };
 }
 
 function istDlcSchluessel(schluessel) {

@@ -12100,3 +12100,23 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: inherit;
     letter-spacing: 0;
 }
+
+/* Haus-Skins: Funken am legendaeren Haus, farbiger Rauch */
+.haus-funke {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--farbe, #fff6a0);
+    box-shadow: 0 0 6px var(--farbe, #fff6a0);
+    pointer-events: none;
+    image-rendering: pixelated;
+    animation: haus-funke 2s steps(8) forwards;
+}
+@keyframes haus-funke {
+    0% { transform: translate(0, 0); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(6px, -26px); opacity: 0; }
+}
+.rauch {
+    background: var(--rauch, rgba(235, 235, 240, 0.75));
+}

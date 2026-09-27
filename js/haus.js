@@ -20,6 +20,7 @@ const KOSMETIK_LISTEN = {
     kugeln: KUGEL_SKINS,
     rahmen: RAHMEN_SKINS,
     pflanzen: PFLANZEN_SKINS,
+    haus: HAUS_SKINS,
     // Teile der eigenen Figur (Profil im Hauptmenue, nicht im Haus)
     figur_haut: FIGUR_TEILE.haut,
     figur_augen: FIGUR_TEILE.augen,
@@ -153,8 +154,9 @@ function wendeKosmetikAn() {
     const thema = gewaehlteKosmetik("landschaft").id;
     const gras = SPRITE_ABWANDLUNGEN["gras_" + thema] ? "gras_" + thema : "gras";
     wurzel.setProperty("--gras", "url(" + spriteUrl(gras) + ")");
-    if (thema !== letztesHofThema) {
-        letztesHofThema = thema;
+    const hofSchluessel = thema + "|" + gewaehlteKosmetik("haus").id;
+    if (hofSchluessel !== letztesHofThema) {
+        letztesHofThema = hofSchluessel;
         zeichneLandschaften();
     }
 
@@ -317,12 +319,28 @@ setInterval(() => {
     if (!hofSzene || !hofSzene.schornstein || document.hidden) return;
     if (Math.random() < (tageszeit > 0.6 ? 0.2 : 0.55)) return;
     const puff = el("div", "rauch");
+    const hausSkin = gewaehlteKosmetik("haus");
+    if (hausSkin.rauch) puff.style.setProperty("--rauch", hausSkin.rauch);
     puff.style.left = (hofSzene.schornstein.x / hofSzene.breite) * 100 + "%";
     puff.style.top = (hofSzene.schornstein.y / hofSzene.hoehe) * 100 + "%";
     puff.style.setProperty("--drift", 20 + Math.random() * 30 + "px");
     hofEbene.appendChild(puff);
     setTimeout(() => puff.remove(), 3200);
 }, 700);
+
+// Legendaere Haeuser: kleine Funken steigen am Haus auf
+setInterval(() => {
+    if (!hofSzene || !hofSzene.haus || document.hidden) return;
+    const skin = gewaehlteKosmetik("haus");
+    if (!skin.funken || Math.random() < 0.35) return;
+    const h = hofSzene.haus;
+    const funke = el("div", "haus-funke");
+    funke.style.left = ((h.x + Math.random() * h.b) / hofSzene.breite) * 100 + "%";
+    funke.style.top = ((h.y + h.h * (0.2 + Math.random() * 0.6)) / hofSzene.hoehe) * 100 + "%";
+    funke.style.setProperty("--farbe", zufall(skin.funken));
+    hofEbene.appendChild(funke);
+    setTimeout(() => funke.remove(), 2000);
+}, 450);
 
 // Deko mit Teilchen (Lagerfeuer, Feenbrunnen ...) und Landschaften mit Funkeln (Zauberwald)
 setInterval(() => {
@@ -1132,7 +1150,8 @@ function renderHaus(inhalt) {
         felder: t("So sieht die Erde auf deinen Feldern aus."),
         kugeln: t("So sieht die Saat aus, die bei der Ernte fällt. Die Farbe des Edelsteins zeigt weiter die Rarität."),
         rahmen: t("Der Rahmen um deine Kuscheltiere im Mondteich."),
-        pflanzen: t("Andere Blattfarben für alle deine Pflanzen.")
+        pflanzen: t("Andere Blattfarben für alle deine Pflanzen."),
+        haus: t("Dein Bauernhaus oben links. Legendäre Häuser leuchten und funkeln.")
     };
     inhalt.appendChild(el("div", "panel-hinweis", hinweise[kategorie]));
 

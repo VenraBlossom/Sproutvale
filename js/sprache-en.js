@@ -2927,7 +2927,23 @@ Object.assign(UEBERSETZUNG, {
     "Spiele ": "Play ",
     " verschiedene Hof-Stile": " different farm styles",
     "{0} Kristalle": "{0} Crystals",
-    " (100 Kristalle = {0}). Nur Optik, kein Pay-to-Win. Kaufen geht, sobald Sproutvale auf Steam ist.": " (100 crystals = {0}). Cosmetic only, no pay-to-win. Buying is possible once Sproutvale is on Steam."
+    " (100 Kristalle = {0}). Nur Optik, kein Pay-to-Win. Kaufen geht, sobald Sproutvale auf Steam ist.": " (100 crystals = {0}). Cosmetic only, no pay-to-win. Buying is possible once Sproutvale is on Steam.",
+    "Haus": "House",
+    "Dein Bauernhaus oben links. Legendäre Häuser leuchten und funkeln.": "Your farmhouse in the top left. Legendary houses glow and sparkle.",
+    "Bezahle insgesamt 15 Rechnungen": "Pay 15 bills in total",
+    "Bauernhaus": "Farmhouse",
+    "Blaues Dach": "Blue Roof",
+    "Steinhaus": "Stone House",
+    "Blockhütte": "Log Cabin",
+    "Kirschblütenhaus": "Cherry Blossom House",
+    "Strandhaus": "Beach House",
+    "Bonbonhaus": "Candy House",
+    "Mitternachtshaus": "Midnight House",
+    "Winterhütte": "Winter Cabin",
+    "Hexenhaus": "Witch House",
+    "Mondhaus": "Moon House",
+    "Sternenhaus": "Star House",
+    "Goldenes Haus": "Golden House"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
