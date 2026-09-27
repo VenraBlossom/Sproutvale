@@ -1970,8 +1970,47 @@ function waehleZielFeld() {
 
 let kassenTextZaehler = 0;
 
+// Samenladen laeuft heiss: ueber KONFIG.klickGrenzeProSek eigenen Klicks pro Sekunde zaehlt jeder Klick nur noch halb.
+// Normale Spieler merken nichts, sehr schnelle Klicker und Autoklicker bleiben stark, aber nicht mehr ohne Grenze.
+const eigeneKlickZeiten = [];
+let ladenHeissBis = 0;
+let dampfMs = 0;
+// Uhr fuer die Klick-Messung (der Balancing-Bot stellt sie auf seine Spielzeit um)
+function klickUhr() {
+    return performance.now();
+}
+
+function klickWertung() {
+    const jetzt = klickUhr();
+    eigeneKlickZeiten.push(jetzt);
+    while (eigeneKlickZeiten.length && eigeneKlickZeiten[0] < jetzt - 1000) eigeneKlickZeiten.shift();
+    // Die Sense (gedrueckt halten) ist ausgenommen, sie ist extra freigeschaltet
+    if (typeof dauerklick !== "undefined" && dauerklick && dauerklick.timer) return 1;
+    if (eigeneKlickZeiten.length <= KONFIG.klickGrenzeProSek) return 1;
+    ladenHeissBis = jetzt + 350;
+    plantButton.classList.add("laden-heiss");
+    // Dampf steigt auf (hoechstens alle 120 ms ein Woelkchen)
+    if (jetzt - dampfMs > 120) {
+        dampfMs = jetzt;
+        const rect = plantButton.getBoundingClientRect();
+        const wolke = el("div", "laden-dampf");
+        wolke.style.left = rect.left + rect.width * (0.25 + Math.random() * 0.5) + "px";
+        wolke.style.top = rect.top + rect.height * 0.2 + "px";
+        fxLayer.appendChild(wolke);
+        setTimeout(() => wolke.remove(), 900);
+    }
+    return KONFIG.klickUeberGrenze;
+}
+setInterval(() => {
+    if (ladenHeissBis && klickUhr() > ladenHeissBis) {
+        ladenHeissBis = 0;
+        plantButton.classList.remove("laden-heiss");
+    }
+}, 150);
+
 function klickSamenladen(vonHelfer, klickX, klickY) {
     if (run.phase !== "tag") return;
+    const wertung = vonHelfer ? 1 : klickWertung();
 
     // Sind alle Felder belegt, passiert nichts: auch die Kombo laeuft nicht weiter
     const seite = eigeneSeite();
@@ -2007,7 +2046,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     // Jeder eigene Klick, der Fortschritt wirft, gibt Sternensamen (Helfer-Klicks nicht)
     if (!vonHelfer) {
         // Bruchteile werden gesammelt (z.B. 0,5 pro Klick = 1 Sternensamen je 2 Klicks)
-        run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick();
+        run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick() * wertung;
         const ganze = Math.floor(run.sternKlickRest);
         run.sternKlickRest -= ganze;
         if (ganze > 0) gibSternensamen(ganze);
@@ -2022,7 +2061,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
             gibSternensamen(1);
         }
     }
-    run.klickZaehler += vonHelfer ? (level("helferlohn") > 0 ? 2 : 1) : komboMultiplikator();
+    run.klickZaehler += vonHelfer ? (level("helferlohn") > 0 ? 2 : 1) : komboMultiplikator() * wertung;
     const wirdSamen = run.klickZaehler >= klicksProSamen();
     if (wirdSamen) {
         run.klickZaehler = klicksProSamen();

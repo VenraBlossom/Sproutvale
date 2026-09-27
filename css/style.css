@@ -11188,3 +11188,28 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     text-align: center;
     font-weight: 700;
 }
+
+/* Samenladen laeuft heiss (zu schnell geklickt): gluehender Rand, leichtes Zittern, Dampf steigt auf */
+#plant-button.laden-heiss {
+    filter: drop-shadow(0 0 6px #ff7a3a) saturate(1.2);
+    animation: laden-zittern 0.12s steps(2) infinite;
+}
+@keyframes laden-zittern {
+    0% { translate: 0 0; }
+    100% { translate: 1px 0; }
+}
+.laden-dampf {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 6px 2px 0 -2px rgba(255, 255, 255, 0.6), -6px 3px 0 -3px rgba(255, 255, 255, 0.55);
+    image-rendering: pixelated;
+    pointer-events: none;
+    animation: laden-dampf 0.9s ease-out forwards;
+}
+@keyframes laden-dampf {
+    from { transform: translateY(0) scale(0.6); opacity: 0.9; }
+    to { transform: translateY(-40px) scale(1.4); opacity: 0; }
+}

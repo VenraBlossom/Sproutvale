@@ -87,6 +87,8 @@ function klemme(wert, min, max) {
 const SPIEL_VERSION = "Alpha 0.8.0";
 
 const KONFIG = {
+    klickGrenzeProSek: 8,             // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt nur halb
+    klickUeberGrenze: 0.5,            // (die Sense aus dem Sternenfall-Shop ist davon ausgenommen)
     startKlicksProSamen: 28,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
     minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
     klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
