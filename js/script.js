@@ -537,12 +537,34 @@ function werkzeugWertFuer(w, stufe) {
 // Wert eines Werkzeugs, das man besitzt (0, wenn nicht)
 function werkzeugWert(id) {
     if (!hatWerkzeug(id)) return 0;
-    return werkzeugWertFuer(WERKZEUG_NACH_ID[id], werkzeugStufe(id));
+    return werkzeugWertFuer(WERKZEUG_NACH_ID[id], werkzeugStufe(id)) * (istEntwickelt(id) ? EVOLUTION_FAKTOR : 1);
+}
+
+// ---------- WERKZEUG-EVOLUTIONEN ----------
+function evolutionFuer(werkzeugId) {
+    return WERKZEUG_EVOLUTIONEN.find(e => e.werkzeug === werkzeugId) || null;
+}
+function istEntwickelt(werkzeugId) {
+    return Boolean(run && run.evolutionen && run.evolutionen[werkzeugId]);
+}
+// Werkzeug und Segen da? Dann entwickelt sich das Werkzeug (einmal pro Run, mit Banner)
+function pruefeEvolutionen() {
+    if (!run) return;
+    WERKZEUG_EVOLUTIONEN.forEach(e => {
+        if (istEntwickelt(e.werkzeug) || !hatWerkzeug(e.werkzeug) || segen(e.segen) <= 0) return;
+        if (!run.evolutionen) run.evolutionen = {};
+        run.evolutionen[e.werkzeug] = true;
+        if (!meta.kodex.evolutionen) meta.kodex.evolutionen = {};
+        meta.kodex.evolutionen[e.werkzeug] = (meta.kodex.evolutionen[e.werkzeug] || 0) + 1;
+        zeigeBanner("🧬", tf("Evolution: {0}!", e.name), tf("{0} + {1} = doppelt so stark", WERKZEUG_NACH_ID[e.werkzeug].name, SEGEN_NACH_ID[e.segen].name), "#7c4fb3", 3600);
+        Klang.stern();
+    });
 }
 
 function werkzeugText(id, stufe = werkzeugStufe(id)) {
     const w = WERKZEUG_NACH_ID[id];
-    return w.text(werkzeugWertFuer(w, stufe));
+    const evo = istEntwickelt(id) && hatWerkzeug(id) ? evolutionFuer(id) : null;
+    return w.text(werkzeugWertFuer(w, stufe) * (evo ? EVOLUTION_FAKTOR : 1)) + (evo ? "\n🧬 " + tf("Entwickelt: {0} (doppelt so stark)", evo.name) : "");
 }
 
 function wetterIst(id) {
@@ -3266,6 +3288,8 @@ function zeigeSegenAuswahl(auswahl) {
         karte.append(
             pixelIcon(s.badge, 64, "segen-bild"),
             ...(s.pakt ? [el("div", "segen-pakt-schild", t("⚠️ Pakt"))] : []),
+            ...(WERKZEUG_EVOLUTIONEN.filter(e => e.segen === id && hatWerkzeug(e.werkzeug) && !istEntwickelt(e.werkzeug))
+                .map(e => el("div", "segen-evo-schild", "🧬 " + tf("Entwickelt {0}", e.name)))),
             el("div", "segen-name", s.name),
             el("div", "segen-text", s.text),
             el("div", "segen-stufe", (stufe > 0 ? t("Du hast ihn schon ") + stufe + t("x, stapelt sich") : t("Neu")) +
@@ -3297,6 +3321,7 @@ function waehleSegen(id, karte) {
     run.segenAuswahl = null;
     run.segenAusstehend = false;
     run.segenBoss = false;
+    pruefeEvolutionen();
     const rect = karte.getBoundingClientRect();
     partikel(rect.left + rect.width / 2, rect.top + rect.height / 2, ["#ffe89a", "#ffffff", "#a3dc6f"], 24, 120);
     Klang.kaufen();
@@ -3355,6 +3380,7 @@ function starteTag(fortsetzen = false) {
     if (run.phase !== "vorTag" || (run.segenAuswahl && !run.sandbox) || run.rechnungOffen) return;
 
     run.phase = "tag";
+    pruefeEvolutionen();
     run.tagesBoni = run.naechsterTag;
     run.naechsterTag = leereTagesBoni();
     haken("tagVorbereiten"); // Wetter wird ausgewuerfelt

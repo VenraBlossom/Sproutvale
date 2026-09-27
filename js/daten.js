@@ -1302,6 +1302,27 @@ const WERKZEUGE = [
 ];
 const WERKZEUG_NACH_ID = Object.fromEntries(WERKZEUGE.map(w => [w.id, w]));
 
+// ---------- WERKZEUG-EVOLUTIONEN (wie in Vampire Survivors) ----------
+// Werkzeug + passender Segen im selben Run: das Werkzeug entwickelt sich und wirkt doppelt so stark.
+const WERKZEUG_EVOLUTIONEN = [
+    { werkzeug: "giesskanne", segen: "regenwolke", name: t("Regenmacher") },
+    { werkzeug: "taschenuhr", segen: "fruehstueck", name: t("Goldene Taschenuhr") },
+    { werkzeug: "gluecksmuenze", segen: "glueckskind", name: t("Glückstaler") },
+    { werkzeug: "saatbeutel", segen: "flink", name: t("Bodenloser Saatsack") },
+    { werkzeug: "flechtkorb", segen: "erntesegen", name: t("Füllhorn-Korb") },
+    { werkzeug: "kristallkugel", segen: "wissen", name: t("Orakelkugel") },
+    { werkzeug: "zaubererde", segen: "kompost", name: t("Wundererde") },
+    { werkzeug: "sanduhr", segen: "wachstum", name: t("Zeitkristall") },
+    { werkzeug: "kleeblatt", segen: "glueckspilz", name: t("Fünfblättriges Kleeblatt") },
+    { werkzeug: "hufeisen", segen: "sammelwut", name: t("Supermagnet") },
+    { werkzeug: "strohhut", segen: "goldhaende", name: t("Goldener Strohhut") },
+    { werkzeug: "wuenschelrute", segen: "sternenhunger", name: t("Sternenrute") },
+    { werkzeug: "fernrohr", segen: "sternenstaub", name: t("Sternwarten-Fernrohr") },
+    { werkzeug: "laterne", segen: "nachteule", name: t("Glühlaterne") },
+    { werkzeug: "honigwabe", segen: "tierfreund", name: t("Königinnen-Wabe") }
+];
+const EVOLUTION_FAKTOR = 2;
+
 // Weitere Angebote des Haendlers (neben Werkzeugen). menge/preis werden in ereignisse.js berechnet.
 const HAENDLER_WAREN = [
     { id: "sternenbeutel", name: t("Sternensamen-Säckchen"), symbol: "👝", preis: 0.35,
@@ -1483,6 +1504,9 @@ const ERFOLG_KETTEN = [
     { id: "segensammler", icon: "🙏", text: z => t("Wähle ") + z + t(" verschiedene Segen"),
         wert: m => Object.keys(m.kodex.segen || {}).length,
         ziele: [10, 25, 35] },
+    { id: "evolutionen", icon: "🧬", text: z => t("Entwickle ") + z + (z === 1 ? t(" Werkzeug") : t(" verschiedene Werkzeuge")),
+        wert: m => Object.keys((m.kodex && m.kodex.evolutionen) || {}).length,
+        ziele: [1, 5, 15] },
     { id: "herausforderer", icon: "🏆", nurStandard: true, text: z => t("Schaffe ") + z + (z === 1 ? t(" Herausforderung") : t(" Herausforderungen")),
         wert: m => Object.keys(m.herausforderungen || {}).length,
         ziele: [1, 3, 6] },

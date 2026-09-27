@@ -2943,7 +2943,28 @@ Object.assign(UEBERSETZUNG, {
     "Hexenhaus": "Witch House",
     "Mondhaus": "Moon House",
     "Sternenhaus": "Star House",
-    "Goldenes Haus": "Golden House"
+    "Goldenes Haus": "Golden House",
+    "Evolution: {0}!": "Evolution: {0}!",
+    "{0} + {1} = doppelt so stark": "{0} + {1} = twice as strong",
+    "Entwickelt: {0} (doppelt so stark)": "Evolved: {0} (twice as strong)",
+    "Entwickelt {0}": "Evolves {0}",
+    "Entwickle ": "Evolve ",
+    " verschiedene Werkzeuge": " different tools",
+    "Regenmacher": "Rainmaker",
+    "Goldene Taschenuhr": "Golden Pocket Watch",
+    "Glückstaler": "Lucky Thaler",
+    "Bodenloser Saatsack": "Bottomless Seed Sack",
+    "Füllhorn-Korb": "Cornucopia Basket",
+    "Orakelkugel": "Oracle Orb",
+    "Wundererde": "Wonder Soil",
+    "Zeitkristall": "Time Crystal",
+    "Fünfblättriges Kleeblatt": "Five-Leaf Clover",
+    "Supermagnet": "Super Magnet",
+    "Goldener Strohhut": "Golden Straw Hat",
+    "Sternenrute": "Star Rod",
+    "Sternwarten-Fernrohr": "Observatory Telescope",
+    "Glühlaterne": "Glow Lantern",
+    "Königinnen-Wabe": "Queen's Comb"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

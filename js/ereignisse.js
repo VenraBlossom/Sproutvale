@@ -428,6 +428,7 @@ function gibWerkzeug(id, preis, stufe = werkzeugStufeJetzt()) {
     meta.kodex.werkzeuge[id] = (meta.kodex.werkzeuge[id] || 0) + 1;
     meta.lebenszeit.maxWerkzeuge = Math.max(meta.lebenszeit.maxWerkzeuge || 0, run.werkzeuge.length);
     Klang.werkzeug();
+    pruefeEvolutionen();
 }
 
 function wendeWareAn(id) {
