@@ -4062,8 +4062,11 @@ function kaufeUpgrade(def, waehrung) {
 // ---------- SHOP (Gold) ----------
 
 // Weizen-Upgrades sind 10% billiger (der Einstieg soll flott gehen)
+// Ertrag ist auf den ersten Stufen guenstiger (Stufe 1 halber Preis, ab Stufe 10 normal): der Einstieg geht flott
 function pflanzenUpgradeKosten(pflanze, upgrade) {
-    return kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert * (pflanze.id === "weizen" ? 0.9 : 1), upgrade.faktor, pflanze.level[upgrade.id]);
+    const stufe = pflanze.level[upgrade.id];
+    const einstieg = upgrade.id === "ertrag" ? Math.min(1, 0.5 + 0.05 * stufe) : 1;
+    return Math.max(1, Math.round(kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert * (pflanze.id === "weizen" ? 0.9 : 1), upgrade.faktor, stufe) * einstieg));
 }
 
 function kaufePflanzenUpgrade(pflanze, upgrade) {
