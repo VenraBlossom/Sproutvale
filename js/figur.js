@@ -464,7 +464,31 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
                 p.fein(cx + 4.5, y, "d");
             }
         }
-    } else if (form === "dutt") {
+    } else if (form === "afro") {
+        // grosser, runder Afro rund um den Kopf (das Gesicht bleibt frei)
+        const frei = (x, y) => blick === "vorne" ? Math.abs(x + 0.5 - cx) < 3.8 && y + 0.5 > cy - 1.6
+            : blick === "seite" ? x + 0.5 > cx - 0.8 && y + 0.5 > cy - 1.6 : false;
+        p.ellipse(cx - (seite ? 0.6 : 0), cy - 1.6, 6.4, 5.8, "2", (x, y) => !frei(x, y));
+        [[cx - 3, cy - 5], [cx + 2, cy - 6], [cx - 5, cy - 2]].forEach(([x, y]) => p.fein(x, y, "h"));
+        [[cx - 4, cy - 3], [cx + 3, cy - 4], [cx, cy - 6.5]].forEach(([x, y]) => p.fein(x, y, "d"));
+    } else if (form === "bob") {
+        // Bob: kinnlang, gerade Kante
+        if (seite) p.rechteck(cx - 5, cy, 4, 3.5, "2");
+        else {
+            p.rechteck(cx - 5.5, cy - 1, 2, 4.5, "2");
+            p.rechteck(cx + 3.5, cy - 1, 2, 4.5, "2");
+            if (blick === "hinten") p.rechteck(cx - 4, cy, 8, 3.5, "2");
+        }
+        p.feinLinie(cx - 5, cy + 3.5, cx - 3.5, cy + 3.5, "d");
+    } else if (form === "seitenzopf") {
+        // geflochtener Zopf ueber der Schulter
+        const x = seite ? cx - 3 : blick === "vorne" ? cx + 4.5 : cx - 4.5;
+        for (let i = 0; i < 4; i++) {
+            p.ellipse(x + (i % 2 ? 0.5 : 0), cy + 2 + i * 1.6, 1.1, 1, "2");
+            p.fein(x - 0.5, cy + 1.5 + i * 1.6, "h");
+        }
+        p.rechteck(x - 0.5, cy + 8, 1, 0.5, "h");
+    } else if (form === "dutt") {    } else if (form === "dutt") {
         const x = seite ? cx - 3 : cx;
         p.ellipse(x, cy - 5.4, 2, 1.9, "2");
         p.feinLinie(x - 1, cy - 6, x + 0.5, cy - 6.5, "h");
@@ -605,7 +629,49 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.punkt(sx, sy, "b");
         p.fein(sx - 2, sy - 0.5, "c");
         p.fein(sx + 1.5, sy - 0.5, "c");
-    } else if (form === "zauberer") {
+    } else if (form === "stirnband") {
+        p.rechteck(cx - 4.5, cy - 2.5, 9.5, 1, "a");
+        p.feinLinie(cx - 4.5, cy - 2, cx + 4.5, cy - 2, "b");
+        if (blick === "vorne") p.fein(cx - 3, cy - 2.5, "c");
+    } else if (form === "cowboy") {
+        // Cowboyhut: breite, hochgebogene Krempe, Delle oben, Band
+        p.rechteck(cx - 7, oben + 1, 15, 1, "a");
+        p.punkt(cx - 7, oben, "a");
+        p.punkt(cx + 7, oben, "a");
+        p.rechteck(cx - 3.5, oben - 2, 7.5, 3, "a");
+        p.fein(cx, oben - 2, "b");
+        p.fein(cx + 0.5, oben - 1.5, "b");
+        p.rechteck(cx - 3.5, oben, 7.5, 1, "b");
+        p.fein(cx - 2, oben, "c");
+        p.feinLinie(cx - 6, oben + 1.5, cx + 6, oben + 1.5, "b");
+    } else if (form === "barett") {
+        // Barett: flach und schraeg, mit Stiel
+        p.ellipse(cx + (vorne ? 0.5 : -0.5), oben, 5.6, 1.8, "a");
+        p.feinLinie(cx - 4, oben + 1, cx + 4.5, oben + 1, "b");
+        p.fein(cx + 1, oben - 2, "c");
+        p.fein(cx + 1, oben - 1.5, "c");
+    } else if (form === "bandana") {
+        // Bandana: Tuch ueber dem Kopf, hinten ein Knoten mit zwei Enden
+        p.ellipse(cx, cy, 5, 4.8, "a", (x, y) => y + 0.5 < cy - 1.5);
+        [[cx - 3, cy - 4], [cx, cy - 4.5], [cx + 3, cy - 3.5], [cx - 1.5, cy - 2.5], [cx + 1.5, cy - 3]].forEach(([x, y]) => p.fein(x, y, "c"));
+        if (blick !== "vorne") {
+            const kx = blick === "seite" ? cx - 5 : cx;
+            p.punkt(kx, cy - 2, "b");
+            p.linie(kx, cy - 1, kx - 1, cy + 1, "a");
+            p.linie(kx, cy - 1, kx + 1, cy + 1.5, "a");
+        }
+    } else if (form === "regenwolke") {
+        // eine kleine Regenwolke schwebt ueber dem Kopf, darunter fallen Tropfen (animiert)
+        const y = oben - 3.5 + (anim % 2 ? -0.5 : 0);
+        [[cx - 2, y + 0.5], [cx, y - 0.5], [cx + 2, y + 0.5], [cx + 3.5, y + 1]].forEach(([x, yy]) => p.ellipse(x, yy, 1.8, 1.4, "a"));
+        p.rechteck(cx - 3.5, y + 1.2, 8, 0.5, "b");
+        for (let i = 0; i < 4; i++) {
+            const tx = cx - 3 + i * 2;
+            const ty = y + 2.5 + ((anim + i) % 3) * 1;
+            p.fein(tx, ty, "c");
+            p.fein(tx, ty + 0.5, "c");
+        }
+    } else if (form === "zauberer") {    } else if (form === "zauberer") {
         // Zaubererhut mit Sternen, die um die Spitze kreisen
         p.ellipse(cx, oben + 1.4, 7, 1, "a");
         for (let i = 0; i < 7; i++) p.rechteck(cx - 3.5 + i * 0.5, oben - i, 7 - i, 1, "a");
@@ -760,7 +826,32 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             g.hinten.rechteck(x0 + 0.5, y0 + 0.5, breite - 1, 4, "8");
             g.hinten.fein(x0 + 1, y0 + 1, "p");
         }
-    } else if (form === "pyjama") {
+    } else if (form === "jacke") {
+        // offene Jacke: Hemd in der Mitte, Kragen, Knoepfe, Brusttasche
+        if (blick === "vorne") {
+            k.rechteck(mitte - 1, y0, 2, 6, "k");
+            k.linie(mitte - 2, y0, mitte - 1, y0 + 2, "8");
+            k.linie(mitte + 1, y0, mitte, y0 + 2, "8");
+            [2, 3.5, 5].forEach(y => k.fein(mitte - 1.5, y0 + y, "p"));
+            k.rechteck(x0 + 0.5, y0 + 2, 1.5, 1, "8");
+        } else if (blick === "seite") {
+            k.rechteck(x0 + 4, y0, 1, 6, "k");
+            k.fein(x0 + 3.5, y0 + 2, "p");
+            k.fein(x0 + 3.5, y0 + 4, "p");
+            k.rechteck(x0 + 1.5, y0, 2, 1, "8");
+        } else {
+            k.rechteck(x0, y0, breite, 1, "8");
+            k.feinLinie(mitte - 0.5, y0 + 1, mitte - 0.5, y0 + 5.5, "8");
+        }
+    } else if (form === "ringel") {
+        for (let y = 1; y < 6; y += 2) k.rechteck(x0, y0 + y, breite, 1, "k");
+    } else if (form === "regenbogen") {
+        // Regenbogenpulli: sechs Farbstreifen, die langsam nach unten wandern
+        const farben = ["A", "B", "C", "D", "E", "F"];
+        for (let y = 0; y < 6; y++) k.rechteck(x0, y0 + y, breite, 1, farben[(y - anim + 12) % 6]);
+        k.rechteck(x0, y0 + 5.5, breite, 0.5, "8");
+        k.fein(x0 + 1, y0 + 1, "k");
+    } else if (form === "pyjama") {    } else if (form === "pyjama") {
         for (let y = 0.5; y < 6; y += 1.5) k.feinLinie(x0, y0 + y, x0 + breite - 0.5, y0 + y, "k");
         if (blick === "vorne") [1.5, 3, 4.5].forEach(y => k.fein(mitte - 0.5, y0 + y, "w"));
     }
@@ -848,6 +939,28 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         k.rechteck(6 - breit, oben, 6 + 2 * breit, 2, "3");
         k.rechteck(5 - breit, oben + 2, 8 + 2 * breit, 1, "9");
         for (let x = 6 - breit; x < 12 + breit; x += 1.5) k.feinLinie(x, oben + 0.5, x, oben + 2, "9");
+    }
+    if (hose.form === "karo") {
+        beine.forEach(([x]) => {
+            for (let y = oben; y < 23; y += 1.5) k.feinLinie(x, y, x + 1.5, y, "u");
+            k.feinLinie(x + 1, oben, x + 1, 23.5, "u");
+        });
+    }
+    if (schuhe.form === "clogs" || schuhe.form === "rakete") {
+        beine.forEach(([x]) => {
+            if (schuhe.form === "clogs") {
+                k.rechteck(x - 0.5, 23, 3.5, 2, "1");
+                k.feinLinie(x, 23, x + 2.5, 23, "l");
+                k.fein(x + 2.5, 24, "l");
+            } else {
+                // Raketenschuhe: Flammen unter den Sohlen, die flackern
+                k.feinLinie(x, 24.5, x + 2, 24.5, "l");
+                const lang = 1 + (anim % 2) * 0.5;
+                g.werkzeug.fein(x + 0.5, 25, "f");
+                g.werkzeug.fein(x + 1, 25 + lang * 0.5, "g");
+                g.werkzeug.fein(x + 1.5, 25, "f");
+            }
+        });
     }
     if (hose.form === "sterne") {
         beine.forEach(([x], i) => {
@@ -959,6 +1072,51 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
             a.rechteck(x + 1.5, y0 + 0.5, 1, 0.5, "x");
             a.rechteck(x + 0.5, y0, 1, 1.5, "y");
             a.fein(x - 1, y0, "z");
+        }
+    } else if (form === "ohrringe") {
+        if (blick === "vorne") {
+            a.fein(cx - 5, cy + 1.5, "x");
+            a.fein(cx - 5, cy + 2, "y");
+            a.fein(cx + 4.5, cy + 1.5, "x");
+            a.fein(cx + 4.5, cy + 2, "y");
+        } else if (seite) {
+            a.fein(cx - 1.5, cy + 1.5, "x");
+            a.fein(cx - 1.5, cy + 2, "y");
+            a.fein(cx - 1.5, cy + 1.5, "z");
+        }
+    } else if (form === "tasche") {
+        // Umhaengetasche: Riemen quer ueber den Koerper, Tasche an der Huefte
+        if (blick === "vorne") {
+            a.linie(x0, y0, x0 + breite - 1, y0 + 4, "y");
+            a.rechteck(x0 + breite - 1, y0 + 4, 2.5, 2, "x");
+            a.feinLinie(x0 + breite - 1, y0 + 4, x0 + breite + 1, y0 + 4, "y");
+            a.fein(x0 + breite, y0 + 4.5, "z");
+        } else if (seite) {
+            a.linie(x0 + 1, y0, x0 + 3, y0 + 4, "y");
+            a.rechteck(x0 + 2, y0 + 4, 2.5, 2, "x");
+            a.fein(x0 + 3, y0 + 4.5, "z");
+        } else {
+            a.linie(x0 + breite - 1, y0, x0, y0 + 4, "y");
+        }
+    } else if (form === "gitarre") {
+        // Gitarre auf dem Ruecken: schraeg, mit Hals und Schallloch
+        const ziel = blick === "hinten" ? a : hinten;
+        const gx = seite ? x0 - 1 : x0 + 2;
+        ziel.ellipse(gx, y0 + 5, 2.2, 2, "x");
+        ziel.ellipse(gx + 0.8, y0 + 2.8, 1.6, 1.4, "x");
+        ziel.linie(gx + 1.5, y0 + 1.5, gx + 4, y0 - 3, "y");
+        ziel.rechteck(gx + 3.5, y0 - 4, 1.5, 1.5, "y");
+        if (blick === "hinten") ziel.ellipse(gx + 0.2, y0 + 4.2, 0.7, 0.7, "y");
+        ziel.fein(gx - 1, y0 + 4.5, "z");
+    } else if (form === "gluehwuermchen") {
+        // drei Gluehwuermchen kreisen um den Kopf
+        for (let i = 0; i < 3; i++) {
+            const winkel = (anim / 4 + i / 3) * Math.PI * 2;
+            const x = cx + Math.cos(winkel) * 6;
+            const y = cy - 1 + Math.sin(winkel) * 2.5;
+            a.fein(x, y, "x");
+            a.fein(x + 0.5, y, "y");
+            a.fein(x, y - 0.5, "z");
         }
     } else if (["fluegel", "fledermaus", "engel", "schmetterling", "drache", "libelle"].includes(form)) {
         figurFluegel(hinten, form, seite, x0, y0, breite, anim);
