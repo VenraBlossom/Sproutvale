@@ -1293,7 +1293,7 @@ function zeichneFigur(f, jetzt) {
     // Begleiter des Mitspielers: gleiches Bild und dieselben Effekte wie der eigene
     const skin = HAUSTIER_SKINS.find(s => s.id === f.skin) || HAUSTIER_SKINS[0];
     const pose = ["laufen", "stehen", "sitzen", "liegen", "schlafen"].includes(f.zustand) ? f.zustand : "sitzen";
-    const url = haustierUrl(skin, pose, f.bild, blinzelt);
+    const url = haustierUrl(skin, pose, f.bild, blinzelt, haustierAnim(skin));
     if (f.letzteUrl !== url) {
         f.img.src = url;
         f.letzteUrl = url;

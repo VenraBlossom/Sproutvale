@@ -1241,9 +1241,14 @@ function erstelleHaustier() {
     zeigeHaustierBild();
 }
 
+// Legendaere Begleiter haben eigene Animationsbilder (etwa 5-mal pro Sekunde), die anderen nicht
+function haustierAnim(skin) {
+    return skin && skin.paket === "einzeln" ? Math.floor(performance.now() / 190) % 4 : 0;
+}
+
 function zeigeHaustierBild() {
     const blinzelt = haustier.blinzeltBis > performance.now();
-    const url = haustierUrl(aktuellerSkin(), haustier.zustand, haustier.bildNummer, blinzelt);
+    const url = haustierUrl(aktuellerSkin(), haustier.zustand, haustier.bildNummer, blinzelt, haustierAnim(aktuellerSkin()));
     if (url !== haustier.letzteUrl) {
         haustier.bild.src = url;
         haustier.letzteUrl = url;

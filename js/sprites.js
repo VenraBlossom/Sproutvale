@@ -1841,6 +1841,8 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         p.punkt(mx + 1, oben - 1, "Y");
         p.punkt(mx + 2, oben - 2, "Y");
         p.punkt(mx + 2, oben - 3, "v");
+        // Glanz wandert am Horn hoch
+        p.punkt(katzenAnim % 4 < 2 ? mx + 1 : mx + 2, oben - (katzenAnim % 4), "w");
     }
     // Rote Schleife am vorderen Ohr (Kitty)
     if (stil.schleife) {
@@ -1869,15 +1871,20 @@ function katzenExtrasOben(p, kopfX, kopfY, stil) {
 }
 
 // Kleine Fluegel auf dem Ruecken: Engel hellblau, Drache gruen
+// Animationsbild fuer legendaere Begleiter (0 bis 3), wird von haustierUrl gesetzt
+let katzenAnim = 0;
+
 function katzenFluegel(p, x, y, stil) {
+    // Fluegelschlag: die Spitzen gehen hoch und runter
+    const hub = [0, -0.8, -1.6, -0.8][katzenAnim % 4];
     if (stil.engel) {
-        p.ellipse(x, y - 0.6, 2.6, 1.8, "z");
+        p.ellipse(x, y - 0.6 + hub * 0.6, 2.6, 1.8 - hub * 0.3, "z");
         p.punkt(x - 1, y - 1, "w");
         p.punkt(x, y - 1, "w");
         p.punkt(x - 1, y + 0.2, "Q");
         p.punkt(x + 1, y + 0.2, "Q");
     } else if (stil.drache) {
-        p.vieleck([[x - 2.5, y + 0.6], [x - 1, y - 2.6], [x + 0.4, y - 1], [x + 1.8, y - 2.8], [x + 2.4, y + 0.6]], "3");
+        p.vieleck([[x - 2.5, y + 0.6], [x - 1, y - 2.6 + hub * 1.2], [x + 0.4, y - 1 + hub * 0.5], [x + 1.8, y - 2.8 + hub * 1.4], [x + 2.4, y + 0.6]], "3");
         p.punkt(x, y - 0.4, "1");
     }
 }
@@ -1904,7 +1911,11 @@ function katzenSchwanz(p, p0, p1, p2, stil) {
         return;
     }
     if (stil.fuchs) {
-        p.kurve(p0, p1, p2, 1.35, t => (t > 0.72 ? "4" : "2"));
+        // Flammenschwanz: die Spitze flackert
+        if (stil.flammen) {
+            p.kurve(p0, p1, p2, 1.35, t => (t > 0.72 ? (katzenAnim % 2 ? "Y" : "4") : t > 0.55 ? "3" : "2"));
+            p.punkt(p2[0] + (katzenAnim % 2 ? 0 : -1), p2[1] - 1 - (katzenAnim % 3 ? 1 : 0), "Y");
+        } else p.kurve(p0, p1, p2, 1.35, t => (t > 0.72 ? "4" : "2"));
         return;
     }
     if (stil.hund) {
@@ -2001,8 +2012,21 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     }
 
     katzenKopf(p, kopf[0], kopf[1], blinzelt, pose === "schlafen", stil);
+    // Sternenfell: einzelne Sterne im Fell funkeln im Takt
+    if (stil.sterne) {
+        p.raster.forEach((zeile, y) => zeile.forEach((farbe, x) => {
+            if ((farbe === "2" || farbe === "3") && (x * 7 + y * 3 + katzenAnim * 5) % 13 === 0) zeile[x] = "w";
+        }));
+    }
     p.umriss("7");
     katzenExtrasOben(p, kopf[0], kopf[1], stil);
+    // Hoellenhund: kleine Flammen ueber dem Kopf
+    if (stil.flammen && stil.hund) {
+        const x = Math.round(kopf[0]) - 1 + (katzenAnim % 2);
+        const y = Math.round(kopf[1]) - 5;
+        p.punkt(x, y, "Y");
+        if (katzenAnim % 3) p.punkt(x + 1, y - 1, "R");
+    }
     return p.raster;
 }
 
@@ -2273,11 +2297,13 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
 
 const haustierUrlCache = {};
 
-function haustierUrl(skin, pose, bild, blinzelt) {
+// anim = Animationsbild fuer legendaere Begleiter (Fluegelschlag, Funkeln ...), unabhaengig von der Pose
+function haustierUrl(skin, pose, bild, blinzelt, anim = 0) {
     const anzahl = HAUSTIER_BILDER[pose] || 1;
     const nummer = bild % anzahl;
-    const schluessel = [skin.id, pose, nummer, blinzelt ? 1 : 0].join("_");
+    const schluessel = [skin.id, pose, nummer, blinzelt ? 1 : 0, anim].join("_");
     if (!haustierUrlCache[schluessel]) {
+        katzenAnim = anim;
         const raster = skin.art === "manta" ? mantaRaster(pose, nummer, blinzelt)
             : skin.art === "maedchen" ? maedchenRaster(pose, nummer, blinzelt)
             : skin.art === "blockmensch" ? blockmenschRaster(pose, nummer, blinzelt, skin.stil)
