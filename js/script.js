@@ -392,8 +392,8 @@ function erstelleRunZustand(sandbox = false) {
         mondphase: sandbox ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0),
         phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
         tag: 1,
-        gold: 10 * metaLevel("startgold") + 5 * kuschel("hase"),
-        skillpunkte: 60 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
+        gold: 25 * metaLevel("startgold") + 5 * kuschel("hase"),
+        skillpunkte: 100 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
         energie: 0,
         tagesMaxEnergie: 0,
         bonusEnergie: 0,
@@ -474,8 +474,9 @@ function level(id) {
     return run.level[id] || 0;
 }
 
+// Stufe eines Segens; dazu kommt der Bonus fuer frueh bezahlte Rechnungen (run.segenExtra, z.B. +0,3 = 30% staerker)
 function segen(id) {
-    return run.segen[id] || 0;
+    return (run.segen[id] || 0) + ((run.segenExtra && run.segenExtra[id]) || 0);
 }
 
 function hatWerkzeug(id) {
@@ -523,24 +524,24 @@ function istNacht() {
 function glueckBonus() {
     return 0.03 * level("glueckstraehne") + 0.02 * metaLevel("gluecksbringer") +
         0.05 * segen("glueckskind") + werkzeugWert("gluecksmuenze") + 0.04 * kuschel("panda") +
-        0.05 * kuschel("manta") + 0.03 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
+        0.05 * kuschel("manta") + 0.04 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
 }
 
 // Weniger Klicks pro Samen geht nicht mehr (weitere Stufen "Schnellere Aussaat" bringen nichts)
 function klicksAmMinimum() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, segen("flink")) + gachaBonus("klicks");
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks");
     return (KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel")) <= KONFIG.minKlicksProSamen;
 }
 
 function klicksProSamen() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, segen("flink")) + gachaBonus("klicks");
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
     return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
 }
 
 // Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
 function energieMax() {
-    let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") + 25 * metaLevel("ausdauer") +
+    let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") + 35 * metaLevel("ausdauer") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
     energie *= 1 + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
@@ -631,20 +632,20 @@ function artenvielfalt() {
 }
 
 function goldMulti() {
-    const summe = 1 + 0.15 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + 0.25 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
-        0.40 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
+        1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
-    return summe * Math.pow(2, level("goldmarie")) * Math.pow(1.1, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
+    return summe * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
         (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
         (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
 function sternWertMulti() {
-    return (1 + 0.2 * kuschel("manta")) * (1 + 0.1 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
+    return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1);
@@ -675,7 +676,7 @@ function feldKosten(seite = eigeneSeite()) {
 }
 
 function rechnungsBetrag(nummer) {
-    const rabatt = 0.04 * metaLevel("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
+    const rabatt = 0.05 * metaLevel("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
         0.03 * kuschel("wal");
     const phase = run ? run.mondphase || 0 : 0;
     const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1);
@@ -685,8 +686,14 @@ function rechnungsBetrag(nummer) {
     return aufrunden(betrag * faktor * (run && run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
+// Nach einer frueh bezahlten Rechnung verschiebt sich der Rhythmus (run.rechnungVersatz Tage)
 function naechsterRechnungsTag() {
-    return Math.ceil(run.tag / KONFIG.tageProRechnung) * KONFIG.tageProRechnung;
+    const versatz = run.rechnungVersatz || 0;
+    return versatz + Math.ceil((run.tag - versatz) / KONFIG.tageProRechnung) * KONFIG.tageProRechnung;
+}
+
+function istRechnungsTag() {
+    return (run.tag - (run.rechnungVersatz || 0)) % KONFIG.tageProRechnung === 0;
 }
 
 function naechsteRechnung() {
@@ -746,13 +753,13 @@ function mondbluetenJetzt() {
     return run.sandbox ? sandboxMondblueten() : mondbluetenFuerRechnungen(run.bezahlteRechnungen);
 }
 
-// Mondblueten fuer bezahlte Rechnungen: Nr. zum Quadrat (1, 4, 9, 16 ...), jeder Sternenfall verdoppelt alles
+// Mondblueten fuer bezahlte Rechnungen: Nr. zum Quadrat (1, 4, 9, 16 ...), jeder Sternenfall verdreifacht alles
 function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 : 0) {
     let summe = 0;
     for (let i = 1; i <= anzahl; i++) summe += i * i;
-    const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.15 * sfLevel("mondmagnet")) *
+    const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.3 * sfLevel("mondmagnet")) *
         (1 + MONDPHASE_BONUS * mondphase);
-    return aufrunden(summe * bonus * Math.pow(2, meta.sternenfaelle));
+    return aufrunden(summe * bonus * sternenfallFaktor());
 }
 
 // +25% pro Stufe, alle 10 Stufen zusaetzlich x2
@@ -825,7 +832,7 @@ function wachstumsTempo() {
 }
 
 function wachstumsTempoOhneJahreszeit() {
-    return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.08 * sfLevel("ewigerfruehling") +
+    return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
         gachaBonus("wachstum");
 }
 
@@ -1750,7 +1757,7 @@ function berechneErnte(feld) {
     const abend = tagesAnteil() > 2 / 3 ? 1 + 0.15 * level("abendsonne") : 1;
     const morgen = tagesAnteil() < 0.5 ? 1 + 0.2 * segen("morgenstund") : 1;
     const riesenwuchs = Math.random() < 0.1 * segen("riesenwuchs") ? 2 : 1;
-    const erntefest = !run.sandbox && run.tag % KONFIG.tageProRechnung === 0 ? 1 + level("erntefest") : 1;
+    const erntefest = !run.sandbox && istRechnungsTag() ? 1 + level("erntefest") : 1;
     const vollmond = pflanzenBonus(pflanze, "mondlilie") && istNacht() ? 2 : 1;
     let mindestRaritaet = run.tagesBoni.mindestGruen || wetterIst("regenbogen") || pflanze.eigenschaft === "eis" ||
         pflanzenBonus(pflanze, "erdbeere") ? 1 : 0;
@@ -3046,7 +3053,8 @@ segenKnopf.addEventListener("click", () => {
         if (!s) return;
         inhalt.appendChild(el("div", "segen-listen-eintrag", null, [
             pixelIcon(s.badge, 48),
-            el("div", null, null, [el("b", null, s.name + (stufe > 1 ? t(" x") + stufe : "")), el("div", null, s.text)])
+            el("div", null, null, [el("b", null, s.name + (stufe > 1 ? t(" x") + stufe : "") +
+                (run.segenExtra && run.segenExtra[id] ? " (+" + Math.round(run.segenExtra[id] * 100) + t("% stärker") + ")" : "")), el("div", null, s.text)])
         ]));
     });
     zeigePopup({ titel: t("🙏 Deine Segen in diesem Run"), inhalt, breite: 620 });
@@ -3066,7 +3074,7 @@ let segenSperreBis = 0;
 // auswahl: gespeicherte Auswahl (nach dem Laden eines Spielstands), sonst wird neu gewuerfelt
 function zeigeSegenAuswahl(auswahl) {
     // Segen mit "max" (z.B. Flinke Haende) verschwinden aus der Auswahl, wenn man sie so oft hat
-    const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && segen(s.id) >= s.max));
+    const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && (run.segen[s.id] || 0) >= s.max));
     run.segenAuswahl = auswahl || mische(moeglich).slice(0, segenAuswahlAnzahl()).map(s => s.id);
     segenFenster.classList.remove("versteckt");
     segenSperreBis = performance.now() + SEGEN_SPERRE_MS;
@@ -3081,12 +3089,13 @@ function zeigeSegenAuswahl(auswahl) {
         const karte = document.createElement("button");
         karte.classList.add("segen-karte");
         karte.style.animationDelay = i * 0.08 + "s";
-        const stufe = segen(id);
+        const stufe = run.segen[id] || 0;
         karte.append(
             pixelIcon(s.badge, 64, "segen-bild"),
             el("div", "segen-name", s.name),
             el("div", "segen-text", s.text),
-            el("div", "segen-stufe", stufe > 0 ? t("Du hast ihn schon ") + stufe + t("x, stapelt sich") : t("Neu"))
+            el("div", "segen-stufe", (stufe > 0 ? t("Du hast ihn schon ") + stufe + t("x, stapelt sich") : t("Neu")) +
+                (run.fruehBonus ? " · +" + Math.round(run.fruehBonus * 100) + t("% stärker") : ""))
         );
         karte.addEventListener("click", () => waehleSegen(id, karte));
         segenKarten.appendChild(karte);
@@ -3096,7 +3105,13 @@ function zeigeSegenAuswahl(auswahl) {
 
 function waehleSegen(id, karte) {
     if (!run.segenAuswahl || performance.now() < segenSperreBis) return;
-    run.segen[id] = segen(id) + 1;
+    run.segen[id] = (run.segen[id] || 0) + 1;
+    // Frueh bezahlte Rechnung: dieser Segen wirkt staerker
+    if (run.fruehBonus) {
+        if (!run.segenExtra) run.segenExtra = {};
+        run.segenExtra[id] = (run.segenExtra[id] || 0) + run.fruehBonus;
+        run.fruehBonus = 0;
+    }
     if (!meta.kodex.segen) meta.kodex.segen = {};
     meta.kodex.segen[id] = (meta.kodex.segen[id] || 0) + 1;
     run.segenAuswahl = null;
@@ -3195,7 +3210,7 @@ function starteTag(fortsetzen = false) {
     schliessePanels();
     kartenHalter.classList.add("versteckt");
     if (!fortsetzen) Klang.tagStart();
-    haken("tagStart");
+    haken("tagStart", fortsetzen);
     meldeAnDesktop("status", (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag + " · " + run.bezahlteRechnungen + t(" Rechnungen bezahlt"));
     aktualisiereAlles();
 }
@@ -3270,33 +3285,11 @@ function bezahleRechnungen() {
         pruefeMeilensteine();
         return true;
     }
-    const faellig = run.gnadenRechnung || (run.tag % KONFIG.tageProRechnung === 0 ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
+    const faellig = run.gnadenRechnung || (istRechnungsTag() ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
     if (faellig === 0) return true;
 
     if (koopGesamtGold() >= faellig) {
-        const warBoss = istBossRechnung(run.bezahlteRechnungen);
-        run.gold -= koopEigenerAnteil(faellig);
-        run.bezahlteRechnungen += 1;
-        meta.lebenszeit.rechnungen += 1;
-        run.gnadenRechnung = 0;
-        run.rechnungsRabatt = 0;
-        run.segenAusstehend = true;
-        run.nachrichten.push(t("🧾 Rechnung über ") + zahl(faellig) + t(" Gold bezahlt!"));
-        const hierophant = aufrunden(tw("hierophant"));
-        if (hierophant > 0) {
-            gibSternensamen(hierophant);
-            run.nachrichten.push(t("🔑 Der Hierophant: +") + hierophant + t(" Sternensamen"));
-        }
-        if (warBoss) {
-            meta.lebenszeit.bossRechnungen += 1;
-            const bonus = BOSS_KONFIG.bonusSternensamenProRechnung * run.bezahlteRechnungen;
-            gibSternensamen(bonus);
-            run.segenBoss = true;
-            run.nachrichten.push(t("🏦 Kredit abbezahlt! +") + zahl(bonus) + t(" Sternensamen und ein zusätzlicher Segen zur Auswahl"));
-        }
-        Klang.rechnung();
-        pruefeMondphaseFrei();
-        haken("rechnungBezahlt", run.bezahlteRechnungen, warBoss);
+        zahleRechnung(faellig);
         return true;
     }
 
@@ -3309,6 +3302,61 @@ function bezahleRechnungen() {
 
     beendeRun(faellig, false);
     return false;
+}
+
+// Rechnung bezahlen (am Zahltag oder frueher): Gold weg, Segen ausstehend, Boni
+function zahleRechnung(faellig) {
+    const warBoss = istBossRechnung(run.bezahlteRechnungen);
+    run.gold -= koopEigenerAnteil(faellig);
+    run.bezahlteRechnungen += 1;
+    meta.lebenszeit.rechnungen += 1;
+    run.gnadenRechnung = 0;
+    run.rechnungsRabatt = 0;
+    run.segenAusstehend = true;
+    run.nachrichten.push(t("🧾 Rechnung über ") + zahl(faellig) + t(" Gold bezahlt!"));
+    const hierophant = aufrunden(tw("hierophant"));
+    if (hierophant > 0) {
+        gibSternensamen(hierophant);
+        run.nachrichten.push(t("🔑 Der Hierophant: +") + hierophant + t(" Sternensamen"));
+    }
+    if (warBoss) {
+        meta.lebenszeit.bossRechnungen += 1;
+        const bonus = BOSS_KONFIG.bonusSternensamenProRechnung * run.bezahlteRechnungen;
+        gibSternensamen(bonus);
+        run.segenBoss = true;
+        run.nachrichten.push(t("🏦 Kredit abbezahlt! +") + zahl(bonus) + t(" Sternensamen und ein zusätzlicher Segen zur Auswahl"));
+    }
+    Klang.rechnung();
+    pruefeMondphaseFrei();
+    haken("rechnungBezahlt", run.bezahlteRechnungen, warBoss);
+}
+
+// ---------- RECHNUNG FRUEHER BEZAHLEN (nur Story, solo, zwischen den Tagen) ----------
+// Hat man das Gold schon vor dem Zahltag, kann man sofort bezahlen: Der naechste Rechnungs-Abschnitt beginnt dann jetzt
+// (der Run wird kuerzer), und der naechste Segen wird pro Tag, den man frueher bezahlt, 10% staerker.
+const FRUEH_BEZAHLT_BONUS = 0.1;
+
+function kannFrueherBezahlen() {
+    if (!run || run.sandbox || run.koop || run.phase !== "vorTag" || run.gnadenRechnung || run.rechnungOffen) return false;
+    if (run.segenAuswahl || run.segenAusstehend) return false;
+    return run.gold >= naechsteRechnung().betrag;
+}
+
+function bezahleFrueher() {
+    if (!kannFrueherBezahlen()) return;
+    const rechnung = naechsteRechnung();
+    const tageFrueher = rechnung.tageBis;
+    zahleRechnung(rechnung.betrag);
+    // Der naechste Zahltag ist in 5 Tagen, gezaehlt ab dem Tag, der als naechstes kommt
+    run.rechnungVersatz = (run.tag - 1) % KONFIG.tageProRechnung;
+    run.fruehBonus = (run.fruehBonus || 0) + FRUEH_BEZAHLT_BONUS * tageFrueher;
+    zeigeBanner("🧾", t("Früher bezahlt!"), tf("{0} Tage früher: der nächste Segen ist {1}% stärker", tageFrueher,
+        Math.round(run.fruehBonus * 100)), "#2e9e2e", 3200);
+    speichereMeta();
+    zeigeSegenAuswahl();
+    renderTagesKarte();
+    aktualisiereAlles();
+    speichereRun();
 }
 
 function aktualisiereLebenszeitMaxima() {
@@ -3401,7 +3449,7 @@ function koopEigenerAnteil(betrag) {
 
 function faelligeRechnung() {
     if (run.sandbox) return 0;
-    return run.gnadenRechnung || (run.tag % KONFIG.tageProRechnung === 0 ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
+    return run.gnadenRechnung || (istRechnungsTag() ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
 }
 
 // "Rechnung bezahlen" ist kurz gesperrt, damit man nicht aus Versehen weiterklickt
@@ -3590,10 +3638,16 @@ function renderTagesKarte() {
             html += `<p class="karte-rechnung${warnung ? " warnung" : ""}${rechnung.boss ? " boss" : ""}">` +
                 `${rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)} Gold</b> ` +
                 `${t("in")} ${tageText(rechnung.tageBis)}. ${t("Du hast")} ${zahl(run.gold)} Gold.</p>`;
+            if (kannFrueherBezahlen()) {
+                html += `<button class="knopf knopf-gruen karte-frueh-bezahlen">🧾 ${tf("Jetzt bezahlen ({0} früher, nächster Segen +{1}%)",
+                    tageText(rechnung.tageBis), Math.round(((run.fruehBonus || 0) + FRUEH_BEZAHLT_BONUS * rechnung.tageBis) * 100))}</button>`;
+            }
         }
     }
 
     tagesKarteInhalt.innerHTML = html;
+    const fruehKnopf = tagesKarteInhalt.querySelector(".karte-frueh-bezahlen");
+    if (fruehKnopf) fruehKnopf.addEventListener("click", bezahleFrueher);
 
     const istRunEnde = modus === "runEnde";
     karteShop.classList.toggle("versteckt", istRunEnde);
@@ -3691,7 +3745,8 @@ function aktualisiereTopBar() {
             (stufe === 0 ? "\n" + t("Die normalen Regeln.") : "\n" + t("Es gelten zusammen:") + regeln) +
             "\n> +" + Math.round(MONDPHASE_BONUS * 100 * stufe) + t("% Mondblüten am Ende des Runs") +
             (neueMondphase() ? "\n> " + t("❗ Neue Mondphase frei: wählbar im Mondteich unter Spielmodi") : "") +
-            "\n" + t("Die Mondphase wählst du im Mondteich (Spielmodi). Sie gilt ab dem nächsten Run."));
+            "\n" + t("Die Mondphase wählst du im Mondteich (Spielmodi). Sie gilt ab dem nächsten Run.") +
+            "\n- " + t("Klick: zur Auswahl im Mondteich"));
     }
     aktualisiereMondphaseHinweis();
     if (run.sandbox) {

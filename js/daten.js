@@ -1581,17 +1581,17 @@ const HAUS_BEREICH = { x: 5, breite: 8 };
 
 const META_UPGRADES = [
     { id: "startgold", name: t("Startkapital"), basiskosten: 1, faktor: 1.5, max: 10,
-        beschreibung: t("+10 Gold zu Beginn jedes Runs."), info: lvl => "+" + 10 * lvl + t(" Gold") },
+        beschreibung: t("+25 Gold zu Beginn jedes Runs."), info: lvl => "+" + 25 * lvl + t(" Gold") },
     { id: "startsp", name: t("Bauernweisheit"), basiskosten: 2, faktor: 1.5, max: 10,
-        beschreibung: t("+60 Sternensamen zu Beginn jedes Runs."), info: lvl => "+" + 60 * lvl + t(" Sternensamen") },
+        beschreibung: t("+100 Sternensamen zu Beginn jedes Runs."), info: lvl => "+" + 100 * lvl + t(" Sternensamen") },
     { id: "startfelder", name: t("Vorbereiteter Boden"), basiskosten: 3, faktor: 2, max: 4,
         beschreibung: t("+1 Feld zu Beginn jedes Runs. Das nächste Feld kostet trotzdem nur 1 Gold."), info: lvl => "+" + lvl + t(" Felder") },
     { id: "ausdauer", name: t("Ausdauer"), basiskosten: 6, faktor: 2.4, max: 4,
-        beschreibung: t("+25 Energie pro Tag."), info: lvl => "+" + 25 * lvl + t(" Energie") },
+        beschreibung: t("+35 Energie pro Tag."), info: lvl => "+" + 35 * lvl + t(" Energie") },
     { id: "verhandlung", name: t("Verhandlungsgeschick"), basiskosten: 5, faktor: 2.1, max: 5,
-        beschreibung: t("Rechnungen kosten 4% weniger."), info: lvl => "-" + 4 * lvl + t("% Rechnungen") },
+        beschreibung: t("Rechnungen kosten 5% weniger."), info: lvl => "-" + 5 * lvl + t("% Rechnungen") },
     { id: "ertrag", name: t("Fruchtbarer Hof"), basiskosten: 6, faktor: 1.45, max: 10,
-        beschreibung: t("+15% Gold aus allen Ernten."), info: lvl => "+" + 15 * lvl + t("% Gold") },
+        beschreibung: t("+25% Gold aus allen Ernten."), info: lvl => "+" + 25 * lvl + t("% Gold") },
     { id: "saatvorrat", name: t("Saatgut-Vorrat"), basiskosten: 20, faktor: 2.5, max: 3,
         beschreibung: t("Jeder Run startet mit einer weiteren freigeschalteten Pflanze."),
         info: lvl => lvl + t(" Pflanzen zusätzlich freigeschaltet") },
@@ -1613,8 +1613,8 @@ const META_UPGRADES = [
         beschreibung: t("Kuschel-Züge werden nur noch nach jedem 2. Zug um 1 teurer."),
         info: lvl => (lvl ? t("+1 alle 2 Züge") : t("+1 pro Zug")) },
     { id: "mondlicht", name: t("Mondlicht"), basiskosten: 8, faktor: 1.4, max: Infinity,
-        beschreibung: t("x1,1 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
-        info: lvl => multiText(Math.pow(1.1, lvl)) + t(" Gold") }
+        beschreibung: t("x1,15 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
+        info: lvl => multiText(Math.pow(1.15, lvl)) + t(" Gold") }
 ];
 
 // ---------- MONDTEICH: TAROTKARTEN ----------
@@ -1785,31 +1785,36 @@ const KUSCHEL_NACH_ID = Object.fromEntries(KUSCHELTIERE.map(k => [k.id, k]));
 // ---------- STERNENFALL (zweite Prestige-Ebene) ----------
 // Setzt Mondblueten und die dauerhaften Mondteich-Upgrades zurueck.
 // Behaelt: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik, Sandbox.
-// Dafuer: Sternensplitter fuer den Sternenfall-Shop UND jeder Sternenfall verdoppelt alle zukuenftigen Mondblueten (x2, x4, x8 ...).
+// Dafuer: Sternensplitter fuer den Sternenfall-Shop UND jeder Sternenfall verdreifacht alle zukuenftigen Mondblueten (x3, x9, x27 ...).
 
 const STERNENFALL_KONFIG = {
     mindestMondblueten: 1500,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
-    splitterTeiler: 150           // Sternensplitter = Wurzel(verdiente Mondblueten / 150)
+    splitterTeiler: 40,           // Sternensplitter = Wurzel(verdiente Mondblueten / 40)
+    mondbluetenFaktor: 3          // jeder Sternenfall: alle zukuenftigen Mondblueten x3
 };
 
+function sternenfallFaktor() {
+    return Math.pow(STERNENFALL_KONFIG.mondbluetenFaktor, meta.sternenfaelle);
+}
+
 const STERNENFALL_UPGRADES = [
+    { id: "dauerklick", name: t("Sense"), symbol: "sprite:sense", basiskosten: 1, faktor: 1, max: 1,
+        beschreibung: t("Halte die Maus auf dem Samenladen gedrückt: Er klickt von allein, 15-mal pro Sekunde."),
+        info: lvl => (lvl > 0 ? t("Aktiv") : t("Nicht aktiv")) },
     { id: "sternenregen", name: t("Sternenregen"), symbol: "🌠", basiskosten: 1, faktor: 1.6, max: Infinity,
-        beschreibung: t("+40% Gold aus allen Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 40 * lvl + t("% Gold") },
+        beschreibung: t("+100% Gold aus allen Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 100 * lvl + t("% Gold") },
     { id: "sternensaat", name: t("Sternensaat"), symbol: "✨", basiskosten: 1, faktor: 1.7, max: Infinity,
-        beschreibung: t("+10% Sternensamen aus Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 10 * lvl + t("% Sternensamen") },
+        beschreibung: t("+25% Sternensamen aus Ernten. Unendlich oft kaufbar."), info: lvl => "+" + 25 * lvl + t("% Sternensamen") },
     { id: "mondmagnet", name: t("Mondmagnet"), symbol: "🌙", basiskosten: 2, faktor: 1.8, max: Infinity,
-        beschreibung: t("+15% Mondblüten am Ende jedes Runs. Unendlich oft kaufbar."), info: lvl => "+" + 15 * lvl + t("% Mondblüten") },
+        beschreibung: t("+30% Mondblüten am Ende jedes Runs. Unendlich oft kaufbar."), info: lvl => "+" + 30 * lvl + t("% Mondblüten") },
     { id: "ewigerfruehling", name: t("Ewiger Frühling"), symbol: "🌸", basiskosten: 2, faktor: 1.9, max: 10,
-        beschreibung: t("Alle Pflanzen wachsen 8% schneller."), info: lvl => "+" + 8 * lvl + t("% Wachstum") },
+        beschreibung: t("Alle Pflanzen wachsen 12% schneller."), info: lvl => "+" + 12 * lvl + t("% Wachstum") },
     { id: "glueckstern", name: t("Glücksstern"), symbol: "⭐", basiskosten: 2, faktor: 2, max: 5,
-        beschreibung: t("+3% Glück bei allen Glücksspielen."), info: lvl => "+" + 3 * lvl + t("% Glück") },
+        beschreibung: t("+4% Glück bei allen Glücksspielen."), info: lvl => "+" + 4 * lvl + t("% Glück") },
     { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 4, faktor: 2.5, max: 3,
         beschreibung: t("Jeder Run startet mit einem zufälligen Werkzeug."), info: lvl => lvl + t(" Werkzeuge zum Start") },
     { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 3, faktor: 3, max: 3,
-        beschreibung: t("Jeder Sternenfall schenkt dir 3 Kuschel-Gutscheine."), info: lvl => 3 * lvl + t(" Gutscheine pro Sternenfall") },
-    { id: "dauerklick", name: t("Sense"), symbol: "sprite:sense", basiskosten: 1, faktor: 1, max: 1,
-        beschreibung: t("Halte die Maus auf dem Samenladen gedrückt: Er klickt von allein, 15-mal pro Sekunde."),
-        info: lvl => (lvl > 0 ? t("Aktiv") : t("Nicht aktiv")) }
+        beschreibung: t("Jeder Sternenfall schenkt dir 5 Kuschel-Gutscheine."), info: lvl => 5 * lvl + t(" Gutscheine pro Sternenfall") }
 ];
 
 // ---------- SPIELMODI ----------

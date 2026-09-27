@@ -609,8 +609,11 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.fein(glanzX, oben - 0.5, "w");
         p.fein(glanzX + 0.5, oben, "w");
     } else if (form === "schein") {
+        // Duenner Ring aus feinen Pixeln (schwebt sanft auf und ab, ein Glanz wandert herum)
         const y = oben - 3 + (anim % 2 ? -0.5 : 0);
-        p.ellipse(cx, y, 4, 1.4, "a", (x, yy) => !((x + 0.5 - cx) ** 2 / 7 + (yy + 0.5 - y) ** 2 / 0.3 < 1));
+        p.ellipseFein(cx, y, 4, 1.3, "b");
+        p.ellipseFein(cx, y - 0.1, 3.4, 0.8, "a");
+        p.feinLinie(cx - 2, y - 0.5, cx + 1.5, y - 0.5, "c");
         p.fein(cx - 2.5 + (anim % 4) * 1.5, y - 1, "c");
     } else if (form === "pilz") {
         const hueft = anim % 2 ? -0.5 : 0;
@@ -859,14 +862,19 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
 
 // ---------- ARME, BEINE, WERKZEUG ----------
 
-function figurArm(g, sx, sy, art, schwung, farbe, hinten) {
+// richtung: nach welcher Seite ein erhobener Arm geht (1 = rechts, -1 = links), weite: wie weit neben den Kopf
+// (erhobene Arme gehen schraeg nach aussen, damit sie nicht ueber dem Gesicht haengen)
+function figurArm(g, sx, sy, art, schwung, farbe, hinten, richtung = 1, weite = 2) {
     const k = g.kleidung;
     const hand = hinten ? "s" : "4";
     if (art === "hoch" || art === "winken" || art === "winken2") {
-        const x = art === "winken2" ? sx + 1 : sx;
-        k.rechteck(x, sy - 4, 2, 5, farbe);
-        k.feinLinie(x, sy - 4, x, sy, "8");
-        g.haut.ellipse(x + 1, sy - 4.6, 1.1, 1, hand);
+        const wink = art === "winken2" ? 1 : 0;
+        const ux = richtung > 0 ? sx + 1 : sx - weite + 1;
+        const fx = richtung > 0 ? sx + weite + wink : sx - weite - wink;
+        k.rechteck(ux, sy - 1, weite, 2, farbe);
+        k.rechteck(fx, sy - 4, 2, 4, farbe);
+        k.feinLinie(richtung > 0 ? fx : fx + 1.5, sy - 4, richtung > 0 ? fx : fx + 1.5, sy - 0.5, "8");
+        g.haut.ellipse(fx + 1, sy - 4.6, 1.1, 1, hand);
     } else if (art === "vorn") {
         k.rechteck(sx, sy, 4, 2, farbe);
         k.feinLinie(sx, sy + 1.5, sx + 3.5, sy + 1.5, "8");
@@ -1213,10 +1221,10 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
             const cy = 6.6 + w;
             const y0 = 12 + w;
             figurBeine(g, [[7 + h.beinHinten, true], [9 + h.beinVorn, false]], 18 + w, teile.hose, teile.schuhe, "seite", anim);
-            figurArm(g, 6 + h.lehnen, y0 + 1, h.armHinten, -h.armSchwung, "8", true);
+            figurArm(g, 6 + h.lehnen, y0 + 1, h.armHinten, -h.armSchwung, "8", true, -1, 2);
             figurOberteil(g, "seite", h, 6 + h.lehnen, y0, teile.oberteil, anim);
             g.haut.rechteck(8 + h.lehnen, y0 - 1, 2, 1, "4");
-            figurArm(g, 9 + h.lehnen, y0 + 1, h.armVorn, h.armSchwung, aermel, false);
+            figurArm(g, 9 + h.lehnen, y0 + 1, h.armVorn, h.armSchwung, aermel, false, 1, 4);
             if (h.werkzeug) figurWerkzeug(g, h.werkzeug, 10 + h.lehnen, y0 + 1);
             figurKopfSeite(g, cx, cy, geschlossen, teile.augen, blinzelt, anim);
             figurHautMuster(g, teile, cx, cy, y0, "seite", anim);
@@ -1243,8 +1251,8 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
         g.haut.rechteck(x0 + 2, y0 - 1, 2, 1, vorne ? "4" : "s");
         const armL = h.armHinten === "hoch" ? "hoch" : "unten";
         const armR = h.armVorn === "hoch" || h.armVorn === "winken" || h.armVorn === "winken2" ? h.armVorn : "unten";
-        figurArm(g, x0 - 2, y0, h.sitzt ? "unten" : armL, 0, aermel, !vorne);
-        figurArm(g, x0 + 6, y0, h.sitzt ? "unten" : armR, 0, aermel, !vorne);
+        figurArm(g, x0 - 2, y0, h.sitzt ? "unten" : armL, 0, aermel, !vorne, -1, 2);
+        figurArm(g, x0 + 6, y0, h.sitzt ? "unten" : armR, 0, aermel, !vorne, 1, 2);
         if (vorne) figurKopfVorne(g, cx, cy, geschlossen, teile.augen, blinzelt, anim);
         else figurKopfHinten(g, cx, cy);
         if (vorne) figurHautMuster(g, teile, cx, cy, y0, blick, anim);
@@ -1549,6 +1557,10 @@ function zeichneFigur(f, jetzt) {
         zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt, blick);
         f.bildEl.huelle.style.transform = blick === "seite" && f.richtung < 0 ? "scaleX(-1)" : "";
         figurFunkeln(f, teile);
+        // Kleine Aura: in der Farbe des leuchtenden Teils, sonst ein warmes Licht
+        const leuchtend = Object.values(teile).filter(tl => tl.fxFarbe).sort((a, b) => kosmetikSeltenheit(b) - kosmetikSeltenheit(a))[0];
+        f.bildEl.huelle.classList.add("figur-aura");
+        f.bildEl.huelle.style.setProperty("--aura", leuchtend ? leuchtend.fxFarbe : "#fff3c4");
         return;
     }
     // Begleiter des Mitspielers: gleiches Bild und dieselben Effekte wie der eigene

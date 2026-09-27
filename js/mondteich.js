@@ -33,7 +33,7 @@ function renderMetaUpgrades() {
     prestigeInfo.textContent = (run.sandbox
         ? t("♾️ Mondteich von Endlos: eigener Fortschritt, getrennt von Story. Mondblüten gibt es beim Neuanfang für Meilensteine")
         : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 1, 2. = 4, 3. = 9 …)")) +
-        (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(Math.pow(2, meta.sternenfaelle)) + "." : ".");
+        (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(sternenfallFaktor()) + "." : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
         const lvl = metaLevel(def.id);
         const kosten = kostenMitFaktor(def.basiskosten, def.faktor, lvl);
@@ -357,7 +357,7 @@ function kannSternenfall() {
 function loeseSternenfallAus() {
     if (!kannSternenfall()) return;
     const splitter = sternenfallSplitter();
-    const geschenk = 3 * sfLevel("himmelsgabe");
+    const geschenk = 5 * sfLevel("himmelsgabe");
     meta.sternensplitter += splitter;
     meta.sternenfaelle += 1;
     meta.mondblueten = 0;
@@ -368,7 +368,7 @@ function loeseSternenfallAus() {
     Klang.goldregen();
     bildschirmBlitz("#c9b0f5", 0.6, 600);
     zeigeBanner("☄️", t("Sternenfall!"), "+" + splitter + t(" Sternensplitter · alle Mondblüten ab jetzt x") +
-        zahl(Math.pow(2, meta.sternenfaelle)) + (geschenk ? " · +" + geschenk + t(" Gutscheine") : ""), "#7c4fb3", 4500);
+        zahl(sternenfallFaktor()) + (geschenk ? " · +" + geschenk + t(" Gutscheine") : ""), "#7c4fb3", 4500);
     // Ein vorbereiteter Tag 1 wird mit den neuen Werten neu aufgebaut
     if (run.phase === "vorTag" && run.tag === 1 && !run.koop) starteNeuenRun(false);
     oeffnePrestigeShop();
@@ -383,8 +383,8 @@ function frageSternenfall() {
         inhalt: el("div", "sternenfall-frage", null, [
             el("p", null, t("Du verlierst: alle Mondblüten und alle dauerhaften Upgrades im Mondteich.")),
             el("p", null, t("Du behältst: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik und Endlos.")),
-            el("p", null, t("Du bekommst: ") + splitter + t(" Sternensplitter und alle zukünftigen Mondblüten zählen doppelt (x") +
-                zahl(Math.pow(2, meta.sternenfaelle + 1)) + ").")
+            el("p", null, t("Du bekommst: ") + splitter + t(" Sternensplitter und alle zukünftigen Mondblüten zählen dreifach (x") +
+                zahl(Math.pow(STERNENFALL_KONFIG.mondbluetenFaktor, meta.sternenfaelle + 1)) + ").")
         ]),
         knoepfe: [
             { text: t("Abbrechen") },
@@ -406,7 +406,7 @@ function kaufeSternenfallUpgrade(def) {
 
 function renderSternenfall() {
     prestigeInfo.textContent = t("Der Sternenfall ist die zweite Prestige-Ebene. Er setzt Mondblüten und Mondteich-Upgrades zurück, ") +
-        t("dafür zählt jede zukünftige Mondblüte doppelt und du bekommst Sternensplitter für starke, dauerhafte Upgrades.");
+        t("dafür zählt jede zukünftige Mondblüte dreifach und du bekommst Sternensplitter für starke, dauerhafte Upgrades.");
 
     const fortschritt = Math.min(1, meta.mondbluetenSeitSternenfall / STERNENFALL_KONFIG.mindestMondblueten);
     const balken = el("div", "erfolg-balken");
@@ -421,7 +421,7 @@ function renderSternenfall() {
     prestigeInhalt.appendChild(el("div", "sternenfall-kasten", null, [
         pixelIcon("☄️", 64),
         el("div", "sternenfall-text", null, [
-            el("b", null, t("Sternenfälle bisher: ") + meta.sternenfaelle + t(" · Mondblüten x") + zahl(Math.pow(2, meta.sternenfaelle))),
+            el("b", null, t("Sternenfälle bisher: ") + meta.sternenfaelle + t(" · Mondblüten x") + zahl(sternenfallFaktor())),
             el("span", null, t("Verdient seit dem letzten Sternenfall: ") + zahl(meta.mondbluetenSeitSternenfall) + " / " +
                 zahl(STERNENFALL_KONFIG.mindestMondblueten) + t(" Mondblüten")),
             balken
@@ -595,3 +595,28 @@ function renderPrestigeShop() {
     else if (aktiverPrestigeReiter === "modi") renderSpielmodi();
     else renderMetaUpgrades();
 }
+
+// Klick auf die Mondphase oben: direkt zur Auswahl im Mondteich (wenn er gerade offen sein darf)
+mondphaseDisplay.addEventListener("click", () => {
+    if (spielPausiert()) return;
+    if (darfMondteich()) aktiverPrestigeReiter = "modi";
+    versucheMondteich();
+});
+
+// Nach dem Run: Mondteich einklappen, um Markt, Stellarium usw. in Ruhe anzuschauen (kaufen geht erst im neuen Run)
+const prestigeEinklappen = $("prestige-einklappen");
+const mondteichAusklappen = $("mondteich-ausklappen");
+setzeTipp(prestigeEinklappen, t("Mondteich einklappen: Markt, Stellarium und Hof ansehen, bevor du neu startest (kaufen geht erst im neuen Run)"));
+prestigeEinklappen.addEventListener("click", () => {
+    schliessePrestigeShop();
+    mondteichAusklappen.classList.remove("versteckt");
+    zeigeToast(t("👀 Nur ansehen: Kaufen und Klicken geht erst im neuen Run."));
+});
+mondteichAusklappen.addEventListener("click", () => {
+    mondteichAusklappen.classList.add("versteckt");
+    oeffnePrestigeShop();
+});
+registriereHaken("anzeige", () => {
+    prestigeEinklappen.classList.toggle("versteckt", run.phase !== "runEnde");
+    if (run.phase !== "runEnde" || !prestigeShop.classList.contains("versteckt")) mondteichAusklappen.classList.add("versteckt");
+});

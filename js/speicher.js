@@ -10,8 +10,34 @@
 // Im Browser (ohne Desktop-App) passiert hier nichts.
 // ============================================================
 
+// Test-Bot (index.html?bot=CODE, siehe bot.js): eigener Spielstand nur im Speicher, ohne Ton
+const BOT_CODE = new URLSearchParams(location.search).get("bot");
+
+(function botSpeicher() {
+    if (!BOT_CODE) return;
+    // Der Bot laeuft in einem unsichtbaren Rahmen: dort bremst der Browser requestAnimationFrame, also per Timer
+    window.requestAnimationFrame = rueckruf => setTimeout(() => rueckruf(performance.now()), 16);
+    const daten = new Map([["sproutvale_einstellungen", JSON.stringify({ musik: 0, sfx: 0, tipps: false })]]);
+    const lesen = Storage.prototype.getItem;
+    const setzen = Storage.prototype.setItem;
+    const entfernen = Storage.prototype.removeItem;
+    Storage.prototype.getItem = function (schluessel) {
+        if (this !== localStorage) return lesen.call(this, schluessel);
+        return daten.has(schluessel) ? daten.get(schluessel) : null;
+    };
+    Storage.prototype.setItem = function (schluessel, wert) {
+        if (this !== localStorage) return setzen.call(this, schluessel, wert);
+        daten.set(schluessel, String(wert));
+    };
+    Storage.prototype.removeItem = function (schluessel) {
+        if (this !== localStorage) return entfernen.call(this, schluessel);
+        daten.delete(schluessel);
+    };
+})();
+
 (function verbindeSpeicherOrdner() {
     const desktop = window.sproutvaleDesktop;
+    if (BOT_CODE) return;
     if (!desktop || !desktop.speicher) return;
     const istSpielstand = schluessel => typeof schluessel === "string" && schluessel.startsWith("sproutvale_");
 

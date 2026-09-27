@@ -50,7 +50,7 @@ function wuerfleWetter() {
     meta.kodex.wetter[wetter.id] = (meta.kodex.wetter[wetter.id] || 0) + 1;
 }
 
-function zeigeWetter() {
+function zeigeWetter(mitBanner) {
     const wetter = run.phase === "tag" && run.wetter ? WETTER_NACH_ID[run.wetter] : null;
     WETTER.forEach(w => document.body.classList.toggle("wetter-" + w.id, Boolean(wetter) && wetter.id === w.id));
     wetterSchleier.innerHTML = "";
@@ -84,7 +84,7 @@ function zeigeWetter() {
             wetterEbene.appendChild(funke);
         }
     }
-    zeigeBanner(wetter.symbol, wetter.name, wetterText(wetter), wetter.gut ? "#2f7fcf" : "#b86a1a", 4200);
+    if (mitBanner) zeigeBanner(wetter.symbol, wetter.name, wetterText(wetter), wetter.gut ? "#2f7fcf" : "#b86a1a", 4200);
 }
 
 // Gewitter: ab und zu schlaegt ein Blitz in eine wachsende Pflanze ein und macht sie sofort reif
@@ -555,12 +555,12 @@ registriereHaken("runStart", () => {
 
 registriereHaken("tagVorbereiten", wuerfleWetter);
 
-registriereHaken("tagStart", () => {
+registriereHaken("tagStart", fortsetzen => {
     tagesPlan.ms = 0;
     tagesPlan.blitzMs = 5000;
     planeKraehen();
     tagesPlan.goldregen = Math.random() < GOLDREGEN_KONFIG.chance * (1 + 0.5 * level("goldschauer")) ? tagesDauerMs() * (0.2 + Math.random() * 0.5) : null;
-    zeigeWetter();
+    zeigeWetter(!fortsetzen && !imHauptmenue());
     if (haendlerSchliessen) haendlerSchliessen();
 });
 

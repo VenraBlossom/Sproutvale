@@ -11213,3 +11213,96 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     from { transform: translateY(0) scale(0.6); opacity: 0.9; }
     to { transform: translateY(-40px) scale(1.4); opacity: 0; }
 }
+
+/* ---------- DEBUG-FENSTER (debug.help) UND TEST-BOT ---------- */
+.debug-fenster .popup-inhalt {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.debug-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+.debug-gruppe {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #44506b;
+    border-bottom: 2px solid rgba(68, 80, 107, 0.3);
+}
+.debug-zeile {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.debug-name {
+    flex: 1;
+    font-size: 14px;
+}
+.debug-feld {
+    width: 110px;
+    font: inherit;
+    font-size: 14px;
+    padding: 2px 4px;
+}
+.debug-haken {
+    width: 20px;
+    height: 20px;
+}
+.debug-zeile .knopf {
+    padding: 2px 10px;
+    min-width: 0;
+}
+/* Der Bot spielt in einem zweiten Spiel ausserhalb des Bildschirms (muss gezeichnet werden, sonst laeuft es nicht) */
+.debug-bot-rahmen {
+    position: fixed;
+    left: -4000px;
+    top: 0;
+    width: 1280px;
+    height: 720px;
+    border: 0;
+    pointer-events: none;
+}
+.debug-bot-schild {
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: rgba(40, 40, 60, 0.85);
+    color: #fff;
+    font-size: 14px;
+    border-radius: 6px;
+}
+.debug-bot-schild .knopf {
+    padding: 0 8px;
+    min-width: 0;
+}
+
+/* Kleine Aura um die eigene Figur (und die des Mitspielers) auf dem Hof */
+.figur-bild.figur-aura {
+    animation: figur-aura 3s ease-in-out infinite;
+}
+@keyframes figur-aura {
+    0%, 100% { filter: drop-shadow(0 0 2px var(--aura, #fff3c4)); }
+    50% { filter: drop-shadow(0 0 5px var(--aura, #fff3c4)); }
+}
+#mondphase-display { cursor: pointer; }
+.karte-frueh-bezahlen {
+    display: block;
+    margin: 6px auto 0;
+    font-size: 15px;
+}
+#mondteich-ausklappen {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    font-size: 18px;
+}
+.prestige-fuss { gap: 10px; }
