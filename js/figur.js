@@ -1870,7 +1870,17 @@ function aktualisiereProfilKnopf() {
     knopf.innerHTML = "";
     const mini = erstelleFigurBild(2);
     zeigeFigurBild(mini, figurTeileAus(profil().teile), "stehen", 0, false, "vorne");
-    knopf.append(mini.huelle, el("span", null, profil().name ? profil().name : t("Profil")));
+    const rang = bauernRang();
+    knopf.append(mini.huelle, el("span", "profil-knopf-text", null, [
+        el("span", null, profil().name ? profil().name : t("Profil")),
+        el("span", "profil-rang", tf("Rang {0}", rang))
+    ]));
+    // Fortschritt bis zum naechsten Bauernrang
+    const xp = meta.bauernXp || 0;
+    const von = rangSchwelle(rang), bis = rangSchwelle(rang + 1);
+    setzeTipp(knopf, "## " + tf("🧑‍🌾 Bauernrang {0}", rang) + "\n= " + tf("Für immer +{0}% Gold", rang - 1) + "\n" +
+        tf("Erfahrung: {0} / {1}", zahl(xp - von), zahl(bis - von)) + "\n- " +
+        t("Jede Ernte gibt Erfahrung (höhere Pflanzen mehr). Jeder Rang +1% Gold, alle 5 Ränge ein Kuschel-Gutschein."));
 }
 
 // Kleiner Ausschnitt der eigenen Figur als Symbol fuer eine Kategorie (Kopf, Oberkoerper oder Beine)

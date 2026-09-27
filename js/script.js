@@ -77,7 +77,7 @@ const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
 // (Mondblueten, Upgrades, Kuscheltiere, Erfolge, Statistik) und eigenem laufenden Hof.
 const ENDLOS_SLOTS = 3;
 // Erfolge gehoeren NICHT dazu: Story und jeder Endlos-Speicherstand haben getrennte Erfolge und Gutscheine
-const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot", "profil"];
+const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot", "profil", "bauernXp"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
 let metaSlot = 0; // welcher Endlos-Speicherstand gerade in "meta" geladen ist (0 = Story)
@@ -393,7 +393,7 @@ function erstelleRunZustand(sandbox = false) {
         phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
         tag: 1,
         gold: 25 * metaLevel("startgold") + 5 * kuschel("hase"),
-        skillpunkte: 100 * metaLevel("startsp") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
+        skillpunkte: 100 * metaLevel("startsp") + 250 * sfLevel("sternenrucksack") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
         energie: 0,
         tagesMaxEnergie: 0,
         bonusEnergie: 0,
@@ -584,6 +584,7 @@ function komboFensterMs() {
     let ms = KONFIG.basisKomboFensterMs + 100 * level("kombo") + 100 * segen("rhythmus") + 50 * level("kuhglocke") +
         30 * kuschel("schnecke");
     ms *= 1 + werkzeugWert("honigtopf");
+    ms *= 1 + 0.1 * sfLevel("ewigekombo");
     if (bossIst("nervoes")) ms *= 0.7;
     return Math.round(ms);
 }
@@ -634,7 +635,7 @@ function artenvielfalt() {
 }
 
 function goldMulti() {
-    const summe = 1 + 0.25 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + rangBonus() + 0.25 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
@@ -683,7 +684,7 @@ function rechnungsBetrag(nummer) {
         0.03 * kuschel("wal");
     const phase = run ? run.mondphase || 0 : 0;
     const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1);
-    const extra = phase >= 5 ? 3 : 0;
+    const extra = phase >= 5 ? 3 * (phase - 4) : 0; // Sternenmond, Sternenmond II ... je +x3
     let betrag = KONFIG.rechnungBasis;
     for (let i = 0; i < nummer; i++) betrag *= (KONFIG.rechnungFaktorenStart[i] || KONFIG.rechnungFaktor) + extra;
     return aufrunden(betrag * faktor * (run && run.koop ? KOOP_ANFORDERUNG : 1));
@@ -779,8 +780,40 @@ function meisterStufe(pflanzenId) {
     return MEISTER_SCHWELLEN.filter(schwelle => ernten >= schwelle).length;
 }
 
+// ---------- BAUERNRANG (dauerhaft, ueber alle Runs und Spielstaende) ----------
+// Jede Ernte gibt Erfahrung (hoehere Pflanzen mehr). Der Rang steigt ohne Ende: +1% Gold pro Rang,
+// alle 5 Raenge ein Kuschel-Gutschein.
+function rangSchwelle(rang) {
+    return rang <= 1 ? 0 : Math.round(60 * Math.pow(rang - 1, 1.8));
+}
+function bauernRang(xp = meta.bauernXp || 0) {
+    let rang = 1;
+    while (rangSchwelle(rang + 1) <= xp) rang += 1;
+    return rang;
+}
+function rangBonus() {
+    return 0.01 * (bauernRang() - 1);
+}
+function gibBauernXp(menge) {
+    const vorher = bauernRang();
+    meta.bauernXp = (meta.bauernXp || 0) + menge;
+    const jetzt = bauernRang();
+    if (jetzt <= vorher) return;
+    let gutscheine = 0;
+    for (let r = vorher + 1; r <= jetzt; r++) if (r % 5 === 0) gutscheine += 1;
+    meta.gutscheine += gutscheine;
+    zeigeBanner("🧑‍🌾", tf("Bauernrang {0}!", jetzt), tf("Für immer +{0}% Gold", jetzt - 1) +
+        (gutscheine ? " · +" + gutscheine + t(" Kuschel-Gutschein") : ""), "#2e9e2e", 3000);
+    if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
+}
+
+// Wert eines Meisterschafts-Levels (Sternenfall "Sternenmeister" macht ihn staerker)
+function meisterBonus() {
+    return MEISTER_BONUS + 0.02 * sfLevel("sternenmeister");
+}
+
 function verkaufswert(pflanze) {
-    return aufrunden(pflanze.verkaufswert * ertragMulti(pflanze) * (1 + MEISTER_BONUS * meisterStufe(pflanze.id)) *
+    return aufrunden(pflanze.verkaufswert * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
         (1 + level("pg_" + pflanze.id)));
 }
 
@@ -1771,7 +1804,8 @@ function berechneErnte(feld) {
     const sichel = hatWerkzeug("sichel") && run.ernteZaehler % 10 === 0 ? 1 + werkzeugWert("sichel") : 0;
     const mondschein = istNacht() ? 1 + 0.2 * segen("mondschein") + 0.05 * kuschel("flamingo") : 1;
     const nebel = wetterIst("nebel") ? 1.2 : 1;
-    const abend = tagesAnteil() > 2 / 3 ? 1 + 0.15 * level("abendsonne") : 1;
+    const abend = (tagesAnteil() > 2 / 3 ? 1 + 0.15 * level("abendsonne") : 1) *
+        (tagesAnteil() > 0.9 ? 1 + 0.5 * level("goldenestunde") : 1);
     const morgen = tagesAnteil() < 0.5 ? 1 + 0.2 * segen("morgenstund") : 1;
     const riesenwuchs = Math.random() < 0.1 * segen("riesenwuchs") ? 2 : 1;
     const erntefest = !run.sandbox && istRechnungsTag() ? 1 + level("erntefest") : 1;
@@ -1822,12 +1856,13 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     run.gesamt.ernten += 1;
     meta.lebenszeit.ernten += 1;
     const stufeVorher = meisterStufe(pflanze.id);
+    gibBauernXp(1 + pflanze.index);
     // Mondteich "Meisterhaende": jede Ernte zaehlt fuer die Meisterschaft oefter
     meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende");
     if (meisterStufe(pflanze.id) > stufeVorher) {
         const stufe = meisterStufe(pflanze.id);
         zeigeBanner(pflanze.emoji, pflanze.name + t(": Meisterschaft ") + stufe + "!",
-            t("Für immer +") + Math.round(MEISTER_BONUS * 100 * stufe) + t("% Wert für ") + pflanze.name, "#d49a00", 3500);
+            t("Für immer +") + Math.round(meisterBonus() * 100 * stufe) + t("% Wert für ") + pflanze.name, "#d49a00", 3500);
         Klang.jackpot();
     }
     if (variante) {
@@ -1897,6 +1932,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         if (plus > 0 && !direkt) zeigeSchwebeText(x + 20, y - 20, "+" + Math.round(plus) + " ⚡", "#c9a400", false);
     }
     leereFeld(feld);
+    // Stern "Saatkette": das Feld bekommt sofort einen neuen Samen
+    if (run.phase === "tag" && Math.random() < 0.08 * level("saatkette")) pflanzeSamen(feld);
     if (run.phase === "tag") wendePflanzenBonusAn(pflanze, x, y);
     if (variante && run.phase === "tag") wendeErnteEffekteAn(feld, variante, x, y);
 }
@@ -3216,11 +3253,12 @@ function starteTag(fortsetzen = false) {
     run.samenUnterwegs = false;
     run.haendler = null;
     helferAkku = 0;
-    kombo.zaehler = 0;
+    kombo.zaehler = 15 * level("morgenkombo"); // Stern "Morgen-Schwung"
     kombo.letzteStufe = 1;
+    if (kombo.zaehler > 0) kombo.letzterKlick = performance.now() + 2000; // kurz Zeit, bevor die Kombo abbricht
 
     verteileFeldEffekte();
-    pflanzeAufZufaelligeFelder(run.tagesBoni.samenregen ? run.felder.length : level("fruehaufsteher"));
+    pflanzeAufZufaelligeFelder(run.tagesBoni.samenregen ? run.felder.length : level("fruehaufsteher") + 2 * sfLevel("sternenwurzel"));
     const keimChance = 0.12 * segen("keimkraft");
     if (keimChance > 0) {
         run.felder.filter(f => f.leer && Math.random() < keimChance).forEach(pflanzeSamen);
@@ -3564,7 +3602,7 @@ function starteNeuenRun(sandbox = false) {
     });
 
     erstelleSlots();
-    const startFelder = 1 + metaLevel("startfelder");
+    const startFelder = 1 + metaLevel("startfelder") + sfLevel("kosmischefelder");
     run.startFelder = startFelder;
     for (let i = 0; i < startFelder; i++) erstelleFeld();
 

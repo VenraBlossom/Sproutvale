@@ -11376,3 +11376,13 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .patchnotes-version.neueste {
     color: #2e9e2e;
 }
+/* Bauernrang am Profil-Knopf */
+.profil-knopf-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.profil-rang {
+    font-size: 0.75em;
+    color: #ffe89a;
+}

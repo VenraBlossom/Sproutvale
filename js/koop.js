@@ -622,7 +622,7 @@ function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite, gespeichert = nul
     if (gespeichert) {
         koopWendeRunDatenAn(gespeichert);
     } else {
-        run.startFelder = 1 + metaLevel("startfelder");
+        run.startFelder = 1 + metaLevel("startfelder") + sfLevel("kosmischefelder");
         for (let i = 0; i < run.startFelder; i++) erstelleFeld(naechsterSlot(seite));
         run.pflanzen.slice(1, 1 + metaLevel("saatvorrat")).forEach(p => {
             p.freigeschaltet = true;

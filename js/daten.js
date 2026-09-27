@@ -690,6 +690,17 @@ const SKILLS = [
         t("Am Rechnungstag (jeder 5. Tag) gibt es +100% Gold aus allen Ernten."),
         () => "+" + prozentText(level("erntefest")) + t(" Gold am Rechnungstag")),
 
+    // ----- Mechanik-Sterne: neue Spielweisen statt nur Prozente (Platz wird automatisch frei gesucht) -----
+    stern("saatkette", "ernte", "🔗", [1180, -660], "doppelernte", t("Saatkette"), 2000, 2.2, 5,
+        t("+8% Chance pro Stufe, dass ein abgeerntetes Feld sofort einen neuen Samen bekommt."),
+        () => prozentText(0.08 * level("saatkette")) + t(" Chance auf Neupflanzung"), { autoPos: true }),
+    stern("goldenestunde", "hof", "🌅", [-220, 1400], "abendsonne", t("Goldene Stunde"), 2500, 2.5, 3,
+        t("In den letzten 10% des Tages geben Ernten +50% Gold pro Stufe."),
+        () => "+" + 50 * level("goldenestunde") + t("% Gold kurz vor Feierabend"), { autoPos: true }),
+    stern("morgenkombo", "helfer", "🌄", [-300, -220], "kombo", t("Morgen-Schwung"), 500, 2, 5,
+        t("Jeder Tag beginnt mit 15 Kombo pro Stufe (Stufe 5: gleich x3)."),
+        () => 15 * level("morgenkombo") + t(" Kombo zum Tagesstart"), { autoPos: true }),
+
     // ----- Grundwerte (unten links, am Hof): stärken alles, was du hast -----
     stern("g_gold", "hof", "🪙", [-700, 960], "sonnenuhr", t("Grundwert: Gold"), 400, 2, 10,
         t("+5% Gold aus allen Ernten."), () => "+" + prozentText(grundwert("g_gold")) + t(" Gold")),
@@ -879,7 +890,8 @@ const STERN_KURZ = {
     mondsichel: t("Nachts mehr Sternensaat"), milchstrasse: t("Zweite Sternensaat"), bienenkoenigin: t("Bienen öfter"),
     spielerglueck: t("Mehr Glück beim Spielen"),
     g_gold: t("Grundwert Gold"), g_sterne: t("Grundwert Sternensamen"), g_energie: t("Grundwert Energie"),
-    g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich")
+    g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich"),
+    saatkette: t("Feld sofort neu bepflanzt"), goldenestunde: t("Kurz vor Feierabend mehr Gold"), morgenkombo: t("Tag startet mit Kombo")
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -911,7 +923,8 @@ const STERN_WIRKUNG = {
     jackpotjaeger: s => "x" + (1 + s) + t(" legendäre Saat"), goldschauer: s => "+" + 50 * s + t("% Goldregen"),
     schnuppenfaenger: s => "+" + 3 * s + t(" Sek. Bonus"), kombovirtuose: s => t("Kombo bis x") + (5 + s),
     g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
-    g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles")
+    g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles"),
+    saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo")
 };
 
 SKILLS.forEach(def => {
@@ -1021,7 +1034,7 @@ const SEGEN_NACH_ID = Object.fromEntries(SEGEN.map(s => [s.id, s]));
 // Jede Pflanze sammelt ueber alle Runs Ernten. Bei diesen Zahlen steigt ihre Meisterschaft um 1 Stufe,
 // jede Stufe gibt dauerhaft +8% Verkaufswert fuer genau diese Pflanze.
 
-const MEISTER_SCHWELLEN = [50, 250, 1000, 3000, 8000, 20000, 50000];
+const MEISTER_SCHWELLEN = [50, 250, 1000, 3000, 8000, 20000, 50000, 120000, 300000, 700000, 1500000, 3000000];
 const MEISTER_BONUS = 0.08;
 
 // ---------- MONDPHASEN (Schwierigkeitsstufen) ----------
@@ -1035,7 +1048,12 @@ const MONDPHASEN = [
     { symbol: "🌓", name: t("Halbmond"), text: t("Jede 2. Rechnung ist ein Kredit mit Auflage.") },
     { symbol: "🌔", name: t("Dreiviertelmond"), text: t("10% weniger Energie pro Tag.") },
     { symbol: "🌕", name: t("Vollmond"), text: t("Es kommen mehr Krähen, und Segen gibt es nur noch 3 zur Auswahl.") },
-    { symbol: "✨", name: t("Sternenmond"), text: t("Jede Rechnung steigt um x3 mehr als sonst (z.B. x28 statt x25).") }
+    { symbol: "✨", name: t("Sternenmond"), text: t("Jede Rechnung steigt um x3 mehr als sonst (z.B. x28 statt x25).") },
+    { symbol: "🌟", name: t("Sternenmond II"), text: t("Jede Rechnung steigt um weitere x3.") },
+    { symbol: "💫", name: t("Sternenmond III"), text: t("Jede Rechnung steigt um weitere x3.") },
+    { symbol: "🌠", name: t("Sternenmond IV"), text: t("Jede Rechnung steigt um weitere x3.") },
+    { symbol: "☄️", name: t("Sternenmond V"), text: t("Jede Rechnung steigt um weitere x3.") },
+    { symbol: "🌌", name: t("Sternenmond VI"), text: t("Jede Rechnung steigt um weitere x3.") }
 ];
 const MONDPHASE_BONUS = 0.3;          // +30% Mondblueten pro Phase
 const MONDPHASE_FREI_AB_RECHNUNGEN = 6;
@@ -1987,7 +2005,17 @@ const STERNENFALL_UPGRADES = [
     { id: "kometenschweif", name: t("Kometenschweif"), symbol: "☄️", basiskosten: 4, faktor: 2.5, max: 3,
         beschreibung: t("Jeder Run startet mit einem zufälligen Werkzeug."), info: lvl => lvl + t(" Werkzeuge zum Start") },
     { id: "himmelsgabe", name: t("Himmelsgabe"), symbol: "🎁", basiskosten: 3, faktor: 3, max: 3,
-        beschreibung: t("Jeder Sternenfall schenkt dir 5 Kuschel-Gutscheine."), info: lvl => 5 * lvl + t(" Gutscheine pro Sternenfall") }
+        beschreibung: t("Jeder Sternenfall schenkt dir 5 Kuschel-Gutscheine."), info: lvl => 5 * lvl + t(" Gutscheine pro Sternenfall") },
+    { id: "sternenrucksack", name: t("Sternenrucksack"), symbol: "🎒", basiskosten: 2, faktor: 1.6, max: 10,
+        beschreibung: t("Jeder Run startet mit 250 Sternensamen mehr."), info: lvl => "+" + 250 * lvl + t(" Sternensamen") },
+    { id: "kosmischefelder", name: t("Kosmische Felder"), symbol: "🟫", basiskosten: 3, faktor: 2.5, max: 3,
+        beschreibung: t("Jeder Run startet mit einem Feld mehr (zusätzlich zum Mondteich)."), info: lvl => "+" + lvl + t(" Felder") },
+    { id: "sternenwurzel", name: t("Sternenwurzel"), symbol: "🌱", basiskosten: 2, faktor: 1.9, max: 5,
+        beschreibung: t("Jeder Tag beginnt mit 2 gepflanzten Samen mehr."), info: lvl => "+" + 2 * lvl + t(" Samen zum Tagesstart") },
+    { id: "ewigekombo", name: t("Ewige Kombo"), symbol: "🥁", basiskosten: 2, faktor: 1.8, max: 5,
+        beschreibung: t("Die Kombo hält 10% länger."), info: lvl => "+" + 10 * lvl + t("% Kombo-Zeit") },
+    { id: "sternenmeister", name: t("Sternenmeister"), symbol: "🏅", basiskosten: 4, faktor: 2.2, max: 5,
+        beschreibung: t("Jede Meisterschafts-Stufe einer Pflanze gibt +2% mehr Wert (sonst +8%)."), info: lvl => "+" + (8 + 2 * lvl) + t("% pro Meisterschafts-Stufe") }
 ];
 
 // ---------- SPIELMODI ----------
