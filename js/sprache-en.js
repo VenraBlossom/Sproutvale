@@ -2892,7 +2892,16 @@ Object.assign(UEBERSETZUNG, {
     "Wikingerhelm": "Viking Helmet",
     "Partyhut": "Party Hat",
     "Hasenohren": "Bunny Ears",
-    "Einhorn-Horn": "Unicorn Horn"
+    "Einhorn-Horn": "Unicorn Horn",
+    "Sproutvale Tagblatt": "Sproutvale Daily",
+    "Ausgabe {0}": "Issue {0}",
+    "Preis: 1 Weizen": "Price: 1 wheat",
+    "Neu in {0}!": "New in {0}!",
+    "Aus dem Dorf: ": "From the village: ",
+    "◀ Neuere": "◀ Newer",
+    "Ältere ▶": "Older ▶",
+    "📰 Neuigkeiten": "📰 News",
+    "📰 Neuigkeiten: Was ist neu in Sproutvale?": "📰 News: what's new in Sproutvale?"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

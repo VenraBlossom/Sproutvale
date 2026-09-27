@@ -396,28 +396,70 @@ requestAnimationFrame(hauptSchleife);
 
 // Patch Notes: Klick auf die Versionsnummer, und nach einem Update einmal von selbst (nicht beim allerersten Start).
 // Alle Versionen untereinander (neueste oben), das Fenster scrollt.
-function zeigeNeuigkeiten() {
-    const inhalt = el("div", "patchnotes");
-    NEUIGKEITEN.forEach((eintrag, i) => {
-        inhalt.appendChild(el("div", "patchnotes-version" + (i === 0 ? " neueste" : ""), eintrag.version));
-        inhalt.appendChild(el("ul", "neuigkeiten-liste", null, eintrag.punkte.map(punkt => el("li", null, punkt))));
-    });
-    zeigePopup({
-        titel: t("📜 Patch Notes"),
-        farbe: "#2e9e2e",
-        breite: 640,
-        klasse: "patchnotes-fenster",
-        inhalt,
+// Patch Notes als Dorfzeitung (wie der Newsletter in Hay Day): jede Version ist eine Ausgabe
+function zeigeNeuigkeiten(ausgabe = 0) {
+    const eintrag = NEUIGKEITEN[ausgabe];
+    const blatt = el("div", "zeitung-blatt");
+    // Kopf der Zeitung
+    blatt.appendChild(el("div", "zeitung-kopf", null, [
+        el("div", "zeitung-name", t("Sproutvale Tagblatt")),
+        el("div", "zeitung-zeile", null, [
+            el("span", null, tf("Ausgabe {0}", NEUIGKEITEN.length - ausgabe)),
+            el("span", null, eintrag.version),
+            el("span", null, t("Preis: 1 Weizen"))
+        ])
+    ]));
+    // Titelgeschichte = erster Punkt, Rest in Spalten
+    const [titel, ...rest] = eintrag.punkte;
+    blatt.appendChild(el("div", "zeitung-titel", ausgabe === 0 ? tf("Neu in {0}!", eintrag.version) : eintrag.version));
+    blatt.appendChild(el("div", "zeitung-aufmacher", titel));
+    if (rest.length) blatt.appendChild(el("div", "zeitung-spalten", null, rest.map(punkt => el("div", "zeitung-meldung", punkt))));
+    // Kleine Rubrik mit einer Schlagzeile aus der Dorfzeitung
+    const dorf = DORFZEITUNG.map(f => { try { return f(meta, run); } catch (fehler) { return null; } }).filter(Boolean);
+    if (dorf.length) blatt.appendChild(el("div", "zeitung-dorf", null, [el("b", null, t("Aus dem Dorf: ")), el("span", null, zufall(dorf))]));
+    // Blaettern durch alte Ausgaben
+    const blaettern = el("div", "zeitung-blaettern");
+    let schliessen = null;
+    const knopf = (text, ziel) => {
+        const k = el("button", "knopf zeitung-knopf", text);
+        k.disabled = ziel < 0 || ziel >= NEUIGKEITEN.length;
+        k.addEventListener("click", () => {
+            if (schliessen) schliessen();
+            zeigeNeuigkeiten(ziel);
+        });
+        return k;
+    };
+    blaettern.append(knopf(t("◀ Neuere"), ausgabe - 1), el("span", null, (ausgabe + 1) + " / " + NEUIGKEITEN.length), knopf(t("Ältere ▶"), ausgabe + 1));
+    blatt.appendChild(blaettern);
+    Klang.klick(8);
+    schliessen = zeigePopup({
+        titel: t("📰 Neuigkeiten"),
+        farbe: "#8a5a2c",
+        breite: 660,
+        klasse: "zeitung-fenster",
+        inhalt: blatt,
         knoepfe: [{ text: t("Weiter spielen"), klasse: "knopf-gruen" }]
     });
+    meta.neuigkeitenGelesen = SPIEL_VERSION;
+    speichereMeta();
+    aktualisiereZeitungKnopf();
 }
+
+function aktualisiereZeitungKnopf() {
+    const knopf = $("menue-zeitung");
+    if (knopf) knopf.classList.toggle("ungelesen", meta.neuigkeitenGelesen !== SPIEL_VERSION);
+}
+$("menue-zeitung").appendChild(pixelIcon("📰", 40));
+$("menue-zeitung").addEventListener("click", () => zeigeNeuigkeiten(0));
+setzeTipp($("menue-zeitung"), t("📰 Neuigkeiten: Was ist neu in Sproutvale?"));
+aktualisiereZeitungKnopf();
 $("menue-version").textContent = SPIEL_VERSION + " · " + t("Patch Notes");
-$("menue-version").addEventListener("click", zeigeNeuigkeiten);
+$("menue-version").addEventListener("click", () => zeigeNeuigkeiten(0));
 if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
     const schonGespielt = (meta.lebenszeit && meta.lebenszeit.tage > 0) || meta.mondblueten > 0;
     meta.neuigkeitenGesehen = SPIEL_VERSION;
     speichereMeta();
-    if (schonGespielt && NEUIGKEITEN[0].version === SPIEL_VERSION) setTimeout(zeigeNeuigkeiten, 600);
+    if (schonGespielt && NEUIGKEITEN[0].version === SPIEL_VERSION) setTimeout(() => zeigeNeuigkeiten(0), 600);
 }
 
 // Auto-Patcher (Desktop-App): ein neues Update ist geladen, jetzt neu laden?

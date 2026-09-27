@@ -11876,3 +11876,146 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     80% { rotate: 10deg; filter: drop-shadow(0 0 10px rgba(255, 170, 60, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
     90% { rotate: -6deg; }
 }
+
+/* ---------- Neuigkeiten als Dorfzeitung ---------- */
+.menue-zeitung {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 56px;
+    height: 56px;
+    border: 3px solid #6b4220;
+    border-radius: 12px;
+    background: linear-gradient(#fff8e4, #f0dfb4);
+    box-shadow: 0 4px 0 #4a2f15;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.12s ease;
+}
+.menue-zeitung:hover {
+    transform: translateX(-50%) translateY(-3px) rotate(-4deg);
+}
+.menue-zeitung.ungelesen::after {
+    content: "!";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e8434a;
+    color: #fff;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: center;
+    box-shadow: 0 2px 0 #7a1418;
+    animation: zeitung-hopsen 1.2s ease-in-out infinite;
+}
+@keyframes zeitung-hopsen {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+.zeitung-blatt {
+    background: #f6ecd2;
+    background-image: repeating-linear-gradient(0deg, rgba(120, 90, 40, 0.04) 0 1px, transparent 1px 4px);
+    color: #2e2418;
+    padding: 14px 18px 10px;
+    border: 1px solid #c8b088;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    transform: rotate(-0.4deg);
+    max-height: 62vh;
+    overflow-y: auto;
+    text-align: left;
+}
+.zeitung-kopf {
+    text-align: center;
+    border-bottom: 3px double #2e2418;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+.zeitung-name {
+    font-family: "Jersey 15", serif;
+    font-size: 2.4em;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+.zeitung-zeile {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75em;
+    border-top: 1px solid #2e2418;
+    margin-top: 4px;
+    padding-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.zeitung-titel {
+    font-weight: 900;
+    font-size: 1.5em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+.zeitung-aufmacher {
+    font-size: 1.02em;
+    line-height: 1.4;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #8a7a5a;
+    margin-bottom: 8px;
+}
+.zeitung-aufmacher::first-letter {
+    font-family: "Jersey 15", serif;
+    font-size: 2.4em;
+    float: left;
+    line-height: 0.9;
+    margin: 2px 6px 0 0;
+    color: #8a2a18;
+}
+.zeitung-spalten {
+    column-count: 2;
+    column-gap: 18px;
+    column-rule: 1px solid #b8a47a;
+    font-size: 0.88em;
+    line-height: 1.4;
+}
+.zeitung-meldung {
+    break-inside: avoid;
+    margin-bottom: 8px;
+    padding-left: 10px;
+    position: relative;
+}
+.zeitung-meldung::before {
+    content: "■";
+    position: absolute;
+    left: 0;
+    font-size: 0.6em;
+    top: 3px;
+    color: #8a5a2c;
+}
+.zeitung-dorf {
+    margin-top: 8px;
+    padding: 6px 8px;
+    border: 1px dashed #8a7a5a;
+    font-size: 0.85em;
+    font-style: italic;
+}
+.zeitung-blaettern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 0.85em;
+}
+.zeitung-knopf {
+    font-size: 0.85em;
+    padding: 3px 10px;
+}
+.zeitung-knopf:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
