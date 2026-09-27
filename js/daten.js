@@ -89,6 +89,7 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe."),
         t("Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet)."),
         t("Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei."),
         t("Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold."),
@@ -1459,6 +1460,19 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#ffc98a", 2: "#f0923a", 3: "#c0601a", 4: "#fff4e2", 5: "#2e1a09", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "kuerbiskatze", name: t("Kürbiskatze"), art: "katze", stil: { kuerbishut: true }, quelle: "dlc", paket: "unterstuetzer",
         farben: { 1: "#4a4a5a", 2: "#2e2e38", 3: "#1c1c24", 4: "#55556a", 5: "#f08a24", 6: "#ff9aa8", 7: "#0b0b10" } },
+    // Neue epische Begleiter: jeder mit eigener Kombination aus Form und Zubehoer
+    { id: "winterhase", name: t("Winterhase"), art: "katze", stil: { hase: true, muetze: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.35,
+        farben: { 1: "#ffffff", 2: "#eef2f8", 3: "#b8c4d6", 4: "#ffffff", 5: "#2a3450", 6: "#ffb3c0", 7: "#7a869a" } },
+    { id: "kuerbishund", name: t("Kürbishund"), art: "katze", stil: { hund: true, kuerbishut: true, keineStreifen: true }, laut: "wuff", quelle: "dlc", paket: "unterstuetzer",
+        farben: { 1: "#fff0d8", 2: "#b0763a", 3: "#5a3418", 4: "#fff8ee", 5: "#2e1a09", 6: "#ff8fa3", 7: "#3a2210" } },
+    { id: "teufelsfuchs", name: t("Teufelchen"), art: "katze", stil: { fuchs: true, teufel: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.15,
+        farben: { 1: "#ff9a8a", 2: "#c8302a", 3: "#3a0e10", 4: "#ffd8d0", 5: "#ffd23a", 6: "#ff8fa3", 7: "#2a0608" } },
+    { id: "kuhkatze", name: t("Kuhkatze"), art: "katze", stil: { flecken: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 0.95,
+        farben: { 1: "#ffffff", 2: "#f8f8f8", 3: "#1c1c24", 4: "#ffffff", 5: "#2e1a09", 6: "#ffb3c0", 7: "#1c1c24" } },
+    { id: "schleifenhase", name: t("Schleifenhase"), art: "katze", stil: { hase: true, schleife: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.45,
+        farben: { 1: "#ffe0ec", 2: "#f5c0d4", 3: "#c87a9a", 4: "#fff4f8", 5: "#4a1a2a", 6: "#ff8fb1", 7: "#8a4a62" } },
+    { id: "pandawelpe", name: t("Panda-Welpe"), art: "katze", stil: { hund: true, panda: true, keineStreifen: true }, laut: "wuff", quelle: "dlc", paket: "unterstuetzer", stimme: 1.2,
+        farben: { 1: "#ffffff", 2: "#f2f2f2", 3: "#1c1c22", 4: "#ffffff", 5: "#f2f2f2", 6: "#ffb3c0", 7: "#1c1c22" } },
     // Blockmenschen in den Skins von BastiGHG und Papaplatte (mit Erlaubnis), Kloetzchen-Figuren mit eigenen Animationen
     { id: "basti", name: "787", art: "blockmensch", stil: { anzug: true }, laut: "block", quelle: "dlc", paket: "unterstuetzer",
         idle: "block", effekt: "bloecke",

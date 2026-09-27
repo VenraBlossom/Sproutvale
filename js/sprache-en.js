@@ -2717,7 +2717,14 @@ Object.assign(UEBERSETZUNG, {
     "10 Rechnungen früher bezahlt": "Paid 10 bills early",
     "Hüter des Weltenbaums": "Keeper of the World Tree",
     "Einen Weltenbaum geerntet": "Harvested a World Tree",
-    "Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet).": "Character editor: new Face category (freckles, beard, star cheeks …), custom colors for clothes and eyes, titles below your name (unlocked through progress)."
+    "Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet).": "Character editor: new Face category (freckles, beard, star cheeks …), custom colors for clothes and eyes, titles below your name (unlocked through progress).",
+    "Winterhase": "Winter Bunny",
+    "Kürbishund": "Pumpkin Dog",
+    "Teufelchen": "Little Devil",
+    "Kuhkatze": "Cow Cat",
+    "Schleifenhase": "Bow Bunny",
+    "Panda-Welpe": "Panda Pup",
+    "Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe.": "New epic companions: Winter Bunny, Pumpkin Dog, Little Devil, Cow Cat, Bow Bunny and Panda Pup."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
