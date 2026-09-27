@@ -84,10 +84,25 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.0.1";
+const SPIEL_VERSION = "Beta 0.1.0";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.1.0", punkte: [
+        t("Patch Notes sind jetzt eine Dorfzeitung (Sproutvale Tagblatt) mit Zeitungs-Knopf unten links im Hauptmenü."),
+        t("Hof-Stile: Ab dem 2. Run wählst du zu Beginn 1 von 3 Stilen, die den Run verändern."),
+        t("Pakte: riskante Segen mit Vor- und Nachteil (rote Karten)."),
+        t("Herausforderungen im Mondteich (ab 3 Runs): Runs mit Einschränkung und dauerhaftem Bonus."),
+        t("Werkzeug-Evolutionen: Werkzeug + passender Segen = doppelt so stark."),
+        t("Erntefieber, Briefe aus dem Dorf, Dorfzeitung am Feierabend und Feiertage nach echtem Datum."),
+        t("Neue Kosmetik-Kategorie Haus: 14 Bauernhaus-Skins."),
+        t("Viel neue Kosmetik: Saat-Skins, Samenläden, Landschaften, Begleiter, Hüte, Kleidung und Accessoires."),
+        t("Beta-Tester bekommen den mythischen Begleiter „Beta Tester“ (bleibt auch nach dem Release)."),
+        t("Level geben keine Spielvorteile mehr, nur Auren (alle 10 Level stärker). Regenbogen-Aura läuft jetzt richtig durch."),
+        t("Neue Preise: legendäre Skins 50 Kristalle, Unterstützer-Paket 4,99 €. Nur Kosmetik, kein Pay-to-Win."),
+        t("Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen."),
+        t("Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.")
+    ] },
     { version: "Beta 0.0.1", punkte: [
         t("Neues Intro: eine Arcade-Halle, der Automat zeigt „Venray Studios presents“."),
         t("Level statt Bauernrang: Erfahrung gibt es für fast alles (Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere, Erfolge). Level 100 ist ein Langzeit-Ziel, danach geht es endlos weiter."),

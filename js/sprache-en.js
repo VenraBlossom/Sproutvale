@@ -2998,7 +2998,20 @@ Object.assign(UEBERSETZUNG, {
     "Hexenkatze": "Witch Cat",
     "Mondwolf": "Moon Wolf",
     "Goldhase": "Golden Bunny",
-    "Der Code hat {0} Zeichen.": "The code has {0} characters."
+    "Der Code hat {0} Zeichen.": "The code has {0} characters.",
+    "Patch Notes sind jetzt eine Dorfzeitung (Sproutvale Tagblatt) mit Zeitungs-Knopf unten links im Hauptmenü.": "Patch notes are now a village newspaper (Sproutvale Daily) with a newspaper button in the bottom left of the main menu.",
+    "Hof-Stile: Ab dem 2. Run wählst du zu Beginn 1 von 3 Stilen, die den Run verändern.": "Farm styles: from your 2nd run you pick 1 of 3 styles at the start that change the run.",
+    "Pakte: riskante Segen mit Vor- und Nachteil (rote Karten).": "Pacts: risky blessings with an upside and a downside (red cards).",
+    "Herausforderungen im Mondteich (ab 3 Runs): Runs mit Einschränkung und dauerhaftem Bonus.": "Challenges in the Moon Pond (after 3 runs): restricted runs with a permanent bonus.",
+    "Werkzeug-Evolutionen: Werkzeug + passender Segen = doppelt so stark.": "Tool evolutions: tool + matching blessing = twice as strong.",
+    "Erntefieber, Briefe aus dem Dorf, Dorfzeitung am Feierabend und Feiertage nach echtem Datum.": "Harvest Fever, letters from the village, a village paper at the end of the day and holidays by real date.",
+    "Neue Kosmetik-Kategorie Haus: 14 Bauernhaus-Skins.": "New cosmetic category House: 14 farmhouse skins.",
+    "Viel neue Kosmetik: Saat-Skins, Samenläden, Landschaften, Begleiter, Hüte, Kleidung und Accessoires.": "Lots of new cosmetics: drop skins, seed stalls, landscapes, companions, hats, clothes and accessories.",
+    "Beta-Tester bekommen den mythischen Begleiter „Beta Tester“ (bleibt auch nach dem Release).": "Beta testers get the mythic companion „Beta Tester“ (kept after release).",
+    "Level geben keine Spielvorteile mehr, nur Auren (alle 10 Level stärker). Regenbogen-Aura läuft jetzt richtig durch.": "Levels no longer give gameplay advantages, only auras (stronger every 10 levels). The rainbow aura now cycles properly.",
+    "Neue Preise: legendäre Skins 50 Kristalle, Unterstützer-Paket 4,99 €. Nur Kosmetik, kein Pay-to-Win.": "New prices: legendary skins 50 crystals, Supporter Pack 4.99 €. Cosmetic only, no pay-to-win.",
+    "Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen.": "All emojis in the game are now pixel art. Lobby codes only have 5 characters.",
+    "Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.": "Fixes: crows could not land, Glowshroom House could not be selected, aura was lost when loading."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
