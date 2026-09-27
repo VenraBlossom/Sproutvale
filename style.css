@@ -11064,3 +11064,12 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     background: rgba(255, 255, 255, 0.4);
     border-radius: 6px;
 }
+
+/* Reihenfolge auf dem Hof: Deko hinten, dann die Figur, ganz vorne die Begleiter */
+.figur-mensch {
+    z-index: 1;
+}
+.haustier,
+.figur-begleiter {
+    z-index: 2;
+}

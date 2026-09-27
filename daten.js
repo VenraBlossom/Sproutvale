@@ -1405,7 +1405,8 @@ const MUSIK_TITEL = [
 // ankunft = Farben der kleinen Explosion, wenn ein Wurf auf dem Feld landet, drehen = Wurf zeigt in Flugrichtung
 const SAMENLADEN_SKINS = [
     { id: "standard", name: t("Rot-Weiß"), quelle: "frei", markise: ["#d9483f", "#fff1d6"], holz: ["#b87a3e", "#9e6530"] },
-    { id: "blau", name: t("Blau-Weiß"), quelle: "dlc", paket: "unterstuetzer", markise: ["#3f7fd9", "#f2f7ff"], holz: ["#b87a3e", "#9e6530"] },
+    { id: "blau", name: t("Blau-Weiß"), quelle: "erspielt", bedingungText: t("Klicke 50.000-mal auf den Samenladen"),
+        bedingung: () => meta.lebenszeit.klicks >= 50000, markise: ["#3f7fd9", "#f2f7ff"], holz: ["#b87a3e", "#9e6530"] },
     { id: "markt", name: t("Bauernmarkt"), quelle: "dlc", paket: "unterstuetzer", markise: ["#4a9a3a", "#f2fff0"], holz: ["#b87a3e", "#9e6530"],
         bauweise: "kisten", funken: ["#a3dc6f", "#ffffff"] },
     { id: "beerenbusch", name: t("Beerenbusch"), quelle: "dlc", paket: "unterstuetzer", markise: ["#4f9a34", "#e8434a"], holz: ["#4f9a34", "#2f6b24"],
@@ -1416,7 +1417,8 @@ const SAMENLADEN_SKINS = [
         bauweise: "truhe", funken: ["#ffd93d", "#fff3b0", "#ffffff"] },
     { id: "kirschbluete", name: t("Kirschblüte"), quelle: "dlc", paket: "unterstuetzer", markise: ["#ff8fb8", "#fff0f6"], holz: ["#c98a8a", "#a86a6a"],
         bauweise: "kirschbaum", funken: ["#ffc2da", "#ff8fb8", "#ffffff"] },
-    { id: "wiese", name: t("Wiesenstand"), quelle: "dlc", paket: "unterstuetzer", markise: ["#7cbf4d", "#fff6a0"], holz: ["#9a7a4a", "#7a5a30"],
+    { id: "wiese", name: t("Wiesenstand"), quelle: "erspielt", bedingungText: t("Ernte insgesamt 100.000 Pflanzen"),
+        bedingung: () => meta.lebenszeit.ernten >= 100000, markise: ["#7cbf4d", "#fff6a0"], holz: ["#9a7a4a", "#7a5a30"],
         funken: ["#a3dc6f", "#fff6a0", "#ffffff"] },
     { id: "honig", name: t("Honigstand"), quelle: "dlc", paket: "unterstuetzer", markise: ["#f5c542", "#fff5d6"], holz: ["#c98a3a", "#a86a2a"],
         bauweise: "bienenkorb", funken: ["#ffd93d", "#f5a623", "#fff5d6"] },
