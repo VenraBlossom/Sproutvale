@@ -11,19 +11,7 @@
 <body>
     <!-- Intro: Arcade-Automat schaltet sich ein und zeigt das Studio-Logo (Klick ueberspringt) -->
     <div id="intro">
-        <div class="arcade">
-            <div class="arcade-marquee">SPROUTVALE</div>
-            <div class="arcade-bildschirm-rahmen">
-                <div class="arcade-bildschirm">
-                    <img class="intro-logo" src="assets/Venray Studios.png" alt="">
-                    <div class="intro-text" data-kein-i18n>Venray Studios presents</div>
-                </div>
-            </div>
-            <div class="arcade-steuerung">
-                <div class="arcade-stick"></div>
-                <div class="arcade-tasten"><span></span><span></span></div>
-            </div>
-        </div>
+        <canvas id="intro-leinwand" width="480" height="270"></canvas>
     </div>
     <div id="crt-filter"></div>
     <!-- Kopfbereich: Himmel (Tageszeit), Sonne/Mond, Wolken, Hof-Landschaft, Haustier und Deko, oben die Holzleiste -->
