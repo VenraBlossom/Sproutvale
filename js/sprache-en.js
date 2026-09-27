@@ -2644,7 +2644,31 @@ Object.assign(UEBERSETZUNG, {
     " Ernten pro Boden-Stufe": " harvests per soil level",
     "Boden wird schneller fruchtbar": "Soil gets fertile faster",
     " Ernten pro Stufe": " harvests per level",
-    "Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde.": "New mechanic Fertile Soil: every field improves through harvests (up to level 5, +10% gold per level), plus the Soil Science star."
+    "Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde.": "New mechanic Fertile Soil: every field improves through harvests (up to level 5, +10% gold per level), plus the Soil Science star.",
+    "Erntekorb": "Harvest Basket",
+    "+1 Gold für jede Ernte.": "+1 gold for every harvest.",
+    " Gold pro Ernte": " gold per harvest",
+    "Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr.": "Unlocks the Stellarium forever: there you spend Star Drops on new plants, colored drops, helpers and much more.",
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 1.000 Gold).": "✨ You unlock the Stellarium in the market (General, 1,000 gold).",
+    "Stellarium freigeschaltet!": "Stellarium unlocked!",
+    "Oben rechts: neue Pflanzen, bunte Saaten, Helfer und mehr": "Top right: new plants, colored drops, helpers and more",
+    "Die Sternensaat sammelst du jetzt schon. Später gibst du sie im Stellarium aus: für neue Pflanzen, bunte Saaten und Helfer. ": "You already collect Star Drops. Later you spend them in the Stellarium: on new plants, colored drops and helpers. ",
+    "Das Stellarium schaltest du im Markt frei, sobald du 1.000 Gold hast.": "You unlock the Stellarium in the market as soon as you have 1,000 gold.",
+    "Verstanden": "Got it",
+    "Stufe 1 schaltet ungewöhnliche Saaten frei (grün, x2,5 Gold, 15% Chance). Jede weitere Stufe: +3% Chance.": "Level 1 unlocks uncommon drops (green, x2.5 gold, 15% chance). Every further level: +3% chance.",
+    "Stufe 1 schaltet seltene Saaten frei (blau, x5 Gold). Jede Stufe: +2% Chance.": "Level 1 unlocks rare drops (blue, x5 gold). Every level: +2% chance.",
+    "Stufe 1 schaltet epische Saaten frei (lila, x12,5 Gold, 3% Chance). Jede weitere Stufe: +1% Chance.": "Level 1 unlocks epic drops (purple, x12.5 gold, 3% chance). Every further level: +1% chance.",
+    "Stufe 1 schaltet legendäre Saat frei (gelb, x50 Gold, vor der 2. Rechnung x25, 1% Chance). Jede weitere Stufe: +0,5% Chance.": "Level 1 unlocks Legendary Drops (yellow, x50 gold, x25 before the 2nd bill, 1% chance). Every further level: +0.5% chance.",
+    "Mehr Energie pro Tag. Jede Stufe bringt mehr als die davor.": "More energy per day. Every level gives more than the one before.",
+    "Rechnungen werden billiger. Jede Stufe bringt mehr als die davor.": "Bills get cheaper. Every level gives more than the one before.",
+    "Mehr Gold aus allen Ernten. Jede Stufe bringt mehr als die davor.": "More gold from all harvests. Every level gives more than the one before.",
+    "+25 Gold zu Beginn jedes Runs. Dazu nach jeder bezahlten Rechnung ein Teil der nächsten Rechnung als Geschenk (jede Stufe mehr als die davor).": "+25 gold at the start of every run. Plus, after every paid bill, part of the next bill as a gift (every level more than the one before).",
+    "+100 Sternensamen zu Beginn jedes Runs und mehr Sternensamen aus allen Ernten (jede Stufe mehr als die davor).": "+100 Star Seeds at the start of every run and more Star Seeds from all harvests (every level more than the one before).",
+    "Chance, dass eine Saat oder Sternensaat doppelt zählt. Jede Stufe bringt mehr als die davor.": "Chance that a drop or Star Drop counts double. Every level gives more than the one before.",
+    " der nächsten Rechnung": " of the next bill",
+    "Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei.": "New start: at first only clicking, waiting and the market (new: Harvest Basket, +1 gold per harvest). You unlock the Stellarium in the market for 1,000 gold.",
+    "Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold.": "Colored drops now have to be unlocked in the Stellarium (level 1 of each color). Wheat is worth 1 gold at first, the first bills are 30, 150 and 1,500 gold.",
+    "Mondteich: Fruchtbarer Hof, Ausdauer, Verhandlungsgeschick, Startkapital, Bauernweisheit und Reiche Ernte werden mit jeder Stufe stärker als vorher.": "Moon Pond: Fertile Farm, Stamina, Negotiation Skill, Starting Capital, Farmer's Wisdom and Rich Harvest get stronger with every level than before."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -115,7 +115,7 @@ function leererKodex() {
 
 function leererMetaStand() {
     return {
-        mondblueten: 0, gutscheine: 0, upgrades: {}, tarot: [], tarotVerbessert: [], tarotSlots: [],
+        mondblueten: 0, gutscheine: 0, upgrades: {}, tarot: [], tarotVerbessert: [], tarotSlots: [], stellariumFrei: false,
         kuscheltiere: {}, kuschelZuegeBezahlt: 0,
         erfolge: {}, erfolgeAbgeholt: {}, lebenszeit: leereLebenszeit(), besterRun: null, kodex: leererKodex(),
         sternenfaelle: 0, sternensplitter: 0, sternenfallUpgrades: {}, mondbluetenSeitSternenfall: 0,
@@ -137,6 +137,8 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 ...daten,
                 // alte Spielstaende: die dauerhafte Waehrung hiess vorher "Sternensamen" bzw. "Prestige"
                 mondblueten: daten.mondblueten ?? daten.sternensamen ?? daten.prestige ?? 0,
+                // Stellarium: alte Spielstaende (ohne Eintrag) haben es frei, wenn schon gespielt wurde
+                stellariumFrei: daten.stellariumFrei ?? Boolean(daten.lebenszeit && (daten.lebenszeit.runs > 0 || daten.lebenszeit.gold >= 1000)),
                 upgrades: { ...daten.upgrades },
                 tarot: Array.isArray(daten.tarot) ? daten.tarot : [],
                 tarotVerbessert: Array.isArray(daten.tarotVerbessert) ? daten.tarotVerbessert : [],
@@ -544,7 +546,7 @@ function energieMax() {
     let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
-    energie *= (1 + 0.1 * metaLevel("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
+    energie *= (1 + metaWert("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
     energie *= 1 + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     energie *= 1 + 0.03 * kuschel("faultier");
@@ -557,14 +559,15 @@ function energieMax() {
 // [Gewoehnlich, Ungewoehnlich, Selten, Episch, Legendaer]
 function raritaetsChancen() {
     const fruehling = run && jahreszeit().id === "fruehling" ? level("bluetenzauber") : 0;
-    const gruen = 0.20 + 0.03 * level("gruen") + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
+    // Am Anfang gibt es nur gewoehnliche Saat: jede Farbe schaltet ihr Stern im Stellarium erst frei (Stufe 1)
+    const gruen = (level("gruen") > 0 ? 0.12 + 0.03 * level("gruen") : 0) + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
-    const lila = 0.04 + 0.01 * level("lila") + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
-    const gelb = 0.01 + 0.005 * level("gelb") + 0.01 * segen("jackpotfieber") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
+    const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
+    const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
-function glueckChance() { return 0.05 * level("glueck") + 0.1 * level("glueck2") + werkzeugWert("kleeblatt") + gachaBonus("glueck") + 0.04 * metaLevel("reicheernte"); }
+function glueckChance() { return 0.05 * level("glueck") + 0.1 * level("glueck2") + werkzeugWert("kleeblatt") + gachaBonus("glueck") + metaWert("reicheernte"); }
 function helferKlicksProSek() { return level("eichhoernchen") + 2 * level("eichhoernchen2") + 0.5 * kuschel("eichhoernchen"); }
 function edelsteinBonus() { return 0.1 * level("edelstein"); }
 function sternensamenProKlick() { return KONFIG.sternensamenProKlick + 0.25 * level("sternenklick") + 0.5 * segen("klingeling"); }
@@ -638,7 +641,7 @@ function artenvielfalt() {
 }
 
 function goldMulti() {
-    const summe = 1 + rangBonus() + 0.25 * metaLevel("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + rangBonus() + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
@@ -655,12 +658,12 @@ function sternWertMulti() {
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + 0.05 * metaLevel("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
+        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
 function sternDoppelChance() {
-    return tw("magier") + 0.15 * segen("wissen") + 0.05 * level("sternensammler") + 0.03 * kuschel("maus") + 0.04 * metaLevel("reicheernte");
+    return tw("magier") + 0.15 * segen("wissen") + 0.05 * level("sternensammler") + 0.03 * kuschel("maus") + metaWert("reicheernte");
 }
 
 function variantenChance(variante) {
@@ -684,7 +687,7 @@ function feldKosten(seite = eigeneSeite()) {
 }
 
 function rechnungsBetrag(nummer) {
-    const rabatt = 0.05 * metaLevel("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
+    const rabatt = metaWert("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
         0.03 * kuschel("wal");
     const phase = run ? run.mondphase || 0 : 0;
     const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1);
@@ -817,7 +820,7 @@ function meisterBonus() {
 }
 
 function verkaufswert(pflanze) {
-    return aufrunden(pflanze.verkaufswert * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
+    return aufrunden((pflanze.verkaufswert + level("erntekorb")) * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
         (1 + level("pg_" + pflanze.id)));
 }
 
@@ -3432,7 +3435,7 @@ function zahleRechnung(faellig) {
         run.nachrichten.push(t("🏦 Kredit abbezahlt! +") + zahl(bonus) + t(" Sternensamen und ein zusätzlicher Segen zur Auswahl"));
     }
     // Mondteich "Startkapital": nach jeder Rechnung ein Geschenk, das mit dem Run mitwaechst
-    const startkapital = aufrunden(0.03 * metaLevel("startgold") * naechsteRechnung().betrag);
+    const startkapital = aufrunden(metaWert("startgold") * naechsteRechnung().betrag);
     if (startkapital > 0) {
         run.gold += startkapital;
         run.nachrichten.push(t("💰 Startkapital: +") + zahl(startkapital) + t(" Gold"));
@@ -3944,10 +3947,11 @@ function aktualisiereHinweisPunkte() {
         shopLeistbar = run.gold >= feldKosten() && run.felder.length < maxEigeneFelder() ||
             SHOP_UPGRADES.some(def => shopUpgradeFrei(def) && level(def.id) < def.max &&
                 run.gold >= kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)));
-        sternLeistbar = SKILLS.some(knotenLeistbar);
+        sternLeistbar = stellariumFrei() && SKILLS.some(knotenLeistbar);
     }
     shopKnopf.classList.toggle("hat-neues", shopLeistbar);
     sternKnopf.classList.toggle("hat-neues", sternLeistbar);
+    sternKnopf.classList.toggle("gesperrt", !stellariumFrei());
 }
 
 function aktualisiereAlles() {
@@ -4022,10 +4026,16 @@ function upgradeKarte(def, waehrung) {
 function kaufeUpgrade(def, waehrung) {
     const kosten = kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
     if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < kosten) return;
+    if (waehrung === "skillpunkte" && !stellariumFrei()) return;
     if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
     bezahle(waehrung, kosten);
     run.level[def.id] = level(def.id) + 1;
+    if (def.id === "stellarium") {
+        meta.stellariumFrei = true;
+        speichereMeta();
+        zeigeBanner("✨", t("Stellarium freigeschaltet!"), t("Oben rechts: neue Pflanzen, bunte Saaten, Helfer und mehr"), "#5b3fa0", 4000);
+    }
     Klang.kaufen();
     schalteSternFrei(def);
     aktualisiereAlles();
@@ -4252,6 +4262,7 @@ function knotenLeistbar(def) {
 // Ist das Markt-Upgrade schon im Stellarium freigeschaltet?
 function shopUpgradeFrei(def) {
     if (istSandboxAus(def.id)) return false;
+    if (def.id === "stellarium") return !stellariumFrei() || level("stellarium") > 0;
     return !def.knoten || level(def.knoten) > 0;
 }
 
@@ -5122,7 +5133,19 @@ function oeffnePanel(panel) {
     haken("panelOffen", panel.id);
 }
 
+// Das Stellarium muss man einmal im Markt freischalten (1.000 Gold). Wer schon gespielt hat, hat es sofort.
+// Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
+function stellariumFrei() {
+    if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
+    return meta.stellariumFrei || (run && run.koop) || level("stellarium") > 0;
+}
+
 function oeffneSkilltree() {
+    if (!stellariumFrei()) {
+        Klang.fehler();
+        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 1.000 Gold)."));
+        return;
+    }
     schliessePanels();
     skilltreeFenster.classList.remove("versteckt");
     renderSkilltree();

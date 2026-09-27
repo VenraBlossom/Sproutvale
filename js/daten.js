@@ -89,6 +89,9 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei."),
+        t("Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold."),
+        t("Mondteich: Fruchtbarer Hof, Ausdauer, Verhandlungsgeschick, Startkapital, Bauernweisheit und Reiche Ernte werden mit jeder Stufe stärker als vorher."),
         t("Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde."),
         t("Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen."),
         t("3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus."),
@@ -186,7 +189,7 @@ const NEUIGKEITEN = [
 const KONFIG = {
     klickGrenzeProSek: 10,            // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt weniger
     klickUeberGrenze: 0.75,           // (Autoklicker bleiben staerker, aber man muss keinen benutzen; die Sense ist ausgenommen)
-    startKlicksProSamen: 28,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
+    startKlicksProSamen: 20,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
     minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
     klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
     startEnergie: 150,
@@ -194,7 +197,7 @@ const KONFIG = {
     tageProRechnung: 5,
     rechnungBasis: 30,
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
-    rechnungFaktorenStart: [18, 11, 17], // die ersten Spruenge sind sanfter: 30, 540, 5.940, 101.000, 2,6 Mio. ...
+    rechnungFaktorenStart: [5, 10, 17], // die ersten Spruenge sind sanfter: 30, 150, 1.500, 25.500, 660.000 ...
     sternensamenProErnte: 6,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
     sternensamenPflanzenFaktor: 1.14, // ... und jede hoehere Pflanze gibt 14% mehr (Kuerbis ~15, Mondlilie ~37): neue Pflanzen lohnen sich
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen (Bruchteile aus Upgrades werden gesammelt)
@@ -248,7 +251,7 @@ const KONFIG = {
 // unlockKosten in Sternensamen. "eigenschaft" = kleine Besonderheit dieser Pflanze (Wirkung in script.js).
 
 const PFLANZEN_VORLAGEN = [
-    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 2, verkaufswert: 2, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 5 Sternensamen extra.") },
+    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 2, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 5 Sternensamen extra.") },
     { id: "karotte", name: t("Karotte"), emoji: "🥕", sekProStufe: 2.5, verkaufswert: 5, unlockKosten: 120, bonusName: t("Knackige Karotten"), bonusText: t("Karotten wachsen 50% schneller.") },
     { id: "kartoffel", name: t("Kartoffel"), emoji: "🥔", sekProStufe: 3, verkaufswert: 12, unlockKosten: 210, bonusName: t("Knollenfund"), bonusText: t("20% Chance, dass eine Kartoffel eine zweite Saat fallen lässt.") },
     { id: "erdbeere", name: t("Erdbeere"), emoji: "🍓", sekProStufe: 3.5, verkaufswert: 30, unlockKosten: 370, bonusName: t("Süße Beeren"), bonusText: t("Saaten von Erdbeeren sind mindestens ungewöhnlich.") },
@@ -365,6 +368,14 @@ const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [
 // wenn ihr Stern im Stellarium gekauft ist (knoten).
 
 const SHOP_UPGRADES = [
+    // Einmalig und dauerhaft: am Anfang gibt es nur Klicken, Warten und den Markt. Das Stellarium kommt danach.
+    // Von Anfang an: mehr Gold fuer jede Ernte (frueh stark, spaeter bei teuren Pflanzen kaum noch spuerbar)
+    { id: "erntekorb", knoten: null, icon: "🧺", name: t("Erntekorb"), basiskosten: 12, faktor: 1.8, max: 10,
+        beschreibung: t("+1 Gold für jede Ernte."),
+        info: () => "+" + level("erntekorb") + t(" Gold pro Ernte") },
+    { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 1000, faktor: 1, max: 1,
+        beschreibung: t("Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
+        info: () => t("Freigeschaltet") },
     { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9, max: 22,
         beschreibung: t("-1 Klick pro Samen."),
         erledigt: () => (klicksAmMinimum() ? t("die geringste Klickzahl pro Samen (mehr geht nicht)") : null),
@@ -454,17 +465,17 @@ function spielStern(id, icon, pos, vor, name, kosten, beschreibung) {
 
 const SKILLS = [
     // ----- Ernte (rechts): Münz-Farben, jede erst, wenn die vorige komplett ausgebaut ist -----
-    stern("gruen", "ernte", "🟢", [300, 0], "p_weizen", t("Grüner Daumen"), 30, 1.8, 5,
-        t("+3% Chance auf ungewöhnliche Saaten (grün, x2,5 Gold)."),
+    stern("gruen", "ernte", "🟢", [300, 0], "p_weizen", t("Grüner Daumen"), 30, 1.8, 6,
+        t("Stufe 1 schaltet ungewöhnliche Saaten frei (grün, x2,5 Gold, 15% Chance). Jede weitere Stufe: +3% Chance."),
         () => prozentText(raritaetsChancen()[1]) + t(" Chance auf Ungewöhnlich")),
     stern("blau", "ernte", "🔵", [520, 0], "gruen", t("Blaues Wunder"), 150, 1.9, 5,
-        t("+2% Chance auf seltene Saaten (blau, x5 Gold)."),
+        t("Stufe 1 schaltet seltene Saaten frei (blau, x5 Gold). Jede Stufe: +2% Chance."),
         () => prozentText(raritaetsChancen()[2]) + t(" Chance auf Selten"), { vorMax: true }),
     stern("lila", "ernte", "🟣", [740, 0], "blau", t("Lila Laune"), 600, 2, 5,
-        t("+1% Chance auf epische Saaten (lila, x12,5 Gold)."),
+        t("Stufe 1 schaltet epische Saaten frei (lila, x12,5 Gold, 3% Chance). Jede weitere Stufe: +1% Chance."),
         () => prozentText(raritaetsChancen()[3]) + t(" Chance auf Episch"), { vorMax: true }),
     stern("gelb", "ernte", "🟡", [960, 0], "lila", t("Goldrausch"), 2500, 2.2, 4,
-        t("+0,5% Chance auf legendäre Saat (gelb, x50 Gold, vor der 2. Rechnung x25)."),
+        t("Stufe 1 schaltet legendäre Saat frei (gelb, x50 Gold, vor der 2. Rechnung x25, 1% Chance). Jede weitere Stufe: +0,5% Chance."),
         () => prozentText(raritaetsChancen()[4]) + t(" Chance auf legendäre Saat"), { vorMax: true }),
     stern("edelstein", "ernte", "💍", [1180, 0], "gelb", t("Edelsteinschleifer"), 5000, 2.3, 5,
         t("Alle Farb-Multiplikatoren (außer Gewöhnlich) werden um 10% stärker."),
@@ -925,8 +936,8 @@ const STERN_KURZ = {
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
 const STERN_WIRKUNG = {
-    gruen: s => "+" + 3 * s + t("% grüne Saat"), blau: s => "+" + 2 * s + t("% blaue Saat"), lila: s => "+" + s + t("% lila Saat"),
-    gelb: s => "+" + prozentText(0.005 * s) + t(" legendäre Saat"), edelstein: s => "+" + 10 * s + t("% Farb-Bonus"),
+    gruen: s => (s > 0 ? 12 + 3 * s : 0) + t("% grüne Saat"), blau: s => 2 * s + t("% blaue Saat"), lila: s => (s > 0 ? 2 + s : 0) + t("% lila Saat"),
+    gelb: s => prozentText(s > 0 ? 0.005 + 0.005 * s : 0) + t(" legendäre Saat"), edelstein: s => "+" + 10 * s + t("% Farb-Bonus"),
     sternengold: s => "+" + 4 * s + t("% Gold"), glueck: s => "+" + 5 * s + t("% Doppel-Saat"),
     sternensammler: s => "+" + 5 * s + t("% Doppel-Sternensaat"), sternenklick: s => "+" + zahl(s * 0.25) + t(" ✨ pro Klick"),
     schwereMuenzen: s => "+" + 20 * s + t("% Wert"), doppelernte: s => "+" + 3 * s + t("% Doppelernte"),
@@ -1819,21 +1830,35 @@ const HAUS_BEREICH = { x: 5, breite: 8 };
 // max: Infinity = unendlich oft kaufbar. Mondblueten gibt es nur noch am Ende eines Runs,
 // darum sind die ersten Stufen guenstig und die starken Upgrades deutlich teurer.
 
+// Mondteich-Werte, die mit jeder Stufe schneller wachsen (Gesamtwert pro Stufe): anfangs klein, spaeter richtig stark
+const META_STUFEN = {
+    ertrag: [0, 0.05, 0.10, 0.20, 0.35, 0.50, 0.70, 0.95, 1.25, 1.60, 2.00],
+    ausdauer: [0, 0.03, 0.07, 0.12, 0.20, 0.30],
+    verhandlung: [0, 0.01, 0.03, 0.06, 0.10, 0.15],
+    startgold: [0, 0.005, 0.01, 0.02, 0.035, 0.05, 0.07, 0.10, 0.13, 0.16, 0.20],
+    startsp: [0, 0.01, 0.02, 0.04, 0.07, 0.10, 0.14, 0.19, 0.25, 0.32, 0.40],
+    reicheernte: [0, 0.01, 0.02, 0.04, 0.06, 0.09, 0.12, 0.16, 0.20, 0.25, 0.30]
+};
+function metaWert(id, lvl = metaLevel(id)) {
+    const liste = META_STUFEN[id];
+    return liste[Math.min(lvl, liste.length - 1)];
+}
+
 const META_UPGRADES = [
     { id: "startgold", name: t("Startkapital"), basiskosten: 1, faktor: 1.5, max: 10,
-        beschreibung: t("+25 Gold zu Beginn jedes Runs. Dazu nach jeder bezahlten Rechnung +3% der nächsten Rechnung als Geschenk."),
-        info: lvl => "+" + 25 * lvl + t(" Gold, +") + 3 * lvl + t("% der nächsten Rechnung") },
+        beschreibung: t("+25 Gold zu Beginn jedes Runs. Dazu nach jeder bezahlten Rechnung ein Teil der nächsten Rechnung als Geschenk (jede Stufe mehr als die davor)."),
+        info: lvl => "+" + 25 * lvl + t(" Gold, +") + prozentText(metaWert("startgold", lvl)) + t(" der nächsten Rechnung") },
     { id: "startsp", name: t("Bauernweisheit"), basiskosten: 2, faktor: 1.5, max: 10,
-        beschreibung: t("+100 Sternensamen zu Beginn jedes Runs und +5% Sternensamen aus allen Ernten."),
-        info: lvl => "+" + 100 * lvl + t(" Sternensamen, +") + 5 * lvl + t("% Sternensamen") },
+        beschreibung: t("+100 Sternensamen zu Beginn jedes Runs und mehr Sternensamen aus allen Ernten (jede Stufe mehr als die davor)."),
+        info: lvl => "+" + 100 * lvl + t(" Sternensamen, +") + prozentText(metaWert("startsp", lvl)) + t(" Sternensamen") },
     { id: "startfelder", name: t("Vorbereiteter Boden"), basiskosten: 3, faktor: 2, max: 4,
         beschreibung: t("+1 Feld zu Beginn jedes Runs. Das nächste Feld kostet trotzdem nur 1 Gold."), info: lvl => "+" + lvl + t(" Felder") },
-    { id: "ausdauer", name: t("Ausdauer"), basiskosten: 6, faktor: 2.4, max: 4,
-        beschreibung: t("+10% Energie pro Tag."), info: lvl => "+" + 10 * lvl + t("% Energie") },
+    { id: "ausdauer", name: t("Ausdauer"), basiskosten: 6, faktor: 2.4, max: 5,
+        beschreibung: t("Mehr Energie pro Tag. Jede Stufe bringt mehr als die davor."), info: lvl => "+" + prozentText(metaWert("ausdauer", lvl)) + t(" Energie") },
     { id: "verhandlung", name: t("Verhandlungsgeschick"), basiskosten: 5, faktor: 2.1, max: 5,
-        beschreibung: t("Rechnungen kosten 5% weniger."), info: lvl => "-" + 5 * lvl + t("% Rechnungen") },
+        beschreibung: t("Rechnungen werden billiger. Jede Stufe bringt mehr als die davor."), info: lvl => "-" + prozentText(metaWert("verhandlung", lvl)) + t(" Rechnungen") },
     { id: "ertrag", name: t("Fruchtbarer Hof"), basiskosten: 6, faktor: 1.45, max: 10,
-        beschreibung: t("+25% Gold aus allen Ernten."), info: lvl => "+" + 25 * lvl + t("% Gold") },
+        beschreibung: t("Mehr Gold aus allen Ernten. Jede Stufe bringt mehr als die davor."), info: lvl => "+" + prozentText(metaWert("ertrag", lvl)) + t(" Gold") },
     { id: "saatvorrat", name: t("Saatgut-Vorrat"), basiskosten: 20, faktor: 2.5, max: 3,
         beschreibung: t("Jeder Run startet mit einer weiteren freigeschalteten Pflanze."),
         info: lvl => lvl + t(" Pflanzen zusätzlich freigeschaltet") },
@@ -1855,7 +1880,7 @@ const META_UPGRADES = [
         beschreibung: t("Kuschel-Züge werden nur noch nach jedem 2. Zug um 1 teurer."),
         info: lvl => (lvl ? t("+1 alle 2 Züge") : t("+1 pro Zug")) },
     { id: "reicheernte", name: t("Reiche Ernte"), basiskosten: 12, faktor: 1.8, max: 10,
-        beschreibung: t("+4% Chance, dass eine Saat oder Sternensaat doppelt zählt."), info: lvl => "+" + 4 * lvl + t("% Chance") },
+        beschreibung: t("Chance, dass eine Saat oder Sternensaat doppelt zählt. Jede Stufe bringt mehr als die davor."), info: lvl => "+" + prozentText(metaWert("reicheernte", lvl)) + t(" Chance") },
     { id: "meisterhaende", name: t("Meisterhände"), basiskosten: 10, faktor: 2, max: 9,
         beschreibung: t("Jede Ernte zählt für die Pflanzen-Meisterschaft einmal mehr (Stufe 9: jede Ernte zählt 10-mal)."),
         info: lvl => t("Jede Ernte zählt ") + (1 + lvl) + t("-mal") },

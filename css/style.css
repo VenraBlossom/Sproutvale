@@ -11402,3 +11402,8 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .feld.boden-voll {
     box-shadow: inset 0 0 10px rgba(255, 210, 58, 0.45);
 }
+
+/* Stellarium noch nicht freigeschaltet (im Markt fuer 1.000 Gold) */
+#skilltree-button.gesperrt {
+    filter: grayscale(0.9) brightness(0.8);
+}
