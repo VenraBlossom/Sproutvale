@@ -12082,3 +12082,21 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     0%, 100% { filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 7px var(--aura, #fff3a0)) drop-shadow(0 0 3px var(--aura, #fff3a0)); }
     50% { filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 16px var(--aura, #fff3a0)) drop-shadow(0 0 6px var(--aura, #fff3a0)) brightness(1.1); }
 }
+
+/* Emojis im Text: als Pixel-Bild (der echte Buchstabe bleibt unsichtbar darunter) */
+.px-emoji {
+    display: inline-block;
+    width: 1.15em;
+    height: 1.15em;
+    vertical-align: -0.2em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+    color: transparent;
+    text-shadow: none;
+    overflow: hidden;
+    line-height: 1;
+    font-size: inherit;
+    letter-spacing: 0;
+}

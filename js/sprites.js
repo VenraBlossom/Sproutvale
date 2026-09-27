@@ -3273,6 +3273,16 @@ const PIXEL_SYMBOL_DATEN = {
         ".obbdbbbo.",
         ".odbbbdbo.",
         ".oooooooo."]],
+    // Kristall (Premium-Waehrung)
+    kristall: [{ o: "#1d3a6a", C: "#6ad0ff", c: "#3a9ae0", W: "#ffffff" }, [
+        "..oooooo..",
+        ".oWCcCCco.",
+        "oWCCcCCcco",
+        "oooooooooo",
+        ".oCCcCCco.",
+        "..oCcCco..",
+        "...oCco...",
+        "....oo...."]],
     // Gepfluegtes Beet mit Keimling (Reiter "Felder" im Haus)
     beet: [{ o: "#3a2412", B: "#9a6634", b: "#6b4a2a", g: "#3f8a32", G: "#7ed957" }, [
         "...Gg.gG..",
@@ -3499,7 +3509,7 @@ const PIXEL_SYMBOL_DATEN = {
 const PIXEL_SYMBOLE = {
     "💗": "herz", "❤️": "herz", "💛": "herz", "✨": "funkeln", "🔥": "flamme", "⭐": "stern", "🌟": "stern",
     "❄️": "schnee", "🟫": "block", "👋": "hand", "✋": "hand", "🎉": "party", "💃": "note", "🎵": "note", "⛏️": "hacke",
-    "😂": "lachen", "👍": "daumen", "💤": "zzz", "☀️": "sonne"
+    "😂": "lachen", "👍": "daumen", "💤": "zzz", "☀️": "sonne", "💎": "kristall"
 };
 
 Object.entries(PIXEL_SYMBOL_DATEN).forEach(([name, [farben, zeilen]]) => {

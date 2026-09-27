@@ -165,17 +165,17 @@ function kraeheKommt() {
     const dauer = 1400;
     function flieg() {
         if (eintrag.weg) return;
-        const t = Math.min(1, (performance.now() - startZeit) / dauer);
-        eintrag.x = startX + (landeX - startX) * t;
-        eintrag.y = startY + (landeY - startY) * t - Math.sin(t * Math.PI) * 40;
+        const anteil = Math.min(1, (performance.now() - startZeit) / dauer);
+        eintrag.x = startX + (landeX - startX) * anteil;
+        eintrag.y = startY + (landeY - startY) * anteil - Math.sin(anteil * Math.PI) * 40;
         kraehe.style.left = eintrag.x + "px";
         kraehe.style.top = eintrag.y + "px";
-        setzeSpriteBild(kraehe, Math.floor(t * 10) % 2 ? "kraehe_flug2" : "kraehe_flug1", 4);
-        if (scheuche && t >= 0.55) {
+        setzeSpriteBild(kraehe, Math.floor(anteil * 10) % 2 ? "kraehe_flug2" : "kraehe_flug1", 4);
+        if (scheuche && anteil >= 0.55) {
             vogelscheucheBuh(eintrag, startX);
             return;
         }
-        if (t < 1) {
+        if (anteil < 1) {
             setTimeout(flieg, 16);
             return;
         }

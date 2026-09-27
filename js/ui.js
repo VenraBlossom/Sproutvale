@@ -371,3 +371,67 @@ document.addEventListener("keydown", event => {
     if (!eintrag) return;
     if (eintrag.aktion(event) !== false) event.preventDefault();
 });
+
+// ---------- EMOJIS IM TEXT ALS PIXEL-ART ----------
+// Ueberall, wo Text mit Emojis im Spiel auftaucht (Titel, Toasts, Tipps, Karten ...), wird jedes Emoji
+// durch sein Pixel-Bild ersetzt. Das Emoji bleibt als (unsichtbarer) Text erhalten, damit textContent gleich bleibt.
+// Pfeile wie ▶ oder ✕ sind keine Emoji-Darstellung und bleiben normale Schrift.
+const EMOJI_MUSTER = /(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️)(?:‍(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️?))*️?/gu;
+const EMOJI_TEST = /\p{Emoji_Presentation}|\p{Extended_Pictographic}️/u;
+const EMOJI_AUSNAHMEN = "script, style, textarea, input, select, option, canvas, [data-kein-emoji], .px-emoji";
+
+function emojiSpan(emoji) {
+    const span = document.createElement("span");
+    span.className = "px-emoji";
+    span.textContent = emoji;
+    span.style.backgroundImage = "url(" + pixelIconUrl(emoji) + ")";
+    return span;
+}
+
+function ersetzeEmojisIn(knoten) {
+    if (knoten.nodeType === Node.TEXT_NODE) {
+        const text = knoten.nodeValue;
+        if (!text || !EMOJI_TEST.test(text)) return;
+        const eltern = knoten.parentElement;
+        if (!eltern || eltern.closest(EMOJI_AUSNAHMEN)) return;
+        const stuecke = document.createDocumentFragment();
+        let letzte = 0;
+        text.replace(EMOJI_MUSTER, (treffer, stelle) => {
+            if (stelle > letzte) stuecke.appendChild(document.createTextNode(text.slice(letzte, stelle)));
+            stuecke.appendChild(emojiSpan(treffer));
+            letzte = stelle + treffer.length;
+            return treffer;
+        });
+        if (letzte === 0) return;
+        if (letzte < text.length) stuecke.appendChild(document.createTextNode(text.slice(letzte)));
+        knoten.replaceWith(stuecke);
+        return;
+    }
+    if (knoten.nodeType !== Node.ELEMENT_NODE || knoten.matches(EMOJI_AUSNAHMEN)) return;
+    const laeufer = document.createTreeWalker(knoten, NodeFilter.SHOW_TEXT);
+    const liste = [];
+    while (laeufer.nextNode()) if (EMOJI_TEST.test(laeufer.currentNode.nodeValue)) liste.push(laeufer.currentNode);
+    liste.forEach(ersetzeEmojisIn);
+}
+
+(function starteEmojiWaechter() {
+    const offen = new Set();
+    let geplant = false;
+    const abarbeiten = () => {
+        geplant = false;
+        const liste = [...offen];
+        offen.clear();
+        liste.forEach(k => { if (k.isConnected) ersetzeEmojisIn(k); });
+    };
+    new MutationObserver(eintraege => {
+        eintraege.forEach(e => {
+            if (e.type === "characterData") offen.add(e.target);
+            else e.addedNodes.forEach(k => offen.add(k));
+        });
+        if (!geplant && offen.size) {
+            geplant = true;
+            queueMicrotask(abarbeiten);
+        }
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+    ersetzeEmojisIn(document.body);
+})();
