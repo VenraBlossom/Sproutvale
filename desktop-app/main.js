@@ -65,7 +65,9 @@ function vergleicheVersion(a, b) {
 
 function liesVersion(ordner) {
     try {
-        const daten = fs.readFileSync(path.join(ordner, "daten.js"), "utf8");
+        // Seit 0.7.3 liegen die Skripte in js/, aeltere Versionen hatten sie direkt im Spielordner
+        const datei = [path.join(ordner, "js", "daten.js"), path.join(ordner, "daten.js")].find(p => fs.existsSync(p));
+        const daten = fs.readFileSync(datei, "utf8");
         const treffer = daten.match(/SPIEL_VERSION\s*=\s*"([^"]+)"/);
         return treffer ? treffer[1] : "";
     } catch (fehler) {

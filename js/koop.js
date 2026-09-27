@@ -792,8 +792,12 @@ function renderPartnerFelder() {
             setzeTipp(el, t("Feld deines Mitspielers"));
         }
         const bild = el.querySelector(".feld-sprite");
-        if (f.bild) {
-            const url = spriteUrl(pflanzenSkinSprite(f.bild));
+        // Unreife Pflanzen sind Farbvarianten, die hier vielleicht noch nie erzeugt wurden
+        let name = f.bild;
+        if (name && name.startsWith("unreif_") && !SPRITE_ABWANDLUNGEN[name] && SPRITE_PIXEL[name.slice(7)]) name = unreifSprite(name.slice(7));
+        if (name && !SPRITE_PIXEL[name] && !SPRITE_ABWANDLUNGEN[name] && !SPRITE_DATEIEN[name]) name = null;
+        if (name) {
+            const url = spriteUrl(pflanzenSkinSprite(name));
             if (bild.dataset.bild !== f.bild) {
                 bild.dataset.bild = f.bild;
                 bild.src = url;

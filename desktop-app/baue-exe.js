@@ -25,7 +25,7 @@ const RELEASE = process.argv.includes("--release");
 // Diese Dateien und Ordner gehoeren zum Spiel (Test-Dateien mit "_" am Anfang bleiben draussen)
 function istSpielDatei(name) {
     if (name.startsWith("_") || name.startsWith(".")) return false;
-    if (["fonts", "Sprites", "assets"].includes(name)) return true;
+    if (["js", "css", "assets"].includes(name)) return true;
     return /\.(html|js|css|png|jpg|ogg|mp3|wav|woff2?)$/i.test(name);
 }
 
