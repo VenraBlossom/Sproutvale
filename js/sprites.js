@@ -872,6 +872,46 @@ const SPRITE_PIXEL = {
         "..KkkK....KkkK..",
         "..kKKk....kKKk.."
     ],
+    schaukel: [
+        "kKKKKKKKKKKKKk",
+        "kK..........Kk",
+        ".K8........8K.",
+        ".K8........8K.",
+        ".K8........8K.",
+        "K.8........8.K",
+        "K.8........8.K",
+        "K.8........8.K",
+        "K.8........8.K",
+        "K.DDDDDDDDDD.K",
+        "K.DkkkkkkkkD.K",
+        "K............K",
+        "K............K",
+        "kk..........kk"
+    ],
+    teetisch: [
+        "....zzz.....",
+        "...zQQQz.Qz.",
+        "..QQQQQQQQ..",
+        "..QQQzQQQ...",
+        "wwwwwwwwwwww",
+        "wRwwwRwwwRww",
+        "wwwwwwwwwwww",
+        ".k........k.",
+        ".k........k.",
+        ".k........k."
+    ],
+    leuchtpilze: [
+        "....MMM.....",
+        "...MMzMM....",
+        "..MMMMMMM...",
+        "....ww..FFF.",
+        "....ww.FzFFF",
+        "QQ..ww.FFFFF",
+        "QzQ.ww...w..",
+        "QQQ.ww...w..",
+        ".w..ww...w..",
+        "GGGGGGGGGGGG"
+    ],
     briefkasten: [
         "...ww...R",
         "..qwwqq.R",
@@ -2012,6 +2052,12 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     }
 
     katzenKopf(p, kopf[0], kopf[1], blinzelt, pose === "schlafen", stil);
+    // Dalmatiner: feste dunkle Flecken im Fell
+    if (stil.flecken) {
+        p.raster.forEach((zeile, y) => zeile.forEach((farbe, x) => {
+            if ((farbe === "2" || farbe === "1") && (x * 5 + y * 7) % 9 === 0) zeile[x] = "3";
+        }));
+    }
     // Sternenfell: einzelne Sterne im Fell funkeln im Takt
     if (stil.sterne) {
         p.raster.forEach((zeile, y) => zeile.forEach((farbe, x) => {
