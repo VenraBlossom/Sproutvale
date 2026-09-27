@@ -2913,7 +2913,12 @@ Object.assign(UEBERSETZUNG, {
     "Winterfest! Die Dächer tragen Schnee, der Begleiter trägt einen Schal (angeblich).": "Winter Festival! The roofs wear snow, the companion wears a scarf (allegedly).",
     "Frohes neues Jahr! Der Bürgermeister verspricht mehr Weizen und weniger Rechnungen. Wie jedes Jahr.": "Happy New Year! The mayor promises more wheat and fewer bills. Like every year.",
     "Valentinstag: Zwei Karotten im Beet nebenan wurden Hand in Hand gesichtet.": "Valentine's Day: two carrots in the next bed were seen holding hands.",
-    "Frühlingsfest! Ein Hase versteckt bunte Eier. Die Hühner sind beleidigt.": "Spring Festival! A bunny hides colourful eggs. The chickens are offended."
+    "Frühlingsfest! Ein Hase versteckt bunte Eier. Die Hühner sind beleidigt.": "Spring Festival! A bunny hides colourful eggs. The chickens are offended.",
+    "Regenmantel": "Raincoat",
+    "Imkeranzug": "Beekeeper Suit",
+    "Flickenhemd": "Patched Shirt",
+    "Laubweste": "Leaf Vest",
+    "Schultervogel": "Shoulder Bird"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -997,6 +997,48 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             g.hinten.rechteck(x0 + 0.5, y0 + 0.5, breite - 1, 4, "8");
             g.hinten.fein(x0 + 1, y0 + 1, "p");
         }
+    } else if (form === "regenmantel") {
+        // Regenmantel: Kragen, dicke Knoepfe, Taschen, unten etwas laenger
+        k.rechteck(x0 - 0.5, y0 + 5.5, breite + 1, 1.5, "6");
+        k.feinLinie(x0 - 0.5, y0 + 6.5, x0 + breite, y0 + 6.5, "8");
+        if (blick === "vorne") {
+            k.linie(mitte - 2, y0, mitte - 0.5, y0 + 1.5, "8");
+            k.linie(mitte + 1.5, y0, mitte, y0 + 1.5, "8");
+            [2, 3.5, 5].forEach(y => k.rechteck(mitte - 0.5, y0 + y, 1, 0.5, "k"));
+            k.rechteck(x0 + 0.5, y0 + 3.5, 1.5, 1, "8");
+            k.rechteck(x0 + breite - 2, y0 + 3.5, 1.5, 1, "8");
+        } else if (blick === "seite") {
+            k.rechteck(x0 + 3.5, y0, 1.5, 1, "8");
+            k.rechteck(x0 + 4, y0 + 2, 1, 0.5, "k");
+            k.rechteck(x0 + 4, y0 + 4, 1, 0.5, "k");
+        } else {
+            k.rechteck(x0, y0, breite, 1, "8");
+        }
+    } else if (form === "imker") {
+        // Imkeranzug: hell, Reissverschluss, kleine Biene auf der Brust
+        if (blick === "vorne") {
+            k.feinLinie(mitte - 0.5, y0 + 0.5, mitte - 0.5, y0 + 5.5, "8");
+            k.rechteck(x0 + breite - 2, y0 + 1.5, 1, 0.5, "k");
+            k.fein(x0 + breite - 1.5, y0 + 2, "p");
+            k.fein(x0 + breite - 2, y0 + 2, "k");
+        } else if (blick === "seite") {
+            k.feinLinie(x0 + 4.5, y0 + 0.5, x0 + 4.5, y0 + 5.5, "8");
+        }
+        k.feinLinie(x0, y0 + 5, x0 + breite - 0.5, y0 + 5, "8");
+    } else if (form === "flicken") {
+        // Arbeitshemd mit bunten Flicken und Naehten
+        [[x0 + 0.5, y0 + 1], [x0 + breite - 2, y0 + 3.5]].forEach(([x, y], i) => {
+            k.rechteck(x, y, 1.5, 1.5, i ? "p" : "k");
+            k.fein(x, y, "w");
+        });
+        for (let y = 0.5; y < 6; y += 1.5) k.fein(mitte - 0.5, y0 + y, "8");
+    } else if (form === "blaetter") {
+        // legendaer: Weste aus Laub, von den Schultern fallen ab und zu Blaetter
+        for (let y = 0; y < 6; y += 1) for (let x = (y % 2) * 0.5; x < breite; x += 1.5) k.fein(x0 + x, y0 + y, y % 3 ? "8" : "k");
+        k.feinLinie(x0, y0 + 5.5, x0 + breite - 0.5, y0 + 5.5, "p");
+        const fall = anim % 4;
+        const bx = blick === "seite" ? x0 - 1 : x0 - 1.5 + ((anim >> 2) % 2) * (breite + 2.5);
+        k.fein(bx + (fall % 2) * 0.5, y0 + 1 + fall * 2, fall % 2 ? "k" : "p");
     } else if (form === "jacke") {
         // offene Jacke: Hemd in der Mitte, Kragen, Knoepfe, Brusttasche
         if (blick === "vorne") {
@@ -1323,6 +1365,42 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
         } else {
             a.linie(x0 + breite - 1, y0, x0, y0 + 4, "y");
         }
+    } else if (form === "rucksack") {
+        // Rucksack: vorne nur die Traeger, seitlich und hinten die Tasche
+        if (blick === "vorne") {
+            a.feinLinie(x0 + 1, y0, x0 + 1, y0 + 4, "y");
+            a.feinLinie(x0 + breite - 1.5, y0, x0 + breite - 1.5, y0 + 4, "y");
+        } else {
+            const ziel = blick === "hinten" ? a : hinten;
+            const rx = seite ? x0 - 2 : x0 + 0.5;
+            ziel.rechteck(rx, y0 + 0.5, seite ? 2.5 : breite - 1, 5, "x");
+            ziel.rechteck(rx, y0 + 0.5, seite ? 2.5 : breite - 1, 1, "y");
+            ziel.fein(rx + (seite ? 1 : 2), y0 + 3, "z");
+            if (seite) a.feinLinie(x0 + 1, y0, x0 + 1.5, y0 + 4, "y");
+        }
+    } else if (form === "vogel") {
+        // kleiner Vogel sitzt auf der Schulter und hopst ab und zu
+        const hops = anim % 4 === 0 ? -0.5 : 0;
+        // ausserhalb vom Kopf, sonst verdeckt ihn der Kopf. Blick immer nach aussen.
+        const links = seite || blick === "hinten";
+        const vx = links ? x0 - 3.5 : x0 + breite - 0.5;
+        const vy = y0 - 2 + hops;
+        const r = links ? -1 : 1;
+        a.rechteck(vx, vy + 1, 3.5, 2, "x");                 // Koerper
+        a.rechteck(vx + (links ? -0.5 : 2), vy - 0.5, 2, 2, "x"); // Kopf
+        a.fein(vx + (links ? 0 : 3), vy, "z");               // Auge
+        a.rechteck(vx + (links ? -1.5 : 4), vy + 0.5, 1, 0.5, "y"); // Schnabel
+        a.feinLinie(vx + (links ? 3 : -0.5), vy + 1.5, vx + (links ? 4 : 0.5), vy + 2, "x"); // Schwanz
+        a.feinLinie(vx + 0.5, vy + 2, vx + 2.5, vy + 2, "z"); // Fluegel-Kante
+        a.fein(vx + 1 + r * 0.5, vy + 3, "y");              // Fuesse
+    } else if (form === "giesskanne") {
+        // Giesskanne in der Hand (vorne rechts), ab und zu tropft es
+        const gx = seite ? x0 + breite : x0 + breite + 0.5;
+        const gy = y0 + 5;
+        a.rechteck(gx, gy, 2.5, 2, "x");
+        a.feinLinie(gx + 0.5, gy - 0.5, gx + 1.5, gy - 0.5, "y");
+        a.linie(gx + 2.5, gy + 0.5, gx + 4, gy - 1, "y");
+        if (anim % 3 === 0) a.fein(gx + 4, gy + 0.5, "z");
     } else if (form === "gitarre") {
         // Gitarre auf dem Ruecken: schraeg, mit Hals und Schallloch
         const ziel = blick === "hinten" ? a : hinten;
