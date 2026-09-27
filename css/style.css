@@ -12276,3 +12276,10 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     from { opacity: 0.85; }
     to { opacity: 1; }
 }
+
+/* Eingeklappter Mondteich: rechts neben der Tageskarte (sonst liegt er ueber ihrer Lasche) */
+#mondteich-ausklappen {
+    top: calc(var(--kopf-hoehe) + 8px);
+    left: calc(50% + 256px);
+    transform: none;
+}

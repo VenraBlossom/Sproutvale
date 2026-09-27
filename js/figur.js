@@ -1424,17 +1424,19 @@ function figurFluegel(p, form, seite, x0, y0, breite, anim) {
             p.feinLinie(fx, y + 1, fx + r * 6, y + 5 + schlag * 0.4, "z");
             p.feinLinie(fx + r * 3, y - 2 + schlag * 0.5, fx + r * 6, y - 2 + schlag, "z");
         } else if (form === "engel") {
-            // Engelsfluegel: grosse Federfluegel in Stufen, von hell nach etwas dunkler, mit Deckfedern
-            p.ellipseFein(fx + r * 3.5, y - 2.5 + schlag, 4, 3.4, "x");
-            for (let i = 0; i < 6; i++) {
-                const yy = y - 3 + schlag * (1 - i / 6) + i * 1.6;
-                const lang = 8.5 - i * 1.1;
-                const x0f = r > 0 ? fx : fx - lang;
-                p.rechteck(x0f, yy, lang, 1.6, i % 2 ? "y" : "x");
-                p.fein(fx + r * (lang - 0.3), yy + 1, "y");
-            }
-            p.feinLinie(fx, y - 3 + schlag, fx + r * 7, y - 5.5 + schlag, "z");
-            p.feinLinie(fx + r, y - 1 + schlag * 0.5, fx + r * 5, y - 2.5 + schlag * 0.7, "z");
+            // Engelsfluegel wie beim Engel-Begleiter: ein Faecher aus Schwungfedern, der vom Ruecken ausgeht,
+            // darueber Deckfedern, graue Trennlinien. Beim Schlagen heben sich die Spitzen und gehen nach aussen.
+            const spitzen = [[7.5, -6], [9, -3], [9, 0.5], [8, 3.5], [6, 6]];
+            spitzen.forEach(([sx, sy], i) => {
+                const hoch = schlag * (1.3 - i * 0.22);
+                const tx = fx + r * (sx + schlag * 0.4), ty = y + sy + hoch;
+                p.linieFein(fx, y, tx, ty, "x");
+                p.linieFein(fx, y + 0.5, tx, ty + 0.5, "x");
+                p.linieFein(fx + r * 0.5, y + 1, tx - r * 0.5, ty + 1, i % 2 ? "y" : "z");
+            });
+            p.ellipseFein(fx + r * 3.2, y - 2 + schlag * 0.6, 3.4, 2.6, "x");
+            p.ellipseFein(fx + r * 2.2, y + 0.5 + schlag * 0.3, 2.4, 1.8, "x");
+            for (let i = 0; i < 3; i++) p.fein(fx + r * (1.5 + i * 1.5), y - 1 + schlag * 0.4 + (i % 2) * 0.5, "y");
         } else if (form === "fledermaus") {
             const spitze = y - 7 + schlag * 1.5;
             p.linieFein(fx, y, fx + r * 7, spitze, "x");
