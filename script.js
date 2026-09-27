@@ -4347,12 +4347,6 @@ $("art-duo").addEventListener("click", () => {
 });
 $("art-zurueck").addEventListener("click", () => zeigeMenueSeite("start"));
 $("koop-zurueck").addEventListener("click", () => zeigeMenueSeite("art"));
-$("koop-einstellung-kopieren").addEventListener("click", () => {
-    if (!koop.code) return;
-    if (navigator.clipboard) navigator.clipboard.writeText(koop.code);
-    zeigeToast(t("📋 Code kopiert: ") + koop.code);
-});
-$("koop-einstellung-neu").addEventListener("click", () => koopNeuerCode());
 
 function menueSeiteModiOffen() {
     return !hauptmenue.classList.contains("versteckt") && !$("menue-modi").classList.contains("versteckt");
@@ -4577,7 +4571,6 @@ function renderEinstellungen() {
     document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
         ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
-    if (typeof renderKoopEinstellung === "function") renderKoopEinstellung();
     // Endlos: von Hand speichern (gespeichert wird ausserdem automatisch)
     const endlosAktiv = run && run.sandbox && run.phase !== "runEnde";
     $("endlos-speichern-zeile").classList.toggle("versteckt", !endlosAktiv);
@@ -5356,7 +5349,7 @@ function hauptSchleife(jetzt) {
 // ---------- FEEDBACK: per Discord an VenraBlossom ----------
 $("feedback-version").textContent = SPIEL_VERSION;
 $("discord-oeffnen").addEventListener("click", () => window.open("https://discord.com/users/218383099443150849", "_blank"));
-$("discord-server").addEventListener("click", () => window.open("https://discord.gg/vmzYDU5/", "_blank"));
+$("discord-server").addEventListener("click", () => window.open("https://discord.gg/vmzYDU5", "_blank"));
 $("discord-kopieren").addEventListener("click", () => {
     navigator.clipboard.writeText("VenraBlossom").then(
         () => {

@@ -1123,14 +1123,3 @@ function renderKoopLobby() {
     inhalt.appendChild(knoepfe);
 }
 
-// Eintrag in den Einstellungen: Lobby-Code waehrend des Spiels (anzeigen, kopieren, neu)
-function renderKoopEinstellung() {
-    const zeile = $("koop-einstellung-zeile");
-    if (!zeile) return;
-    const aktiv = Boolean(koop.rolle);
-    zeile.classList.toggle("versteckt", !aktiv);
-    if (!aktiv) return;
-    $("koop-einstellung-code").textContent = t("👥 Lobby-Code: ") + (koop.code || "…") +
-        (koop.verbunden ? t(" · Mitspieler verbunden") : t(" · Mitspieler nicht da"));
-    $("koop-einstellung-neu").classList.toggle("versteckt", koop.rolle !== "host");
-}
