@@ -2669,7 +2669,9 @@ Object.assign(UEBERSETZUNG, {
     "Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei.": "New start: at first only clicking, waiting and the market (new: Harvest Basket, +1 gold per harvest). You unlock the Stellarium in the market for 1,000 gold.",
     "Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold.": "Colored drops now have to be unlocked in the Stellarium (level 1 of each color). Wheat is worth 1 gold at first, the first bills are 30, 150 and 1,500 gold.",
     "Mondteich: Fruchtbarer Hof, Ausdauer, Verhandlungsgeschick, Startkapital, Bauernweisheit und Reiche Ernte werden mit jeder Stufe stärker als vorher.": "Moon Pond: Fertile Farm, Stamina, Negotiation Skill, Starting Capital, Farmer's Wisdom and Rich Harvest get stronger with every level than before.",
-    "🔒 Erst {0}x Ertrag für {1} kaufen ({2}/{0})": "🔒 First buy Yield {0}x for {1} ({2}/{0})"
+    "🔒 Erst {0}x Ertrag für {1} kaufen ({2}/{0})": "🔒 First buy Yield {0}x for {1} ({2}/{0})",
+    "Bald": "Soon",
+    "Diese Sprache kommt bald.": "This language is coming soon."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

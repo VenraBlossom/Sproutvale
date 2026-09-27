@@ -13,6 +13,13 @@ const SPRACHEN = [
     { id: "en", name: "English" },
     { id: "de", name: "Deutsch" }
 ];
+// Kommen spaeter: nur als Karte sichtbar, noch nicht waehlbar und noch ohne Uebersetzung
+const SPRACHEN_BALD = [
+    { id: "es", name: "Español" }, { id: "fr", name: "Français" }, { id: "it", name: "Italiano" },
+    { id: "pt", name: "Português" }, { id: "nl", name: "Nederlands" }, { id: "pl", name: "Polski" },
+    { id: "tr", name: "Türkçe" }, { id: "ru", name: "Русский" }, { id: "uk", name: "Українська" },
+    { id: "ja", name: "日本語" }, { id: "zh", name: "中文" }, { id: "ko", name: "한국어" }
+];
 
 const SPRACHE = (() => {
     try {

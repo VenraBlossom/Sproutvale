@@ -468,4 +468,15 @@ aktualisiereProfilKnopf();
         });
         wahl.appendChild(karte);
     });
+    // Weitere Sprachen: schon zu sehen, aber noch gesperrt
+    SPRACHEN_BALD.forEach(s => {
+        const karte = el("button", "knopf sprach-karte bald", null, [
+            el("span", "sprach-flagge flagge-" + s.id),
+            el("span", "sprach-name", s.name),
+            el("span", "sprach-bald", t("Bald"))
+        ]);
+        karte.disabled = true;
+        setzeTipp(karte, t("Diese Sprache kommt bald."));
+        wahl.appendChild(karte);
+    });
 })();

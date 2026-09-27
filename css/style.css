@@ -11414,3 +11414,38 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 #skilltree-button.gesperrt {
     filter: grayscale(0.9) brightness(0.8);
 }
+
+/* Sprachen, die bald kommen (noch nicht waehlbar) */
+.sprach-karte.bald {
+    opacity: 0.6;
+    cursor: default;
+    filter: saturate(0.7);
+}
+.sprach-bald {
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.18);
+}
+.flagge-es { background: linear-gradient(#c60b1e 0 25%, #ffc400 25% 75%, #c60b1e 75%); }
+.flagge-fr { background: linear-gradient(90deg, #0055a4 0 33.3%, #fff 33.3% 66.6%, #ef4135 66.6%); }
+.flagge-it { background: linear-gradient(90deg, #009246 0 33.3%, #fff 33.3% 66.6%, #ce2b37 66.6%); }
+.flagge-pt { background: radial-gradient(circle at 40% 50%, #ffcc1a 0 12%, transparent 13%), linear-gradient(90deg, #046a38 0 40%, #da291c 40%); }
+.flagge-nl { background: linear-gradient(#ae1c28 0 33.3%, #fff 33.3% 66.6%, #21468b 66.6%); }
+.flagge-pl { background: linear-gradient(#fff 0 50%, #dc143c 50%); }
+.flagge-tr { background: radial-gradient(circle at 42% 50%, #e30a17 0 16%, transparent 17%), radial-gradient(circle at 38% 50%, #fff 0 22%, transparent 23%), #e30a17; }
+.flagge-ru { background: linear-gradient(#fff 0 33.3%, #0039a6 33.3% 66.6%, #d52b1e 66.6%); }
+.flagge-uk { background: linear-gradient(#0057b7 0 50%, #ffd700 50%); }
+.flagge-ja { background: radial-gradient(circle, #bc002d 0 28%, #fff 29%); }
+.flagge-zh { background: radial-gradient(circle at 25% 32%, #ffde00 0 14%, transparent 15%), #de2910; }
+.flagge-ko { background: radial-gradient(circle, #cd2e3a 0 14%, #0047a0 15% 27%, #fff 28%); }
+.sprach-karte.bald .sprach-name {
+    min-width: 0;
+    font-size: 0.85em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sprach-karte.bald .sprach-bald {
+    flex-shrink: 0;
+}
