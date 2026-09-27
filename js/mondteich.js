@@ -32,7 +32,7 @@ function kaufeMetaUpgrade(def) {
 function renderMetaUpgrades() {
     prestigeInfo.textContent = (run.sandbox
         ? t("♾️ Mondteich von Endlos: eigener Fortschritt, getrennt von Story. Mondblüten gibt es beim Neuanfang für Meilensteine")
-        : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 1, 2. = 4, 3. = 9 …)")) +
+        : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 2, 2. = 8, 3. = 18 …)")) +
         (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(sternenfallFaktor()) + "." : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
         const lvl = metaLevel(def.id);

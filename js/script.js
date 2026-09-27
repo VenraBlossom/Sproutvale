@@ -753,10 +753,12 @@ function mondbluetenJetzt() {
     return run.sandbox ? sandboxMondblueten() : mondbluetenFuerRechnungen(run.bezahlteRechnungen);
 }
 
-// Mondblueten fuer bezahlte Rechnungen: Nr. zum Quadrat (1, 4, 9, 16 ...), jeder Sternenfall verdreifacht alles
+// Mondblueten fuer bezahlte Rechnungen: 2 x Nr. zum Quadrat (2, 8, 18, 32 ...), jeder Sternenfall verdreifacht alles.
+// Verdoppelt, damit schon ein kurzer erster Run ein spuerbares Upgrade im Mondteich bringt.
+const MONDBLUETEN_PRO_RECHNUNG = 2;
 function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 : 0) {
     let summe = 0;
-    for (let i = 1; i <= anzahl; i++) summe += i * i;
+    for (let i = 1; i <= anzahl; i++) summe += MONDBLUETEN_PRO_RECHNUNG * i * i;
     const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.3 * sfLevel("mondmagnet")) *
         (1 + MONDPHASE_BONUS * mondphase);
     return aufrunden(summe * bonus * sternenfallFaktor());

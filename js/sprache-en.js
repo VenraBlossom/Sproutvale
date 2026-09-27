@@ -1219,7 +1219,7 @@ Object.assign(UEBERSETZUNG, {
     "Lass einen Samen fallen. Er hüpft durch ": "Drop a seed. It bounces through ",
     " Reihen Nägel und landet in einem Fach: Einsatz x Fach.": " rows of pins and lands in a slot: bet x slot.",
     "🏖️ Sandbox-Mondteich: eigener Fortschritt, getrennt vom Standard-Modus. Mondblüten gibt es beim Neuanfang für Meilensteine": "🏖️ Sandbox Moon Pond: its own progress, separate from standard mode. You get Moonpetals at the fresh start for milestones",
-    "Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 1, 2. = 4, 3. = 9 …)": "You get Moonpetals at the end of every run for paid bills (1st = 1, 2nd = 4, 3rd = 9 …)",
+    "Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 2, 2. = 8, 3. = 18 …)": "You get Moonpetals at the end of every run for paid bills (1st = 2, 2nd = 8, 3rd = 18 …)",
     ", durch deine Sternenfälle x": ", through your Starfalls x",
     " Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.": " slots are taken. Unequip an equipped card first.",
     "⭐ Ausgerüstet": "⭐ Equipped",
