@@ -84,7 +84,7 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Alpha 0.7.2";
+const SPIEL_VERSION = "Alpha 0.8.0";
 
 const KONFIG = {
     startKlicksProSamen: 28,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
