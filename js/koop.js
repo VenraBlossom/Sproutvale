@@ -343,6 +343,8 @@ function koopFehler(text) {
 
 // Lobby verlassen (still = ohne Meldung, z.B. vor einem neuen Versuch)
 function koopVerlassen(still) {
+    // Der Mitspieler behaelt meinen letzten Stand: wer spaeter auf meiner Seite einsteigt, spielt damit weiter
+    if (koop.imSpiel && run && run.koop && run.phase !== "runEnde") koopSende("stand", { daten: runDaten() });
     if (koop.imSpiel) koopBeendeSpiel(true);
     koopSende("tschuess");
     if (koop.kanal) koop.kanal.onclose = null;
@@ -424,7 +426,7 @@ function koopEmpfange(n) {
             if (koop.rolle === "host" && koop.imSpiel && run && run.koop && run.phase !== "runEnde") {
                 koopSende("start", {
                     sandbox: Boolean(run.sandbox), slot: run.koopSlot, kosmetik: { ...koop.kosmetik }, gastSeite: partnerSeite(),
-                    spielId: koop.spielId, gastDaten: run.sandbox ? koop.partnerStand : null, hostDaten: null,
+                    spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten: null,
                     mondphase: run.mondphase || 0,
                     wiedereinstieg: { tag: run.tag, bezahlteRechnungen: run.bezahlteRechnungen, phase: run.phase }
                 });
@@ -531,7 +533,7 @@ function koopStarteSpiel() {
     const hostSeite = stand ? stand.ich : "links";
     const gastSeite = hostSeite === "links" ? "rechts" : "links";
     koop.spielId = stand && stand.id ? stand.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    koop.partnerStand = stand ? stand.seiten[gastSeite] || null : null;
+    koop.partnerStand = stand ? stand.seiten[gastSeite] || null : null; // Story: neues Spiel, noch kein Stand
     const hostDaten = stand ? stand.seiten[hostSeite] || null : null;
     // Story: die Mondphase des Hosts gilt fuer beide (sonst waeren die Rechnungen auf beiden Seiten verschieden)
     koop.startMondphase = endlos ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0);
@@ -695,8 +697,8 @@ function koopFragePlatzUeberschreiben() {
 
 // Aus speichereRun: eigenen Stand speichern und dem Mitspieler schicken
 function koopSpeichereRun(daten) {
-    if (!run.sandbox) return;
-    koopSchreibeStand(daten);
+    // Endlos: den ganzen Stand speichern. Story: nur dem Mitspieler schicken (fuer einen Wiedereinstieg auf dieser Seite)
+    if (run.sandbox) koopSchreibeStand(daten);
     // Den Stand nur schicken, wenn er sich geaendert hat (ohne die Uhrzeit)
     const { gespeichertAm, ...vergleich } = daten;
     const text = JSON.stringify(vergleich);

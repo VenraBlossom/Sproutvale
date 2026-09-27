@@ -5040,12 +5040,10 @@ function stelleFeldWiederHer(feld, stand) {
     zeigeFeldSprite(feld);
 }
 
-function speichereRun() {
-    if (speichernGesperrt || !run || run.phase === "runEnde") return;
-    // Normale Runs nur zwischen den Tagen (mitten am Tag geht es beim Laden vor diesem Tag weiter)
-    if (!run.sandbox && run.phase !== "vorTag") return;
+// Der ganze Run als speicherbare Daten (Felder mit Pflanzen nur in Endlos)
+function runDaten() {
     const { felder, zielFeld, pflanzen, ...rest } = run;
-    const daten = {
+    return {
         version: RUN_SPEICHER_VERSION,
         anzahlFelder: felder.length,
         feldSlots: felder.map(f => f.slot),
@@ -5053,6 +5051,13 @@ function speichereRun() {
         gespeichertAm: Date.now(),
         run: { ...rest, pflanzen: pflanzen.map(p => ({ id: p.id, freigeschaltet: p.freigeschaltet, level: p.level })) }
     };
+}
+
+function speichereRun() {
+    if (speichernGesperrt || !run || run.phase === "runEnde") return;
+    // Normale Runs nur zwischen den Tagen (mitten am Tag geht es beim Laden vor diesem Tag weiter)
+    if (!run.sandbox && run.phase !== "vorTag") return;
+    const daten = runDaten();
     try {
         if (run.koop) return koopSpeichereRun(daten);
         localStorage.setItem(runSpeicherKey(run.sandbox, run.slot || 1), JSON.stringify(daten));
