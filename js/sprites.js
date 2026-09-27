@@ -2924,3 +2924,169 @@ SPRITE_PIXEL.form_kristall = [
     "............",
     "............"
 ];
+
+// ---------- PIXEL-SYMBOLE (statt Emojis) ----------
+// Eigene Pixel-Symbole im Spielstil. pixelIcon("❤️") nimmt automatisch das Pixel-Symbol, wenn es eins gibt.
+// o = Umriss, weitere Buchstaben je Symbol eigene Farben.
+const PIXEL_SYMBOL_DATEN = {
+    herz: [{ o: "#5a1a24", R: "#ff4a6a", r: "#c8243a", w: "#ffffff" }, [
+        ".oo...oo..",
+        "oRRo.oRRo.",
+        "oRwRoRRRo.",
+        "oRRRRRRRo.",
+        "oRRRRRRro.",
+        ".oRRRRro..",
+        "..oRRro...",
+        "...oRo....",
+        "....o....."]],
+    funkeln: [{ o: "#8a6a10", Y: "#ffe066", W: "#ffffff" }, [
+        "....o.....",
+        "...oYo....",
+        "...oYo....",
+        ".ooYWYoo..",
+        "oYYWWWYYo.",
+        ".ooYWYoo..",
+        "...oYo..o.",
+        "...oYo.oYo",
+        "....o...o."]],
+    flamme: [{ o: "#5a1a08", R: "#e8432a", O: "#ff8a2a", Y: "#ffd23a", W: "#fff6c0" }, [
+        "....o.....",
+        "...oRo....",
+        "...oRo.o..",
+        "..oROooRo.",
+        "..oROORRo.",
+        ".oROOYORo.",
+        ".oROYWYRo.",
+        ".oROYYORo.",
+        "..oRRRRo..",
+        "...oooo..."]],
+    stern: [{ o: "#6a4a08", Y: "#ffd23a", y: "#d49a00", W: "#fff6c0" }, [
+        "....oo....",
+        "....oYo...",
+        "...oYYo...",
+        "ooooYWoooo",
+        "oYYYYYYYYo",
+        ".oYYYYYyo.",
+        "..oYYYyo..",
+        ".oYYooYyo.",
+        ".oYo..oyo.",
+        ".oo....oo."]],
+    schnee: [{ o: "#3a5a7a", B: "#bfeaff", W: "#ffffff" }, [
+        "....oo....",
+        "..o.oBo.o.",
+        "..oBoBoBo.",
+        "...oBBBo..",
+        "ooooBWBooo",
+        "oBBBWWWBBo",
+        "ooooBWBooo",
+        "...oBBBo..",
+        "..oBoBoBo.",
+        "..o.oBo.o."]],
+    block: [{ o: "#3a2412", g: "#5fb03c", G: "#8fd05a", b: "#9a6634", d: "#6b4a2a" }, [
+        ".oooooooo.",
+        ".oGgGggGo.",
+        ".oggggggo.",
+        ".obdbbdbo.",
+        ".obbbbbbo.",
+        ".obbdbbbo.",
+        ".odbbbdbo.",
+        ".oooooooo."]],
+    hand: [{ o: "#5a3a2a", H: "#ffd2b0", h: "#e0a880" }, [
+        "...o.o....",
+        "..oHoHo.o.",
+        "..oHoHooHo",
+        "o.oHoHoHHo",
+        "oHoHHHHHHo",
+        "oHHoHHHHHo",
+        ".oHHHHHHHo",
+        "..oHHHHHo.",
+        "..oHHHhHo.",
+        "...ohhhho.",
+        "....oooo.."]],
+    party: [{ o: "#3a1a4a", P: "#c86ae0", Y: "#ffd23a", R: "#ff4a6a", B: "#5ab8f0" }, [
+        "......Y..R",
+        "..R......Y",
+        ".......B..",
+        "....oooo..",
+        "...oPPPo..",
+        "..oPYPPo..",
+        ".oPPPBo...",
+        "oPRPPo....",
+        "oPPPo.....",
+        ".ooo......"]],
+    note: [{ o: "#1a1030", N: "#3a2a7a", n: "#6a5ab0" }, [
+        "....oooooo",
+        "....oNNNNo",
+        "....oNoooo",
+        "....oNo...",
+        "....oNo...",
+        ".ooooNo...",
+        "onNNNNo...",
+        "oNNNNNo...",
+        ".oooooo..."]],
+    hacke: [{ o: "#2a1a0a", t: "#9a6634", e: "#b8c0cc", w: "#ffffff" }, [
+        ".oooo.....",
+        "owweeo....",
+        "oeoooeo...",
+        ".o..oto...",
+        ".....oto..",
+        "......oto.",
+        ".......oto",
+        "........oo"]],
+    lachen: [{ o: "#6a4a08", Y: "#ffd23a", y: "#e8b020", M: "#8a2a1a", B: "#5ab8f0", W: "#ffffff" }, [
+        "..oooooo..",
+        ".oYYYYYYo.",
+        "oYoYYYYoYo",
+        "oYYoYYoYYo",
+        "BYYYYYYYYB",
+        "BoMMMMMMoB",
+        "oYMWWWWMYo",
+        ".oYMMMMYo.",
+        "..oooooo.."]],
+    daumen: [{ o: "#5a3a2a", H: "#ffd2b0", h: "#e0a880", B: "#5ab8f0" }, [
+        "....oo....",
+        "...oHo....",
+        "...oHo....",
+        "..oHHo....",
+        "ooHHHooooo",
+        "oBoHHHHHHo",
+        "oBoHHHHHho",
+        "oBoHHHHHho",
+        "oBoHHHHhho",
+        "oooooooooo"]],
+    zzz: [{ o: "#2a3a7a", B: "#8fa2f0", W: "#dce4ff" }, [
+        ".....ooooo",
+        ".....oWBBo",
+        ".......oBo",
+        "......oBo.",
+        ".....oBBBo",
+        "ooooo.ooo.",
+        "oWBBo.....",
+        "..oBo.....",
+        ".oBo......",
+        "oBBBo.....",
+        "ooooo....."]],
+    sonne: [{ o: "#8a5a08", Y: "#ffd23a", W: "#fff6c0" }, [
+        "....oo....",
+        ".o..oo..o.",
+        "..oooooo..",
+        "..oYYYYo..",
+        "ooYWYYYYoo",
+        "ooYYYYYYoo",
+        "..oYYYYo..",
+        "..oooooo..",
+        ".o..oo..o.",
+        "....oo...."]]
+};
+
+// Welche Emojis durch Pixel-Symbole ersetzt werden
+const PIXEL_SYMBOLE = {
+    "💗": "herz", "❤️": "herz", "💛": "herz", "✨": "funkeln", "🔥": "flamme", "⭐": "stern", "🌟": "stern",
+    "❄️": "schnee", "🟫": "block", "👋": "hand", "✋": "hand", "🎉": "party", "💃": "note", "🎵": "note", "⛏️": "hacke",
+    "😂": "lachen", "👍": "daumen", "💤": "zzz", "☀️": "sonne"
+};
+
+Object.entries(PIXEL_SYMBOL_DATEN).forEach(([name, [farben, zeilen]]) => {
+    SPRITE_PIXEL["sym_" + name + "_basis"] = zeilen;
+    SPRITE_ABWANDLUNGEN["sym_" + name] = { basis: "sym_" + name + "_basis", farben };
+});

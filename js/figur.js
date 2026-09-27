@@ -1468,6 +1468,18 @@ function aktualisiereProfilKnopf() {
     knopf.append(mini.huelle, el("span", null, profil().name ? profil().name : t("Profil")));
 }
 
+// Kleiner Ausschnitt der eigenen Figur als Symbol fuer eine Kategorie (Kopf, Oberkoerper oder Beine)
+const FIGUR_AUSSCHNITTE = { haut: 3, augen: 7, frisur: 2, haarfarbe: 2, kopf: 0, oberteil: 16, accessoire: 14, hose: 22, schuhe: 26 };
+function figurAusschnitt(kategorie) {
+    const fenster = el("div", "figur-ausschnitt");
+    const figur = erstelleFigurBild(2);
+    zeigeFigurBild(figur, figurTeileAus(profilVorschau || profil().teile, false), "stehen", 0, false, "vorne");
+    figur.huelle.style.marginTop = -(FIGUR_AUSSCHNITTE[kategorie] || 0) * 2 + "px";
+    figur.huelle.style.marginLeft = "-4px";
+    fenster.appendChild(figur.huelle);
+    return fenster;
+}
+
 function renderProfil() {
     const inhalt = $("profil-inhalt");
     inhalt.innerHTML = "";
@@ -1483,8 +1495,13 @@ function renderProfil() {
     links.appendChild(buehne);
 
     const posen = el("div", "profil-posen");
-    [["laufen", "🚶"], ["winken", "👋"], ["hacken", "⛏️"], ["tanzen", "💃"], ["jubeln", "🎉"], ["sitzen", "🪑"]].forEach(([pose, symbol]) => {
-        const knopf = el("button", "knopf profil-pose" + (pose === profilPose ? " aktiv" : ""), null, [pixelIcon(symbol, 20)]);
+    [["laufen", t("Laufen")], ["winken", t("Winken")], ["hacken", t("Hacken")], ["tanzen", t("Tanzen")], ["jubeln", t("Jubeln")], ["sitzen", t("Sitzen")]]
+        .forEach(([pose, name]) => {
+        // Statt eines Symbols: die eigene Figur klein in dieser Pose
+        const mini = erstelleFigurBild(1);
+        zeigeFigurBild(mini, figurTeileAus(profilVorschau, false), pose, 1, false, pose === "laufen" || pose === "hacken" ? "seite" : "vorne");
+        const knopf = el("button", "knopf profil-pose" + (pose === profilPose ? " aktiv" : ""), null, [mini.huelle]);
+        setzeTipp(knopf, name);
         // Nochmal anklicken schaltet die Animation wieder aus
         knopf.addEventListener("click", () => {
             profilPose = profilPose === pose ? null : pose;
@@ -1519,7 +1536,7 @@ function renderProfil() {
     const rechts = el("div", "profil-rechts");
     const reiter = el("div", "profil-reiter");
     FIGUR_KATEGORIEN.forEach(k => {
-        const knopf = el("button", "knopf reiter-knopf" + (k.id === profilKategorie ? " aktiv" : ""), null, [pixelIcon(k.symbol, 20), el("span", null, k.name)]);
+        const knopf = el("button", "knopf reiter-knopf" + (k.id === profilKategorie ? " aktiv" : ""), null, [figurAusschnitt(k.id), el("span", null, k.name)]);
         knopf.addEventListener("click", () => {
             profilKategorie = k.id;
             renderProfil();

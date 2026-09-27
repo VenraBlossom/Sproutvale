@@ -11147,3 +11147,19 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     width: 44px;
     height: 44px;
 }
+
+/* Charakter-Editor: Ausschnitte der eigenen Figur als Symbole */
+.figur-ausschnitt {
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.45);
+    flex: 0 0 auto;
+}
+.figur-ausschnitt .figur-bild {
+    transform-origin: 0 0;
+}
+.profil-pose .figur-bild {
+    margin: 2px;
+}

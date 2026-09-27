@@ -2224,6 +2224,8 @@ Object.assign(UEBERSETZUNG, {
     "Engelsflügel": "Angel Wings",
     "Schmetterlingsflügel": "Butterfly Wings",
     "Drachenflügel": "Dragon Wings",
+    "Laufen": "Walk",
+    "Sitzen": "Sit",
     "Saatband": "Seed Tape",
     "+5% Chance, dass ein Samen einen zweiten mitbringt.": "+5% chance that a seed brings a second one.",
     "Sternenkiste": "Star Chest",
