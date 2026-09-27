@@ -3092,6 +3092,17 @@ const PIXEL_SYMBOL_DATEN = {
         ".oBo......",
         "oBBBo.....",
         "ooooo....."]],
+    stuhl: [{ o: "#3a2412", W: "#b87a3e", w: "#8a5a2c" }, [
+        ".oo.......",
+        ".oWo......",
+        ".oWo......",
+        ".oWo......",
+        ".oWoooooo.",
+        ".oWWWWWWo.",
+        ".owwwwwwo.",
+        ".oWooooWo.",
+        ".oWo..oWo.",
+        ".ooo..ooo."]],
     kat_haut: [{ o: "#5a3a2a", H: "#ffd2b0", h: "#e0a880" }, [
         "...o.o....",
         "..oHoHo.o.",
