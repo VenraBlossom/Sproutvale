@@ -189,15 +189,15 @@ const NEUIGKEITEN = [
 const KONFIG = {
     klickGrenzeProSek: 10,            // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt weniger
     klickUeberGrenze: 0.75,           // (Autoklicker bleiben staerker, aber man muss keinen benutzen; die Sense ist ausgenommen)
-    startKlicksProSamen: 20,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
+    startKlicksProSamen: 15,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
     minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
     klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
-    startEnergie: 150,
+    startEnergie: 180,
     energieProSek: 5,
     tageProRechnung: 5,
     rechnungBasis: 30,
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
-    rechnungFaktorenStart: [5, 10, 17], // die ersten Spruenge sind sanfter: 30, 150, 1.500, 25.500, 660.000 ...
+    rechnungFaktorenStart: [5, 40, 25], // 30, 150, dann nach dem Stellarium steiler: 6.000, 150.000, 3,9 Mio. ...
     sternensamenProErnte: 6,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
     sternensamenPflanzenFaktor: 1.14, // ... und jede hoehere Pflanze gibt 14% mehr (Kuerbis ~15, Mondlilie ~37): neue Pflanzen lohnen sich
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen (Bruchteile aus Upgrades werden gesammelt)
@@ -251,7 +251,7 @@ const KONFIG = {
 // unlockKosten in Sternensamen. "eigenschaft" = kleine Besonderheit dieser Pflanze (Wirkung in script.js).
 
 const PFLANZEN_VORLAGEN = [
-    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 2, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 5 Sternensamen extra.") },
+    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 1.6, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 5 Sternensamen extra.") },
     { id: "karotte", name: t("Karotte"), emoji: "🥕", sekProStufe: 2.5, verkaufswert: 5, unlockKosten: 120, bonusName: t("Knackige Karotten"), bonusText: t("Karotten wachsen 50% schneller.") },
     { id: "kartoffel", name: t("Kartoffel"), emoji: "🥔", sekProStufe: 3, verkaufswert: 12, unlockKosten: 210, bonusName: t("Knollenfund"), bonusText: t("20% Chance, dass eine Kartoffel eine zweite Saat fallen lässt.") },
     { id: "erdbeere", name: t("Erdbeere"), emoji: "🍓", sekProStufe: 3.5, verkaufswert: 30, unlockKosten: 370, bonusName: t("Süße Beeren"), bonusText: t("Saaten von Erdbeeren sind mindestens ungewöhnlich.") },
@@ -370,10 +370,10 @@ const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [
 const SHOP_UPGRADES = [
     // Einmalig und dauerhaft: am Anfang gibt es nur Klicken, Warten und den Markt. Das Stellarium kommt danach.
     // Von Anfang an: mehr Gold fuer jede Ernte (frueh stark, spaeter bei teuren Pflanzen kaum noch spuerbar)
-    { id: "erntekorb", knoten: null, icon: "🧺", name: t("Erntekorb"), basiskosten: 12, faktor: 1.8, max: 10,
+    { id: "erntekorb", knoten: null, icon: "🧺", name: t("Erntekorb"), basiskosten: 8, faktor: 1.7, max: 10,
         beschreibung: t("+1 Gold für jede Ernte."),
         info: () => "+" + level("erntekorb") + t(" Gold pro Ernte") },
-    { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 1000, faktor: 1, max: 1,
+    { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 700, faktor: 1, max: 1,
         beschreibung: t("Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
         info: () => t("Freigeschaltet") },
     { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9, max: 22,

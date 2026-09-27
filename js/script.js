@@ -4029,6 +4029,7 @@ function kaufeUpgrade(def, waehrung) {
     if (waehrung === "skillpunkte" && !stellariumFrei()) return;
     if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
+    if (vorigePflanzeFehlt(def)) return;
     bezahle(waehrung, kosten);
     run.level[def.id] = level(def.id) + 1;
     if (def.id === "stellarium") {
@@ -4044,8 +4045,9 @@ function kaufeUpgrade(def, waehrung) {
 
 // ---------- SHOP (Gold) ----------
 
+// Weizen-Upgrades sind 10% billiger (der Einstieg soll flott gehen)
 function pflanzenUpgradeKosten(pflanze, upgrade) {
-    return kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert, upgrade.faktor, pflanze.level[upgrade.id]);
+    return kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert * (pflanze.id === "weizen" ? 0.9 : 1), upgrade.faktor, pflanze.level[upgrade.id]);
 }
 
 function kaufePflanzenUpgrade(pflanze, upgrade) {
@@ -4053,6 +4055,8 @@ function kaufePflanzenUpgrade(pflanze, upgrade) {
     if (!darfEinkaufen() || !pflanzenUpgradeFrei(pflanze, upgrade) || pflanze.level[upgrade.id] >= upgrade.max || run.gold < kosten) return;
     run.gold -= kosten;
     pflanze.level[upgrade.id] += 1;
+    // selbst gekaufte Ertrag-Stufen zaehlen fuer das Freischalten der naechsten Pflanze (geerbte Stufen nicht)
+    if (upgrade.id === "ertrag") pflanze.level.ertragEigen = (pflanze.level.ertragEigen || 0) + 1;
     Klang.kaufen();
     if (upgrade.id === "ertrag" && pflanze.level.ertrag % 10 === 0) {
         zeigeBanner(pflanze.emoji, pflanze.name + t(": Ertrag Stufe ") + pflanze.level.ertrag, t("Wert verdoppelt!"), "#e0a800", 2600);
@@ -4241,8 +4245,18 @@ function istSternErledigt(def) {
     return Boolean(def.erledigt && def.erledigt());
 }
 
+// Nicht bis zur 6. Pflanze durchskippen: eine neue Pflanze gibt es erst, wenn in die vorige investiert wurde
+const PFLANZE_ERTRAG_VOR = 3;
+function vorigePflanzeFehlt(def) {
+    if (def.art !== "pflanze" || !def.vor) return null;
+    const vorige = run.pflanzen.find(p => "p_" + p.id === def.vor);
+    if (!vorige || !vorige.freigeschaltet) return null;
+    const eigen = vorige.level.ertragEigen || 0;
+    return eigen < PFLANZE_ERTRAG_VOR ? { pflanze: vorige, eigen } : null;
+}
+
 function istKnotenOffen(def) {
-    return !def.vor || istVorgaengerErfuellt(def.vor, def.vorMax);
+    return (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) && !vorigePflanzeFehlt(def);
 }
 
 function knotenKosten(def) {
@@ -4555,7 +4569,10 @@ function renderSternDetails(def) {
     }
 
     if (erledigt) sternbildDetails.appendChild(erstelleHinweis(t("✔ Schon erledigt durch ") + erledigt + "."));
-    if (!offen) {
+    const fehlt = vorigePflanzeFehlt(def);
+    if (fehlt) {
+        sternbildDetails.appendChild(erstelleHinweis(tf("🔒 Erst {0}x Ertrag für {1} kaufen ({2}/{0})", PFLANZE_ERTRAG_VOR, fehlt.pflanze.name, fehlt.eigen)));
+    } else if (!offen) {
         const vor = SKILL_NACH_ID[def.vor];
         const vorName = knotenSicht(vor) === "schatten" ? t("einen unbekannten Stern") : vor.name;
         sternbildDetails.appendChild(erstelleHinweis(def.vorMax ? t("🔒 Erst ganz ausbauen: ") + vorName : t("🔒 Erst kaufen: ") + vorName));
