@@ -398,8 +398,29 @@ requestAnimationFrame(hauptSchleife);
 // Alle Versionen untereinander (neueste oben), das Fenster scrollt.
 // Patch Notes als Dorfzeitung (wie der Newsletter in Hay Day): jede Version ist eine Ausgabe
 function zeigeNeuigkeiten(ausgabe = 0) {
-    const eintrag = NEUIGKEITEN[ausgabe];
     const blatt = el("div", "zeitung-blatt");
+    fuelleZeitung(blatt, ausgabe);
+    Klang.klick(8);
+    zeigePopup({
+        titel: t("📰 Neuigkeiten"),
+        farbe: "#8a5a2c",
+        breite: 660,
+        klasse: "zeitung-fenster",
+        inhalt: blatt,
+        knoepfe: [{ text: t("Weiter spielen"), klasse: "knopf-gruen" }]
+    });
+    meta.neuigkeitenGelesen = SPIEL_VERSION;
+    speichereMeta();
+    aktualisiereZeitungKnopf();
+}
+
+// Eine Ausgabe auf das Zeitungsblatt schreiben (beim Blaettern wird nur der Inhalt getauscht)
+function fuelleZeitung(blatt, ausgabe) {
+    const eintrag = NEUIGKEITEN[ausgabe];
+    blatt.innerHTML = "";
+    blatt.classList.remove("umblaettern");
+    void blatt.offsetWidth;
+    blatt.classList.add("umblaettern");
     // Kopf der Zeitung
     blatt.appendChild(el("div", "zeitung-kopf", null, [
         el("div", "zeitung-name", t("Sproutvale Tagblatt")),
@@ -419,30 +440,18 @@ function zeigeNeuigkeiten(ausgabe = 0) {
     if (dorf.length) blatt.appendChild(el("div", "zeitung-dorf", null, [el("b", null, t("Aus dem Dorf: ")), el("span", null, zufall(dorf))]));
     // Blaettern durch alte Ausgaben
     const blaettern = el("div", "zeitung-blaettern");
-    let schliessen = null;
     const knopf = (text, ziel) => {
         const k = el("button", "knopf zeitung-knopf", text);
         k.disabled = ziel < 0 || ziel >= NEUIGKEITEN.length;
         k.addEventListener("click", () => {
-            if (schliessen) schliessen();
-            zeigeNeuigkeiten(ziel);
+            Klang.klick(6);
+            fuelleZeitung(blatt, ziel);
+            blatt.scrollTop = 0;
         });
         return k;
     };
     blaettern.append(knopf(t("◀ Neuere"), ausgabe - 1), el("span", null, (ausgabe + 1) + " / " + NEUIGKEITEN.length), knopf(t("Ältere ▶"), ausgabe + 1));
     blatt.appendChild(blaettern);
-    Klang.klick(8);
-    schliessen = zeigePopup({
-        titel: t("📰 Neuigkeiten"),
-        farbe: "#8a5a2c",
-        breite: 660,
-        klasse: "zeitung-fenster",
-        inhalt: blatt,
-        knoepfe: [{ text: t("Weiter spielen"), klasse: "knopf-gruen" }]
-    });
-    meta.neuigkeitenGelesen = SPIEL_VERSION;
-    speichereMeta();
-    aktualisiereZeitungKnopf();
 }
 
 function aktualisiereZeitungKnopf() {
@@ -464,8 +473,7 @@ aktualisiereZeitungKnopf();
     speichereMeta();
     setTimeout(() => zeigeBanner(fest.symbol, fest.name + "!", fest.zeitung, "#b8862b", 4200), 1500);
 })();
-$("menue-version").textContent = SPIEL_VERSION + " · " + t("Patch Notes");
-$("menue-version").addEventListener("click", () => zeigeNeuigkeiten(0));
+$("menue-version").textContent = SPIEL_VERSION;
 if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
     const schonGespielt = (meta.lebenszeit && meta.lebenszeit.tage > 0) || meta.mondblueten > 0;
     meta.neuigkeitenGesehen = SPIEL_VERSION;

@@ -12019,3 +12019,57 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.4;
     cursor: default;
 }
+
+/* Zeitung unten links statt Schriftzug, Version rechts nur als Text */
+.menue-zeitung {
+    left: 14px;
+    bottom: 12px;
+    transform: none;
+}
+.menue-zeitung:hover {
+    transform: translateY(-3px) rotate(-4deg);
+}
+#menue-version {
+    cursor: default;
+}
+#menue-version:hover {
+    text-decoration: none;
+    opacity: 0.85;
+}
+/* Ungelesen: der Knopf wackelt ab und zu (in Pixel-Schritten, wie in Hay Day) */
+.menue-zeitung.ungelesen {
+    animation: zeitung-wackeln 2.4s steps(1) infinite;
+}
+@keyframes zeitung-wackeln {
+    0%, 70%, 100% { transform: rotate(0deg); }
+    74% { transform: rotate(-10deg) scale(1.08); }
+    78% { transform: rotate(10deg) scale(1.08); }
+    82% { transform: rotate(-8deg) scale(1.05); }
+    86% { transform: rotate(6deg); }
+    90% { transform: rotate(0deg); }
+}
+/* Beim Oeffnen wirbelt die Zeitung heran wie in alten Filmen (ruckelig in festen Schritten = Pixel-Look) */
+.popup.zeitung-fenster {
+    animation: zeitung-wirbel 0.8s steps(12) both;
+    image-rendering: pixelated;
+}
+@keyframes zeitung-wirbel {
+    0% { transform: scale(0.05) rotate(-720deg); opacity: 0; }
+    15% { opacity: 1; }
+    85% { transform: scale(1.06) rotate(-8deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.popup-weg .popup.zeitung-fenster {
+    animation: zeitung-weg 0.3s steps(5) forwards;
+}
+@keyframes zeitung-weg {
+    to { transform: scale(0.1) rotate(180deg); opacity: 0; }
+}
+/* Umblaettern: die Seite klappt kurz in Pixel-Schritten auf */
+.zeitung-blatt.umblaettern {
+    animation: zeitung-seite 0.3s steps(4);
+}
+@keyframes zeitung-seite {
+    from { transform: rotate(-0.4deg) scaleX(0.2); opacity: 0.4; }
+    to { transform: rotate(-0.4deg) scaleX(1); opacity: 1; }
+}
