@@ -2740,7 +2740,11 @@ Object.assign(UEBERSETZUNG, {
     "Am Ende eines Runs wandern 5% deiner übrigen Sternensamen in den nächsten Run.": "At the end of a run 5% of your remaining Star Seeds carry over into the next run.",
     "% der Sternensamen": "% of Star Seeds",
     "🔒 Noch unbekannt": "🔒 Still unknown",
-    "Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank).": "Moon Pond: 4 new upgrades you discover over time (Heirloom, Star Map, Blessed Start, Seed Bank)."
+    "Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank).": "Moon Pond: 4 new upgrades you discover over time (Heirloom, Star Map, Blessed Start, Seed Bank).",
+    "🌾 Story komplett löschen?": "🌾 Delete Story completely?",
+    "ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. ": "WARNING: this deletes all Story progress: Moonpetals, Moon Pond upgrades, tarot, plushies, Starfall, achievements, statistics and mastery. ",
+    "Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos.": "Only cosmetics, purchased content, your profile, your settings and Endless are kept.",
+    "🌾 Story komplett zurückgesetzt": "🌾 Story completely reset"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -4767,12 +4767,14 @@ function spieleModus(sandbox) {
 function frageModusReset(sandbox) {
     const name = sandbox ? t("deinen Spielstand in Endlos") : t("deinen Run");
     zeigePopup({
-        titel: sandbox ? t("🏖️ Sandbox zurücksetzen?") : t("🌾 Run zurücksetzen?"),
+        titel: sandbox ? t("🏖️ Sandbox zurücksetzen?") : t("🌾 Story komplett löschen?"),
+        farbe: "#b8232a",
         inhalt: t("Willst du ") + name + t(" wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine ") +
             t("(dafür ") + (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")) + t(" nutzen). ") +
             (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). ") +
                 t("Story, Erfolge und Kosmetik bleiben.")
-                : t("Mondblüten, Upgrades, Kuscheltiere, Erfolge und Kosmetik bleiben.")),
+                : t("ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. ") +
+                t("Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos.")),
         breite: 560,
         knoepfe: [
             { text: t("Abbrechen") },
@@ -4780,7 +4782,7 @@ function frageModusReset(sandbox) {
                 setzeModusZurueck(sandbox);
                 Klang.reset();
                 renderModusKarten();
-                zeigeToast(sandbox ? t("🏖️ Sandbox zurückgesetzt") : t("🌾 Run zurückgesetzt"));
+                zeigeToast(sandbox ? t("🏖️ Sandbox zurückgesetzt") : t("🌾 Story komplett zurückgesetzt"));
             } }
         ]
     });
@@ -5537,6 +5539,16 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
             localStorage.removeItem(endlosMetaKey(slot));
         } catch (fehler) {
             console.warn("Endlos-Speicherstand konnte nicht geloescht werden", fehler);
+        }
+    } else {
+        // Story loeschen = der ganze Story-Fortschritt faengt neu an (Mondteich, Tarot, Kuscheltiere, Sternenfall,
+        // Erfolge, Statistik, Meisterschaft). Kosmetik, Kaeufe, Profil und Endlos bleiben ("Run beenden" behaelt dagegen alles).
+        const frisch = fortschrittVon(leererMetaStand());
+        if (metaProfil === "standard") {
+            Object.keys(fortschrittVon(meta)).forEach(schluessel => delete meta[schluessel]);
+            Object.assign(meta, frisch);
+        } else {
+            metaRuhend = frisch;
         }
     }
     if (aktiv) {
