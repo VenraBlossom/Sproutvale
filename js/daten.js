@@ -1697,7 +1697,7 @@ const KOSMETIK_KATEGORIEN = [
     { id: "deko", name: t("Deko"), symbol: "🪴" },
     { id: "musik", name: t("Musik"), symbol: "🎵" },
     { id: "samenladen", name: t("Samenladen"), symbol: "🏪" },
-    { id: "felder", name: t("Felder"), symbol: "🟫" },
+    { id: "felder", name: t("Felder"), symbol: "sprite:sym_beet" },
     { id: "kugeln", name: t("Münzen"), symbol: "🪙" },
     { id: "rahmen", name: t("Kuschel-Rahmen"), symbol: "🖼️" },
     { id: "pflanzen", name: t("Pflanzen"), symbol: "🌱" }

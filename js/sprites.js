@@ -3220,6 +3220,16 @@ const PIXEL_SYMBOL_DATEN = {
         ".obbdbbbo.",
         ".odbbbdbo.",
         ".oooooooo."]],
+    // Gepfluegtes Beet mit Keimling (Reiter "Felder" im Haus)
+    beet: [{ o: "#3a2412", B: "#9a6634", b: "#6b4a2a", g: "#3f8a32", G: "#7ed957" }, [
+        "...Gg.gG..",
+        "....gGg...",
+        ".....g....",
+        ".oooooooo.",
+        "oBbBBbBBbo",
+        "obBBbBBbBo",
+        "oBbBBbBBbo",
+        ".oooooooo."]],
     hand: [{ o: "#5a3a2a", H: "#ffd2b0", h: "#e0a880" }, [
         "...o.o....",
         "..oHoHo.o.",
