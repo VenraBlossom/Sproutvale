@@ -2340,7 +2340,7 @@ const FIGUR_TEILE = {
         { id: "grinsen", name: t("Breites Grinsen"), quelle: "frei", form: "grinsen", farben: { G: "#9a4a3a", H: "#ffffff" } },
         { id: "schnurrbart", name: t("Schnurrbart"), ...EPISCH, form: "schnurrbart" },
         { id: "vollbart", name: t("Vollbart"), ...EPISCH, form: "vollbart" },
-        { id: "pflaster", name: t("Pflaster"), ...EPISCH, form: "pflaster", farben: { G: "#f0c89a", H: "#d8a878" } },
+        { id: "pflaster", name: t("Pflaster"), ...EPISCH, form: "pflaster", farben: { G: "#fff4e0", H: "#b07a4a" } },
         { id: "kriegsbemalung", name: t("Farbstreifen"), ...EPISCH, form: "streifen", farben: { G: "#2f6fb8", H: "#e8434a" } },
         { id: "sternenwangen", name: t("Sternenwangen"), ...LEGENDAER, form: "sternenwangen", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
             farben: { G: "#ffd23a", H: "#fff6c0" } }

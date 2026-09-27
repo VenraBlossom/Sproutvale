@@ -326,9 +326,9 @@ function figurGesicht(g, blick, cx, ay, teil, anim) {
     case "pflaster": {
         // Pflaster quer auf der Wange (auf der Stirn lagen die Haare darueber)
         const px = vorne ? cx + 1.5 : cx + 1;
-        a.rechteck(px, ay + 2.5, 2.5, 1, "G");
+        a.rechteck(px - 0.5, ay + 2, 3.5, 1.5, "H");
+        a.rechteck(px, ay + 2, 2.5, 1, "G");
         a.fein(px + 1, ay + 2.5, "H");
-        a.fein(px + 1.5, ay + 3, "H");
         break;
     }
     case "streifen":

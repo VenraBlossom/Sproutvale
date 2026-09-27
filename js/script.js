@@ -1911,7 +1911,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     run.gesamt.ernten += 1;
     meta.lebenszeit.ernten += 1;
     const stufeVorher = meisterStufe(pflanze.id);
-    gibBauernXp(1 + pflanze.index);
+    gibErnteXp(1 + pflanze.index);
     // Mondteich "Meisterhaende": jede Ernte zaehlt fuer die Meisterschaft oefter
     meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende") + Math.floor(segen("meisterlich"));
     if (meisterStufe(pflanze.id) > stufeVorher) {
@@ -3501,9 +3501,24 @@ function aktualisiereLebenszeitMaxima() {
     if (run.sandbox) l.maxMeilensteine = Math.max(l.maxMeilensteine || 0, run.meilensteine);
 }
 
+// Ernte-Erfahrung: pro Tag bis 400 voll, danach nur noch 3% (sonst waere Level 100 spaet in 2 Runs erreicht)
+const ERNTE_XP_PRO_TAG = 400;
+function gibErnteXp(menge) {
+    const heute = run.ernteXpHeute || 0;
+    const wert = heute < ERNTE_XP_PRO_TAG ? menge : menge * 0.03;
+    run.ernteXpHeute = heute + menge;
+    run.ernteXpRest = (run.ernteXpRest || 0) + wert;
+    const ganz = Math.floor(run.ernteXpRest);
+    if (ganz <= 0) return;
+    run.ernteXpRest -= ganz;
+    gibBauernXp(ganz);
+}
+
 // Feierabend: Tag geschafft, dazu etwas fuer Gold und Sternensamen im Beutel
 function gibTagesXp() {
+    run.ernteXpHeute = 0;
     gibBauernXp(25 + Math.min(run.tag, 50) + xpAusMenge(run.gold, 12) + xpAusMenge(run.skillpunkte, 10));
+    if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf(); // XP-Leiste auffrischen
 }
 
 function beendeTag() {
