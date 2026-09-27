@@ -910,7 +910,7 @@ function figurWerkzeug(g, art, x, y) {
 
 function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
     const k = g.kleidung;
-    const stiefel = schuhe.form === "stiefel";
+    const stiefel = schuhe.form === "stiefel" || schuhe.form === "cowboy";
     const rock = hose.form === "rock";
     beine.forEach(([x, dunkel]) => {
         const hoch = 24 - oben;
@@ -926,6 +926,11 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         if (stiefel) {
             k.rechteck(x, 21, 2, 3, "1");
             k.feinLinie(x, 21, x + 1.5, 21, "l");
+            // Cowboystiefel: goldene Ziernaht am Schaft
+            if (schuhe.form === "cowboy") {
+                k.fein(x + 0.5, 22, "n");
+                k.fein(x + 1, 22.5, "n");
+            }
         }
         if (blick === "seite") {
             k.rechteck(x, 24, 3, 1, "1");
@@ -933,6 +938,23 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         } else {
             k.rechteck(x - (x < 9 ? 0.5 : 0), 24, 2.5, 1, "1");
             k.fein(x < 9 ? x - 0.5 : x + 2, 24, "l");
+        }
+        if (schuhe.form === "sandalen") {
+            // Sandalen: die Zehen schauen raus, ein Riemen darueber
+            k.fein(blick === "seite" ? x + 2 : x + 0.5, 24, "4");
+            k.fein(blick === "seite" ? x + 2.5 : x + 1.5, 24, "4");
+            k.feinLinie(x, 23.5, x + 2, 23.5, "l");
+        }
+        if (schuhe.form === "blitz") {
+            // Blitzschuhe: kleine Funken springen abwechselnd links und rechts vom Schuh
+            k.feinLinie(x, 24, x + 1.5, 24, "l");
+            const links = (anim + (x < 9 ? 0 : 1)) % 2 === 0;
+            const bx = links ? x - 1 : x + 2.5;
+            const r = links ? -0.5 : 0.5;
+            g.werkzeug.feinLinie(bx, 22, bx + r, 23, "g");
+            g.werkzeug.feinLinie(bx + r, 23, bx, 23.5, "g");
+            g.werkzeug.feinLinie(bx, 23.5, bx + r, 24.5, "g");
+            g.werkzeug.fein(bx, 22, "w");
         }
         if (schuhe.form === "wolke") {
             // Wolkenschuhe: kleine Wolken, die im Takt aufpuffen
@@ -968,6 +990,33 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
                 g.werkzeug.fein(x + 1, 25 + lang * 0.5, "g");
                 g.werkzeug.fein(x + 1.5, 25, "f");
             }
+        });
+    }
+    if (hose.form === "cargo") {
+        // Cargohose: aufgesetzte Seitentasche mit hellerer Klappe
+        beine.forEach(([x, dunkel]) => {
+            if (dunkel) return;
+            k.rechteck(x, oben + 2, 2, 1.5, "9");
+            k.feinLinie(x, oben + 2, x + 1.5, oben + 2, "u");
+        });
+    }
+    if (hose.form === "risse") {
+        // Zerrissene Jeans: Haut an Knie und Oberschenkel, mit weissen Faeden
+        beine.forEach(([x], i) => {
+            const y = oben + (i % 2 ? 3 : 2);
+            k.rechteck(x + 0.5, y, 1, 0.5, "4");
+            k.feinLinie(x, y - 0.5, x + 1.5, y - 0.5, "u");
+            k.feinLinie(x, y + 0.5, x + 1.5, y + 0.5, "u");
+        });
+    }
+    if (hose.form === "lava") {
+        // Lavahose: gluehende Risse, die im Takt heller und dunkler werden
+        beine.forEach(([x], i) => {
+            const hell = (anim + i) % 2 === 0 ? "j" : "u";
+            const dunkel = hell === "j" ? "u" : "j";
+            k.feinLinie(x + 0.5, oben + 0.5, x + 1, oben + 2, hell);
+            k.feinLinie(x + 1, oben + 2, x + 0.5, oben + 3.5, dunkel);
+            k.feinLinie(x + 0.5, oben + 3.5, x + 1.5, oben + 5, hell);
         });
     }
     if (hose.form === "sterne") {
