@@ -1307,19 +1307,91 @@ function figurHatAnimation(teile) {
     return Object.values(teile).some(tl => tl.anim);
 }
 
-function figurUrls(teile, pose, bild, blinzelt, blick = "seite", anim = 0) {
+// Farbe als [r, g, b, a] (fuer das schnelle Zeichnen der Schichten), mit Zwischenspeicher
+const figurFarbCache = {};
+function figurRgba(farbe) {
+    if (!figurFarbCache[farbe]) {
+        const stift = figurFarbStift();
+        stift.clearRect(0, 0, 1, 1);
+        stift.fillStyle = farbe;
+        stift.fillRect(0, 0, 1, 1);
+        figurFarbCache[farbe] = Array.from(stift.getImageData(0, 0, 1, 1).data);
+    }
+    return figurFarbCache[farbe];
+}
+let figurFarbLeinwand = null;
+function figurFarbStift() {
+    if (!figurFarbLeinwand) {
+        figurFarbLeinwand = document.createElement("canvas");
+        figurFarbLeinwand.width = figurFarbLeinwand.height = 1;
+    }
+    return figurFarbLeinwand.getContext("2d", { willReadFrequently: true });
+}
+
+// Alle Schichten eines Figur-Bilds als Leinwaende (null = Schicht ist leer). Kein PNG-Kodieren mehr:
+// das hat pro neuem Bild ca. 10 ms gekostet und im Duo (zwei Figuren) zu Rucklern gefuehrt.
+function figurSchichten(teile, pose, bild, blinzelt, blick = "seite", anim = 0) {
     const schluessel = FIGUR_KATEGORIEN.map(k => teile[k.id].id).join(",") + "|" + pose + "|" + bild + "|" + (blinzelt ? 1 : 0) + "|" + blick + "|" + anim;
     if (!figurUrlCache[schluessel]) {
         const g = figurRaster(pose, bild, blinzelt, teile, blick, anim);
-        const farben = figurFarben(teile);
-        const urls = {};
+        const farben = { ...SPRITE_FARBEN, ...figurFarben(teile) };
+        const schichten = {};
         FIGUR_SCHICHTEN.forEach(s => {
-            const zeilen = g[s].raster.map(zeile => zeile.map(f => f || ".").join(""));
-            urls[s] = zeilen.some(z => /[^.]/.test(z)) ? zeichneSprite(zeilen, farben).toDataURL() : "";
+            const raster = g[s].raster;
+            if (!raster.some(zeile => zeile.some(Boolean))) {
+                schichten[s] = null;
+                return;
+            }
+            const leinwand = document.createElement("canvas");
+            leinwand.width = FIGUR_RB;
+            leinwand.height = FIGUR_RH;
+            const stift = leinwand.getContext("2d");
+            const daten = stift.createImageData(FIGUR_RB, FIGUR_RH);
+            for (let y = 0; y < FIGUR_RH; y++) {
+                for (let x = 0; x < FIGUR_RB; x++) {
+                    const farbe = raster[y][x] && farben[raster[y][x]];
+                    if (!farbe) continue;
+                    const [r, gr, b, a] = figurRgba(farbe);
+                    const i = (y * FIGUR_RB + x) * 4;
+                    daten.data[i] = r;
+                    daten.data[i + 1] = gr;
+                    daten.data[i + 2] = b;
+                    daten.data[i + 3] = a;
+                }
+            }
+            stift.putImageData(daten, 0, 0);
+            schichten[s] = leinwand;
         });
-        figurUrlCache[schluessel] = urls;
+        figurUrlCache[schluessel] = schichten;
     }
     return figurUrlCache[schluessel];
+}
+
+// Haeufige Bilder einer Figur vorbereiten, wenn der Browser gerade nichts zu tun hat (ein Bild pro Pause),
+// damit beim Laufen und Blinzeln kein neues Bild mitten im Spiel gezeichnet werden muss
+const figurVorbereitet = new Set();
+const figurWarteschlange = [];
+function figurVorwaermen(teile) {
+    const schluessel = FIGUR_KATEGORIEN.map(k => teile[k.id].id).join(",");
+    if (figurVorbereitet.has(schluessel)) return;
+    figurVorbereitet.add(schluessel);
+    const anims = figurHatAnimation(teile) ? [0, 1, 2, 3] : [0];
+    ["stehen", "laufen", "sitzen"].forEach(pose => {
+        for (let bild = 0; bild < FIGUR_BILDER[pose]; bild++) {
+            ["seite", "vorne"].forEach(blick => anims.forEach(anim => [false, true].forEach(blinzelt =>
+                figurWarteschlange.push([teile, pose, bild, blinzelt, blick, anim]))));
+        }
+    });
+    figurArbeite();
+}
+function figurArbeite() {
+    if (!figurWarteschlange.length) return;
+    const weiter = window.requestIdleCallback || (rueckruf => setTimeout(rueckruf, 50));
+    weiter(() => {
+        const auftrag = figurWarteschlange.shift();
+        if (auftrag) figurSchichten(...auftrag);
+        figurArbeite();
+    });
 }
 
 // Welche Schicht bekommt welchen CSS-Effekt (nur Aussehen)
@@ -1338,12 +1410,12 @@ function erstelleFigurBild(groesse) {
     huelle.style.height = FIGUR_HOEHE * groesse + "px";
     const bilder = {};
     FIGUR_SCHICHTEN.forEach(s => {
-        const img = document.createElement("img");
-        img.alt = "";
-        img.draggable = false;
-        img.className = "figur-schicht schicht-" + s;
-        huelle.appendChild(img);
-        bilder[s] = img;
+        const leinwand = document.createElement("canvas");
+        leinwand.width = FIGUR_RB;
+        leinwand.height = FIGUR_RH;
+        leinwand.className = "figur-schicht schicht-" + s;
+        huelle.appendChild(leinwand);
+        bilder[s] = leinwand;
     });
     return { huelle, bilder, letzte: {} };
 }
@@ -1351,14 +1423,16 @@ function erstelleFigurBild(groesse) {
 function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
     // Legendaere Teile haben eigene Animationsbilder (unabhaengig von der Pose, etwa 4-mal pro Sekunde)
     const anim = figurHatAnimation(teile) ? Math.floor(performance.now() / 240) % 4 : 0;
-    const urls = figurUrls(teile, pose, nummer % (FIGUR_BILDER[pose] || 1), blinzelt, blick, anim);
+    const schichten = figurSchichten(teile, pose, nummer % (FIGUR_BILDER[pose] || 1), blinzelt, blick, anim);
     const fx = figurSchichtFx(teile);
     FIGUR_SCHICHTEN.forEach(s => {
         const img = bild.bilder[s];
-        if (bild.letzte[s] !== urls[s]) {
-            bild.letzte[s] = urls[s];
-            if (urls[s]) img.src = urls[s];
-            img.style.visibility = urls[s] ? "" : "hidden";
+        if (bild.letzte[s] !== schichten[s]) {
+            bild.letzte[s] = schichten[s];
+            const stift = img.getContext("2d");
+            stift.clearRect(0, 0, FIGUR_RB, FIGUR_RH);
+            if (schichten[s]) stift.drawImage(schichten[s], 0, 0);
+            img.style.visibility = schichten[s] ? "" : "hidden";
         }
         const teilMitFx = fx[s];
         const klasse = "figur-schicht schicht-" + s + (teilMitFx ? " figfx-" + teilMitFx : "");
@@ -1561,6 +1635,7 @@ function zeichneFigur(f, jetzt) {
     const blinzelt = f.blinzeltBis > jetzt;
     if (f.art === "mensch") {
         const teile = figurTeileAus(f.teile, !f.partner);
+        figurVorwaermen(teile);
         const blick = f.blick || "seite";
         zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt, blick);
         f.bildEl.huelle.style.transform = blick === "seite" && f.richtung < 0 ? "scaleX(-1)" : "";

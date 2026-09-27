@@ -163,12 +163,12 @@ window.debug = {
         const rahmen = el("iframe", "debug-bot-rahmen");
         rahmen.src = location.pathname + "?bot=" + sauber;
         document.body.appendChild(rahmen);
-        const schild = el("div", "debug-bot-schild", null, [el("span", "debug-bot-status", "🤖 Bot startet (" + sauber + ") …")]);
+        const schild = el("div", "debug-bot-schild", null, [el("span", "debug-bot-status", "🤖 Bot startet …")]);
         const weg = el("button", "knopf", "✕");
         weg.addEventListener("click", () => debug.botWeg());
         schild.appendChild(weg);
         document.body.appendChild(schild);
-        zeigeToast("🤖 Der Bot tritt der Lobby " + sauber + " bei …");
+        zeigeToast("🤖 Der Bot tritt deiner Lobby bei …");
     },
     botWeg() {
         document.querySelectorAll(".debug-bot-rahmen, .debug-bot-schild").forEach(e => e.remove());

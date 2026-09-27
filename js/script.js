@@ -5436,7 +5436,7 @@ function hauptSchleife(jetzt) {
         aktualisiereHimmel(dtMs);
 
         erfolgPruefMs += dtMs;
-        if (erfolgPruefMs >= 250) {
+        if (erfolgPruefMs >= 1000) { // Erfolge pruefen kostet ein paar Millisekunden, einmal pro Sekunde reicht
             erfolgPruefMs = 0;
             pruefeErfolge();
         }

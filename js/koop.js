@@ -68,6 +68,45 @@ function partnerSeite() {
     return eigeneSeite() === "links" ? "rechts" : "links";
 }
 
+// Der Lobby-Code ist standardmaessig versteckt (z.B. fuer Streamer, damit niemand ungefragt beitritt)
+function koopCodeText() {
+    if (!koop.code) return "…";
+    return koop.codeSichtbar ? koop.code : "X X X X X X";
+}
+
+// Knopf zum Zeigen/Verstecken des Codes; nachher = was danach neu gezeichnet werden soll
+function koopCodeAugeKnopf(nachher) {
+    const knopf = el("button", "knopf koop-klein", koop.codeSichtbar ? t("🙈 Verbergen") : t("👁 Anzeigen"));
+    knopf.addEventListener("click", () => {
+        koop.codeSichtbar = !koop.codeSichtbar;
+        nachher();
+    });
+    return knopf;
+}
+
+function koopKopiereCode() {
+    if (koop.code && navigator.clipboard) navigator.clipboard.writeText(koop.code);
+    zeigeToast(t("📋 Code kopiert"));
+}
+
+// Host: Mitspieler rauswerfen. Danach gibt es sofort einen neuen Code, mit dem alten kommt er nicht wieder rein.
+function koopKicken() {
+    if (koop.rolle !== "host" || !koop.verbunden) return;
+    const name = koop.partnerProfil && koop.partnerProfil.name ? koop.partnerProfil.name : t("Mitspieler");
+    koopSende("gekickt");
+    setTimeout(() => {
+        if (koop.kanal) {
+            koop.kanal.onclose = null;
+            koop.kanal.close();
+        }
+        if (koop.pc) koop.pc.close();
+        koop.pc = null;
+        koopVerbindungWeg(true);
+        koopNeuerCode();
+        zeigeToast(tf("🥾 {0} wurde entfernt. Die Lobby hat einen neuen Code.", name));
+    }, 300);
+}
+
 function zufallsCode(laenge = KOOP_KONFIG.codeLaenge) {
     let code = "";
     for (let i = 0; i < laenge; i++) code += KOOP_KONFIG.codeZeichen[Math.floor(Math.random() * KOOP_KONFIG.codeZeichen.length)];
@@ -187,6 +226,7 @@ function richteKanalEin(kanal) {
         koop.letzteInfo = "";
         koop.letzterStand = "";
         koop.status = "";
+        koop.beitrittGemeldet = false;
         // Der Gast braucht den Vermittler nicht mehr (die Verbindung laeuft jetzt direkt)
         if (koop.rolle === "gast" && koop.ws) {
             koop.ws.close();
@@ -361,7 +401,7 @@ function koopVerlassen(still) {
 }
 
 // Verbindung zum Mitspieler ist weg: jeder spielt sein eigenes Spiel weiter
-function koopVerbindungWeg() {
+function koopVerbindungWeg(still = false) {
     if (!koop.verbunden && !koop.kanal) return;
     const warImSpiel = koop.imSpiel;
     koop.verbunden = false;
@@ -373,7 +413,7 @@ function koopVerbindungWeg() {
     zeigePauseSchild();
     if (warImSpiel && run) renderPartnerFelder();
     if (koop.rolle === "host") {
-        if (warImSpiel) zeigeToast(t("👥 Dein Mitspieler hat das Spiel verlassen. Mit dem Lobby-Code kann er wieder beitreten."));
+        if (warImSpiel && !still) zeigeToast(t("👥 Dein Mitspieler hat das Spiel verlassen. Mit dem Lobby-Code kann er wieder beitreten."));
     } else if (warImSpiel) {
         // Der Host ist weg: wir werden Host und melden denselben Code wieder an
         koop.rolle = "host";
@@ -505,10 +545,22 @@ function koopEmpfange(n) {
             break;
         case "profil":
             koop.partnerProfil = { name: String(n.name || "").slice(0, 16), teile: n.teile || {}, begleiter: n.begleiter || "rot" };
+            // Beim ersten Profil nach dem Verbinden: mit Namen melden, wer da ist (nie den Code zeigen)
+            if (!koop.beitrittGemeldet) {
+                koop.beitrittGemeldet = true;
+                const name = koop.partnerProfil.name || t("Mitspieler");
+                zeigeToast(koop.rolle === "host" ? tf("👥 Spieler {0} ist beigetreten", name) : tf("👥 Verbunden mit {0}", name));
+                Klang.geschenk();
+            }
             renderKoopLobby();
             break;
         case "emote":
             zeigePartnerEmote(n.id);
+            break;
+        case "gekickt":
+            if (koop.rolle !== "gast") break;
+            zeigeToast(t("🥾 Der Host hat dich aus der Lobby entfernt."));
+            koopVerlassen(false);
             break;
         case "zurLobby":
             koopZurueckZurLobby(false);
@@ -1002,6 +1054,7 @@ function renderKoopLobby() {
         erstellen.addEventListener("click", koopLobbyErstellen);
         const eingabe = document.createElement("input");
         eingabe.className = "koop-code-eingabe";
+        eingabe.type = "password"; // auch der eingetippte Code bleibt fuer Zuschauer unsichtbar
         eingabe.maxLength = 7;
         eingabe.placeholder = t("Code");
         eingabe.autocomplete = "off";
@@ -1034,14 +1087,12 @@ function renderKoopLobby() {
     // Code
     const codeZeile = el("div", "koop-code", null, [
         el("span", "koop-code-titel", t("Lobby-Code")),
-        el("span", "koop-code-wert", koop.code || "…")
+        el("span", "koop-code-wert", koopCodeText())
     ]);
     if (koop.code) {
+        codeZeile.appendChild(koopCodeAugeKnopf(renderKoopLobby));
         const kopieren = el("button", "knopf koop-klein", t("📋 Kopieren"));
-        kopieren.addEventListener("click", () => {
-            navigator.clipboard && navigator.clipboard.writeText(koop.code);
-            zeigeToast(t("📋 Code kopiert: ") + koop.code);
-        });
+        kopieren.addEventListener("click", koopKopiereCode);
         codeZeile.appendChild(kopieren);
     }
     if (host) {
@@ -1054,7 +1105,7 @@ function renderKoopLobby() {
 
     // Spieler
     // mit Namen und kleiner Figur aus dem Profil
-    const spielerZeile = (text, teile, klasse = "") => {
+    const spielerZeile = (text, teile, klasse = "", kicken = false) => {
         const zeile = el("div", "koop-spieler-zeile" + klasse);
         if (teile) {
             const mini = erstelleFigurBild(2);
@@ -1062,6 +1113,12 @@ function renderKoopLobby() {
             zeile.appendChild(mini.huelle);
         }
         zeile.appendChild(el("span", null, text));
+        if (kicken) {
+            const knopf = el("button", "knopf knopf-rot koop-klein koop-kicken", t("🥾 Rauswerfen"));
+            setzeTipp(knopf, t("Mitspieler aus der Lobby entfernen. Die Lobby bekommt einen neuen Code."));
+            knopf.addEventListener("click", koopKicken);
+            zeile.appendChild(knopf);
+        }
         return zeile;
     };
     const partner = koop.partnerProfil;
@@ -1069,7 +1126,7 @@ function renderKoopLobby() {
         spielerZeile((host ? "👑 " : "🙂 ") + profilName() + (host ? t(" (du, Host)") : t(" (du)")), profil().teile),
         koop.verbunden
             ? spielerZeile((host ? "🙂 " : "👑 ") + (partner && partner.name ? partner.name : t("Mitspieler")) + (host ? "" : t(" (Host)")),
-                partner ? partner.teile : null)
+                partner ? partner.teile : null, "", host)
             : spielerZeile(host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"), null, " wartet")
     ]));
 
@@ -1155,11 +1212,11 @@ function aktualisiereKoopKnopf() {
     const aktiv = Boolean(koop.rolle) && koop.imSpiel;
     knopf.classList.toggle("versteckt", !aktiv);
     if (!aktiv) return;
-    const text = koop.rolle === "host" ? (koop.code || "…") : (koop.verbunden ? t("Duo") : t("Allein"));
+    const text = koop.verbunden ? t("Duo") : t("Allein");
     const span = knopf.querySelector("span");
     if (span.textContent !== text) span.textContent = text;
     knopf.classList.toggle("wartet", !koop.verbunden);
-    setzeTipp(knopf, "## " + t("👥 Duo") + "\n= " + (koop.rolle === "host" ? t("Code: ") + (koop.code || "…") : t("Du bist Gast")) +
+    setzeTipp(knopf, "## " + t("👥 Duo") + "\n= " + (koop.rolle === "host" ? t("Du bist Host") : t("Du bist Gast")) +
         "\n- " + (koop.verbunden ? t("Mitspieler verbunden") : t("Mitspieler nicht da: mit dem Code kann er wieder beitreten")) +
         "\n" + t("Klick: Code anzeigen, kopieren oder neu machen"));
 }
@@ -1170,15 +1227,14 @@ function zeigeKoopFenster() {
         el("p", null, host
             ? t("Gib deinem Mitspieler diesen Code. Wer mit dem Code beitritt, steigt auf der freien Seite ins laufende Spiel ein.")
             : t("Du spielst als Gast. Verlässt du das Duo, kannst du mit demselben Code wieder beitreten.")),
-        host ? el("div", "koop-code-gross", koop.code || "…") : null,
+        host ? el("div", "koop-code-gross", koopCodeText()) : null,
+        host && koop.code ? koopCodeAugeKnopf(() => { schliesse(); zeigeKoopFenster(); }) : null,
         el("p", "koop-fenster-status", koop.verbunden ? t("👥 Mitspieler verbunden") : t("⏳ Kein Mitspieler da"))
     ].filter(Boolean));
     const knoepfe = [{ text: t("Schließen") }];
     if (host) {
-        knoepfe.push({ text: t("📋 Kopieren"), aktion: () => {
-            if (koop.code && navigator.clipboard) navigator.clipboard.writeText(koop.code);
-            zeigeToast(t("📋 Code kopiert: ") + koop.code);
-        } });
+        knoepfe.push({ text: t("📋 Kopieren"), aktion: koopKopiereCode });
+        if (koop.verbunden) knoepfe.push({ text: t("🥾 Rauswerfen"), klasse: "knopf-rot", aktion: koopKicken });
         knoepfe.push({ text: t("🔄 Neuer Code"), aktion: () => {
             koopNeuerCode();
             zeigeToast(t("🔄 Neuer Code: der alte gilt nicht mehr."));
@@ -1188,7 +1244,7 @@ function zeigeKoopFenster() {
         if (host) koopZurueckZurLobby(true);
         else koopVerlassen(false);
     } });
-    zeigePopup({ titel: t("👥 Duo"), breite: 460, inhalt, knoepfe });
+    const schliesse = zeigePopup({ titel: t("👥 Duo"), breite: 460, inhalt, knoepfe });
 }
 
 setInterval(aktualisiereKoopKnopf, 500);

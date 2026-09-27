@@ -11287,12 +11287,9 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 /* Kleine Aura um die eigene Figur (und die des Mitspielers) auf dem Hof */
+/* ohne Animation: ein pulsierender Schatten muss jedes Bild neu berechnet werden (kostet im Duo spuerbar Leistung) */
 .figur-bild.figur-aura {
-    animation: figur-aura 3s ease-in-out infinite;
-}
-@keyframes figur-aura {
-    0%, 100% { filter: drop-shadow(0 0 2px var(--aura, #fff3c4)); }
-    50% { filter: drop-shadow(0 0 5px var(--aura, #fff3c4)); }
+    filter: drop-shadow(0 0 3px var(--aura, #fff3c4));
 }
 #mondphase-display { cursor: pointer; }
 .karte-frueh-bezahlen {
