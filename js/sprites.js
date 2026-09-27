@@ -3092,6 +3092,18 @@ const PIXEL_SYMBOL_DATEN = {
         ".oBo......",
         "oBBBo.....",
         "ooooo....."]],
+    duo: [{ o: "#2a1a3a", A: "#8a6af0", a: "#5a3ab0", B: "#5fb03c", b: "#3e8a28", H: "#ffd2b0" }, [
+        "..ooo.....",
+        ".oHHHo.ooo",
+        ".oHHHooHHHo",
+        ".oHHHooHHHo",
+        "..ooo..ooo.",
+        ".oAAAoo....",
+        "oAAAAAooooo",
+        "oAaaAoBBBBo",
+        "oAAAAoBbbBo",
+        "ooooooBBBBo",
+        ".....oooooo"]],
     sonne: [{ o: "#8a5a08", Y: "#ffd23a", W: "#fff6c0" }, [
         "....oo....",
         ".o..oo..o.",

@@ -419,11 +419,14 @@ function koopEmpfange(n) {
             }
             koop.partner = { hatEndlos: Boolean(n.hatEndlos) };
             if (koop.rolle === "host") koopSende("lobby", { lobby: koop.lobby });
-            // Laeuft schon ein Endlos-Koop-Spiel, steigt der Neue direkt auf der freien Seite ein
-            if (koop.rolle === "host" && koop.imSpiel && run && run.koop && run.sandbox) {
+            // Laeuft schon ein Koop-Spiel, steigt der Neue direkt auf der freien Seite ein
+            // (Endlos: mit seinem gespeicherten Stand, Story: neu, aber am selben Tag und mit denselben Rechnungen)
+            if (koop.rolle === "host" && koop.imSpiel && run && run.koop && run.phase !== "runEnde") {
                 koopSende("start", {
-                    sandbox: true, slot: run.koopSlot, kosmetik: { ...koop.kosmetik }, gastSeite: partnerSeite(),
-                    spielId: koop.spielId, gastDaten: koop.partnerStand, hostDaten: null
+                    sandbox: Boolean(run.sandbox), slot: run.koopSlot, kosmetik: { ...koop.kosmetik }, gastSeite: partnerSeite(),
+                    spielId: koop.spielId, gastDaten: run.sandbox ? koop.partnerStand : null, hostDaten: null,
+                    mondphase: run.mondphase || 0,
+                    wiedereinstieg: { tag: run.tag, bezahlteRechnungen: run.bezahlteRechnungen, phase: run.phase }
                 });
                 zeigeToast(t("👥 Dein Mitspieler ist wieder da."));
             }
@@ -458,6 +461,7 @@ function koopEmpfange(n) {
                 koop.keinPlatzGemeldet = false;
                 koop.partnerStand = n.hostDaten || null;
                 koop.startMondphase = Math.max(0, Math.min(MONDPHASEN.length - 1, Number(n.mondphase) || 0));
+                koop.wiedereinstieg = n.wiedereinstieg || null;
                 koopStarteEigenesSpiel(Boolean(n.sandbox), n.slot || 0, n.kosmetik || {}, n.gastSeite || "rechts", n.gastDaten || null);
             }
             break;
@@ -572,8 +576,19 @@ function koopStarteEigenesSpiel(endlos, slot, kosmetik, seite, gespeichert = nul
     einstellungenFenster.classList.add("versteckt");
     segenFenster.classList.add("versteckt");
     haken("runStart");
+    const wieder = koop.wiedereinstieg;
+    koop.wiedereinstieg = null;
+    if (!endlos && wieder) {
+        // Wiedereinstieg in Story: gleicher Tag und gleiche Rechnungen wie der Host, damit alles zusammenpasst
+        run.tag = Math.max(1, Number(wieder.tag) || 1);
+        run.bezahlteRechnungen = Math.max(0, Number(wieder.bezahlteRechnungen) || 0);
+    }
     if (endlos) starteTag(true);
-    else zeigeTagesKarte(run.tag === 1 && run.bezahlteRechnungen === 0 ? "start" : "feierabend");
+    else if (wieder && wieder.phase === "tag") {
+        koop.tagStartFrei = true;
+        starteTag();
+        koop.tagStartFrei = false;
+    } else zeigeTagesKarte(run.tag === 1 && run.bezahlteRechnungen === 0 ? "start" : "feierabend");
     wendeKosmetikAn();
     Klang.start();
     aktualisiereAlles();
@@ -1127,3 +1142,51 @@ function renderKoopLobby() {
     inhalt.appendChild(knoepfe);
 }
 
+
+// ---------- DUO-KNOPF IM SPIEL ----------
+// Oben in der Leiste: der Host sieht den Lobby-Code (kopieren, neu machen: der alte gilt dann nicht mehr),
+// beide koennen das Duo verlassen. Wer mit dem Code wieder beitritt, steigt auf der freien Seite ein.
+
+function aktualisiereKoopKnopf() {
+    const knopf = $("koop-knopf");
+    if (!knopf) return;
+    const aktiv = Boolean(koop.rolle) && koop.imSpiel;
+    knopf.classList.toggle("versteckt", !aktiv);
+    if (!aktiv) return;
+    const text = koop.rolle === "host" ? (koop.code || "…") : (koop.verbunden ? t("Duo") : t("Allein"));
+    const span = knopf.querySelector("span");
+    if (span.textContent !== text) span.textContent = text;
+    knopf.classList.toggle("wartet", !koop.verbunden);
+    setzeTipp(knopf, "## " + t("👥 Duo") + "\n= " + (koop.rolle === "host" ? t("Code: ") + (koop.code || "…") : t("Du bist Gast")) +
+        "\n- " + (koop.verbunden ? t("Mitspieler verbunden") : t("Mitspieler nicht da: mit dem Code kann er wieder beitreten")) +
+        "\n" + t("Klick: Code anzeigen, kopieren oder neu machen"));
+}
+
+function zeigeKoopFenster() {
+    const host = koop.rolle === "host";
+    const inhalt = el("div", "koop-fenster-inhalt", null, [
+        el("p", null, host
+            ? t("Gib deinem Mitspieler diesen Code. Wer mit dem Code beitritt, steigt auf der freien Seite ins laufende Spiel ein.")
+            : t("Du spielst als Gast. Verlässt du das Duo, kannst du mit demselben Code wieder beitreten.")),
+        host ? el("div", "koop-code-gross", koop.code || "…") : null,
+        el("p", "koop-fenster-status", koop.verbunden ? t("👥 Mitspieler verbunden") : t("⏳ Kein Mitspieler da"))
+    ].filter(Boolean));
+    const knoepfe = [{ text: t("Schließen") }];
+    if (host) {
+        knoepfe.push({ text: t("📋 Kopieren"), aktion: () => {
+            if (koop.code && navigator.clipboard) navigator.clipboard.writeText(koop.code);
+            zeigeToast(t("📋 Code kopiert: ") + koop.code);
+        } });
+        knoepfe.push({ text: t("🔄 Neuer Code"), aktion: () => {
+            koopNeuerCode();
+            zeigeToast(t("🔄 Neuer Code: der alte gilt nicht mehr."));
+        } });
+    }
+    knoepfe.push({ text: host ? t("🏳️ Duo beenden") : t("🚪 Duo verlassen"), klasse: "knopf-rot", aktion: () => {
+        if (host) koopZurueckZurLobby(true);
+        else koopVerlassen(false);
+    } });
+    zeigePopup({ titel: t("👥 Duo"), breite: 460, inhalt, knoepfe });
+}
+
+setInterval(aktualisiereKoopKnopf, 500);

@@ -11163,3 +11163,28 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .profil-pose .figur-bild {
     margin: 2px;
 }
+
+/* Duo-Knopf oben und Code-Fenster */
+#koop-knopf {
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+#koop-knopf.wartet {
+    animation: neues-huepfen 1.2s ease-in-out infinite;
+}
+.koop-code-gross {
+    font-size: 2.4em;
+    font-weight: 900;
+    letter-spacing: 0.25em;
+    text-align: center;
+    padding: 10px;
+    margin: 8px 0;
+    border: 3px dashed var(--holz);
+    border-radius: 10px;
+    background: #fffdf0;
+}
+.koop-fenster-status {
+    text-align: center;
+    font-weight: 700;
+}

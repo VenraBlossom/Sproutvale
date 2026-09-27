@@ -200,6 +200,10 @@ if (window.sproutvaleDesktop && window.sproutvaleDesktop.update) {
     });
 }
 
+// Duo-Knopf in der oberen Leiste
+$("koop-knopf").querySelector("img").src = spriteUrl("sym_duo");
+$("koop-knopf").addEventListener("click", zeigeKoopFenster);
+
 // Profil (oben rechts im Hauptmenue)
 $("profil-knopf").addEventListener("click", oeffneProfil);
 $("profil-schliessen").addEventListener("click", schliesseProfil);
