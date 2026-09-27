@@ -1031,7 +1031,7 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
             liste.splice(index, 1);
         } else if (liste.length >= DEKO_MAX) {
             Klang.fehler();
-            zeigeToast("Es passen höchstens " + DEKO_MAX + t(" Deko-Objekte in den Hof. Nimm zuerst eins weg."));
+            zeigeToast(t("Es passen höchstens ") + DEKO_MAX + t(" Deko-Objekte in den Hof. Nimm zuerst eins weg."));
             return;
         } else {
             liste.push(eintrag.id);

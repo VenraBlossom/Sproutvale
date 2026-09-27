@@ -442,7 +442,7 @@ function verkaufeWerkzeug(id) {
 
 function frageWerkzeugVerkauf(id) {
     if (!darfEinkaufen()) {
-        zeigeToast("Werkzeuge verkaufst du zwischen den Tagen.");
+        zeigeToast(t("Werkzeuge verkaufst du zwischen den Tagen."));
         return;
     }
     const w = WERKZEUG_NACH_ID[id];
@@ -779,3 +779,9 @@ registriereHaken("anzeige", () => {
 registriereHaken("tagVorbereiten", () => {
     if (run.wetter) jahreszeitEbene.innerHTML = "";
 });
+
+// Regengeraeusch nur, solange man wirklich auf dem Hof ist (nicht im Hauptmenue)
+setInterval(() => {
+    if (!run) return;
+    Klang.regen(run.phase === "tag" && (run.wetter === "regen" || run.wetter === "gewitter") && !imHauptmenue());
+}, 500);

@@ -354,8 +354,10 @@ const Klang = {
 
     setzeLautstaerken() {
         if (!this.ctx) return;
-        this.musikBus.gain.value = einstellungen.musik * 0.5;
-        this.sfxBus.gain.value = einstellungen.sfx * 0.55;
+        // "Im Hintergrund stumm": ist das Fenster nicht vorne, bleibt es leise
+        const stumm = einstellungen.hintergrundStumm && (document.hidden || !document.hasFocus());
+        this.musikBus.gain.value = stumm ? 0 : einstellungen.musik * 0.5;
+        this.sfxBus.gain.value = stumm ? 0 : einstellungen.sfx * 0.55;
     },
 
     // Verbindet eine Stimme mit dem Bus und optional mit Hall/Echo
@@ -710,7 +712,7 @@ const Klang = {
             filter.frequency.value = 2600;
             filter.Q.value = 0.6;
             const g = ctx.createGain();
-            g.gain.value = 0.0001;
+            g.gain.setValueAtTime(0.0001, ctx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 1.5);
             quelle.connect(filter);
             filter.connect(g);
@@ -719,6 +721,9 @@ const Klang = {
             this.regenQuelle = { quelle, g };
         } else if (!an && this.regenQuelle) {
             const { quelle, g } = this.regenQuelle;
+            // vom aktuellen Wert aus leiser werden (sonst springt die Lautstaerke und es knackt)
+            g.gain.cancelScheduledValues(this.ctx.currentTime);
+            g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), this.ctx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1);
             quelle.stop(this.ctx.currentTime + 1.1);
             this.regenQuelle = null;
@@ -928,3 +933,7 @@ document.addEventListener("pointerdown", () => Klang.start(), { once: true });
         };
     });
 })();
+
+// Fenster kommt nach vorne oder geht in den Hintergrund: Lautstaerke neu setzen (Einstellung "Im Hintergrund stumm")
+["blur", "focus"].forEach(ereignis => window.addEventListener(ereignis, () => Klang.setzeLautstaerken()));
+document.addEventListener("visibilitychange", () => Klang.setzeLautstaerken());

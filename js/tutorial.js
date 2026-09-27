@@ -130,5 +130,5 @@ setInterval(zeigeTutorial, 300);
 
 $("tutorial-neu").addEventListener("click", () => {
     starteTutorialNeu();
-    zeigeToast("📖 Das Tutorial startet im normalen Modus beim nächsten passenden Moment neu.");
+    zeigeToast(t("📖 Das Tutorial startet im normalen Modus beim nächsten passenden Moment neu."));
 });

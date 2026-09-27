@@ -4708,6 +4708,7 @@ document.querySelectorAll("[data-option]").forEach(schalter => {
         speichereEinstellungen();
         if (schalter.dataset.option === "tipps" && !schalter.checked) versteckeTipp();
         if (schalter.dataset.option === "farbenblind") document.body.classList.toggle("farbenblind", schalter.checked);
+        if (schalter.dataset.option === "hintergrundStumm") Klang.setzeLautstaerken();
     });
 });
 
@@ -4787,7 +4788,7 @@ function wechsleVollbild() {
     } else if (document.fullscreenElement) {
         document.exitFullscreen();
     } else if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => zeigeToast("Vollbild ist hier nicht möglich."));
+        document.documentElement.requestFullscreen().catch(() => zeigeToast(t("Vollbild ist hier nicht möglich.")));
     }
 }
 $("vollbild-knopf").addEventListener("click", wechsleVollbild);
