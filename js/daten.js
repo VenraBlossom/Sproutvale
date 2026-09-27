@@ -84,11 +84,11 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Alpha 0.9.0";
+const SPIEL_VERSION = "Alpha 0.9.1";
 
 // "Was ist neu?" (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
-    { version: "Alpha 0.10.0", punkte: [
+    { version: "Alpha 0.9.1", punkte: [
         t("Duo läuft viel flüssiger: Figuren werden schneller gezeichnet."),
         t("Duo: Der Lobby-Code ist versteckt (Anzeigen per Klick), Beitritt mit Namen, der Host kann Mitspieler rauswerfen."),
         t("Duo: Felder kosten doppelt so viel wie solo."),
