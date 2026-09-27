@@ -1356,19 +1356,6 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
         } else {
             a.linie(x0 + breite - 1, y0, x0, y0 + 4, "y");
         }
-    } else if (form === "rucksack") {
-        // Rucksack: vorne nur die Traeger, seitlich und hinten die Tasche
-        if (blick === "vorne") {
-            a.feinLinie(x0 + 1, y0, x0 + 1, y0 + 4, "y");
-            a.feinLinie(x0 + breite - 1.5, y0, x0 + breite - 1.5, y0 + 4, "y");
-        } else {
-            const ziel = blick === "hinten" ? a : hinten;
-            const rx = seite ? x0 - 2 : x0 + 0.5;
-            ziel.rechteck(rx, y0 + 0.5, seite ? 2.5 : breite - 1, 5, "x");
-            ziel.rechteck(rx, y0 + 0.5, seite ? 2.5 : breite - 1, 1, "y");
-            ziel.fein(rx + (seite ? 1 : 2), y0 + 3, "z");
-            if (seite) a.feinLinie(x0 + 1, y0, x0 + 1.5, y0 + 4, "y");
-        }
     } else if (form === "vogel") {
         // kleiner Vogel sitzt auf der Schulter und hopst ab und zu
         const hops = anim % 4 === 0 ? -0.5 : 0;
