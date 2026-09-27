@@ -11449,3 +11449,45 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .sprach-karte.bald .sprach-bald {
     flex-shrink: 0;
 }
+
+/* Profil: eigene Farben und Titel */
+.profil-farben {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 6px 0 8px;
+}
+.profil-farben-titel {
+    font-weight: 700;
+    margin-right: 4px;
+}
+.profil-farbe {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #4a2f15;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1;
+}
+.profil-farbe.original {
+    background: repeating-linear-gradient(45deg, #fff6d8 0 4px, #e8dcc0 4px 8px);
+    color: #6b4220;
+}
+.profil-farbe.gewaehlt {
+    outline: 3px solid #ffd23a;
+    outline-offset: 1px;
+}
+.profil-farben-hinweis {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+.profil-titel-wahl {
+    font: inherit;
+    padding: 3px 6px;
+    border: 2px solid #8a5a2c;
+    border-radius: 6px;
+    background: #fff6dc;
+}

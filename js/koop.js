@@ -544,7 +544,7 @@ function koopEmpfange(n) {
             }
             break;
         case "profil":
-            koop.partnerProfil = { name: String(n.name || "").slice(0, 16), teile: n.teile || {}, begleiter: n.begleiter || "rot" };
+            koop.partnerProfil = { name: String(n.name || "").slice(0, 16), titel: String(n.titel || "").slice(0, 40), teile: n.teile || {}, begleiter: n.begleiter || "rot" };
             // Beim ersten Profil nach dem Verbinden: mit Namen melden, wer da ist (nie den Code zeigen)
             if (!koop.beitrittGemeldet) {
                 koop.beitrittGemeldet = true;
@@ -1129,7 +1129,7 @@ function renderKoopLobby() {
     inhalt.appendChild(el("div", "koop-spieler", null, [
         spielerZeile((host ? "👑 " : "🙂 ") + profilName() + (host ? t(" (du, Host)") : t(" (du)")), profil().teile),
         koop.verbunden
-            ? spielerZeile((host ? "🙂 " : "👑 ") + (partner && partner.name ? partner.name : t("Mitspieler")) + (host ? "" : t(" (Host)")),
+            ? spielerZeile((host ? "🙂 " : "👑 ") + (partner && partner.name ? partner.name : t("Mitspieler")) + (partner && partner.titel ? " · " + partner.titel : "") + (host ? "" : t(" (Host)")),
                 partner ? partner.teile : null, "", host)
             : spielerZeile(host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"), null, " wartet")
     ]));

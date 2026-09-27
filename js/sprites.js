@@ -3294,6 +3294,17 @@ const PIXEL_SYMBOL_DATEN = {
         "oPpo..oppo",
         "oo.o..o.oo",
         "...o..o..."]],
+    kat_gesicht: [{ o: "#5a3a2a", H: "#ffd2b0", h: "#e0a880", K: "#2a1a12", R: "#ff7a8a", B: "#9a6634" }, [
+        "..oooooo..",
+        ".oHHHHHHo.",
+        "oHHHHHHHHo",
+        "oHKHHHHKHo",
+        "oHHHHHHHHo",
+        "oRRHHHHRRo",
+        "oHHKHHKHHo",
+        "oHHHKKHHHo",
+        ".oHHHHHHo.",
+        "..oooooo.."]],
     duo: [{ o: "#2a1a3a", A: "#8a6af0", a: "#5a3ab0", B: "#5fb03c", b: "#3e8a28", H: "#ffd2b0" }, [
         "..ooo.....",
         ".oHHHo.ooo",

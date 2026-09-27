@@ -43,7 +43,29 @@ function figurTeileAus(teile, pruefen = true) {
         const teil = figurTeil(k.id, teile[k.id] || FIGUR_STANDARD[k.id]);
         ergebnis[k.id] = !pruefen || istKosmetikFrei(teil, "figur_" + k.id) ? teil : figurTeil(k.id, FIGUR_STANDARD[k.id]);
     });
+    // Eigene Farben (nicht bei legendaeren Teilen): als eigene Variante, damit der Bild-Zwischenspeicher sie trennt
+    const farben = teile.farben || {};
+    FIGUR_FARBBAR.forEach(k => {
+        const hex = farben[k];
+        if (!hex || kosmetikSeltenheit(ergebnis[k]) >= 4) return;
+        ergebnis[k] = { ...ergebnis[k], id: ergebnis[k].id + "~" + hex, farben: { ...(ergebnis[k].farben || {}), ...figurFarbwechsel(k, hex) } };
+    });
     return ergebnis;
+}
+
+// Welche Farb-Buchstaben eine eigene Farbe ersetzt (hell und dunkel werden abgeleitet)
+function figurFarbwechsel(kategorie, hex) {
+    const dunkel = mischeHex(hex, "#000000", 0.3);
+    const hell = mischeHex(hex, "#ffffff", 0.35);
+    if (kategorie === "oberteil") return { 6: hex, 8: dunkel, o: hell };
+    if (kategorie === "hose") return { 3: hex, 9: dunkel };
+    if (kategorie === "schuhe") return { 1: hex, l: hell };
+    return { 5: hex };
+}
+
+function profilTitel() {
+    const titel = FIGUR_TITEL.find(ti => ti.id === profil().titel);
+    return titel && titel.bedingung(meta) ? titel : FIGUR_TITEL[0];
 }
 
 function profilName() {
@@ -233,6 +255,62 @@ function figurKopfSeite(g, cx, cy, geschlossen, augen, blinzelt, anim) {
         g.haut.fein(cx + 2.2, cy + 2.5, "m");
     }
     figurAuge(g, Math.round(cx + 1), Math.round(cy) - 1, augen, geschlossen || blinzelt, anim, false);
+    if (g.gesicht) figurGesicht(g, "seite", cx, Math.round(cy) - 1, g.gesicht, anim);
+}
+
+// Gesichts-Details auf der Augen-Schicht (liegt ueber der Haut). ay = obere Kante der Augen
+function figurGesicht(g, blick, cx, ay, teil, anim) {
+    const a = g.augen;
+    const vorne = blick === "vorne";
+    // Wangen-Mitten (vorne zwei, seitlich eine vor dem Ohr)
+    const wangen = vorne ? [cx - 3.5, cx + 3] : [cx + 2.5];
+    const mundX = vorne ? cx - 1 : cx + 2.2;
+    switch (teil.form) {
+    case "sommersprossen":
+        wangen.forEach(x => { a.fein(x, ay + 2, "G"); a.fein(x + 1, ay + 2.5, "G"); a.fein(x + 0.5, ay + 3, "G"); });
+        a.fein(vorne ? cx - 0.5 : cx + 3, ay + 1.5, "G");
+        break;
+    case "wangen":
+        wangen.forEach(x => a.rechteck(x - 0.5, ay + 2, 2, 1, "G"));
+        break;
+    case "muttermal":
+        a.fein(vorne ? cx + 2.5 : cx + 3, ay + 3.5, "G");
+        break;
+    case "grinsen":
+        a.feinLinie(mundX, ay + 3.5, mundX + (vorne ? 2 : 1), ay + 3.5, "G");
+        a.feinLinie(mundX + 0.5, ay + 4, mundX + (vorne ? 1.5 : 1), ay + 4, "H");
+        break;
+    case "schnurrbart":
+        a.feinLinie(mundX - 0.5, ay + 3, mundX + (vorne ? 2.5 : 1.5), ay + 3, "2");
+        a.fein(mundX - 0.5, ay + 3.5, "d");
+        if (vorne) a.fein(mundX + 2.5, ay + 3.5, "d");
+        break;
+    case "vollbart":
+        a.rechteck(vorne ? cx - 4 : cx - 1, ay + 3, vorne ? 8 : 5, 2, "2");
+        a.rechteck(vorne ? cx - 2 : cx + 0.5, ay + 5, vorne ? 4 : 3, 1, "d");
+        a.feinLinie(mundX, ay + 3.5, mundX + (vorne ? 2 : 1), ay + 3.5, "m");
+        break;
+    case "pflaster":
+        a.rechteck(vorne ? cx + 2 : cx + 1.5, ay - 1.5, 2, 1, "G");
+        a.fein(vorne ? cx + 2.5 : cx + 2, ay - 1.5, "H");
+        a.fein(vorne ? cx + 3.5 : cx + 3, ay - 1, "H");
+        break;
+    case "streifen":
+        wangen.forEach(x => { a.feinLinie(x - 0.5, ay + 2, x + 1, ay + 2, "G"); a.feinLinie(x - 0.5, ay + 3, x + 1, ay + 3, "H"); });
+        break;
+    case "sternenwangen":
+        // kleine Sterne auf den Wangen, die abwechselnd aufleuchten
+        wangen.forEach((x, i) => {
+            const hell = (anim + i) % 2 === 0 ? "H" : "G";
+            a.fein(x + 0.5, ay + 2, hell);
+            a.fein(x, ay + 2.5, "G");
+            a.fein(x + 1, ay + 2.5, "G");
+            a.fein(x + 0.5, ay + 3, hell);
+        });
+        break;
+    default:
+        break;
+    }
 }
 
 function figurKopfVorne(g, cx, cy, geschlossen, augen, blinzelt, anim) {
@@ -246,6 +324,7 @@ function figurKopfVorne(g, cx, cy, geschlossen, augen, blinzelt, anim) {
     figurAuge(g, cx + 1, ay, augen, geschlossen || blinzelt, anim, true);
     g.haut.rechteck(cx - 4, ay + 2.5, 1.5, 0.5, "r");
     g.haut.rechteck(cx + 2.5, ay + 2.5, 1.5, 0.5, "r");
+    if (g.gesicht) figurGesicht(g, "vorne", cx, ay, g.gesicht, anim);
     if (!geschlossen) {
         // kleines Laecheln
         g.haut.feinLinie(cx - 0.5, ay + 3.5, cx + 0.5, ay + 3.5, "m");
@@ -1247,6 +1326,7 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
     const w = h.wippen;
     const cx = 9 + h.lehnen;
     const aermel = teile.oberteil.form === "latz" ? "k" : "6";
+    g.gesicht = teile.gesicht && teile.gesicht.form !== "keins" ? teile.gesicht : null;
 
     if (blick === "seite") {
         if (h.sitzt) {
@@ -1340,7 +1420,8 @@ function figurFarben(teile) {
     const f = {
         ...FIGUR_FESTE_FARBEN, q: "rgba(0, 0, 0, 0.18)",
         ...teile.haut.farben, ...teile.augen.farben, ...teile.haarfarbe.farben, ...teile.oberteil.farben,
-        ...teile.hose.farben, ...teile.schuhe.farben, ...(teile.kopf.farben || {}), ...(teile.accessoire.farben || {})
+        ...teile.hose.farben, ...teile.schuhe.farben, ...(teile.kopf.farben || {}), ...(teile.accessoire.farben || {}),
+        ...((teile.gesicht && teile.gesicht.farben) || {})
     };
     if (!f.d && f[2]) f.d = mischeHex(f[2], "#000000", 0.28);
     if (!f.o && f[6]) f.o = mischeHex(f[6], "#ffffff", 0.35);
@@ -1825,13 +1906,14 @@ function zeigePartnerEmote(id) {
 // Profil an den Mitspieler schicken (Name, Aussehen, eigener Begleiter)
 function koopSendeProfil() {
     if (typeof koop === "undefined" || !koop.verbunden) return;
-    koopSende("profil", { name: profilName(), teile: figurTeileIds(), begleiter: meta.kosmetik.haustier || "rot" });
+    koopSende("profil", { name: profilName(), titel: profilTitel().name, teile: figurTeileIds(), begleiter: meta.kosmetik.haustier || "rot" });
 }
 
 function figurTeileIds() {
     const teile = figurTeileAus(profil().teile);
     const ids = {};
-    FIGUR_KATEGORIEN.forEach(k => { ids[k.id] = teile[k.id].id; });
+    FIGUR_KATEGORIEN.forEach(k => { ids[k.id] = teile[k.id].id.split("~")[0]; }); // ohne Farb-Anhang
+    if (profil().teile.farben) ids.farben = { ...profil().teile.farben };
     return ids;
 }
 
@@ -1873,7 +1955,7 @@ function aktualisiereProfilKnopf() {
     const rang = bauernRang();
     knopf.append(mini.huelle, el("span", "profil-knopf-text", null, [
         el("span", null, profil().name ? profil().name : t("Profil")),
-        el("span", "profil-rang", tf("Rang {0}", rang))
+        el("span", "profil-rang", tf("Rang {0}", rang) + " · " + profilTitel().name)
     ]));
     // Fortschritt bis zum naechsten Bauernrang
     const xp = meta.bauernXp || 0;
@@ -1884,7 +1966,7 @@ function aktualisiereProfilKnopf() {
 }
 
 // Kleiner Ausschnitt der eigenen Figur als Symbol fuer eine Kategorie (Kopf, Oberkoerper oder Beine)
-const FIGUR_AUSSCHNITTE = { haut: 3, augen: 7, frisur: 2, haarfarbe: 2, kopf: 0, oberteil: 16, accessoire: 14, hose: 22, schuhe: 26 };
+const FIGUR_AUSSCHNITTE = { haut: 3, augen: 7, frisur: 2, haarfarbe: 2, kopf: 0, oberteil: 16, accessoire: 14, hose: 22, schuhe: 26, gesicht: 8 };
 function figurAusschnitt(kategorie) {
     const fenster = el("div", "figur-ausschnitt");
     const figur = erstelleFigurBild(2);
@@ -1938,6 +2020,26 @@ function renderProfil() {
     nameZeile.appendChild(eingabe);
     links.appendChild(nameZeile);
 
+    // Titel: freigeschaltete zum Auswaehlen, gesperrte mit Bedingung
+    const titelZeile = el("label", "profil-name-zeile", null, [el("span", null, t("Titel"))]);
+    const titelWahl = document.createElement("select");
+    titelWahl.className = "profil-titel-wahl";
+    FIGUR_TITEL.forEach(ti => {
+        const frei = ti.bedingung(meta);
+        const option = el("option", null, frei ? ti.name : "🔒 " + ti.name + " (" + ti.text + ")");
+        option.value = ti.id;
+        option.disabled = !frei;
+        titelWahl.appendChild(option);
+    });
+    titelWahl.value = profilTitel().id;
+    titelWahl.addEventListener("change", () => {
+        profil().titel = titelWahl.value;
+        speichereMeta();
+        aktualisiereProfilKnopf();
+    });
+    titelZeile.appendChild(titelWahl);
+    links.appendChild(titelZeile);
+
     // Hinweis, wenn etwas nur anprobiert ist
     const nichtBesessen = FIGUR_KATEGORIEN.filter(k => !istKosmetikFrei(figurTeil(k.id, profilVorschau[k.id]), "figur_" + k.id));
     if (nichtBesessen.length > 0) {
@@ -1959,6 +2061,35 @@ function renderProfil() {
     });
     rechts.appendChild(reiter);
 
+    // Eigene Farbe fuer Kleidung und Augen (fuer alle frei, nicht bei legendaeren Teilen)
+    if (FIGUR_FARBBAR.includes(profilKategorie)) {
+        const farbReihe = el("div", "profil-farben", null, [el("span", "profil-farben-titel", t("🎨 Farbe:"))]);
+        const aktuell = (profilVorschau.farben || {})[profilKategorie] || null;
+        const setzeFarbe = hex => {
+            if (!profilVorschau) return;
+            profilVorschau.farben = { ...(profilVorschau.farben || {}), [profilKategorie]: hex };
+            if (!hex) delete profilVorschau.farben[profilKategorie];
+            profil().teile.farben = { ...profilVorschau.farben };
+            speichereMeta();
+            Klang.klick(6);
+            renderProfil();
+        };
+        const original = el("button", "profil-farbe original" + (!aktuell ? " gewaehlt" : ""), "✕");
+        setzeTipp(original, t("Originalfarbe"));
+        original.addEventListener("click", () => setzeFarbe(null));
+        farbReihe.appendChild(original);
+        FIGUR_PALETTE.forEach(hex => {
+            const feld = el("button", "profil-farbe" + (aktuell === hex ? " gewaehlt" : ""));
+            feld.style.background = hex;
+            feld.addEventListener("click", () => setzeFarbe(hex));
+            farbReihe.appendChild(feld);
+        });
+        if (kosmetikSeltenheit(figurTeil(profilKategorie, profilVorschau[profilKategorie])) >= 4) {
+            farbReihe.appendChild(el("span", "profil-farben-hinweis", t("Legendäre Teile behalten ihre Farben.")));
+        }
+        rechts.appendChild(farbReihe);
+    }
+
     const raster = el("div", "profil-inventar");
     FIGUR_TEILE[profilKategorie].forEach(teil => {
         const kategorie = "figur_" + profilKategorie;
@@ -1967,7 +2098,8 @@ function renderProfil() {
         const gewaehlt = profilVorschau[profilKategorie] === teil.id;
         const kachel = el("button", "profil-kachel" + (gewaehlt ? " gewaehlt" : "") + (frei ? "" : " gesperrt"));
         kachel.style.setProperty("--seltenheit", seltenheit.rand);
-        const probe = { ...profilVorschau, [profilKategorie]: teil.id };
+        // Kacheln zeigen jedes Teil in seiner Originalfarbe
+        const probe = { ...profilVorschau, [profilKategorie]: teil.id, farben: { ...(profilVorschau.farben || {}), [profilKategorie]: null } };
         const mini = erstelleFigurBild(3);
         zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false, "vorne");
         kachel.appendChild(mini.huelle);

@@ -89,6 +89,7 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet)."),
         t("Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei."),
         t("Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold."),
         t("Mondteich: Fruchtbarer Hof, Ausdauer, Verhandlungsgeschick, Startkapital, Bauernweisheit und Reiche Ernte werden mit jeder Stufe stärker als vorher."),
@@ -2126,7 +2127,33 @@ const FIGUR_KATEGORIEN = [
     { id: "hose", name: t("Hose"), symbol: "👖" },
     { id: "schuhe", name: t("Schuhe"), symbol: "👟" },
     { id: "kopf", name: t("Kopf"), symbol: "👒" },
-    { id: "accessoire", name: t("Accessoire"), symbol: "🎀" }
+    { id: "accessoire", name: t("Accessoire"), symbol: "🎀" },
+    { id: "gesicht", name: t("Gesicht"), symbol: "🙂" }
+];
+
+// Eigene Farben fuer Kleidung und Augen (gilt nicht fuer legendaere Teile, die haben ihre eigenen Farben)
+const FIGUR_FARBBAR = ["oberteil", "hose", "schuhe", "augen"];
+const FIGUR_PALETTE = ["#e8434a", "#f08a24", "#f5d547", "#8fcf5c", "#3f8a32", "#5aa9e6", "#2f6fb8", "#1b3f73",
+    "#a877e0", "#6b3fa0", "#ff8fb1", "#8f6139", "#5c5c66", "#1c1b24", "#f4f4f4", "#d9b56a"];
+
+// Titel unter dem Namen: werden durch Fortschritt freigeschaltet (m = Fortschritt des Spielstands)
+const FIGUR_TITEL = [
+    { id: "neuling", name: t("Neuling"), bedingung: () => true, text: t("Von Anfang an") },
+    { id: "hobby", name: t("Hobbygärtner"), bedingung: () => bauernRang() >= 5, text: t("Bauernrang 5") },
+    { id: "feldarbeiter", name: t("Feldarbeiter"), bedingung: () => bauernRang() >= 10, text: t("Bauernrang 10") },
+    { id: "erntemeister", name: t("Erntemeister"), bedingung: () => bauernRang() >= 25, text: t("Bauernrang 25") },
+    { id: "sternenbauer", name: t("Sternenbauer"), bedingung: () => bauernRang() >= 50, text: t("Bauernrang 50") },
+    { id: "legende", name: t("Legende von Sproutvale"), bedingung: () => bauernRang() >= 100, text: t("Bauernrang 100") },
+    { id: "bezwinger", name: t("Rechnungsbezwinger"), bedingung: m => (m.besterRun ? m.besterRun.rechnungen : 0) >= 8, text: t("8 Rechnungen in einem Run") },
+    { id: "mondwanderer", name: t("Mondwanderer"), bedingung: m => (m.mondphaseFrei || 0) >= 3, text: t("3. Mondphase freigeschaltet") },
+    { id: "sternenfaller", name: t("Sternenfaller"), bedingung: m => (m.sternenfaelle || 0) >= 1, text: t("Einen Sternenfall ausgelöst") },
+    { id: "kuschelsammler", name: t("Kuschelsammler"), bedingung: m => Object.keys(m.kuscheltiere || {}).length >= 15, text: t("15 verschiedene Kuscheltiere") },
+    { id: "gluckspilz", name: t("Glückspilz"), bedingung: m => (m.lebenszeit.jackpots || 0) >= 100, text: t("100 legendäre Saaten") },
+    { id: "kombokoenig", name: t("Kombokönig"), bedingung: m => (m.lebenszeit.maxKombo || 0) >= 300, text: t("300er-Kombo") },
+    { id: "streichelprofi", name: t("Streichelprofi"), bedingung: m => (m.lebenszeit.streicheln || 0) >= 3333, text: t("3.333-mal gestreichelt") },
+    { id: "pflanzenmeister", name: t("Pflanzenmeister"), bedingung: m => PFLANZEN_VORLAGEN.some(p => (m.kodex.pflanzen[p.id] || 0) >= MEISTER_SCHWELLEN[6]), text: t("Meisterschaft 7 bei einer Pflanze") },
+    { id: "puenktlich", name: t("Überpünktlich"), bedingung: m => (m.lebenszeit.fruehBezahlt || 0) >= 10, text: t("10 Rechnungen früher bezahlt") },
+    { id: "weltenhueter", name: t("Hüter des Weltenbaums"), bedingung: m => (m.kodex.pflanzen.weltenbaum || 0) >= 1, text: t("Einen Weltenbaum geerntet") }
 ];
 
 const EPISCH = { quelle: "dlc", paket: "unterstuetzer" };
@@ -2277,6 +2304,20 @@ const FIGUR_TEILE = {
         { id: "wolken", name: t("Wolkenschuhe"), ...LEGENDAER, form: "wolke", anim: true, fx: "schweben", farben: { 1: "#ffffff", l: "#d8e4f4" } },
         { id: "raketen", name: t("Raketenschuhe"), ...LEGENDAER, form: "rakete", anim: true, fx: "glow", fxFarbe: "#ff8a2a", farben: { 1: "#d0d4dc", l: "#ff4a3a" } }
     ],
+    // Gesicht: Kleinigkeiten, mit denen man sich selbst beschreiben kann (G/H = eigene Farben)
+    gesicht: [
+        { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
+        { id: "sommersprossen", name: t("Sommersprossen"), quelle: "frei", form: "sommersprossen", farben: { G: "#b0643a" } },
+        { id: "wangen", name: t("Rote Wangen"), quelle: "frei", form: "wangen", farben: { G: "#ff7a8a" } },
+        { id: "muttermal", name: t("Muttermal"), quelle: "frei", form: "muttermal", farben: { G: "#5a2a1a" } },
+        { id: "grinsen", name: t("Breites Grinsen"), quelle: "frei", form: "grinsen", farben: { G: "#9a4a3a", H: "#ffffff" } },
+        { id: "schnurrbart", name: t("Schnurrbart"), ...EPISCH, form: "schnurrbart" },
+        { id: "vollbart", name: t("Vollbart"), ...EPISCH, form: "vollbart" },
+        { id: "pflaster", name: t("Pflaster"), ...EPISCH, form: "pflaster", farben: { G: "#f0c89a", H: "#d8a878" } },
+        { id: "kriegsbemalung", name: t("Farbstreifen"), ...EPISCH, form: "streifen", farben: { G: "#2f6fb8", H: "#e8434a" } },
+        { id: "sternenwangen", name: t("Sternenwangen"), ...LEGENDAER, form: "sternenwangen", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
+            farben: { G: "#ffd23a", H: "#fff6c0" } }
+    ],
     kopf: [
         { id: "keiner", name: t("Nichts"), quelle: "frei", form: "keiner" },
         { id: "strohhut", name: t("Strohhut"), quelle: "frei", form: "strohhut", farben: { a: "#e8c860", b: "#c8a040", c: "#c8302a" } },
@@ -2338,7 +2379,7 @@ const FIGUR_TEILE = {
 };
 
 const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut",
-    accessoire: "keins" };
+    accessoire: "keins", gesicht: "keins" };
 
 // Emotes mit Rechtsklick auf die eigene Figur
 const FIGUR_EMOTES = [
