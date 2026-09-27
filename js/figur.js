@@ -2010,10 +2010,10 @@ function aktualisiereProfilKnopf() {
         el("span", "profil-rang", tf("Level {0}", rang)),
         xpLeiste((xp - von) / (bis - von))
     ]));
-    setzeTipp(knopf, "## " + tf("⭐ Level {0}", rang) + "\n= " + tf("Für immer +{0}% Gold", rang - 1) + "\n" +
+    setzeTipp(knopf, "## " + tf("⭐ Level {0}", rang) + "\n" +
         tf("Erfahrung: {0} / {1}", zahl(xp - von), zahl(bis - von)) + "\n- " +
         t("Erfahrung gibt es für fast alles: Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere und Erfolge.") + "\n- " +
-        t("Jedes Level +1% Gold. Alle 5 Level ein Kuschel-Gutschein und eine neue Aura (im Profil wählbar)."));
+        t("Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar)."));
 }
 
 function xpLeiste(anteil) {

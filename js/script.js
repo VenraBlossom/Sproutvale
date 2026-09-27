@@ -641,7 +641,7 @@ function artenvielfalt() {
 }
 
 function goldMulti() {
-    const summe = 1 + rangBonus() + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
+    const summe = 1 + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
@@ -790,10 +790,11 @@ function meisterStufe(pflanzenId) {
 // ---------- LEVEL (dauerhaft, ueber alle Modi und Spielstaende) ----------
 // Erfahrung gibt es fuer fast alles: Ernten, Tage, Rechnungen, Gold und Sternensamen am Feierabend,
 // Mondblueten am Run-Ende, Sternensplitter, Kuscheltiere und Erfolge. Gold und Sternensamen zaehlen
-// logarithmisch, damit Milliarden spaeter nicht alles sprengen. Level 100 braucht ~2,45 Mio. Erfahrung
-// (Langzeit-Ziel), danach geht es ohne Ende weiter. +1% Gold pro Level, alle 5 Level ein Gutschein und eine Aura.
+// logarithmisch, damit Milliarden spaeter nicht alles sprengen. Level 100 braucht ~3,1 Mio. Erfahrung
+// (Langzeit-Ziel), danach geht es ohne Ende weiter. Keine Vorteile im Spiel, nur alle 5 Level eine Aura.
 function rangSchwelle(rang) {
-    return rang <= 1 ? 0 : Math.round(250 * Math.pow(rang - 1, 2));
+    // am Anfang schnell (erster Run etwa Level 6-7), hinten steil (Level 100 ~3,1 Mio.)
+    return rang <= 1 ? 0 : Math.round(20 * Math.pow(rang - 1, 2.6));
 }
 // Erfahrung fuer Waehrungen: waechst nur langsam mit der Menge
 function xpAusMenge(menge, faktor) {
@@ -804,20 +805,14 @@ function bauernRang(xp = meta.bauernXp || 0) {
     while (rangSchwelle(rang + 1) <= xp) rang += 1;
     return rang;
 }
-function rangBonus() {
-    return 0.01 * (bauernRang() - 1);
-}
 function gibBauernXp(menge) {
     const vorher = bauernRang();
     meta.bauernXp = (meta.bauernXp || 0) + menge;
     const jetzt = bauernRang();
     if (jetzt <= vorher) return;
-    let gutscheine = 0;
-    for (let r = vorher + 1; r <= jetzt; r++) if (r % 5 === 0) gutscheine += 1;
-    meta.gutscheine += gutscheine;
+    // Das Level ist nur zum Angeben: keine Vorteile im Spiel, nur Auren
     const neueAura = FIGUR_AUREN.filter(au => au.level > vorher && au.level <= jetzt).pop();
-    zeigeBanner("⭐", tf("Level {0}!", jetzt), tf("Für immer +{0}% Gold", jetzt - 1) +
-        (gutscheine ? " · +" + gutscheine + t(" Kuschel-Gutschein") : "") + (neueAura ? " · " + tf("Neue Aura: {0}", neueAura.name) : ""), "#2e9e2e", 3000);
+    zeigeBanner("⭐", tf("Level {0}!", jetzt), neueAura ? tf("Neue Aura: {0}", neueAura.name) : t("Weiter so!"), "#2e9e2e", 3000);
     if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
 }
 
@@ -5209,7 +5204,7 @@ function oeffnePanel(panel) {
     haken("panelOffen", panel.id);
 }
 
-// Das Stellarium muss man einmal im Markt freischalten (1.000 Gold). Wer schon gespielt hat, hat es sofort.
+// Das Stellarium muss man einmal im Markt freischalten (700 Gold). Wer schon gespielt hat, hat es sofort.
 // Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
 function stellariumFrei() {
     if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
@@ -5219,7 +5214,7 @@ function stellariumFrei() {
 function oeffneSkilltree() {
     if (!stellariumFrei()) {
         Klang.fehler();
-        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 1.000 Gold)."));
+        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 700 Gold)."));
         return;
     }
     schliessePanels();

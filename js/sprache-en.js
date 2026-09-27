@@ -2649,11 +2649,11 @@ Object.assign(UEBERSETZUNG, {
     "+1 Gold für jede Ernte.": "+1 gold for every harvest.",
     " Gold pro Ernte": " gold per harvest",
     "Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr.": "Unlocks the Stellarium forever: there you spend Star Drops on new plants, colored drops, helpers and much more.",
-    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 1.000 Gold).": "✨ You unlock the Stellarium in the market (General, 1,000 gold).",
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 700 Gold).": "✨ You unlock the Stellarium in the market (General, 700 gold).",
     "Stellarium freigeschaltet!": "Stellarium unlocked!",
     "Oben rechts: neue Pflanzen, bunte Saaten, Helfer und mehr": "Top right: new plants, colored drops, helpers and more",
     "Die Sternensaat sammelst du jetzt schon. Später gibst du sie im Stellarium aus: für neue Pflanzen, bunte Saaten und Helfer. ": "You already collect Star Drops. Later you spend them in the Stellarium: on new plants, colored drops and helpers. ",
-    "Das Stellarium schaltest du im Markt frei, sobald du 1.000 Gold hast.": "You unlock the Stellarium in the market as soon as you have 1,000 gold.",
+    "Das Stellarium schaltest du im Markt frei, sobald du 700 Gold hast.": "You unlock the Stellarium in the market as soon as you have 700 gold.",
     "Verstanden": "Got it",
     "Stufe 1 schaltet ungewöhnliche Saaten frei (grün, x2,5 Gold, 15% Chance). Jede weitere Stufe: +3% Chance.": "Level 1 unlocks uncommon drops (green, x2.5 gold, 15% chance). Every further level: +3% chance.",
     "Stufe 1 schaltet seltene Saaten frei (blau, x5 Gold). Jede Stufe: +2% Chance.": "Level 1 unlocks rare drops (blue, x5 gold). Every level: +2% chance.",
@@ -2786,7 +2786,9 @@ Object.assign(UEBERSETZUNG, {
     "Kleidung, Kopf und Accessoire haben jetzt Haupt- und Zweitfarbe, auch legendäre Teile. Doppelte Farb-Teile wurden entfernt (du bekommst das Grundteil in deiner Farbe).": "Clothes, head and accessory now have a main and a second color, legendary parts too. Duplicate color items were removed (you get the base item in your color).",
     "Rote Schleife größer, Pflaster sichtbar, Zauberhut entfernt, Gesicht im Debug-Menü.": "Red bow bigger, band-aid visible, wizard hat removed, face in the debug menu.",
     "Mondteich am Run-Anfang nur noch über den Teich im Hintergrund.": "At the start of a run the Moon Pond is only reachable through the pond in the background.",
-    "Neu in den Einstellungen: CRT-Filter.": "New in the settings: CRT filter."
+    "Neu in den Einstellungen: CRT-Filter.": "New in the settings: CRT filter.",
+    "Weiter so!": "Keep it up!",
+    "Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar).": "Your level gives no advantages in the game. Every 5 levels you get a new aura (choose it in your profile)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
