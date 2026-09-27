@@ -463,10 +463,16 @@ function kaufeSandbox() {
     renderPrestigeShop();
 }
 
-// Mondphasen: Auswahl der Schwierigkeit fuer den naechsten normalen Run
+// Mondphasen gehoeren zu Story. Laeuft gerade Endlos, liegt der Story-Fortschritt in metaRuhend.
+function storyMeta() {
+    return metaProfil === "standard" ? meta : metaRuhend || meta;
+}
+
+// Mondphasen: Auswahl der Schwierigkeit fuer den naechsten normalen Run (auch aus Endlos heraus)
 function waehleMondphase(index) {
-    if (index > (meta.mondphaseFrei || 0)) return;
-    meta.mondphase = index;
+    const m = storyMeta();
+    if (index > (m.mondphaseFrei || 0)) return;
+    m.mondphase = index;
     speichereMeta();
     // Ein vorbereiteter Tag 1 uebernimmt die Phase sofort (im Duo nicht: dort waehlt der Host beim Start)
     if (run.phase === "vorTag" && run.tag === 1 && !run.sandbox && !run.koop) starteNeuenRun(false);
@@ -475,16 +481,18 @@ function waehleMondphase(index) {
 }
 
 function renderMondphasen() {
+    const m = storyMeta();
     const kasten = el("div", "mondphasen-kasten");
     kasten.appendChild(el("div", "mondphasen-titel", t("🌙 Mondphasen: Schwierigkeit für normale Runs")));
+    if (run.sandbox) kasten.appendChild(el("div", "mondphasen-hinweis", t("♾️ In Endlos gibt es keine Mondphasen. Deine Auswahl gilt für deine Story-Runs.")));
     kasten.appendChild(el("div", "mondphasen-hinweis", t("Jede Phase ist schwerer als die vorige, ihre Regeln gelten zusammen. ") +
         t("Dafür gibt es +") + Math.round(MONDPHASE_BONUS * 100) + t("% Mondblüten pro Phase. Die nächste Phase wird frei, wenn du in der ") +
         t("höchsten freien Phase ") + MONDPHASE_FREI_AB_RECHNUNGEN + t(" Rechnungen in einem Run bezahlst.")));
     const reihe = el("div", "mondphasen-reihe");
     MONDPHASEN.forEach((phase, index) => {
-        const frei = index <= (meta.mondphaseFrei || 0);
-        const aktiv = index === Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0);
-        const neu = index > (meta.mondphaseGesehen || 0) && frei;
+        const frei = index <= (m.mondphaseFrei || 0);
+        const aktiv = index === Math.min(m.mondphase || 0, m.mondphaseFrei || 0);
+        const neu = index > (m.mondphaseGesehen || 0) && frei;
         const knopf = el("button", "mondphase" + (aktiv ? " aktiv" : "") + (frei ? "" : " gesperrt") + (neu ? " neu" : ""), null, [
             neu ? el("div", "mondphase-neu", t("NEU")) : null,
             el("div", "mondphase-symbol", phase.symbol),
@@ -511,18 +519,18 @@ function renderSpielmodi() {
     if (run.koop) {
         prestigeInhalt.appendChild(erstelleHinweis(t("👥 Im Duo startet der Host neue Runs in der Lobby. Die Mondphase des Hosts gilt für euch beide. ") +
             t("Deine Auswahl hier gilt für deine Solo-Runs.")));
-        if (!run.sandbox) renderMondphasen();
+        renderMondphasen();
         if (neueMondphase()) {
-            meta.mondphaseGesehen = meta.mondphaseFrei || 0;
+            storyMeta().mondphaseGesehen = storyMeta().mondphaseFrei || 0;
             speichereMeta();
             aktualisiereMondphaseHinweis();
         }
         return;
     }
-    if (!run.sandbox) renderMondphasen(); // Mondphasen gelten nur fuer normale Runs
+    renderMondphasen(); // gelten nur fuer Story, sind aber auch aus Endlos heraus waehlbar
     // Neue Mondphasen sind jetzt gesehen (das Ausrufezeichen verschwindet beim naechsten Oeffnen)
     if (neueMondphase()) {
-        meta.mondphaseGesehen = meta.mondphaseFrei || 0;
+        storyMeta().mondphaseGesehen = storyMeta().mondphaseFrei || 0;
         speichereMeta();
         aktualisiereMondphaseHinweis();
     }
@@ -553,7 +561,7 @@ function renderSpielmodi() {
 
 // Wurde eine neue Mondphase frei, die man sich noch nicht angesehen hat?
 function neueMondphase() {
-    return (meta.mondphaseFrei || 0) > (meta.mondphaseGesehen || 0);
+    return (storyMeta().mondphaseFrei || 0) > (storyMeta().mondphaseGesehen || 0);
 }
 
 // Ausrufezeichen am Mondteich-Knopf (Tageskarte)

@@ -2492,7 +2492,9 @@ Object.assign(UEBERSETZUNG, {
     "📜 Patch Notes": "📜 Patch notes",
     "Patch Notes": "Patch notes",
     "Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).": "Patch notes: read up on every version since Alpha 0.2.0 (click the version number in the main menu).",
-    "Kein laufender Hof. Der nächste Endlos-Run beginnt bei Tag 1, Mondblüten und Upgrades bleiben erhalten.": "No farm in progress. The next Endless run starts at day 1, your Moonpetals and upgrades are kept."
+    "Kein laufender Hof. Der nächste Endlos-Run beginnt bei Tag 1, Mondblüten und Upgrades bleiben erhalten.": "No farm in progress. The next Endless run starts at day 1, your Moonpetals and upgrades are kept.",
+    "♾️ In Endlos gibt es keine Mondphasen. Deine Auswahl gilt für deine Story-Runs.": "♾️ Endless has no moon phases. Your choice applies to your Story runs.",
+    "In Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.": "Endless has no moon phases. This is the phase for your next Story runs."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

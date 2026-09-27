@@ -10736,7 +10736,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     position: relative;
     padding: 16px 22px 20px;
     background:
-        radial-gradient(circle at calc(100% - 70px) 50%, #fff6c8 0 16px, rgba(255, 246, 200, 0.35) 17px 30px, transparent 46px),
         repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 18px, transparent 18px 40px) bottom / 100% 5px no-repeat,
         linear-gradient(#4a4fb0, #2b2f78);
     border-bottom: 4px solid #0e1030;
@@ -10747,7 +10746,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     text-shadow: 2px 2px 0 #141a42, 0 0 12px rgba(200, 180, 255, 0.6);
 }
 #prestige-guthaben {
-    margin-right: 90px;
+    margin-right: 0;
 }
 #prestige-guthaben .guthaben-teil {
     background: rgba(10, 12, 40, 0.45);

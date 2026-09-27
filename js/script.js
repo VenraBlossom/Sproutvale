@@ -3744,8 +3744,19 @@ function aktualisiereTopBar() {
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
     // Aktuelle Mondphase (Schwierigkeit), nur in Story
-    mondphaseDisplay.classList.toggle("versteckt", Boolean(run.sandbox));
-    if (!run.sandbox) {
+    // Mondphase oben: in Story die des Runs, in Endlos die fuer Story gewaehlte (dort gibt es keine Mondphasen)
+    mondphaseDisplay.classList.remove("versteckt");
+    if (run.sandbox) {
+        const sm = storyMeta();
+        const stufe = Math.min(sm.mondphase || 0, sm.mondphaseFrei || 0);
+        const phase = MONDPHASEN[stufe];
+        mondphaseDisplay.querySelector("span").textContent = phase.symbol;
+        mondphaseDisplay.classList.toggle("hat-neues", neueMondphase());
+        setzeTipp(mondphaseDisplay, "## " + t("🌙 Mondphase: ") + phase.name + "\n" +
+            t("In Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.") +
+            "\n> +" + Math.round(MONDPHASE_BONUS * 100 * stufe) + t("% Mondblüten am Ende des Runs") +
+            "\n- " + t("Klick: zur Auswahl im Mondteich"));
+    } else {
         const stufe = run.mondphase || 0;
         const phase = MONDPHASEN[stufe];
         mondphaseDisplay.querySelector("span").textContent = phase.symbol;
