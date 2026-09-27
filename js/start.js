@@ -154,7 +154,7 @@ window.debug = {
     level(n) { meta.bauernXp = rangSchwelle(Math.max(1, Math.floor(n))); speichereMeta(); aktualisiereProfilKnopf(); },
     xp(menge) { gibBauernXp(menge); speichereMeta(); },
     // Fenster mit allen Befehlen, Werte direkt eintragen: debug.help()
-    help() { zeigeDebugFenster(); },
+    help() { console.log("Debug-Fenster: Einstellungen > Klang, dann Strg+F12."); },
     // Ein Bot tritt deiner Lobby bei und spielt mit: debug.bot("ABC123") (Code aus dem Duo-Fenster)
     bot(code) {
         debug.botWeg();
@@ -189,7 +189,7 @@ window.debug = {
     resetMeta() { Object.assign(meta, leererMetaStand()); speichereMeta(); loescheRunSpeicher(); }
 };
 
-// Fenster zu debug.help() (auch mit F12): jeder Befehl mit Eingaben und einem Knopf zum Ausfuehren.
+// Debug-Fenster (Einstellungen > Klang, Strg+F12): jeder Befehl mit Eingaben und einem Knopf zum Ausfuehren.
 // Feldtypen: zahl (min/max, die Grenzen stehen grau im Feld), wahl (oeffnet ein "Inventar" mit allen Moeglichkeiten
 // als Kacheln; optionen kann von den anderen Feldern abhaengen), haken, text
 const WERKZEUG_DEBUG_MAX = 20; // Werkzeuge haben kein festes Maximum (Stufe = 1 + bezahlte Rechnungen), 20 reicht fuer jeden Run
@@ -361,15 +361,24 @@ function zeigeDebugFenster() {
         }
         liste.appendChild(zeile);
     });
-    debugFensterSchliessen = zeigePopup({ titel: "🛠️ Debug (F12)", farbe: "#44506b", breite: 680, klasse: "debug-fenster", inhalt: liste,
+    debugFensterSchliessen = zeigePopup({ titel: "🛠️ Debug (Strg+F12)", farbe: "#44506b", breite: 680, klasse: "debug-fenster", inhalt: liste,
         onSchliessen: () => { debugFensterSchliessen = null; } });
 }
 
-// F12 oeffnet und schliesst das Debug-Fenster (statt der Konsole)
+// Das Debug-Fenster geht NUR mit Strg+F12 in den Einstellungen im Reiter Klang auf.
+// Die Einstellungen schliessen sich dabei, das Debug-Fenster liegt dann ganz oben.
 window.addEventListener("keydown", event => {
     if (event.key !== "F12") return;
     event.preventDefault();
+    if (debugFensterSchliessen) {
+        event.stopPropagation();
+        debugFensterSchliessen();
+        return;
+    }
+    const imKlangReiter = !einstellungenFenster.classList.contains("versteckt") && aktiverEinstellungsReiter === "audio";
+    if (!event.ctrlKey || !imKlangReiter) return;
     event.stopPropagation();
+    einstellungenFenster.classList.add("versteckt");
     zeigeDebugFenster();
 }, true);
 

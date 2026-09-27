@@ -6,7 +6,7 @@
 // darum ist jede Code-Aenderung beim naechsten Start sofort drin. Aendert sich eine Datei,
 // waehrend das Spiel offen ist, laedt das Fenster automatisch neu.
 //
-// Tasten: F11 = Vollbild, F12 = Debug-Fenster im Spiel (Strg+Umschalt+F12 = Entwickler-Werkzeuge), Strg+R = neu laden
+// Tasten: F11 = Vollbild, Strg+F12 in den Einstellungen (Reiter Klang) = Debug-Fenster (Strg+Umschalt+F12 = Entwickler-Werkzeuge), Strg+R = neu laden
 // ============================================================
 
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
@@ -381,7 +381,7 @@ function erstelleFenster() {
             fenster.setFullScreen(!fenster.isFullScreen());
             event.preventDefault();
         } else if (eingabe.key === "F12" && eingabe.control && eingabe.shift) {
-            // Nur fuer die Entwicklung versteckt: Strg+Umschalt+F12 = Entwickler-Werkzeuge. F12 allein oeffnet im Spiel das Debug-Fenster.
+            // Nur fuer die Entwicklung versteckt: Strg+Umschalt+F12 = Entwickler-Werkzeuge. Strg+F12 im Klang-Reiter der Einstellungen oeffnet das Debug-Fenster.
             fenster.webContents.toggleDevTools();
             event.preventDefault();
         }
