@@ -9,7 +9,9 @@
 // Gehoert zu script.js, haus.js und sprites.js (gemeinsame Funktionen stehen dort).
 // ============================================================
 
-const FIGUR_BREITE = 18;
+// Platz links und rechts neben der Figur (fuer grosse Fluegel); gezeichnet wird weiter mit x = 0 bis 18
+const FIGUR_LINKS = 3;
+const FIGUR_BREITE = 18 + 2 * FIGUR_LINKS;
 const FIGUR_OBEN = 5;   // Platz ueber dem Kopf (hohe Huete, Heiligenschein, Flammenhaar)
 const FIGUR_HOEHE = 26 + FIGUR_OBEN;
 // Schichten von hinten nach vorne (hinten = Fluegel, Rucksack, Umhang)
@@ -54,9 +56,10 @@ function profilName() {
 // Raster in doppelter Aufloesung: gezeichnet wird in "Figur-Pixeln" (18 breit), jeder davon besteht aus 2x2 feinen Pixeln.
 // punkt/rechteck/ellipse/linie arbeiten in Figur-Pixeln (Rundungen werden fein berechnet und dadurch weicher),
 // fein/feinLinie setzen einzelne feine Pixel (Koordinaten in Figur-Pixeln, halbe Werte erlaubt) fuer Details.
-const FIGUR_FEIN = 2;
-const FIGUR_RB = FIGUR_BREITE * FIGUR_FEIN;
-const FIGUR_RH = FIGUR_HOEHE * FIGUR_FEIN;
+// 1,5-fache Aufloesung: feiner als frueher, aber nicht zu fein (bleibt im Pixel-Stil des Spiels)
+const FIGUR_FEIN = 1.5;
+const FIGUR_RB = Math.round(FIGUR_BREITE * FIGUR_FEIN);
+const FIGUR_RH = Math.round(FIGUR_HOEHE * FIGUR_FEIN);
 
 function figurGitter() {
     const raster = Array.from({ length: FIGUR_RH }, () => Array(FIGUR_RB).fill(null));
@@ -65,27 +68,31 @@ function figurGitter() {
     };
     // Figur-Pixel (x, y) -> 2x2 feine Pixel; y ohne den Platz oben (0 = Kopfbereich)
     const setze = (x, y, farbe) => {
-        const fx = Math.round(x) * FIGUR_FEIN;
-        const fy = (Math.round(y) + FIGUR_OBEN) * FIGUR_FEIN;
-        for (let dy = 0; dy < FIGUR_FEIN; dy++) for (let dx = 0; dx < FIGUR_FEIN; dx++) setzeFein(fx + dx, fy + dy, farbe);
+        const lx = Math.round(x) + FIGUR_LINKS;
+        const ly = Math.round(y) + FIGUR_OBEN;
+        const fx0 = Math.round(lx * FIGUR_FEIN);
+        const fx1 = Math.max(fx0 + 1, Math.round((lx + 1) * FIGUR_FEIN));
+        const fy0 = Math.round(ly * FIGUR_FEIN);
+        const fy1 = Math.max(fy0 + 1, Math.round((ly + 1) * FIGUR_FEIN));
+        for (let fy = fy0; fy < fy1; fy++) for (let fx = fx0; fx < fx1; fx++) setzeFein(fx, fy, farbe);
     };
-    const fein = (x, y, farbe) => setzeFein(Math.round(x * FIGUR_FEIN), Math.round((y + FIGUR_OBEN) * FIGUR_FEIN), farbe);
+    const fein = (x, y, farbe) => setzeFein(Math.round((x + FIGUR_LINKS) * FIGUR_FEIN), Math.round((y + FIGUR_OBEN) * FIGUR_FEIN), farbe);
     return {
         raster,
         punkt: setze,
         fein,
         rechteck(x, y, b, h, farbe) {
-            const fx0 = Math.round(x * FIGUR_FEIN);
+            const fx0 = Math.round((x + FIGUR_LINKS) * FIGUR_FEIN);
             const fy0 = Math.round((y + FIGUR_OBEN) * FIGUR_FEIN);
-            const fb = Math.round(b * FIGUR_FEIN);
-            const fh = Math.round(h * FIGUR_FEIN);
+            const fb = Math.max(1, Math.round(b * FIGUR_FEIN));
+            const fh = Math.max(1, Math.round(h * FIGUR_FEIN));
             for (let dy = 0; dy < fh; dy++) for (let dx = 0; dx < fb; dx++) setzeFein(fx0 + dx, fy0 + dy, farbe);
         },
         // Ellipse fein gerastert; filter(x, y) bekommt Koordinaten, bei denen x + 0.5 die Mitte des feinen Pixels ist
         ellipse(cx, cy, rx, ry, farbe, filter) {
             for (let fy = 0; fy < FIGUR_RH; fy++) {
                 for (let fx = 0; fx < FIGUR_RB; fx++) {
-                    const lx = (fx + 0.5) / FIGUR_FEIN;
+                    const lx = (fx + 0.5) / FIGUR_FEIN - FIGUR_LINKS;
                     const ly = (fy + 0.5) / FIGUR_FEIN - FIGUR_OBEN;
                     const dx = (lx - cx) / rx;
                     const dy = (ly - cy) / ry;
@@ -99,7 +106,7 @@ function figurGitter() {
             for (let i = 0; i <= schritte; i++) {
                 const x = x0 + ((x1 - x0) * i) / schritte;
                 const y = y0 + ((y1 - y0) * i) / schritte;
-                const fx = Math.round(x * FIGUR_FEIN);
+                const fx = Math.round((x + FIGUR_LINKS) * FIGUR_FEIN);
                 const fy = Math.round((y + FIGUR_OBEN) * FIGUR_FEIN);
                 setzeFein(fx, fy, farbe);
                 setzeFein(fx + 1, fy, farbe);
@@ -879,44 +886,51 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
 
 // Fluegel am Ruecken: 4 Animationsbilder (auf, mitte, ab, mitte), jede Art mit eigener Form und Zeichnung
 function figurFluegel(p, form, seite, x0, y0, breite, anim) {
-    const schlag = [-2, -1, 0.5, -1][anim % 4];
+    const schlag = [-2.5, -1, 1, -1][anim % 4];
     const fluegel = (fx, r) => {
+        const y = y0 + 1;
         if (form === "fluegel" || form === "libelle") {
-            // Feen- und Libellenfluegel: zwei durchscheinende Blaetter mit feinen Adern
-            const spitzeY = y0 - 2.5 + schlag;
-            p.ellipse(fx + r * 3, spitzeY + 1, 2.8, form === "libelle" ? 1.2 : 2.6, "x");
-            p.ellipse(fx + r * 2.5, y0 + 4 + schlag * 0.3, form === "libelle" ? 2.8 : 2, form === "libelle" ? 1 : 1.8, "y");
-            p.feinLinie(fx, y0 + 1, fx + r * 5, spitzeY, "z");
-            p.feinLinie(fx, y0 + 2, fx + r * 4, y0 + 4.5 + schlag * 0.3, "z");
-        } else if (form === "fledermaus") {
-            const spitze = y0 - 5 + schlag * 1.5;
-            p.linie(fx, y0, fx + r * 5, spitze, "x");
-            p.linie(fx + r * 5, spitze, fx + r * 6.5, y0 + 4, "x");
-            for (let i = 1; i <= 5; i++) p.linie(fx, y0 + 1, fx + r * i * 1.1, spitze + i * 1.2 + 1, i % 2 ? "y" : "x");
-            p.feinLinie(fx + r * 5, spitze, fx + r * 3, y0 + 4, "z");
-            p.feinLinie(fx + r * 5, spitze, fx + r * 5.5, y0 + 4, "z");
+            // Feen- und Libellenfluegel: zwei grosse, durchscheinende Blaetter mit Adern
+            const schmal = form === "libelle";
+            p.ellipse(fx + r * 4.5, y - 3.5 + schlag, 4.6, schmal ? 1.8 : 4, "x");
+            p.ellipse(fx + r * 3.5, y + 4 + schlag * 0.4, schmal ? 4.2 : 3.2, schmal ? 1.5 : 3, "y");
+            p.feinLinie(fx, y, fx + r * 8, y - 6 + schlag, "z");
+            p.feinLinie(fx, y + 1, fx + r * 6, y + 5 + schlag * 0.4, "z");
+            p.feinLinie(fx + r * 3, y - 2 + schlag * 0.5, fx + r * 6, y - 2 + schlag, "z");
         } else if (form === "engel") {
-            // Federn in Stufen, die Spitzen etwas dunkler
-            for (let i = 0; i < 5; i++) {
-                const y = y0 - 3 + schlag + i * 1.3;
-                const lang = 6 - i * 0.8;
-                p.rechteck(Math.min(fx, fx + r * lang), y, lang, 1.2, "x");
-                p.fein(fx + r * (lang - 0.5), y + 0.5, "y");
+            // Engelsfluegel: grosse Federfluegel in Stufen, von hell nach etwas dunkler, mit Deckfedern
+            p.ellipse(fx + r * 3.5, y - 2.5 + schlag, 4, 3.4, "x");
+            for (let i = 0; i < 6; i++) {
+                const yy = y - 3 + schlag * (1 - i / 6) + i * 1.6;
+                const lang = 8.5 - i * 1.1;
+                const x0f = r > 0 ? fx : fx - lang;
+                p.rechteck(x0f, yy, lang, 1.6, i % 2 ? "y" : "x");
+                p.fein(fx + r * (lang - 0.3), yy + 1, "y");
             }
-            p.feinLinie(fx, y0 - 2 + schlag, fx + r * 5, y0 - 3 + schlag, "z");
+            p.feinLinie(fx, y - 3 + schlag, fx + r * 7, y - 5.5 + schlag, "z");
+            p.feinLinie(fx + r, y - 1 + schlag * 0.5, fx + r * 5, y - 2.5 + schlag * 0.7, "z");
+        } else if (form === "fledermaus") {
+            const spitze = y - 7 + schlag * 1.5;
+            p.linie(fx, y, fx + r * 7, spitze, "x");
+            p.linie(fx + r * 7, spitze, fx + r * 9, y + 5, "x");
+            for (let i = 1; i <= 7; i++) p.linie(fx, y + 1, fx + r * i * 1.2, spitze + i * 1.3 + 1, i % 2 ? "y" : "x");
+            p.feinLinie(fx + r * 7, spitze, fx + r * 4, y + 5, "z");
+            p.feinLinie(fx + r * 7, spitze, fx + r * 7.5, y + 5, "z");
+            p.fein(fx + r * 7, spitze - 0.5, "z");
         } else if (form === "schmetterling") {
-            p.ellipse(fx + r * 3, y0 - 1 + schlag, 3, 2.8, "x");
-            p.ellipse(fx + r * 2.5, y0 + 4 + schlag * 0.3, 2.2, 2, "y");
-            p.ellipse(fx + r * 3.5, y0 - 1.5 + schlag, 1.2, 1.1, "z");
-            p.ellipse(fx + r * 2.5, y0 + 4 + schlag * 0.3, 0.8, 0.8, "z");
-            p.fein(fx + r * 3.5, y0 - 2 + schlag, "w");
+            p.ellipse(fx + r * 4.5, y - 2.5 + schlag, 4.4, 4, "x");
+            p.ellipse(fx + r * 3.5, y + 4.5 + schlag * 0.4, 3.2, 3, "y");
+            p.ellipse(fx + r * 5.2, y - 3 + schlag, 1.8, 1.6, "z");
+            p.ellipse(fx + r * 3.5, y + 4.5 + schlag * 0.4, 1.2, 1.1, "z");
+            p.fein(fx + r * 5.5, y - 3.5 + schlag, "w");
+            p.feinLinie(fx + r * 1, y - 5 + schlag, fx + r * 7, y - 6 + schlag, "y");
         } else if (form === "drache") {
-            const spitze = y0 - 5 + schlag * 1.5;
-            p.linie(fx, y0, fx + r * 6, spitze, "x");
-            p.ellipse(fx + r * 3.5, y0 + 1 + schlag * 0.5, 3, 3, "y", (x, y) => y + 0.5 > spitze + 2);
-            for (let i = 1; i <= 3; i++) p.feinLinie(fx + r * 1, y0 + 1, fx + r * (2 + i * 1.3), y0 + 4, "x");
-            p.fein(fx + r * 6.5, spitze - 0.5, "z");
-            if (anim % 2 === 0) p.fein(fx + r * 5, y0 + 3, "z");
+            const spitze = y - 7 + schlag * 1.5;
+            p.linie(fx, y, fx + r * 8.5, spitze, "x");
+            p.ellipse(fx + r * 5, y + 1.5 + schlag * 0.5, 4.4, 4.2, "y", (xx, yy) => yy + 0.5 > spitze + 2.5);
+            for (let i = 1; i <= 4; i++) p.linie(fx + r, y + 1, fx + r * (2.5 + i * 1.6), y + 5.5, "x");
+            p.fein(fx + r * 9, spitze - 0.5, "z");
+            if (anim % 2 === 0) p.fein(fx + r * 7, y + 4, "z");
         }
     };
     if (seite) fluegel(x0, -1);
@@ -1010,7 +1024,7 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
     }
     // Schatten auf dem Boden
     for (let y = FIGUR_RH - 2; y < FIGUR_RH; y++) {
-        for (let x = 8; x < 28; x++) if (!g.umriss.raster[y][x] && !voll(x, y)) g.umriss.raster[y][x] = "q";
+        for (let x = Math.round((4 + FIGUR_LINKS) * FIGUR_FEIN); x < Math.round((14 + FIGUR_LINKS) * FIGUR_FEIN); x++) if (!g.umriss.raster[y][x] && !voll(x, y)) g.umriss.raster[y][x] = "q";
     }
     return g;
 }
@@ -1536,7 +1550,7 @@ function renderProfil() {
     const rechts = el("div", "profil-rechts");
     const reiter = el("div", "profil-reiter");
     FIGUR_KATEGORIEN.forEach(k => {
-        const knopf = el("button", "knopf reiter-knopf" + (k.id === profilKategorie ? " aktiv" : ""), null, [figurAusschnitt(k.id), el("span", null, k.name)]);
+        const knopf = el("button", "knopf reiter-knopf" + (k.id === profilKategorie ? " aktiv" : ""), null, [pixelIcon("sprite:sym_kat_" + k.id, 22), el("span", null, k.name)]);
         knopf.addEventListener("click", () => {
             profilKategorie = k.id;
             renderProfil();
