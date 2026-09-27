@@ -2964,7 +2964,32 @@ Object.assign(UEBERSETZUNG, {
     "Sternenrute": "Star Rod",
     "Sternwarten-Fernrohr": "Observatory Telescope",
     "Glühlaterne": "Glow Lantern",
-    "Königinnen-Wabe": "Queen's Comb"
+    "Königinnen-Wabe": "Queen's Comb",
+    "+40 Energie morgen": "+40 energy tomorrow",
+    "+3 gedüngte Felder morgen": "+3 fertilized fields tomorrow",
+    "📬 Ein Brief für dich!": "📬 A letter for you!",
+    "Danke!": "Thanks!",
+    "Bekomme ": "Receive ",
+    " Brief": " letter",
+    " Briefe": " letters",
+    " aus dem Dorf": " from the village",
+    "Die Bäckerin": "The Baker",
+    "Danke für den Weizen! Das Brot ist so gut geworden, dass ich dir etwas vom Gewinn abgebe.": "Thanks for the wheat! The bread turned out so well that I'm sharing some of the profit.",
+    "Der Bürgermeister": "The Mayor",
+    "Ihr Hof ist das Schönste im ganzen Tal. Nehmen Sie das als kleine Anerkennung der Gemeinde.": "Your farm is the prettiest in the whole valley. Please accept this small token from the village.",
+    "Die Sternguckerin": "The Stargazer",
+    "Letzte Nacht fiel etwas Glitzerndes auf meinen Balkon. Ich glaube, es gehört dir.": "Last night something sparkly fell onto my balcony. I think it belongs to you.",
+    "Der Imker": "The Beekeeper",
+    "Meine Bienen fliegen am liebsten zu deinen Blumen. Hier, ein Glas Honig für mehr Schwung!": "My bees love your flowers most. Here, a jar of honey for more energy!",
+    "Die Gärtnerin": "The Gardener",
+    "Ich hatte noch Dünger übrig. Streu ihn morgen auf deine Felder!": "I had some fertilizer left over. Spread it on your fields tomorrow!",
+    "Der Postbote": "The Mail Carrier",
+    "Ich habe mich verlaufen und dabei diese Sternensaat gefunden. Behalt sie ruhig.": "I got lost and found these Star Seeds along the way. You can keep them.",
+    "Die Nachbarskinder": "The Neighbour Kids",
+    "Wir haben mit deinem Begleiter gespielt! Hier sind unsere Ersparnisse, damit er Leckerlis bekommt.": "We played with your companion! Here are our savings so it gets treats.",
+    "Der Müller": "The Miller",
+    "Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei.": "Your grain mills like butter. Tomorrow morning I'll bring you a coffee.",
+    "„{0}“": "“{0}”"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

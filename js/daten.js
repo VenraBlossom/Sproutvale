@@ -1407,6 +1407,20 @@ function aktuellesFest(datum = new Date()) {
     }) || null;
 }
 
+// ---------- BRIEFKASTEN (wie die Briefe in Animal Crossing) ----------
+// Ab und zu schreibt jemand aus dem Dorf am Feierabend einen Brief mit einem kleinen Geschenk. Keine Namen, nur wer es ist.
+const BRIEF_CHANCE = 0.1;
+const BRIEFE = [
+    { absender: t("Die Bäckerin"), text: t("Danke für den Weizen! Das Brot ist so gut geworden, dass ich dir etwas vom Gewinn abgebe."), geschenk: "gold" },
+    { absender: t("Der Bürgermeister"), text: t("Ihr Hof ist das Schönste im ganzen Tal. Nehmen Sie das als kleine Anerkennung der Gemeinde."), geschenk: "gold" },
+    { absender: t("Die Sternguckerin"), text: t("Letzte Nacht fiel etwas Glitzerndes auf meinen Balkon. Ich glaube, es gehört dir."), geschenk: "sterne" },
+    { absender: t("Der Imker"), text: t("Meine Bienen fliegen am liebsten zu deinen Blumen. Hier, ein Glas Honig für mehr Schwung!"), geschenk: "energie" },
+    { absender: t("Die Gärtnerin"), text: t("Ich hatte noch Dünger übrig. Streu ihn morgen auf deine Felder!"), geschenk: "duenger" },
+    { absender: t("Der Postbote"), text: t("Ich habe mich verlaufen und dabei diese Sternensaat gefunden. Behalt sie ruhig."), geschenk: "sterne" },
+    { absender: t("Die Nachbarskinder"), text: t("Wir haben mit deinem Begleiter gespielt! Hier sind unsere Ersparnisse, damit er Leckerlis bekommt."), geschenk: "gold" },
+    { absender: t("Der Müller"), text: t("Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei."), geschenk: "energie" }
+];
+
 // ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------
 const ERNTEFIEBER_KONFIG = { chance: 0.07, abTag: 3, dauerMs: 12000, tempo: 6 };
 
@@ -1504,6 +1518,9 @@ const ERFOLG_KETTEN = [
     { id: "segensammler", icon: "🙏", text: z => t("Wähle ") + z + t(" verschiedene Segen"),
         wert: m => Object.keys(m.kodex.segen || {}).length,
         ziele: [10, 25, 35] },
+    { id: "briefe", icon: "📬", text: z => t("Bekomme ") + z + (z === 1 ? t(" Brief") : t(" Briefe")) + t(" aus dem Dorf"),
+        wert: m => m.lebenszeit.briefe || 0,
+        ziele: [1, 10, 30] },
     { id: "evolutionen", icon: "🧬", text: z => t("Entwickle ") + z + (z === 1 ? t(" Werkzeug") : t(" verschiedene Werkzeuge")),
         wert: m => Object.keys((m.kodex && m.kodex.evolutionen) || {}).length,
         ziele: [1, 5, 15] },

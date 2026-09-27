@@ -12130,3 +12130,35 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 1px 8px;
     margin-bottom: 2px;
 }
+
+/* Brief aus dem Dorf */
+.brief {
+    background: #fffaf0;
+    background-image: repeating-linear-gradient(0deg, transparent 0 21px, rgba(90, 140, 200, 0.18) 21px 22px);
+    border: 1px solid #d8c8a0;
+    padding: 14px 16px 10px;
+    text-align: left;
+    transform: rotate(0.6deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.brief-text {
+    font-style: italic;
+    line-height: 1.45;
+}
+.brief-absender {
+    text-align: right;
+    margin-top: 8px;
+    font-weight: 800;
+}
+.brief-geschenk {
+    margin-top: 10px;
+    font-weight: 800;
+    color: #3f8a32;
+}
+.popup.brief-fenster {
+    animation: brief-rein 0.5s steps(6) both;
+}
+@keyframes brief-rein {
+    0% { transform: translateY(40px) rotate(-8deg) scale(0.6); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+}

@@ -3683,7 +3683,38 @@ function schliesseFeierabendAb() {
     speichereMeta();
     zeigeTagesKarte("feierabend");
     if (run.segenAusstehend) zeigeSegenAuswahl();
+    else if (!run.koop && run.tag > 2 && Math.random() < BRIEF_CHANCE) setTimeout(zeigeBrief, 700);
     aktualisiereAlles();
+}
+
+// Brief aus dem Dorf mit kleinem Geschenk (Gold, Sternensamen, Energie oder Duenger fuer morgen)
+function zeigeBrief() {
+    if (!run || run.phase !== "vorTag" || run.segenAuswahl) return;
+    const brief = zufall(BRIEFE);
+    const gold = Math.max(5, aufrunden(0.12 * naechsteRechnung().betrag));
+    const sterne = 15 + 5 * run.tag;
+    const geschenkText = {
+        gold: "+" + zahl(gold) + " Gold",
+        sterne: "+" + zahl(sterne) + t(" Sternensamen"),
+        energie: t("+40 Energie morgen"),
+        duenger: t("+3 gedüngte Felder morgen")
+    }[brief.geschenk];
+    meta.lebenszeit.briefe = (meta.lebenszeit.briefe || 0) + 1;
+    Klang.geschenk();
+    const inhalt = el("div", "brief", null, [
+        el("div", "brief-text", tf("„{0}“", brief.text)),
+        el("div", "brief-absender", "– " + brief.absender),
+        el("div", "brief-geschenk", "🎁 " + geschenkText)
+    ]);
+    zeigePopup({ titel: t("📬 Ein Brief für dich!"), farbe: "#b8862b", breite: 420, inhalt, klasse: "brief-fenster",
+        knoepfe: [{ text: t("Danke!"), klasse: "knopf-gruen", aktion: () => {
+            if (brief.geschenk === "gold") run.gold += gold;
+            else if (brief.geschenk === "sterne") gibSternensamen(sterne);
+            else if (brief.geschenk === "energie") run.naechsterTag.energie += 40;
+            else if (brief.geschenk === "duenger") run.naechsterTag.extraDuenger += 3;
+            Klang.kaufen();
+            aktualisiereAlles();
+        } }] });
 }
 
 // Betrag, der heute Abend faellig ist (0 = keine Rechnung)
