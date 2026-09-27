@@ -2724,7 +2724,23 @@ Object.assign(UEBERSETZUNG, {
     "Kuhkatze": "Cow Cat",
     "Schleifenhase": "Bow Bunny",
     "Panda-Welpe": "Panda Pup",
-    "Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe.": "New epic companions: Winter Bunny, Pumpkin Dog, Little Devil, Cow Cat, Bow Bunny and Panda Pup."
+    "Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe.": "New epic companions: Winter Bunny, Pumpkin Dog, Little Devil, Cow Cat, Bow Bunny and Panda Pup.",
+    "Erbstück": "Heirloom",
+    "Der Weizen startet jeden Run mit 2 Ertrag-Stufen mehr.": "Wheat starts every run with 2 more Yield levels.",
+    " Ertrag-Stufen für Weizen": " Yield levels for wheat",
+    "Sternenkarte": "Star Map",
+    "Erscheint, sobald das Stellarium frei ist.": "Appears once the Stellarium is unlocked.",
+    "Alle Sterne im Stellarium kosten 3% weniger.": "All stars in the Stellarium cost 3% less.",
+    "% Sternpreise": "% star prices",
+    "Segenstart": "Blessed Start",
+    "Erscheint nach 3 Runs.": "Appears after 3 runs.",
+    "Jeder Run beginnt mit einer Segen-Auswahl.": "Every run starts with a blessing choice.",
+    "Saatbank": "Seed Bank",
+    "Erscheint nach 5 Runs.": "Appears after 5 runs.",
+    "Am Ende eines Runs wandern 5% deiner übrigen Sternensamen in den nächsten Run.": "At the end of a run 5% of your remaining Star Seeds carry over into the next run.",
+    "% der Sternensamen": "% of Star Seeds",
+    "🔒 Noch unbekannt": "🔒 Still unknown",
+    "Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank).": "Moon Pond: 4 new upgrades you discover over time (Heirloom, Star Map, Blessed Start, Seed Bank)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

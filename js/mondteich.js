@@ -19,6 +19,7 @@ function schliessePrestigeShop() {
 // ---------- DAUERHAFTE UPGRADES (Mondblueten) ----------
 
 function kaufeMetaUpgrade(def) {
+    if (def.sichtbar && !def.sichtbar(meta)) return;
     const lvl = metaLevel(def.id);
     const kosten = kostenMitFaktor(def.basiskosten, def.faktor, lvl);
     if (lvl >= def.max || meta.mondblueten < kosten) return;
@@ -35,6 +36,12 @@ function renderMetaUpgrades() {
         : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 2, 2. = 8, 3. = 18 …)")) +
         (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(sternenfallFaktor()) + "." : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
+        // Noch nicht entdeckt: nur ein Geheimnis mit Hinweis
+        if (def.sichtbar && !def.sichtbar(meta)) {
+            prestigeInhalt.appendChild(erstelleKarte({ titel: t("🔒 Noch unbekannt"), beschreibung: def.sichtbarText, info: "",
+                knopfText: t("Gesperrt"), aktiv: false, onKauf: () => {} }));
+            return;
+        }
         const lvl = metaLevel(def.id);
         const kosten = kostenMitFaktor(def.basiskosten, def.faktor, lvl);
         const istMax = lvl >= def.max;

@@ -3627,6 +3627,8 @@ function beendeRun(offenerBetrag, freiwillig) {
 
     const mondblueten = mondbluetenJetzt();
     meta.mondblueten += mondblueten;
+    // Mondteich "Saatbank": ein Teil der Sternensamen wandert in den naechsten Run
+    if (metaLevel("saatbank") > 0) meta.saatbank = Math.floor(run.skillpunkte * 0.05 * metaLevel("saatbank"));
     meta.mondbluetenSeitSternenfall += mondblueten;
     meta.lebenszeit.runs += 1;
     aktualisiereLebenszeitMaxima();
@@ -3660,6 +3662,15 @@ function starteNeuenRun(sandbox = false) {
         run.level["p_" + p.id] = 1;
     });
 
+    // Mondteich "Erbstueck": der Weizen startet mit Ertrag-Stufen
+    const weizen = run.pflanzen.find(p => p.id === "weizen");
+    if (weizen) weizen.level.ertrag += 2 * metaLevel("erbstueck");
+    // Mondteich "Saatbank": Sternensamen aus dem letzten Run
+    if (meta.saatbank > 0) {
+        run.skillpunkte += meta.saatbank;
+        meta.saatbank = 0;
+    }
+
     erstelleSlots();
     const startFelder = 1 + metaLevel("startfelder") + sfLevel("kosmischefelder");
     run.startFelder = startFelder;
@@ -3671,6 +3682,11 @@ function starteNeuenRun(sandbox = false) {
     // Die Sandbox hat keine Pausen zwischen den Tagen: sie laeuft sofort los
     if (sandbox) starteTag();
     else zeigeTagesKarte("start");
+    // Mondteich "Segenstart": gleich eine Segen-Auswahl
+    if (metaLevel("segenstart") > 0 && !run.koop) {
+        run.segenAusstehend = true;
+        zeigeSegenAuswahl();
+    }
     aktualisiereAlles();
 }
 
@@ -4024,7 +4040,7 @@ function upgradeKarte(def, waehrung) {
 }
 
 function kaufeUpgrade(def, waehrung) {
-    const kosten = kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
+    const kosten = waehrung === "skillpunkte" ? knotenKosten(def) : kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
     if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < kosten) return;
     if (waehrung === "skillpunkte" && !stellariumFrei()) return;
     if (def.erledigt && def.erledigt()) return;
@@ -4260,7 +4276,8 @@ function istKnotenOffen(def) {
 }
 
 function knotenKosten(def) {
-    return kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
+    // Mondteich "Sternenkarte": alle Sterne billiger
+    return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)) * (1 - 0.03 * metaLevel("sternenkarte"))));
 }
 
 function knotenSicht(def) {

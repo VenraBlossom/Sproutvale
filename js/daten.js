@@ -89,6 +89,7 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank)."),
         t("Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe."),
         t("Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet)."),
         t("Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei."),
@@ -1899,6 +1900,18 @@ const META_UPGRADES = [
     { id: "meisterhaende", name: t("Meisterhände"), basiskosten: 10, faktor: 2, max: 9,
         beschreibung: t("Jede Ernte zählt für die Pflanzen-Meisterschaft einmal mehr (Stufe 9: jede Ernte zählt 10-mal)."),
         info: lvl => t("Jede Ernte zählt ") + (1 + lvl) + t("-mal") },
+    // Tauchen erst mit der Zeit auf (sichtbar), damit es nach jedem Run etwas Neues zu entdecken gibt
+    { id: "erbstueck", name: t("Erbstück"), basiskosten: 6, faktor: 1.9, max: 5,
+        beschreibung: t("Der Weizen startet jeden Run mit 2 Ertrag-Stufen mehr."), info: lvl => "+" + 2 * lvl + t(" Ertrag-Stufen für Weizen") },
+    { id: "sternenkarte", name: t("Sternenkarte"), basiskosten: 20, faktor: 1.7, max: 10,
+        sichtbar: () => stellariumFrei(), sichtbarText: t("Erscheint, sobald das Stellarium frei ist."),
+        beschreibung: t("Alle Sterne im Stellarium kosten 3% weniger."), info: lvl => "-" + 3 * lvl + t("% Sternpreise") },
+    { id: "segenstart", name: t("Segenstart"), basiskosten: 40, faktor: 1, max: 1,
+        sichtbar: m => (m.lebenszeit.runs || 0) >= 3, sichtbarText: t("Erscheint nach 3 Runs."),
+        beschreibung: t("Jeder Run beginnt mit einer Segen-Auswahl."), info: lvl => (lvl ? t("Aktiv") : t("Nicht aktiv")) },
+    { id: "saatbank", name: t("Saatbank"), basiskosten: 30, faktor: 2, max: 5,
+        sichtbar: m => (m.lebenszeit.runs || 0) >= 5, sichtbarText: t("Erscheint nach 5 Runs."),
+        beschreibung: t("Am Ende eines Runs wandern 5% deiner übrigen Sternensamen in den nächsten Run."), info: lvl => 5 * lvl + t("% der Sternensamen") },
     { id: "mondlicht", name: t("Mondlicht"), basiskosten: 8, faktor: 1.4, max: Infinity,
         beschreibung: t("x1,15 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
         info: lvl => multiText(Math.pow(1.15, lvl)) + t(" Gold") }
