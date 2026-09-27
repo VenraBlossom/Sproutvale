@@ -541,8 +541,10 @@ function klicksProSamen() {
 
 // Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
 function energieMax() {
-    let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") + 35 * metaLevel("ausdauer") +
+    let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
+    // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
+    energie *= (1 + 0.1 * metaLevel("ausdauer")) * (1 + grundwert("g_energie"));
     energie *= 1 + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     energie *= 1 + 0.03 * kuschel("faultier");
@@ -562,7 +564,7 @@ function raritaetsChancen() {
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
-function glueckChance() { return 0.05 * level("glueck") + 0.1 * level("glueck2") + werkzeugWert("kleeblatt") + gachaBonus("glueck"); }
+function glueckChance() { return 0.05 * level("glueck") + 0.1 * level("glueck2") + werkzeugWert("kleeblatt") + gachaBonus("glueck") + 0.04 * metaLevel("reicheernte"); }
 function helferKlicksProSek() { return level("eichhoernchen") + 2 * level("eichhoernchen2") + 0.5 * kuschel("eichhoernchen"); }
 function edelsteinBonus() { return 0.1 * level("edelstein"); }
 function sternensamenProKlick() { return KONFIG.sternensamenProKlick + 0.25 * level("sternenklick") + 0.5 * segen("klingeling"); }
@@ -638,7 +640,7 @@ function goldMulti() {
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
-    return summe * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
+    return summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
         (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
         (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
@@ -648,12 +650,13 @@ function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
-        (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1);
+        (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
+        (1 + 0.05 * metaLevel("startsp")) * (1 + grundwert("g_sterne"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
 function sternDoppelChance() {
-    return tw("magier") + 0.15 * segen("wissen") + 0.05 * level("sternensammler") + 0.03 * kuschel("maus");
+    return tw("magier") + 0.15 * segen("wissen") + 0.05 * level("sternensammler") + 0.03 * kuschel("maus") + 0.04 * metaLevel("reicheernte");
 }
 
 function variantenChance(variante) {
@@ -835,7 +838,7 @@ function wachstumsTempo() {
 
 function wachstumsTempoOhneJahreszeit() {
     return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
-        gachaBonus("wachstum");
+        gachaBonus("wachstum") + grundwert("g_wachstum");
 }
 
 function basisStufenZeitSek(pflanze) {
@@ -873,7 +876,7 @@ function sandboxTageszeit() {
 // Sterne, die nur Energie geben: in der Sandbox automatisch voll (dort gibt es keine Energie)
 // Sandbox: alles, was nur mit Energie oder Rechnungen zu tun hat, gibt es dort nicht.
 // Sterne davon sind automatisch voll (damit der Weg dahinter frei ist), wirken aber nicht.
-const SANDBOX_AUS_STERNE = ["s_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
+const SANDBOX_AUS_STERNE = ["s_energie", "g_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
     "v_blitz", "pb_sonnenblume"];
 const SANDBOX_AUS_SHOP = ["energie", "laterne"];
 const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule"];
@@ -1680,6 +1683,9 @@ function pflanzeSamen(feld) {
     feld.el.balkenInnen.style.width = "0%";
     zeigeFeldSprite(feld);
 
+    // Stern "Fruehreife" dieser Pflanze: startet gleich als Keimling
+    if (level("pr_" + pflanze.id) > 0) wachseEineStufe(feld);
+
     run.samenGesamt += 1;
     haken("samen", feld);
     if (hatTarot("turm") && run.samenGesamt % aufrunden(KONFIG.turmIntervall / tarotFaktor("turm")) === 0) {
@@ -1816,7 +1822,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     run.gesamt.ernten += 1;
     meta.lebenszeit.ernten += 1;
     const stufeVorher = meisterStufe(pflanze.id);
-    meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1;
+    // Mondteich "Meisterhaende": jede Ernte zaehlt fuer die Meisterschaft oefter
+    meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende");
     if (meisterStufe(pflanze.id) > stufeVorher) {
         const stufe = meisterStufe(pflanze.id);
         zeigeBanner(pflanze.emoji, pflanze.name + t(": Meisterschaft ") + stufe + "!",
@@ -1866,7 +1873,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     }
     for (let i = 0; i < sternKugeln; i++) {
         const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
-        const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index);
+        const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index) *
+            (1 + 0.5 * level("pk_" + pflanze.id)); // Stern "Sternenfrucht" dieser Pflanze
         const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
         if (direkt) gibSternensamen(sterne);
@@ -3336,6 +3344,12 @@ function zahleRechnung(faellig) {
         gibSternensamen(bonus);
         run.segenBoss = true;
         run.nachrichten.push(t("🏦 Kredit abbezahlt! +") + zahl(bonus) + t(" Sternensamen und ein zusätzlicher Segen zur Auswahl"));
+    }
+    // Mondteich "Startkapital": nach jeder Rechnung ein Geschenk, das mit dem Run mitwaechst
+    const startkapital = aufrunden(0.03 * metaLevel("startgold") * naechsteRechnung().betrag);
+    if (startkapital > 0) {
+        run.gold += startkapital;
+        run.nachrichten.push(t("💰 Startkapital: +") + zahl(startkapital) + t(" Gold"));
     }
     Klang.rechnung();
     pruefeMondphaseFrei();

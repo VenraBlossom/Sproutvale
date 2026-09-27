@@ -89,6 +89,10 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Mondteich: Startkapital, Bauernweisheit und Ausdauer wachsen jetzt mit dem Run (Prozent statt fester Werte)."),
+        t("Mondteich: neu Reiche Ernte (Saat zählt doppelt) und Meisterhände (Ernten zählen mehrfach für die Meisterschaft)."),
+        t("Stellarium: neuer Ast Grundwerte (Gold, Sternensamen, Energie, Wachstum und unendliche Harmonie)."),
+        t("Stellarium: jede Pflanze hat 2 neue Sterne, Sternenfrucht (mehr Sternensaat) und Frühreife (Samen starten als Keimling)."),
         t("Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab."),
         t("Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert."),
         t("Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da."),
@@ -684,8 +688,26 @@ const SKILLS = [
         () => (level("wurmhumus") > 0 ? t("x3 Gold auf gedüngten Feldern") : t("x2 Gold auf gedüngten Feldern"))),
     stern("erntefest", "hof", "🎪", [440, 1400], "lagerhaus", t("Erntefest"), 900, 3, 3,
         t("Am Rechnungstag (jeder 5. Tag) gibt es +100% Gold aus allen Ernten."),
-        () => "+" + prozentText(level("erntefest")) + t(" Gold am Rechnungstag"))
+        () => "+" + prozentText(level("erntefest")) + t(" Gold am Rechnungstag")),
+
+    // ----- Grundwerte (unten links, am Hof): stärken alles, was du hast -----
+    stern("g_gold", "hof", "🪙", [-700, 960], "sonnenuhr", t("Grundwert: Gold"), 400, 2, 10,
+        t("+5% Gold aus allen Ernten."), () => "+" + prozentText(grundwert("g_gold")) + t(" Gold")),
+    stern("g_sterne", "hof", "✨", [-920, 960], "g_gold", t("Grundwert: Sternensamen"), 400, 2, 10,
+        t("+5% Sternensamen aus allen Ernten."), () => "+" + prozentText(grundwert("g_sterne")) + t(" Sternensamen")),
+    stern("g_energie", "hof", "⚡", [-700, 1180], "g_gold", t("Grundwert: Energie"), 300, 2, 10,
+        t("+5% Energie pro Tag."), () => "+" + prozentText(grundwert("g_energie")) + t(" Energie")),
+    stern("g_wachstum", "hof", "🌱", [-920, 1180], "g_energie", t("Grundwert: Wachstum"), 500, 2, 10,
+        t("Alle Pflanzen wachsen 5% schneller."), () => "+" + prozentText(grundwert("g_wachstum")) + t(" Wachstum")),
+    stern("g_harmonie", "hof", "☯️", [-1140, 1070], "g_sterne", t("Harmonie"), 5000, 1.6, Infinity,
+        t("+3% auf alle vier Grundwerte (Gold, Sternensamen, Energie, Wachstum). Unendlich oft kaufbar."),
+        () => "+" + 3 * level("g_harmonie") + t("% auf alle Grundwerte"))
 ];
+
+// Grundwert = eigener Stern (+5% pro Stufe) + Harmonie (+3% pro Stufe)
+function grundwert(id) {
+    return 0.05 * level(id) + 0.03 * level("g_harmonie");
+}
 
 // ----- Spezialpflanzen: eine Kette rechts unten, jede braucht die vorige (verborgen, bis sie erreichbar ist) -----
 VARIANTEN.forEach((variante, index) => {
@@ -768,7 +790,56 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         beschreibung: t("+100% Wert für ") + p.name + t(" (jede Stufe noch einmal +100%)."),
         info: () => "+" + 100 * level("pg_" + p.id) + t("% Wert")
     });
+    // Sternenfrucht: mehr Sternensaat von genau dieser Pflanze
+    SKILLS.push({
+        id: "pk_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "✨", pos: [x - 500, y - 90], vor: "pp_" + p.id, autoPos: true,
+        name: p.name + t(": Sternenfrucht"), basiskosten: rundePreis(basis * 0.8), faktor: 3, max: 3,
+        beschreibung: t("+50% Sternensaat von ") + p.name + t(" (jede Stufe noch einmal +50%)."),
+        info: () => "+" + 50 * level("pk_" + p.id) + t("% Sternensaat")
+    });
+    // Fruehreife: neue Samen dieser Pflanze starten eine Wachstumsstufe weiter
+    SKILLS.push({
+        id: "pr_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🌿", pos: [x - 650, y - 190], vor: "pk_" + p.id, autoPos: true,
+        name: p.name + t(": Frühreife"), basiskosten: rundePreis(basis * 1.5), faktor: 1, max: 1,
+        beschreibung: t("Neue Samen von ") + p.name + t(" sind sofort Keimlinge: Sie starten eine Wachstumsstufe weiter."),
+        info: () => (level("pr_" + p.id) > 0 ? t("Aktiv") : t("Nicht aktiv"))
+    });
 });
+
+// Neue Sterne mit autoPos: in der Naehe ihres Wunschplatzes einen freien Platz suchen (kein Stern darf einen anderen verdecken)
+(function platziereNeueSterne() {
+    const ABSTAND = 130;
+    const LINIE = 45; // so weit muss ein Stern von fremden Linien weg sein
+    const nachId = Object.fromEntries(SKILLS.map(s => [s.id, s]));
+    const abstandZurLinie = (p, a, b) => {
+        const vx = b[0] - a[0], vy = b[1] - a[1];
+        const l = vx * vx + vy * vy || 1;
+        const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l));
+        return Math.hypot(p[0] - a[0] - t * vx, p[1] - a[1] - t * vy);
+    };
+    const linien = () => SKILLS.filter(s => s.vor && s.pos && nachId[s.vor] && nachId[s.vor].pos).map(s => [nachId[s.vor], s]);
+    const frei = (pos, selbst) => {
+        if (!SKILLS.every(s => s === selbst || !s.pos || Math.hypot(s.pos[0] - pos[0], s.pos[1] - pos[1]) >= ABSTAND)) return false;
+        // nicht auf einer fremden Linie liegen
+        if (linien().some(([a, b]) => a !== selbst && b !== selbst && abstandZurLinie(pos, a.pos, b.pos) < LINIE)) return false;
+        // die eigene Linie darf durch keinen anderen Stern laufen
+        const vor = nachId[selbst.vor];
+        return !vor || !vor.pos || SKILLS.every(s => s === selbst || s === vor || !s.pos || abstandZurLinie(s.pos, vor.pos, pos) >= LINIE);
+    };
+    SKILLS.filter(s => s.autoPos).forEach(s => {
+        if (frei(s.pos, s)) return;
+        const [wx, wy] = s.pos;
+        for (let r = 40; r <= 600; r += 40) {
+            for (let w = 0; w < 16; w++) {
+                const kandidat = [Math.round(wx + r * Math.cos(w * Math.PI / 8)), Math.round(wy + r * Math.sin(w * Math.PI / 8))];
+                if (frei(kandidat, s)) {
+                    s.pos = kandidat;
+                    return;
+                }
+            }
+        }
+    });
+})();
 
 // Preise anheben: ein erster Run soll nicht fast das ganze Stellarium freischalten (Ausgleich ueber Mondblueten)
 SKILLS.forEach(def => {
@@ -806,7 +877,9 @@ const STERN_KURZ = {
     schnuppenfaenger: t("Sternschnuppen-Bonus länger"), kombovirtuose: t("Höchste Kombo stärker"),
     sternbild: t("+1% Gold je 10 Sterne"), kometenregen: t("Sternschnuppen geben Sternensamen"), polarstern: t("Morgen-Geschenk"),
     mondsichel: t("Nachts mehr Sternensaat"), milchstrasse: t("Zweite Sternensaat"), bienenkoenigin: t("Bienen öfter"),
-    spielerglueck: t("Mehr Glück beim Spielen")
+    spielerglueck: t("Mehr Glück beim Spielen"),
+    g_gold: t("Grundwert Gold"), g_sterne: t("Grundwert Sternensamen"), g_energie: t("Grundwert Energie"),
+    g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich")
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -836,7 +909,9 @@ const STERN_WIRKUNG = {
     sonnenernte: s => "+" + 20 * s + t("% Gold im Sommer"), erntedank: s => "+" + 25 * s + t("% Sternensaat im Herbst"),
     frostschutz: s => (s >= 2 ? t("+10% Wachstum im Winter") : t("kein Winter-Malus")),
     jackpotjaeger: s => "x" + (1 + s) + t(" legendäre Saat"), goldschauer: s => "+" + 50 * s + t("% Goldregen"),
-    schnuppenfaenger: s => "+" + 3 * s + t(" Sek. Bonus"), kombovirtuose: s => t("Kombo bis x") + (5 + s)
+    schnuppenfaenger: s => "+" + 3 * s + t(" Sek. Bonus"), kombovirtuose: s => t("Kombo bis x") + (5 + s),
+    g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
+    g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles")
 };
 
 SKILLS.forEach(def => {
@@ -845,6 +920,11 @@ SKILLS.forEach(def => {
     if (def.art === "shop" && !def.kurz) def.kurz = t("Markt: ") + def.name;
     if (def.id.startsWith("p_")) def.kurz = t("Neue Pflanze · Grundwert ") + zahl(PFLANZEN_VORLAGEN.find(p => p.id === def.pflanze).verkaufswert) + t(" Gold");
     if (def.art === "pflanzenShop") def.kurz = t("Markt: ") + def.name.split(": ")[1];
+    if (def.id.startsWith("pk_")) {
+        def.kurz = t("Mehr Sternensaat von ") + def.name.split(":")[0];
+        def.wirkung = s => "+" + 50 * s + t("% Sternensaat");
+    }
+    if (def.id.startsWith("pr_")) def.kurz = t("Samen starten als Keimling");
     if (def.id.startsWith("pg_")) {
         def.kurz = t("Mehr Wert für ") + def.name.split(":")[0];
         def.wirkung = s => "+" + 300 * s + t("% Wert");
@@ -1667,13 +1747,15 @@ const HAUS_BEREICH = { x: 5, breite: 8 };
 
 const META_UPGRADES = [
     { id: "startgold", name: t("Startkapital"), basiskosten: 1, faktor: 1.5, max: 10,
-        beschreibung: t("+25 Gold zu Beginn jedes Runs."), info: lvl => "+" + 25 * lvl + t(" Gold") },
+        beschreibung: t("+25 Gold zu Beginn jedes Runs. Dazu nach jeder bezahlten Rechnung +3% der nächsten Rechnung als Geschenk."),
+        info: lvl => "+" + 25 * lvl + t(" Gold, +") + 3 * lvl + t("% der nächsten Rechnung") },
     { id: "startsp", name: t("Bauernweisheit"), basiskosten: 2, faktor: 1.5, max: 10,
-        beschreibung: t("+100 Sternensamen zu Beginn jedes Runs."), info: lvl => "+" + 100 * lvl + t(" Sternensamen") },
+        beschreibung: t("+100 Sternensamen zu Beginn jedes Runs und +5% Sternensamen aus allen Ernten."),
+        info: lvl => "+" + 100 * lvl + t(" Sternensamen, +") + 5 * lvl + t("% Sternensamen") },
     { id: "startfelder", name: t("Vorbereiteter Boden"), basiskosten: 3, faktor: 2, max: 4,
         beschreibung: t("+1 Feld zu Beginn jedes Runs. Das nächste Feld kostet trotzdem nur 1 Gold."), info: lvl => "+" + lvl + t(" Felder") },
     { id: "ausdauer", name: t("Ausdauer"), basiskosten: 6, faktor: 2.4, max: 4,
-        beschreibung: t("+35 Energie pro Tag."), info: lvl => "+" + 35 * lvl + t(" Energie") },
+        beschreibung: t("+10% Energie pro Tag."), info: lvl => "+" + 10 * lvl + t("% Energie") },
     { id: "verhandlung", name: t("Verhandlungsgeschick"), basiskosten: 5, faktor: 2.1, max: 5,
         beschreibung: t("Rechnungen kosten 5% weniger."), info: lvl => "-" + 5 * lvl + t("% Rechnungen") },
     { id: "ertrag", name: t("Fruchtbarer Hof"), basiskosten: 6, faktor: 1.45, max: 10,
@@ -1698,6 +1780,11 @@ const META_UPGRADES = [
     { id: "kuschelrabatt", name: t("Kuschel-Rabatt"), basiskosten: 120, faktor: 1, max: 1,
         beschreibung: t("Kuschel-Züge werden nur noch nach jedem 2. Zug um 1 teurer."),
         info: lvl => (lvl ? t("+1 alle 2 Züge") : t("+1 pro Zug")) },
+    { id: "reicheernte", name: t("Reiche Ernte"), basiskosten: 12, faktor: 1.8, max: 10,
+        beschreibung: t("+4% Chance, dass eine Saat oder Sternensaat doppelt zählt."), info: lvl => "+" + 4 * lvl + t("% Chance") },
+    { id: "meisterhaende", name: t("Meisterhände"), basiskosten: 10, faktor: 2, max: 9,
+        beschreibung: t("Jede Ernte zählt für die Pflanzen-Meisterschaft einmal mehr (Stufe 9: jede Ernte zählt 10-mal)."),
+        info: lvl => t("Jede Ernte zählt ") + (1 + lvl) + t("-mal") },
     { id: "mondlicht", name: t("Mondlicht"), basiskosten: 8, faktor: 1.4, max: Infinity,
         beschreibung: t("x1,15 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
         info: lvl => multiText(Math.pow(1.15, lvl)) + t(" Gold") }
