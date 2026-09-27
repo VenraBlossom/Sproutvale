@@ -2402,56 +2402,129 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
     return p.raster;
 }
 
-// Engel (Beta Tester): goldene Haare, Heiligenschein, weisse Robe mit Goldborte, schlagende Fluegel, Schwert.
-// Farben: 1 Sandalen, 2 Haare, 3 Robe dunkel, 4 Haut, 5 Augen, 6 Robe, 7 Umriss, 8 Robe Schatten, h Haende, k Gold,
-//         F Fluegel, f Fluegel Schatten, B Klinge, G Griff, R Heiligenschein
+// Engel (Beta Tester, mythisch): ritterlicher Engel in silberner Ruestung mit Goldkanten, grossen Federfluegeln,
+// goldenem Heiligenschein-Ring und einem goettlichen Schwert. Doppelt so feines Raster wie die anderen Begleiter
+// (44x32 statt 22x16, gleiche Groesse im Spiel). Die Ruestung hat leuchtende Risse, die pulsieren.
+const ENGEL_B = 44, ENGEL_H = 32;
 function engelRaster(pose, bild, blinzelt) {
-    const p = pixelRaster();
+    const raster = Array.from({ length: ENGEL_H }, () => Array(ENGEL_B).fill(null));
+    const punkt = (x, y, f) => {
+        x = Math.round(x); y = Math.round(y);
+        if (x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H) raster[y][x] = f;
+    };
+    const rechteck = (x, y, b, h, f) => { for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < b; dx++) punkt(x + dx, y + dy, f); };
+    const ellipse = (cx, cy, rx, ry, f, wenn) => {
+        for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+            const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+            if (dx * dx + dy * dy <= 1 && (!wenn || wenn(x, y))) punkt(x, y, f);
+        }
+    };
+    const linie = (x0, y0, x1, y1, dicke, f) => {
+        const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) * 2 + 1;
+        for (let i = 0; i <= n; i++) {
+            const t = i / n, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t;
+            for (let d = 0; d < dicke; d++) punkt(x, y + d - Math.floor(dicke / 2), f);
+        }
+    };
     const geschlossen = blinzelt || pose === "schlafen";
     const sitzt = pose === "sitzen" || pose === "liegen" || pose === "schlafen";
-    const schwebe = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : 0;
-    const y = 1 + (sitzt ? 1 : 0) + schwebe; // 1 Pixel Platz oben fuer den Heiligenschein
-    // Fluegel hinten mit Federreihen, schlagen im Takt (im Sitzen ruhiger)
-    const hub = sitzt ? [0, 1, 0, 1][katzenAnim % 4] : [2, 1, 0, 1][katzenAnim % 4];
-    const fy = 6 + y - hub;
-    p.ellipse(6.5, fy, 4.5, 2.4, "F");
-    p.ellipse(6, fy + 2.2, 3.6, 1.5, "F");
-    p.ellipse(5.5, fy + 3.8, 2.6, 1.1, "F");
-    for (let x = 3; x <= 9; x += 2) p.punkt(x, fy + 1, "f");
-    for (let x = 3; x <= 8; x += 2) p.punkt(x, fy + 3, "f");
-    // Robe bis zu den Fuessen, hinten dunkler, Goldborte
-    const rh = sitzt ? 5 : 6;
-    p.rechteck(9, 7 + y, 5, rh, "6");
-    p.rechteck(9, 7 + y, 1, rh, "8");
-    p.rechteck(9, 6 + rh + y, 5, 1, "k");
-    p.rechteck(12, 7 + y, 1, 3, "k");
-    if (sitzt) p.rechteck(12, 12 + y, 4, 1, "1");
-    else p.rechteck(10, 7 + rh + y, 3, 1, "1");
-    // Arm nach vorne, Hand haelt das Schwert, Klinge zeigt nach oben
-    p.rechteck(13, 8 + y, 3, 2, "6");
-    p.punkt(16, 9 + y, "h");
-    p.rechteck(17, y - 1, 1, 9, "B");
-    p.rechteck(16, 8 + y, 3, 1, "G");
-    p.rechteck(17, 9 + y, 1, 2, "G");
-    // Kopf mit goldenem Haar
-    const kx = 8, ky = 1 + y;
-    p.rechteck(kx, ky, 6, 6, "4");
-    p.rechteck(kx, ky, 6, 2, "2");
-    p.rechteck(kx, ky, 2, 5, "2");
-    p.punkt(kx + 5, ky + 2, "2");
-    if (geschlossen) {
-        p.punkt(kx + 4, ky + 3, "7");
+    const bob = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : [0, 0, -1, -1][katzenAnim % 4];
+    const y0 = (sitzt ? 2 : 0) + bob;
+    const flap = sitzt ? [0, 1, 0, 1][katzenAnim % 4] : [0, 2, 3, 1][katzenAnim % 4];
+
+    // ---- Fluegel (hinten): grosse Federreihen, die Spitzen schlagen auf und ab ----
+    const wurzelX = 22, wurzelY = 13 + y0;
+    const spitzen = [[5, 1], [3, 5], [2, 9], [3, 13], [5, 17], [8, 20], [12, 22]];
+    spitzen.forEach(([sx, sy], i) => {
+        const ty = sy + flap * (1 - i / spitzen.length) - (sitzt ? -3 : 0) + y0;
+        linie(wurzelX, wurzelY, sx + (sitzt ? 3 : 0), ty, 3, "W");
+        linie(wurzelX, wurzelY + 1, sx + 1 + (sitzt ? 3 : 0), ty + 1, 1, i % 2 ? "V" : "v");
+    });
+    ellipse(15, 10 + y0 + flap * 0.4, 7.5, 5, "W");
+    ellipse(17, 13 + y0 + flap * 0.2, 5.5, 3.2, "W");
+    for (let x = 10; x <= 20; x += 3) { punkt(x, 12 + y0 + flap * 0.3, "V"); punkt(x + 1, 13 + y0 + flap * 0.3, "V"); }
+    for (let x = 12; x <= 20; x += 3) punkt(x, 15 + y0, "V");
+
+    // ---- Beine mit Beinschienen und Goldstiefeln ----
+    if (!sitzt) {
+        rechteck(24, 24 + y0, 3, 5, "a"); rechteck(24, 24 + y0, 1, 5, "Q");
+        rechteck(28, 24 + y0, 3, 5, "A"); rechteck(30, 24 + y0, 1, 5, "a");
+        rechteck(23, 29 + y0, 4, 2, "g"); rechteck(28, 29 + y0, 4, 2, "G");
+        punkt(29, 26 + y0, "G"); punkt(25, 26 + y0, "g");
     } else {
-        p.punkt(kx + 3, ky + 3, "w");
-        p.punkt(kx + 4, ky + 3, "5");
+        rechteck(26, 24 + y0, 7, 3, "A"); rechteck(26, 26 + y0, 7, 1, "a");
+        rechteck(32, 23 + y0, 3, 4, "G");
     }
-    p.punkt(kx + 4, ky + 5, "7");
-    p.umriss("7");
-    // Heiligenschein schwebt ueber dem Kopf (ohne Umriss, leuchtet), Glanz wandert ueber die Klinge
-    p.rechteck(kx + 1, ky - 2, 4, 1, "R");
-    p.punkt(kx + 1 + (katzenAnim % 4), ky - 2, "w");
-    p.punkt(17, y + (katzenAnim % 4) * 2, "w");
-    return p.raster;
+    // ---- Rock/Tassets aus Stoff mit Goldsaum ----
+    for (let y = 0; y < 5; y++) rechteck(22 - Math.floor(y / 2), 19 + y + y0, 11 + Math.floor(y / 2) * 2, 1, y > 3 ? "G" : "C");
+    for (let y = 19; y <= 23; y++) punkt(22 - Math.floor((y - 19) / 2), y + y0, "c");
+    punkt(26, 21 + y0, "c"); punkt(29, 22 + y0, "c");
+
+    // ---- Brustpanzer: Licht vorne, Schatten hinten, Goldkragen und Guertel ----
+    rechteck(23, 12 + y0, 8, 8, "A");
+    rechteck(23, 12 + y0, 2, 8, "a"); rechteck(23, 18 + y0, 8, 1, "a");
+    punkt(23, 14 + y0, "Q"); punkt(23, 17 + y0, "Q");
+    rechteck(23, 12 + y0, 8, 1, "G");
+    rechteck(23, 19 + y0, 8, 1, "G");
+    rechteck(26, 13 + y0, 2, 5, "w");
+    // Edelstein in der Mitte und leuchtende Risse (pulsieren)
+    const glut = katzenAnim % 2 ? "L" : "G";
+    punkt(28, 15 + y0, "R"); punkt(29, 15 + y0, glut);
+    linie(24, 14 + y0, 26, 17 + y0, 1, glut);
+    linie(29, 17 + y0, 30, 14 + y0, 1, glut);
+
+    // ---- Schulterpanzer vorne ----
+    ellipse(30.5, 13.5 + y0, 2.8, 2.2, "A");
+    rechteck(29, 15 + y0, 4, 1, "G");
+    punkt(30, 12 + y0, "w");
+
+    // ---- Schwert: goettliche Klinge schraeg nach oben, goldene Parierstange mit Edelstein ----
+    const hx = 34, hy = 18 + y0;
+    linie(hx, hy - 1, 42, 2 + y0, 2, "B");
+    linie(hx + 1, hy - 2, 43, 2 + y0, 1, "b");
+    punkt(42, 1 + y0, "w"); punkt(43, 1 + y0, "B");
+    const glanz = (katzenAnim % 4) * 2;
+    punkt(hx + 2 + glanz, hy - 3 - glanz * 1.9, "w");
+    linie(hx - 2, hy - 3, hx + 2, hy + 1, 2, "G");
+    punkt(hx, hy - 1, "R");
+    linie(hx - 1, hy, hx - 3, hy + 3, 2, "g");
+    punkt(hx - 4, hy + 4, "G");
+
+    // ---- Arm vorne (Panzerhandschuh haelt das Schwert) ----
+    linie(31, 15 + y0, 33, 18 + y0, 2, "A");
+    rechteck(32, 17 + y0, 3, 2, "a");
+
+    // ---- Kopf: blondes Haar mit Straehnen nach hinten, Gesicht nach rechts ----
+    const kx = 26, ky = 7 + y0;
+    ellipse(kx, ky, 3.8, 4, "H");
+    ellipse(kx + 1.6, ky + 0.8, 2.6, 3, "S");
+    rechteck(kx - 4, ky - 1, 3, 6, "H"); rechteck(kx - 4, ky + 3, 2, 3, "h");
+    punkt(kx - 1, ky - 3, "h"); punkt(kx + 1, ky - 3, "H"); punkt(kx + 2, ky - 2, "H");
+    punkt(kx, ky - 1, "h"); punkt(kx + 3, ky - 1, "H");
+    if (geschlossen) {
+        punkt(kx + 2, ky + 1, "7"); punkt(kx + 3, ky + 1, "7");
+    } else {
+        punkt(kx + 2, ky + 1, "E"); punkt(kx + 2, ky, "w"); punkt(kx + 3, ky + 1, "E");
+    }
+    punkt(kx + 3, ky + 3, "X");
+    punkt(kx + 1, ky + 2, "X");
+
+    // ---- Umriss (nicht um den Heiligenschein) ----
+    const kopie = raster.map(z => [...z]);
+    const voll = (x, y) => x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H && kopie[y][x];
+    for (let y = 0; y < ENGEL_H; y++) for (let x = 0; x < ENGEL_B; x++) {
+        if (voll(x, y)) continue;
+        if (voll(x - 1, y) || voll(x + 1, y) || voll(x, y - 1) || voll(x, y + 1)) raster[y][x] = "7";
+    }
+
+    // ---- Heiligenschein: goldener Ring ueber dem Kopf, ein Glanz laeuft herum ----
+    for (let w = 0; w < 36; w++) {
+        const winkel = (w / 36) * Math.PI * 2;
+        punkt(kx + Math.cos(winkel) * 5, ky - 6 + Math.sin(winkel) * 1.4, w < 18 ? "r" : "R");
+    }
+    const lauf = (katzenAnim * 9) % 36;
+    punkt(kx + Math.cos((lauf / 36) * Math.PI * 2) * 5, ky - 6 + Math.sin((lauf / 36) * Math.PI * 2) * 1.4, "w");
+    return raster;
 }
 
 const haustierUrlCache = {};

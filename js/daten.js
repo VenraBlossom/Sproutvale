@@ -1654,8 +1654,9 @@ const HAUSTIER_SKINS = [
     // ----- Mythisch: nur fuer Beta-Tester (sichtbar nur, wenn man ihn hat) -----
     { id: "betatester", name: "Beta Tester", art: "engel", quelle: "beta", seltenheit: 5, laut: "block", stimme: 1.3,
         aura: "#fff3a0", schwebt: true, klasse: "haustier-engel", effekt: "funkeln",
-        farben: { 1: "#d4a02a", 2: "#ffd84a", 3: "#c8cce8", 4: "#ffd2b0", 5: "#4a8aff", 6: "#ffffff", 7: "#3a3a5a", 8: "#dfe3f5",
-            h: "#ffd2b0", k: "#ffcf4a", F: "#ffffff", f: "#b8c8f0", B: "#c8d4ec", G: "#e0a800", R: "#ffe066" } },
+        farben: { 7: "#2a2a44", A: "#eef2fa", a: "#b8c0d6", Q: "#7a84a0", G: "#ffd23a", g: "#c8901a", H: "#ffe28a", h: "#d8a84a",
+            S: "#ffdcc6", X: "#f0b09a", E: "#3a7ae0", W: "#ffffff", V: "#c8d4ec", v: "#98a8c8", B: "#eef6ff", b: "#a8bcdc",
+            C: "#fff8ee", c: "#e0d2bc", R: "#ffe066", r: "#e0a800", L: "#fff8c0", w: "#ffffff" } },
 
     // ----- Legendaer (einzeln, mit Effekten) -----
     { id: "axolotl", name: t("Axolotl"), art: "katze", stil: { axolotl: true, keineStreifen: true }, laut: "blubb",
