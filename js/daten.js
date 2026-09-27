@@ -89,6 +89,7 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus."),
         t("Langzeit-Ziele: Bauernrang (jede Ernte gibt Erfahrung, jeder Rang +1% Gold für immer), Mondphasen bis Sternenmond VI, Meisterschaft bis Stufe 12."),
         t("Sternenfall: 5 neue Upgrades (Sternenrucksack, Kosmische Felder, Sternenwurzel, Ewige Kombo, Sternenmeister)."),
         t("Stellarium: neue Sterne Saatkette, Goldene Stunde, Morgen-Schwung, Feldkunde und Sternenmeer."),
@@ -266,7 +267,17 @@ const PFLANZEN_VORLAGEN = [
     { id: "eisblume", name: t("Eisblume"), emoji: "❄️", sekProStufe: 9, verkaufswert: 295000, unlockKosten: 99000, bonusName: t("Diamantfrost"), bonusText: t("Saaten von Eisblumen sind mindestens selten."),
         eigenschaft: "eis", eigenschaftText: t("Kristallkälte: ihre Saaten sind mindestens ungewöhnlich.") },
     { id: "mondlilie", name: t("Mondlilie"), emoji: "🌸", sekProStufe: 10, verkaufswert: 740000, unlockKosten: 170000, bonusName: t("Vollmond"), bonusText: t("Mondlilien geben am Abend und in der Nacht doppeltes Gold."),
-        eigenschaft: "mond", eigenschaftText: t("Blüht im Mondlicht: wächst tagsüber halb so schnell, nachts 3-mal so schnell.") }
+        eigenschaft: "mond", eigenschaftText: t("Blüht im Mondlicht: wächst tagsüber halb so schnell, nachts 3-mal so schnell.") },
+    // Spaetes Spiel: drei neue Pflanzen mit eigener Art
+    { id: "kristallrose", name: t("Kristallrose"), emoji: "🌹", sekProStufe: 11, verkaufswert: 1850000, unlockKosten: 290000,
+        bonusName: t("Kristallglanz"), bonusText: t("Kristallrosen lassen dreifache Sternensaat fallen."),
+        eigenschaft: "kristall", eigenschaftText: t("Funkelnde Blüten: die Hälfte ihrer Saaten ist mindestens selten.") },
+    { id: "sonnenfrucht", name: t("Sonnenfrucht"), emoji: "🍊", sekProStufe: 12, verkaufswert: 4600000, unlockKosten: 490000,
+        bonusName: t("Sonnenwärme"), bonusText: t("Jede Sonnenfrucht-Ernte gibt +3 Energie."),
+        eigenschaft: "sonne", eigenschaftText: t("Liebt die Sonne: wächst tagsüber 50% schneller, nachts halb so schnell.") },
+    { id: "weltenbaum", name: t("Weltenbaum"), emoji: "🌳", sekProStufe: 14, verkaufswert: 11500000, unlockKosten: 830000,
+        bonusName: t("Uralte Wurzeln"), bonusText: t("Weltenbäume lassen 2 zusätzliche Saaten fallen."),
+        eigenschaft: "wurzeln", eigenschaftText: t("Uralt und mächtig: zählt für die Artenvielfalt doppelt.") }
 ];
 
 // Sprites fuer Samen, kleine Pflanze, grosse Pflanze. Die fertige Stufe nutzt das Sprite der Pflanze.

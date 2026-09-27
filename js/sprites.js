@@ -398,6 +398,60 @@ const SPRITE_PIXEL = {
         "......kkk.......",
         "................"
     ],
+    kristallrose: [
+        "................",
+        "......qQq.......",
+        "....qQzFzQq.....",
+        "...qFzwzFzFq....",
+        "...QzFzwzFzQ....",
+        "...qFzFzwzFq....",
+        "....qQzFzQq.....",
+        ".....qqQqq......",
+        ".......d........",
+        "...GG..d........",
+        "..GgGG.d..GG....",
+        "...GgG.d.GgGG...",
+        ".......d.GgG....",
+        ".......d........",
+        "......kkk.......",
+        "................"
+    ],
+    sonnenfrucht: [
+        "................",
+        "......gG........",
+        ".....gGGd.......",
+        "....oOOOOo......",
+        "...oOYOOOOo.....",
+        "...oOwYOOOo.....",
+        "...oOOOOOOo.....",
+        "...oOOOOOyo.....",
+        "....ooOOoo......",
+        "..GG..ood..GG...",
+        ".GgGG..d..GgGG..",
+        "..GgGG.d.GgGG...",
+        "....GG.d.GG.....",
+        ".......d........",
+        "......kkk.......",
+        "................"
+    ],
+    weltenbaum: [
+        "....hGGGGh......",
+        "..hGGNGGGGGh....",
+        ".hGGGGGGvGGGh...",
+        ".GGvGGGGGGGNG...",
+        "hGGGGGNGGGGGGh..",
+        ".GGGGGGGGvGGG...",
+        "..hGNGGGGGGh....",
+        "....GGGGGG......",
+        "......VDV.......",
+        "......VDV.......",
+        ".....VVDVV......",
+        ".....VDDDV......",
+        "....VV.D.VV.....",
+        "...DD..D..DD....",
+        "......kkk.......",
+        "................"
+    ],
     muenze: [
         "....kkkk....",
         "..kkYYYYkk..",
@@ -1636,7 +1690,8 @@ function zeichneSprite(zeilen, farbenExtra) {
 
 // Pflanzen (auch ihre Farbvarianten) bekommen automatisch eine dunkle Kontur wie Deko und Haustiere
 const KONTUR_SPRITES = new Set(["samen", "keimling", "jungpflanze", "weizen", "karotte", "kartoffel", "erdbeere", "tomate",
-    "mais", "kuerbis", "sonnenblume", "blaubeere", "melone", "reis", "kaffee", "riesenpilz", "eisblume", "mondlilie"]);
+    "mais", "kuerbis", "sonnenblume", "blaubeere", "melone", "reis", "kaffee", "riesenpilz", "eisblume", "mondlilie",
+    "kristallrose", "sonnenfrucht", "weltenbaum"]);
 
 // Jedes leere Pixel neben einer Farbe wird zur Kontur: eine stark abgedunkelte Version der Nachbarfarbe
 function zeichneKontur(leinwand) {

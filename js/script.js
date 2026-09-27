@@ -631,7 +631,10 @@ function klickGold() {
 
 // Artenvielfalt: jede weitere freigeschaltete Pflanze gibt allen Pflanzen +12% Gold (neue Pflanzen lohnen sich immer)
 function artenvielfalt() {
-    return run && run.pflanzen ? 0.12 * Math.max(0, run.pflanzen.filter(p => p.freigeschaltet).length - 1) : 0;
+    if (!run || !run.pflanzen) return 0;
+    const freie = run.pflanzen.filter(p => p.freigeschaltet);
+    // Der Weltenbaum zaehlt doppelt
+    return 0.12 * Math.max(0, freie.length - 1 + freie.filter(p => p.eigenschaft === "wurzeln").length);
 }
 
 function goldMulti() {
@@ -943,6 +946,7 @@ function stufenZeitSek(feld) {
     if (tagesAnteil() < 0.2) tempo *= 1 + 0.25 * level("morgentau");
     if (feld.pflanze.eigenschaft === "nacht" && istNacht()) tempo *= 2;
     if (feld.pflanze.eigenschaft === "mond") tempo *= istNacht() ? 3 : 0.5;
+    if (feld.pflanze.eigenschaft === "sonne") tempo *= istNacht() ? 0.5 : 1.5;
     if (wetterIst("hitze")) tempo *= 1.3;
     if (wetterIst("frost")) tempo *= 0.75;
     if (bossIst("schaedlinge")) tempo *= 0.85;
@@ -1793,6 +1797,7 @@ function berechneErnte(feld) {
         anzahlGold *= pflanzenBonus(pflanze, "blaubeere") ? 3 : 2;
         wertAnteil = 0.6;
     }
+    if (pflanzenBonus(pflanze, "weltenbaum")) anzahlGold += 2;
     const knollen = pflanzenBonus(pflanze, "kartoffel") ? 0.2 : 0;
     if (Math.random() < extraKugelChance() + ueberflussChance(pflanze) + knollen) anzahlGold += 1;
     if (Math.random() < 0.03 * level("doppelernte")) anzahlGold *= 2;
@@ -1816,6 +1821,8 @@ function berechneErnte(feld) {
     let mindestRaritaet = run.tagesBoni.mindestGruen || wetterIst("regenbogen") || pflanze.eigenschaft === "eis" ||
         pflanzenBonus(pflanze, "erdbeere") ? 1 : 0;
     if (pflanzenBonus(pflanze, "eisblume")) mindestRaritaet = 2;
+    // Kristallrose: die Haelfte ihrer Saaten ist mindestens selten
+    if (pflanze.eigenschaft === "kristall" && Math.random() < 0.5) mindestRaritaet = Math.max(mindestRaritaet, 2);
 
     for (let i = 0; i < anzahlGold; i++) {
         let raritaetIndex = 0;
@@ -1912,7 +1919,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     for (let i = 0; i < sternKugeln; i++) {
         const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
         const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index) *
-            (1 + 0.5 * level("pk_" + pflanze.id)); // Stern "Sternenfrucht" dieser Pflanze
+            (1 + 0.5 * level("pk_" + pflanze.id)) * // Stern "Sternenfrucht" dieser Pflanze
+            (pflanzenBonus(pflanze, "kristallrose") ? 3 : 1);
         const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
         if (direkt) gibSternensamen(sterne);
@@ -1924,7 +1932,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         partikel(x, y, ["#6cc24a", "#3f8a32", "#a3dc6f", "#8f6139"], 12, 55);
     }
     // Kaffee gibt nur noch 1 Energie (im spaeten Spiel gab es sonst zu viel Energie)
-    const energie = pflanze.eigenschaft === "wachmacher" ? 1 : pflanzenBonus(pflanze, "sonnenblume") ? 2 : 0;
+    const energie = pflanze.eigenschaft === "wachmacher" ? 1 : pflanzenBonus(pflanze, "sonnenblume") ? 2 :
+        pflanzenBonus(pflanze, "sonnenfrucht") ? 3 : 0;
     // Espresso: Gratis-Klicks auf den Samenladen
     if (pflanzenBonus(pflanze, "kaffee") && run.phase === "tag" && !run.samenUnterwegs) {
         run.klickZaehler = Math.min(klicksProSamen() - 1, run.klickZaehler + 5);

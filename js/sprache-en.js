@@ -2618,7 +2618,20 @@ Object.assign(UEBERSETZUNG, {
     "Langzeit-Ziele: Bauernrang (jede Ernte gibt Erfahrung, jeder Rang +1% Gold für immer), Mondphasen bis Sternenmond VI, Meisterschaft bis Stufe 12.": "Long-term goals: Farmer Rank (every harvest gives experience, every rank +1% gold forever), moon phases up to Star Moon VI, mastery up to level 12.",
     "Sternenfall: 5 neue Upgrades (Sternenrucksack, Kosmische Felder, Sternenwurzel, Ewige Kombo, Sternenmeister).": "Starfall: 5 new upgrades (Star Backpack, Cosmic Fields, Star Root, Eternal Combo, Star Master).",
     "Stellarium: neue Sterne Saatkette, Goldene Stunde, Morgen-Schwung, Feldkunde und Sternenmeer.": "Stellarium: new stars Seed Chain, Golden Hour, Morning Swing, Field Lore and Sea of Stars.",
-    "4 neue Kredit-Auflagen, 3 neue Wetter (Wind, Pollenflug, Frost) und 6 neue Segen.": "4 new loan conditions, 3 new weathers (Wind, Pollen Day, Frost) and 6 new blessings."
+    "4 neue Kredit-Auflagen, 3 neue Wetter (Wind, Pollenflug, Frost) und 6 neue Segen.": "4 new loan conditions, 3 new weathers (Wind, Pollen Day, Frost) and 6 new blessings.",
+    "Kristallrose": "Crystal Rose",
+    "Kristallglanz": "Crystal Shine",
+    "Kristallrosen lassen dreifache Sternensaat fallen.": "Crystal Roses drop triple Star Drops.",
+    "Funkelnde Blüten: die Hälfte ihrer Saaten ist mindestens selten.": "Sparkling blossoms: half of their drops are at least rare.",
+    "Sonnenfrucht": "Sunfruit",
+    "Sonnenwärme": "Sun Warmth",
+    "Jede Sonnenfrucht-Ernte gibt +3 Energie.": "Every Sunfruit harvest gives +3 energy.",
+    "Liebt die Sonne: wächst tagsüber 50% schneller, nachts halb so schnell.": "Loves the sun: grows 50% faster by day, half as fast at night.",
+    "Weltenbaum": "World Tree",
+    "Uralte Wurzeln": "Ancient Roots",
+    "Weltenbäume lassen 2 zusätzliche Saaten fallen.": "World Trees drop 2 extra drops.",
+    "Uralt und mächtig: zählt für die Artenvielfalt doppelt.": "Ancient and mighty: counts double for Variety.",
+    "3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus.": "3 new late-game plants: Crystal Rose, Sunfruit and World Tree, each with its own trait and bonus."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
