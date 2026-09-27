@@ -89,6 +89,10 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Alpha 0.9.3", punkte: [
+        t("Langzeit-Ziele: Bauernrang (jede Ernte gibt Erfahrung, jeder Rang +1% Gold für immer), Mondphasen bis Sternenmond VI, Meisterschaft bis Stufe 12."),
+        t("Sternenfall: 5 neue Upgrades (Sternenrucksack, Kosmische Felder, Sternenwurzel, Ewige Kombo, Sternenmeister)."),
+        t("Stellarium: neue Sterne Saatkette, Goldene Stunde, Morgen-Schwung, Feldkunde und Sternenmeer."),
+        t("4 neue Kredit-Auflagen, 3 neue Wetter (Wind, Pollenflug, Frost) und 6 neue Segen."),
         t("Mondteich: Startkapital, Bauernweisheit und Ausdauer wachsen jetzt mit dem Run (Prozent statt fester Werte)."),
         t("Mondteich: neu Reiche Ernte (Saat zählt doppelt) und Meisterhände (Ernten zählen mehrfach für die Meisterschaft)."),
         t("Stellarium: neuer Ast Grundwerte (Gold, Sternensamen, Energie, Wachstum und unendliche Harmonie)."),
@@ -701,6 +705,13 @@ const SKILLS = [
         t("Jeder Tag beginnt mit 15 Kombo pro Stufe (Stufe 5: gleich x3)."),
         () => 15 * level("morgenkombo") + t(" Kombo zum Tagesstart"), { autoPos: true }),
 
+    stern("feldkunde", "hof", "📚", [440, 1620], "erntefest", t("Feldkunde"), 6000, 1.5, Infinity,
+        t("Alle Pflanzen wachsen 2% schneller. Unendlich oft kaufbar."),
+        () => "+" + 2 * level("feldkunde") + t("% Wachstum"), { autoPos: true }),
+    stern("sternenmeer", "ernte", "🌊", [1620, -880], "milchstrasse", t("Sternenmeer"), 9000, 1.5, Infinity,
+        t("+3% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
+        () => "+" + 3 * level("sternenmeer") + t("% Sternensamen"), { autoPos: true }),
+
     // ----- Grundwerte (unten links, am Hof): stärken alles, was du hast -----
     stern("g_gold", "hof", "🪙", [-700, 960], "sonnenuhr", t("Grundwert: Gold"), 400, 2, 10,
         t("+5% Gold aus allen Ernten."), () => "+" + prozentText(grundwert("g_gold")) + t(" Gold")),
@@ -891,7 +902,8 @@ const STERN_KURZ = {
     spielerglueck: t("Mehr Glück beim Spielen"),
     g_gold: t("Grundwert Gold"), g_sterne: t("Grundwert Sternensamen"), g_energie: t("Grundwert Energie"),
     g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich"),
-    saatkette: t("Feld sofort neu bepflanzt"), goldenestunde: t("Kurz vor Feierabend mehr Gold"), morgenkombo: t("Tag startet mit Kombo")
+    saatkette: t("Feld sofort neu bepflanzt"), goldenestunde: t("Kurz vor Feierabend mehr Gold"), morgenkombo: t("Tag startet mit Kombo"),
+    feldkunde: t("Schneller wachsen · unendlich"), sternenmeer: t("Mehr Sternensamen · unendlich")
 };
 
 // s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
@@ -924,7 +936,8 @@ const STERN_WIRKUNG = {
     schnuppenfaenger: s => "+" + 3 * s + t(" Sek. Bonus"), kombovirtuose: s => t("Kombo bis x") + (5 + s),
     g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
     g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles"),
-    saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo")
+    saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo"),
+    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 3 * s + t("% Sternensamen")
 };
 
 SKILLS.forEach(def => {
@@ -1006,6 +1019,12 @@ const SEGEN = [
     { id: "kompost", badge: "🪱", name: t("Kompost"), text: t("Jedes Feld hat jeden Tag 8% Chance, gedüngt zu sein (doppeltes Gold).") },
     { id: "regenwolke", badge: "🌧️", name: t("Regenwolke"), text: t("Jedes Feld hat jeden Tag 8% Chance, bewässert zu sein (wächst doppelt so schnell).") },
     { id: "flink", badge: "👐", name: t("Flinke Hände"), max: 3, text: t("-2 Klicks pro Samen (höchstens 3-mal wählbar).") },
+    { id: "saatsegen", badge: "🔗", name: t("Saatsegen"), text: t("+10% Chance, dass ein abgeerntetes Feld sofort einen neuen Samen bekommt.") },
+    { id: "keimsegen", badge: "🌿", name: t("Keimsegen"), text: t("+10% Chance, dass ein neuer Samen gleich als Keimling startet.") },
+    { id: "feldarbeit", badge: "⛏️", name: t("Feldarbeit"), text: t("Neue Felder kosten 20% weniger.") },
+    { id: "kraftpaket", badge: "💪", name: t("Kraftpaket"), text: t("+10% Energie an jedem Tag.") },
+    { id: "sammelwut", badge: "🧲", name: t("Sammelwut"), text: t("Dein Cursor-Kreis ist 20% größer.") },
+    { id: "meisterlich", badge: "🏅", name: t("Meisterlich"), text: t("Jede Ernte zählt für die Pflanzen-Meisterschaft einmal mehr.") },
     { id: "wissen", badge: "📚", name: t("Wissensdurst"), text: t("+15% Chance, dass eine Sternensaat doppelt zählt.") },
     { id: "glueckspilz", badge: "🍄", name: t("Glückspilz"), text: t("+2% Chance auf epische Saaten.") },
     { id: "wachstum", badge: "🌿", name: t("Wachstumsschub"), text: t("Alle Pflanzen wachsen 10% schneller.") },
@@ -1066,14 +1085,14 @@ const JAHRESZEITEN_KONFIG = { tageProJahreszeit: 5 };
 
 const JAHRESZEITEN = [
     { id: "fruehling", name: t("Frühling"), symbol: "🌸", farbe: "#ff9ad5", text: t("Pflanzen wachsen 20% schneller."),
-        wachstum: 1.2, wetter: { regen: 2, regenbogen: 2, hitze: 0.3 }, partikel: "bluete" },
+        wachstum: 1.2, wetter: { regen: 2, regenbogen: 2, hitze: 0.3, frost: 0, pollenflug: 2.5 }, partikel: "bluete" },
     { id: "sommer", name: t("Sommer"), symbol: "☀️", farbe: "#ffd93d", text: t("20% mehr Energie pro Tag."),
-        energie: 1.2, sandbox: { gold: 1.1, text: t("10% mehr Gold aus allen Ernten.") }, wetter: { hitze: 2.5, gewitter: 1.5, nebel: 0.3 }, partikel: "schmetterling" },
+        energie: 1.2, sandbox: { gold: 1.1, text: t("10% mehr Gold aus allen Ernten.") }, wetter: { hitze: 2.5, gewitter: 1.5, nebel: 0.3, frost: 0 }, partikel: "schmetterling" },
     { id: "herbst", name: t("Herbst"), symbol: "🍂", farbe: "#e8902a", text: t("15% mehr Gold aus allen Ernten."),
-        gold: 1.15, wetter: { nebel: 2, regen: 1.5, hitze: 0.3 }, partikel: "blatt" },
+        gold: 1.15, wetter: { nebel: 2, regen: 1.5, hitze: 0.3, wind: 2, pollenflug: 0.3 }, partikel: "blatt" },
     { id: "winter", name: t("Winter"), symbol: "❄️", farbe: "#9fd8ff",
         text: t("Pflanzen wachsen 15% langsamer, dafür ist jede Sternensaat 50% mehr wert."),
-        wachstum: 0.85, sterne: 1.5, wetter: { hitze: 0, sternennacht: 3, gewitter: 0.3 }, partikel: "schnee" }
+        wachstum: 0.85, sterne: 1.5, wetter: { hitze: 0, sternennacht: 3, gewitter: 0.3, frost: 2.5, pollenflug: 0 }, partikel: "schnee" }
 ];
 
 // ---------- WETTER (selten: an den meisten Tagen gibt es kein Wetter) ----------
@@ -1097,7 +1116,13 @@ const WETTER = [
     { id: "sternennacht", name: t("Sternennacht"), symbol: "🌠", gut: true, gewicht: 10,
         text: t("Sternschnuppen kommen 3-mal so oft.") },
     { id: "regenbogen", name: t("Regenbogen"), symbol: "🌈", gut: true, gewicht: 5,
-        text: t("Alle Saaten sind mindestens ungewöhnlich.") }
+        text: t("Alle Saaten sind mindestens ungewöhnlich.") },
+    { id: "wind", name: t("Windiger Tag"), symbol: "🌬️", gut: true, gewicht: 15,
+        text: t("Der Wind hält die Krähen fern: heute kommt keine einzige.") },
+    { id: "pollenflug", name: t("Pollenflug"), symbol: "🌼", gut: true, gewicht: 10,
+        text: t("Spezialpflanzen erscheinen 50% öfter.") },
+    { id: "frost", name: t("Frost"), symbol: "🥶", gut: false, gewicht: 15,
+        text: t("Alle Pflanzen wachsen 25% langsamer.") }
 ];
 const WETTER_NACH_ID = Object.fromEntries(WETTER.map(w => [w.id, w]));
 
@@ -1138,7 +1163,11 @@ const BOSS_REGELN = [
     { id: "nervoes", name: t("Nervöse Kombo"), symbol: "💢", text: t("Das Kombo-Fenster ist 30% kürzer.") },
     { id: "geizig", name: t("Geizige Kundschaft"), symbol: "🧐", text: t("Gewöhnliche Saaten sind nur halb so viel wert.") },
     { id: "unwetter", name: t("Unwetter"), symbol: "🌪️", text: t("Jeden Tag gibt es schlechtes Wetter (die Kristallkugel hilft trotzdem).") },
-    { id: "dunkel", name: t("Dunkle Nächte"), symbol: "🌑", text: t("Keine Sternschnuppen und keine Glühwürmchen.") }
+    { id: "dunkel", name: t("Dunkle Nächte"), symbol: "🌑", text: t("Keine Sternschnuppen und keine Glühwürmchen.") },
+    { id: "schaedlinge", name: t("Schädlinge"), symbol: "🐛", text: t("Alle Pflanzen wachsen 15% langsamer.") },
+    { id: "steuer", name: t("Steuerprüfung"), symbol: "📜", text: t("Bei Feierabend gehen 10% des Tagesgewinns an das Finanzamt.") },
+    { id: "stille", name: t("Stille"), symbol: "🤫", text: t("Die Kombo geht höchstens bis x3.") },
+    { id: "muede", name: t("Müde Hände"), symbol: "😩", text: t("+5 Klicks pro Samen.") }
 ];
 const BOSS_NACH_ID = Object.fromEntries(BOSS_REGELN.map(b => [b.id, b]));
 

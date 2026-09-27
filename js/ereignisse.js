@@ -107,6 +107,7 @@ function gewitterTick(dtMs) {
 // ---------- KRAEHEN ----------
 
 function kraehenZahl() {
+    if (wetterIst("wind")) return 0; // Windiger Tag: keine Kraehen
     if (bossIst("kraehenplage")) return 2 + Math.floor(Math.random() * 3);
     const chancen = KRAEHEN_KONFIG.anzahlChancen;
     const wurf = () => gewichteterZufall(chancen.map((_, i) => i), i => chancen[i]);

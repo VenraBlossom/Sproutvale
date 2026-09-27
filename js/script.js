@@ -536,7 +536,7 @@ function klicksAmMinimum() {
 function klicksProSamen() {
     const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks");
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
-    return bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks;
+    return (bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks) + (bossIst("muede") ? 5 : 0);
 }
 
 // Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
@@ -544,7 +544,7 @@ function energieMax() {
     let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
-    energie *= (1 + 0.1 * metaLevel("ausdauer")) * (1 + grundwert("g_energie"));
+    energie *= (1 + 0.1 * metaLevel("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
     energie *= 1 + werkzeugWert("taschenuhr");
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     energie *= 1 + 0.03 * kuschel("faultier");
@@ -652,7 +652,7 @@ function sternWertMulti() {
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + 0.05 * metaLevel("startsp")) * (1 + grundwert("g_sterne"));
+        (1 + 0.05 * metaLevel("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -666,6 +666,7 @@ function variantenChance(variante) {
     if (run.sandbox && variante.energieBonus) return 0; // Blitzpflanzen geben nur Energie
     let chance = (skill.chanceProStufe * level(skill.id) + tarot) * (1 + 0.1 * kuschel("oktopus")) * (1 + 0.1 * level("saatsortiment"));
     if (variante.id === "blitz" && wetterIst("gewitter")) chance *= 3;
+    if (wetterIst("pollenflug")) chance *= 1.5;
     return chance;
 }
 
@@ -676,7 +677,7 @@ function feldKosten(seite = eigeneSeite()) {
     const felder = seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length;
     const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
-        Math.pow(0.85, segen("sparsam")) * (run.koop ? KOOP_ANFORDERUNG : 1));
+        Math.pow(0.85, segen("sparsam")) * Math.pow(0.8, segen("feldarbeit")) * (run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
 function rechnungsBetrag(nummer) {
@@ -871,7 +872,7 @@ function wachstumsTempo() {
 
 function wachstumsTempoOhneJahreszeit() {
     return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
-        gachaBonus("wachstum") + grundwert("g_wachstum");
+        gachaBonus("wachstum") + grundwert("g_wachstum") + 0.02 * level("feldkunde");
 }
 
 function basisStufenZeitSek(pflanze) {
@@ -912,7 +913,7 @@ function sandboxTageszeit() {
 const SANDBOX_AUS_STERNE = ["s_energie", "g_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
     "v_blitz", "pb_sonnenblume"];
 const SANDBOX_AUS_SHOP = ["energie", "laterne"];
-const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule"];
+const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule", "kraftpaket"];
 const SANDBOX_AUS_WERKZEUGE = ["sparstrumpf", "taschenuhr", "laterne"];
 const SANDBOX_AUS_WAREN = ["elixier"];
 const SANDBOX_AUS_META = ["verhandlung", "ausdauer", "fruehervogel"];
@@ -943,6 +944,8 @@ function stufenZeitSek(feld) {
     if (feld.pflanze.eigenschaft === "nacht" && istNacht()) tempo *= 2;
     if (feld.pflanze.eigenschaft === "mond") tempo *= istNacht() ? 3 : 0.5;
     if (wetterIst("hitze")) tempo *= 1.3;
+    if (wetterIst("frost")) tempo *= 0.75;
+    if (bossIst("schaedlinge")) tempo *= 0.85;
     return basisStufenZeitSek(feld.pflanze) / tempo;
 }
 
@@ -954,7 +957,7 @@ function komboStufe() {
     });
     const hoechste = KONFIG.komboStufen[KONFIG.komboStufen.length - 1];
     if (kombo.zaehler >= hoechste.ab) multi += level("kombovirtuose");
-    return multi;
+    return bossIst("stille") ? Math.min(3, multi) : multi;
 }
 
 // So viele Klicks zaehlt ein Klick auf den Samenladen (Honigwabe: jede Stufe ueber x1 zaehlt etwas mehr)
@@ -1717,7 +1720,7 @@ function pflanzeSamen(feld) {
     zeigeFeldSprite(feld);
 
     // Stern "Fruehreife" dieser Pflanze: startet gleich als Keimling
-    if (level("pr_" + pflanze.id) > 0) wachseEineStufe(feld);
+    if (level("pr_" + pflanze.id) > 0 || Math.random() < 0.1 * segen("keimsegen")) wachseEineStufe(feld);
 
     run.samenGesamt += 1;
     haken("samen", feld);
@@ -1858,7 +1861,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     const stufeVorher = meisterStufe(pflanze.id);
     gibBauernXp(1 + pflanze.index);
     // Mondteich "Meisterhaende": jede Ernte zaehlt fuer die Meisterschaft oefter
-    meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende");
+    meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende") + Math.floor(segen("meisterlich"));
     if (meisterStufe(pflanze.id) > stufeVorher) {
         const stufe = meisterStufe(pflanze.id);
         zeigeBanner(pflanze.emoji, pflanze.name + t(": Meisterschaft ") + stufe + "!",
@@ -1933,7 +1936,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     }
     leereFeld(feld);
     // Stern "Saatkette": das Feld bekommt sofort einen neuen Samen
-    if (run.phase === "tag" && Math.random() < 0.08 * level("saatkette")) pflanzeSamen(feld);
+    if (run.phase === "tag" && Math.random() < 0.08 * level("saatkette") + 0.1 * segen("saatsegen")) pflanzeSamen(feld);
     if (run.phase === "tag") wendePflanzenBonusAn(pflanze, x, y);
     if (variante && run.phase === "tag") wendeErnteEffekteAn(feld, variante, x, y);
 }
@@ -3477,6 +3480,13 @@ function beendeTag() {
     if (zinsen > 0) {
         run.gold += zinsen;
         run.nachrichten.push(t("🐷 Zinsen: +") + zahl(zinsen) + t(" Gold"));
+    }
+
+    // Kredit-Auflage "Steuerpruefung": 10% des Tagesgewinns sind weg
+    if (bossIst("steuer") && run.statistik.gold > 0) {
+        const steuer = Math.min(run.gold, aufrunden(run.statistik.gold * 0.1));
+        run.gold -= steuer;
+        run.nachrichten.push(t("📜 Steuerprüfung: -") + zahl(steuer) + t(" Gold"));
     }
 
     aktualisiereLebenszeitMaxima();
