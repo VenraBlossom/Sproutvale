@@ -842,15 +842,6 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
             p.fein(tx, ty, "c");
             p.fein(tx, ty + 0.5, "c");
         }
-    } else if (form === "zauberer") {    } else if (form === "zauberer") {
-        // Zaubererhut mit Sternen, die um die Spitze kreisen
-        p.ellipse(cx, oben + 1.4, 7, 1, "a");
-        for (let i = 0; i < 7; i++) p.rechteck(cx - 3.5 + i * 0.5, oben - i, 7 - i, 1, "a");
-        p.rechteck(cx - 3.5, oben, 7, 0.5, "c");
-        const kreis = anim % 4;
-        const punkte = [[cx - 2, oben - 2], [cx + 1, oben - 4], [cx + 2.5, oben - 1], [cx - 1, oben - 5]];
-        punkte.forEach(([x, y], i) => { if (i !== kreis) p.fein(x, y, "c"); });
-        p.rechteck(cx + 0.5, oben - 7, 1, 1, "c");
     }
 }
 
