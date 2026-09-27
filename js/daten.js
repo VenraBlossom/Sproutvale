@@ -1844,8 +1844,10 @@ const FIGUR_TEILE = {
         { id: "stein", name: t("Stein"), ...EPISCH, farben: { 4: "#a8a8b4", s: "#8a8a98", r: "#c8a0a0", m: "#3a3a48" } },
         { id: "geist", name: t("Geist"), ...LEGENDAER, fx: "geist", farben: { 4: "#eef4ff", s: "#c8d8f0", r: "#b8c8ff", m: "#6a7ab0" } },
         { id: "rgb", name: t("RGB"), ...LEGENDAER, fx: "rgb", farben: { 4: "#ff8a8a", s: "#e06a6a", r: "#ffd0d0", m: "#6a1a1a" } },
-        { id: "kristall", name: t("Kristall"), ...LEGENDAER, fx: "funkeln", fxFarbe: "#bff0ff",
-            farben: { 4: "#c8f4ff", s: "#8ad8f0", r: "#f0c8ff", m: "#3a7a9a" } }
+        { id: "kristall", name: t("Kristall"), ...LEGENDAER, form: "kristall", anim: true, fx: "funkeln", fxFarbe: "#bff0ff",
+            farben: { 4: "#c8f4ff", s: "#8ad8f0", r: "#f0c8ff", m: "#3a7a9a", v: "#ffffff" } },
+        { id: "sternenhaut", name: t("Sternenhaut"), ...LEGENDAER, form: "sternenhaut", anim: true, fx: "glow", fxFarbe: "#8fa2f0",
+            farben: { 4: "#3a4a9a", s: "#26306e", r: "#8a6af0", m: "#c9b0f5", v: "#fff6a0" } }
     ],
     augen: [
         { id: "braun", name: t("Braun"), quelle: "frei", farben: { 5: "#4a2a12" } },
@@ -1855,8 +1857,10 @@ const FIGUR_TEILE = {
         { id: "rot", name: t("Rot"), ...EPISCH, farben: { 5: "#c8201a" } },
         { id: "gold", name: t("Gold"), ...EPISCH, farben: { 5: "#d49a10" } },
         { id: "lila", name: t("Lila"), ...EPISCH, farben: { 5: "#7a2ad0" } },
-        { id: "leuchtend", name: t("Leuchtend"), ...LEGENDAER, fx: "glow", fxFarbe: "#5af0ff", farben: { 5: "#3ae0ff" } },
-        { id: "herz", name: t("Herzaugen"), ...LEGENDAER, form: "herz", fx: "glow", fxFarbe: "#ff5a9a", farben: { 5: "#ff3a8a" } }
+        { id: "katze", name: t("Katzenaugen"), ...EPISCH, form: "katze", farben: { 5: "#8ad02a" } },
+        { id: "leuchtend", name: t("Leuchtend"), ...LEGENDAER, form: "leuchten", anim: true, fx: "glow", fxFarbe: "#5af0ff", farben: { 5: "#3ae0ff", v: "#e8ffff" } },
+        { id: "herz", name: t("Herzaugen"), ...LEGENDAER, form: "herz", anim: true, fx: "glow", fxFarbe: "#ff5a9a", farben: { 5: "#ff2a7a" } },
+        { id: "sternaugen", name: t("Sternaugen"), ...LEGENDAER, form: "stern", anim: true, fx: "glow", fxFarbe: "#fff6a0", farben: { 5: "#3a4ab0", v: "#fff6a0" } }
     ],
     frisur: [
         { id: "kurz", name: t("Kurz"), quelle: "frei", form: "kurz" },
@@ -1868,9 +1872,11 @@ const FIGUR_TEILE = {
         { id: "iro", name: t("Irokese"), ...EPISCH, form: "iro" },
         { id: "zoepfe", name: t("Zöpfe"), ...EPISCH, form: "zoepfe" },
         { id: "stachel", name: t("Stachelhaar"), ...EPISCH, form: "stachel" },
-        { id: "flamme", name: t("Flammenhaar"), ...LEGENDAER, form: "flamme", fx: "flamme", fxFarbe: "#ff8a2a" },
-        { id: "wolke", name: t("Wolkenhaar"), ...LEGENDAER, form: "wolke", fx: "schweben" },
-        { id: "sternenhaar", name: t("Sternenhaar"), ...LEGENDAER, form: "sterne", fx: "funkeln", fxFarbe: "#fff6a0" }
+        { id: "doppeldutt", name: t("Doppeldutt"), ...EPISCH, form: "doppeldutt" },
+        { id: "flamme", name: t("Flammenhaar"), ...LEGENDAER, form: "flamme", anim: true, fx: "flamme", fxFarbe: "#ff8a2a" },
+        { id: "wolke", name: t("Wolkenhaar"), ...LEGENDAER, form: "wolke", anim: true, fx: "schweben" },
+        { id: "sternenhaar", name: t("Sternenhaar"), ...LEGENDAER, form: "sterne", anim: true, fx: "funkeln", fxFarbe: "#fff6a0" },
+        { id: "meer", name: t("Meereswellen"), ...LEGENDAER, form: "meer", anim: true, fx: "glow", fxFarbe: "#5ad8f0" }
     ],
     haarfarbe: [
         { id: "braun", name: t("Braun"), quelle: "frei", farben: { 2: "#6b3f1d", h: "#9a6634" } },
@@ -1898,12 +1904,15 @@ const FIGUR_TEILE = {
         { id: "karo", name: t("Karohemd"), quelle: "frei", form: "karo", farben: { 6: "#c8302a", 8: "#8a1a18", k: "#f4e4d0" } },
         { id: "hoodie", name: t("Hoodie"), ...EPISCH, form: "hoodie", farben: { 6: "#7a3ab0", 8: "#55287e", k: "#9a5ad0" } },
         { id: "kimono", name: t("Kimono"), ...EPISCH, form: "kimono", farben: { 6: "#e8566a", 8: "#b83a4c", k: "#f4d060" } },
-        { id: "matrose", name: t("Matrosenhemd"), ...EPISCH, form: "matrose", farben: { 6: "#f6f6fa", 8: "#d0d0dc", k: "#2a3a7a" } },
+        { id: "matrose", name: t("Matrosenhemd"), ...EPISCH, form: "matrose", farben: { 6: "#f6f6fa", 8: "#d0d0dc", k: "#2a3a7a", p: "#d9302a" } },
         { id: "weste", name: t("Weste"), ...EPISCH, form: "weste", farben: { 6: "#6b3f1d", 8: "#4a2a12", k: "#f4f0e8" } },
-        { id: "umhang", name: t("Sternenumhang"), ...LEGENDAER, form: "umhang", fx: "funkeln", fxFarbe: "#fff6a0",
+        { id: "umhang", name: t("Sternenumhang"), ...LEGENDAER, form: "umhang", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
             farben: { 6: "#2a3a8a", 8: "#1a2460", k: "#fff6a0" } },
-        { id: "bluetenkleid", name: t("Blütenkleid"), ...LEGENDAER, form: "kleid", fx: "funkeln", fxFarbe: "#ffb3d0",
-            farben: { 6: "#8fd07a", 8: "#5fb03c", k: "#ff8fb8" } }
+        { id: "bluetenkleid", name: t("Blütenkleid"), ...LEGENDAER, form: "kleid", anim: true, fx: "funkeln", fxFarbe: "#ffb3d0",
+            farben: { 6: "#8fd07a", 8: "#5fb03c", k: "#ff8fb8", p: "#ffd23a" } },
+        { id: "pyjama", name: t("Schlafanzug"), ...EPISCH, form: "pyjama", farben: { 6: "#8ab8f0", 8: "#6a98d0", k: "#f4f8ff" } },
+        { id: "astronaut", name: t("Raumanzug"), ...LEGENDAER, form: "astronaut", anim: true, fx: "glow", fxFarbe: "#8fe0ff",
+            farben: { 6: "#f4f6fa", 8: "#b8c4d8", k: "#3ae0ff", p: "#ff4a4a" } }
     ],
     hose: [
         { id: "jeans", name: t("Jeans"), quelle: "frei", farben: { 3: "#3a5a9a", 9: "#2a4478" } },
@@ -1913,7 +1922,7 @@ const FIGUR_TEILE = {
         { id: "rock", name: t("Rock"), quelle: "frei", form: "rock", farben: { 3: "#c83a3a", 9: "#9a2a2a" } },
         { id: "shorts", name: t("Shorts"), ...EPISCH, form: "shorts", farben: { 3: "#c8a060", 9: "#a07a40" } },
         { id: "latzrot", name: t("Rote Latzhose"), ...EPISCH, farben: { 3: "#c8302a", 9: "#8a1a18" } },
-        { id: "sternenhose", name: t("Sternenhose"), ...LEGENDAER, form: "sterne", fx: "funkeln", fxFarbe: "#fff6a0",
+        { id: "sternenhose", name: t("Sternenhose"), ...LEGENDAER, form: "sterne", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
             farben: { 3: "#1d2a6a", 9: "#121a48" } }
     ],
     schuhe: [
@@ -1922,7 +1931,7 @@ const FIGUR_TEILE = {
         { id: "weiss", name: t("Turnschuhe"), quelle: "frei", farben: { 1: "#f4f4f4", l: "#d0d0d8" } },
         { id: "gummistiefel", name: t("Gummistiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#f0c83a", l: "#c89a1a" } },
         { id: "rotestiefel", name: t("Rote Stiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#c8302a", l: "#8a1a18" } },
-        { id: "wolken", name: t("Wolkenschuhe"), ...LEGENDAER, form: "wolke", fx: "schweben", farben: { 1: "#ffffff", l: "#d8e4f4" } }
+        { id: "wolken", name: t("Wolkenschuhe"), ...LEGENDAER, form: "wolke", anim: true, fx: "schweben", farben: { 1: "#ffffff", l: "#d8e4f4" } }
     ],
     kopf: [
         { id: "keiner", name: t("Nichts"), quelle: "frei", form: "keiner" },
@@ -1933,11 +1942,13 @@ const FIGUR_TEILE = {
         { id: "hexenhut", name: t("Hexenhut"), ...EPISCH, form: "hexe", farben: { a: "#3a2a5a", b: "#241a3a", c: "#a86ae0" } },
         { id: "katzenohren", name: t("Katzenohren"), ...EPISCH, form: "ohren", farben: { a: "#3a2a2a", b: "#ff9ab8", c: "#3a2a2a" } },
         { id: "kopfhoerer", name: t("Kopfhörer"), ...EPISCH, form: "kopfhoerer", farben: { a: "#2a2a30", b: "#ff5a8a", c: "#ff5a8a" } },
-        { id: "krone", name: t("Krone"), ...LEGENDAER, form: "krone", fx: "funkeln", fxFarbe: "#ffe066",
+        { id: "krone", name: t("Krone"), ...LEGENDAER, form: "krone", anim: true, fx: "funkeln", fxFarbe: "#ffe066",
             farben: { a: "#ffd23a", b: "#c89a10", c: "#e8434a" } },
-        { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", fx: "glow", fxFarbe: "#fff6a0",
+        { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", anim: true, fx: "glow", fxFarbe: "#fff6a0",
             farben: { a: "#fff6a0", b: "#ffe066", c: "#ffffff" } },
-        { id: "pilzhut", name: t("Pilzhut"), ...LEGENDAER, form: "pilz", fx: "schweben", farben: { a: "#e8434a", b: "#b82a30", c: "#ffffff" } }
+        { id: "pilzhut", name: t("Pilzhut"), ...LEGENDAER, form: "pilz", anim: true, farben: { a: "#e8434a", b: "#b82a30", c: "#ffffff" } },
+        { id: "zauberhut", name: t("Zauberhut"), ...LEGENDAER, form: "zauberer", anim: true, fx: "funkeln", fxFarbe: "#c9b0f5",
+            farben: { a: "#3a2a8a", b: "#26186a", c: "#ffe066" } }
     ],
     // Farben: x Rahmen/Hauptfarbe, y Glas/Zweitfarbe, z Glanz/Akzent
     accessoire: [
@@ -1951,10 +1962,17 @@ const FIGUR_TEILE = {
         { id: "herzbrille", name: t("Herzbrille"), ...EPISCH, form: "herzbrille", farben: { x: "#ff4a8a", y: "#ff9ac0", z: "#ffffff" } },
         { id: "monokel", name: t("Monokel"), ...EPISCH, form: "monokel", farben: { x: "#d4a02a", y: "#e8f4ff", z: "#fff6c0" } },
         { id: "blumenkette", name: t("Blumenkette"), ...EPISCH, form: "lei", farben: { x: "#ff8fb8", y: "#ffd23a", z: "#5fb03c" } },
-        { id: "feenfluegel", name: t("Feenflügel"), ...LEGENDAER, form: "fluegel", fx: "funkeln", fxFarbe: "#bff0ff",
+        { id: "libellenfluegel", name: t("Libellenflügel"), ...EPISCH, form: "libelle", anim: true, farben: { x: "#c8f0e8", y: "#a8e0d8", z: "#5aa89a" } },
+        { id: "feenfluegel", name: t("Feenflügel"), ...LEGENDAER, form: "fluegel", anim: true, fx: "funkeln", fxFarbe: "#bff0ff",
             farben: { x: "#bff0ff", y: "#ffffff", z: "#ffc2e8" } },
-        { id: "fledermausfluegel", name: t("Fledermausflügel"), ...LEGENDAER, form: "fledermaus", fx: "glow", fxFarbe: "#b04ae0",
-            farben: { x: "#3a1a4a", y: "#5a2a6a", z: "#b04ae0" } }
+        { id: "engelsfluegel", name: t("Engelsflügel"), ...LEGENDAER, form: "engel", anim: true, fx: "glow", fxFarbe: "#fff6c8",
+            farben: { x: "#ffffff", y: "#d8e0f0", z: "#fff6c8" } },
+        { id: "schmetterlingsfluegel", name: t("Schmetterlingsflügel"), ...LEGENDAER, form: "schmetterling", anim: true, fx: "funkeln", fxFarbe: "#ffb3e0",
+            farben: { x: "#ff8ac8", y: "#8a6af0", z: "#ffe066" } },
+        { id: "fledermausfluegel", name: t("Fledermausflügel"), ...LEGENDAER, form: "fledermaus", anim: true, fx: "glow", fxFarbe: "#b04ae0",
+            farben: { x: "#3a1a4a", y: "#5a2a6a", z: "#b04ae0" } },
+        { id: "drachenfluegel", name: t("Drachenflügel"), ...LEGENDAER, form: "drache", anim: true, fx: "flamme", fxFarbe: "#ff6a2a",
+            farben: { x: "#8a1a1a", y: "#c83a2a", z: "#ffd23a" } }
 
     ]
 };
