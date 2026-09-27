@@ -52,7 +52,7 @@ const BOT_CODE = new URLSearchParams(location.search).get("bot");
     const leeren = Storage.prototype.clear;
 
     // Dateien -> Spiel (Dateien gewinnen), fehlende Dateien aus den bisherigen Daten anlegen
-    ["sproutvale_meta", "sproutvale_run", "sproutvale_einstellungen", "sproutvale_kaeufe",
+    ["sproutvale_meta", "sproutvale_run", "sproutvale_einstellungen", "sproutvale_kaeufe", "sproutvale_beta",
         "sproutvale_meta_sandbox", "sproutvale_sandbox", "sproutvale_meta_sandbox_2", "sproutvale_sandbox_2",
         "sproutvale_meta_sandbox_3", "sproutvale_sandbox_3", "sproutvale_koop_1", "sproutvale_koop_2", "sproutvale_koop_3"].forEach(schluessel => {
         if (dateien[schluessel] !== undefined) {

@@ -39,6 +39,7 @@ function istKosmetikFrei(eintrag, kategorie) {
     if (!eintrag) return false;
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
+    if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
     if (meta.freigeschaltet[schluessel]) return true;
     if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && Boolean(meta.dlc);
     // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)
@@ -1158,7 +1159,8 @@ function renderHaus(inhalt) {
     }
 
     const raster = el("div", "haus-raster");
-    const sortiert = KOSMETIK_LISTEN[kategorie].map((eintrag, index) => ({ eintrag, index }))
+    // Beta-Inhalte sieht nur, wer sie hat
+    const sortiert = KOSMETIK_LISTEN[kategorie].filter(e => e.quelle !== "beta" || istKosmetikFrei(e, kategorie)).map((eintrag, index) => ({ eintrag, index }))
         .sort((a, b) => kosmetikSeltenheit(a.eintrag) - kosmetikSeltenheit(b.eintrag) || a.index - b.index)
         .map(x => x.eintrag);
     sortiert.forEach(eintrag => {

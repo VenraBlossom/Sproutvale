@@ -2402,6 +2402,58 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
     return p.raster;
 }
 
+// Engel (Beta Tester): goldene Haare, Heiligenschein, weisse Robe mit Goldborte, schlagende Fluegel, Schwert.
+// Farben: 1 Sandalen, 2 Haare, 3 Robe dunkel, 4 Haut, 5 Augen, 6 Robe, 7 Umriss, 8 Robe Schatten, h Haende, k Gold,
+//         F Fluegel, f Fluegel Schatten, B Klinge, G Griff, R Heiligenschein
+function engelRaster(pose, bild, blinzelt) {
+    const p = pixelRaster();
+    const geschlossen = blinzelt || pose === "schlafen";
+    const sitzt = pose === "sitzen" || pose === "liegen" || pose === "schlafen";
+    const schwebe = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : 0;
+    const y = 1 + (sitzt ? 1 : 0) + schwebe; // 1 Pixel Platz oben fuer den Heiligenschein
+    // Fluegel hinten mit Federreihen, schlagen im Takt (im Sitzen ruhiger)
+    const hub = sitzt ? [0, 1, 0, 1][katzenAnim % 4] : [2, 1, 0, 1][katzenAnim % 4];
+    const fy = 6 + y - hub;
+    p.ellipse(6.5, fy, 4.5, 2.4, "F");
+    p.ellipse(6, fy + 2.2, 3.6, 1.5, "F");
+    p.ellipse(5.5, fy + 3.8, 2.6, 1.1, "F");
+    for (let x = 3; x <= 9; x += 2) p.punkt(x, fy + 1, "f");
+    for (let x = 3; x <= 8; x += 2) p.punkt(x, fy + 3, "f");
+    // Robe bis zu den Fuessen, hinten dunkler, Goldborte
+    const rh = sitzt ? 5 : 6;
+    p.rechteck(9, 7 + y, 5, rh, "6");
+    p.rechteck(9, 7 + y, 1, rh, "8");
+    p.rechteck(9, 6 + rh + y, 5, 1, "k");
+    p.rechteck(12, 7 + y, 1, 3, "k");
+    if (sitzt) p.rechteck(12, 12 + y, 4, 1, "1");
+    else p.rechteck(10, 7 + rh + y, 3, 1, "1");
+    // Arm nach vorne, Hand haelt das Schwert, Klinge zeigt nach oben
+    p.rechteck(13, 8 + y, 3, 2, "6");
+    p.punkt(16, 9 + y, "h");
+    p.rechteck(17, y - 1, 1, 9, "B");
+    p.rechteck(16, 8 + y, 3, 1, "G");
+    p.rechteck(17, 9 + y, 1, 2, "G");
+    // Kopf mit goldenem Haar
+    const kx = 8, ky = 1 + y;
+    p.rechteck(kx, ky, 6, 6, "4");
+    p.rechteck(kx, ky, 6, 2, "2");
+    p.rechteck(kx, ky, 2, 5, "2");
+    p.punkt(kx + 5, ky + 2, "2");
+    if (geschlossen) {
+        p.punkt(kx + 4, ky + 3, "7");
+    } else {
+        p.punkt(kx + 3, ky + 3, "w");
+        p.punkt(kx + 4, ky + 3, "5");
+    }
+    p.punkt(kx + 4, ky + 5, "7");
+    p.umriss("7");
+    // Heiligenschein schwebt ueber dem Kopf (ohne Umriss, leuchtet), Glanz wandert ueber die Klinge
+    p.rechteck(kx + 1, ky - 2, 4, 1, "R");
+    p.punkt(kx + 1 + (katzenAnim % 4), ky - 2, "w");
+    p.punkt(17, y + (katzenAnim % 4) * 2, "w");
+    return p.raster;
+}
+
 const haustierUrlCache = {};
 
 // anim = Animationsbild fuer legendaere Begleiter (Fluegelschlag, Funkeln ...), unabhaengig von der Pose
@@ -2414,6 +2466,7 @@ function haustierUrl(skin, pose, bild, blinzelt, anim = 0) {
         const raster = skin.art === "manta" ? mantaRaster(pose, nummer, blinzelt)
             : skin.art === "maedchen" ? maedchenRaster(pose, nummer, blinzelt)
             : skin.art === "blockmensch" ? blockmenschRaster(pose, nummer, blinzelt, skin.stil)
+            : skin.art === "engel" ? engelRaster(pose, nummer, blinzelt)
             : skin.art === "pinguin" ? pinguinRaster(pose, nummer, blinzelt)
                 : katzenRaster(pose, nummer, blinzelt, skin.stil);
         const zeilen = raster.map(zeile => zeile.map(farbe => farbe || ".").join(""));

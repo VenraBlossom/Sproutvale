@@ -265,6 +265,26 @@ function kaufPruefsumme(text) {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
+// ---------- BETA-TESTER ----------
+// Wer vor dem richtigen Release spielt (Alpha oder Beta), bekommt eine eigene Datei (beta.dat, mit Pruefsumme).
+// Sie bleibt auch nach dem Release erhalten und schaltet den mythischen Begleiter "Beta Tester" frei.
+const BETA_KEY = "sproutvale_beta";
+
+function istBetaTester() {
+    try {
+        const roh = JSON.parse(localStorage.getItem(BETA_KEY));
+        return Boolean(roh && typeof roh.daten === "string" && kaufPruefsumme(roh.daten) === roh.sig && JSON.parse(roh.daten).beta);
+    } catch (fehler) {
+        return false;
+    }
+}
+
+function merkeBetaTester() {
+    if (istBetaTester() || !/^(Alpha|Beta)\b/.test(SPIEL_VERSION)) return;
+    const daten = JSON.stringify({ beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) });
+    localStorage.setItem(BETA_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+}
+
 function dlcListen() {
     return { haustier: HAUSTIER_SKINS, landschaft: HOF_THEMEN, deko: DEKO_OBJEKTE, musik: MUSIK_TITEL, samenladen: SAMENLADEN_SKINS,
         felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS };
@@ -5141,7 +5161,8 @@ const IMPORT_DATEIEN = {
     "run.json": "sproutvale_run",
     "sandbox.json": "sproutvale_sandbox",
     "einstellungen.json": "sproutvale_einstellungen",
-    "kaeufe.dat": "sproutvale_kaeufe"
+    "kaeufe.dat": "sproutvale_kaeufe",
+    "beta.dat": "sproutvale_beta"
 };
 
 // Alles in EINER Datei sichern (alle Spielstaende, Mondteich, Kaeufe, Einstellungen); "Spielstand laden" liest sie wieder ein

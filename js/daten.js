@@ -1592,6 +1592,12 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#fff700", 2: "#332a28", 3: "#ff6a0a", 4: "#0a0808", 5: "#ff2a1a", 6: "#403633", 7: "#140e0c", 8: "#292126",
             h: "#ffd23a", k: "#c8a83e" } },
 
+    // ----- Mythisch: nur fuer Beta-Tester (sichtbar nur, wenn man ihn hat) -----
+    { id: "betatester", name: "Beta Tester", art: "engel", quelle: "beta", seltenheit: 5, laut: "block", stimme: 1.3,
+        aura: "#fff3a0", schwebt: true, klasse: "haustier-engel", effekt: "funkeln",
+        farben: { 1: "#d4a02a", 2: "#ffd84a", 3: "#c8cce8", 4: "#ffd2b0", 5: "#4a8aff", 6: "#ffffff", 7: "#3a3a5a", 8: "#dfe3f5",
+            h: "#ffd2b0", k: "#ffcf4a", F: "#ffffff", f: "#b8c8f0", B: "#c8d4ec", G: "#e0a800", R: "#ffe066" } },
+
     // ----- Legendaer (einzeln, mit Effekten) -----
     { id: "axolotl", name: t("Axolotl"), art: "katze", stil: { axolotl: true, keineStreifen: true }, laut: "blubb",
         quelle: "dlc", paket: "einzeln", effekt: "blasen",

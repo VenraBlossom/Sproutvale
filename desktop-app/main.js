@@ -185,6 +185,7 @@ const SPEICHER_DATEIEN = {
     sproutvale_run: ["run.json"],
     sproutvale_einstellungen: ["einstellungen.json"],
     sproutvale_kaeufe: ["kaeufe.dat"], // gekaufte Inhalte mit Pruefsumme (Hand-Aenderungen gelten nicht)
+    sproutvale_beta: ["beta.dat"], // Beta-Tester (vor dem Release gespielt), bleibt fuer immer
     sproutvale_meta_sandbox: ["persistedsavefile_1.json", "fortschritt"],
     sproutvale_sandbox: ["persistedsavefile_1.json", "run"],
     sproutvale_meta_sandbox_2: ["persistedsavefile_2.json", "fortschritt"],

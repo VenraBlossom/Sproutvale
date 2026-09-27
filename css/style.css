@@ -12073,3 +12073,12 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     from { transform: rotate(-0.4deg) scaleX(0.2); opacity: 0.4; }
     to { transform: rotate(-0.4deg) scaleX(1); opacity: 1; }
 }
+
+/* Beta Tester (mythisch): dickere, pulsierende Aura */
+.haustier.haustier-aura.haustier-engel img {
+    animation: engel-aura 2.2s ease-in-out infinite, geist-schweben 3s ease-in-out infinite;
+}
+@keyframes engel-aura {
+    0%, 100% { filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 7px var(--aura, #fff3a0)) drop-shadow(0 0 3px var(--aura, #fff3a0)); }
+    50% { filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 16px var(--aura, #fff3a0)) drop-shadow(0 0 6px var(--aura, #fff3a0)) brightness(1.1); }
+}

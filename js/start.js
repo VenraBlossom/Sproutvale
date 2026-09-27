@@ -877,3 +877,6 @@ aktualisiereProfilKnopf();
     (document.fonts ? Promise.all([document.fonts.load("32px 'Jersey 15'"), document.fonts.load("700 20px 'Pixelify Sans'")]).catch(() => {}) : Promise.resolve())
         .finally(() => requestAnimationFrame(bild));
 })();
+
+// Wer jetzt (vor dem Release) spielt, wird als Beta-Tester gemerkt (eigene Datei, bleibt fuer immer)
+merkeBetaTester();
