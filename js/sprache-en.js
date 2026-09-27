@@ -2989,7 +2989,15 @@ Object.assign(UEBERSETZUNG, {
     "Wir haben mit deinem Begleiter gespielt! Hier sind unsere Ersparnisse, damit er Leckerlis bekommt.": "We played with your companion! Here are our savings so it gets treats.",
     "Der Müller": "The Miller",
     "Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei.": "Your grain mills like butter. Tomorrow morning I'll bring you a coffee.",
-    "„{0}“": "“{0}”"
+    "„{0}“": "“{0}”",
+    "Lebkuchenkatze": "Gingerbread Cat",
+    "Bonbonhase": "Candy Bunny",
+    "Strandhund": "Beach Dog",
+    "Kirschblütenfuchs": "Cherry Blossom Fox",
+    "Mitternachtskatze": "Midnight Cat",
+    "Hexenkatze": "Witch Cat",
+    "Mondwolf": "Moon Wolf",
+    "Goldhase": "Golden Bunny"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

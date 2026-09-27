@@ -1633,6 +1633,24 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#fff700", 2: "#332a28", 3: "#ff6a0a", 4: "#0a0808", 5: "#ff2a1a", 6: "#403633", 7: "#140e0c", 8: "#292126",
             h: "#ffd23a", k: "#c8a83e" } },
 
+    // ----- neu: passend zu den Haus-Skins -----
+    { id: "lebkuchenkatze", name: t("Lebkuchenkatze"), art: "katze", stil: { keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.15,
+        farben: { 1: "#d08a4a", 2: "#a8602a", 3: "#fff6f0", 4: "#e8a868", 5: "#3a1a08", 6: "#ff8fa3", 7: "#4a2410" } },
+    { id: "bonbonhase", name: t("Bonbonhase"), art: "katze", stil: { hase: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.45,
+        farben: { 1: "#ffd6ea", 2: "#9ae0ff", 3: "#ff6a9a", 4: "#fff4fa", 5: "#3a1a2a", 6: "#ff8fb1", 7: "#8a4a6a" } },
+    { id: "strandhund", name: t("Strandhund"), art: "katze", stil: { hund: true, keineStreifen: true }, laut: "wuff", quelle: "dlc", paket: "unterstuetzer", stimme: 1.1,
+        farben: { 1: "#f4e4c0", 2: "#d8b878", 3: "#2ab0c0", 4: "#fffaf0", 5: "#2e1a09", 6: "#ff9aa8", 7: "#6a4a20" } },
+    { id: "kirschfuchs", name: t("Kirschblütenfuchs"), art: "katze", stil: { fuchs: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.25,
+        farben: { 1: "#ffd6ea", 2: "#ff9ac0", 3: "#c84a7a", 4: "#fff4f8", 5: "#3a1a2a", 6: "#ff8fb1", 7: "#8a2a5a" } },
+    { id: "mitternachtskatze", name: t("Mitternachtskatze"), art: "katze", stil: { keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.1,
+        farben: { 1: "#4a3a7a", 2: "#2a1d5a", 3: "#ffe89a", 4: "#5a4a8a", 5: "#ffe89a", 6: "#c9b0f5", 7: "#140e2a" } },
+    { id: "hexenkatze", name: t("Hexenkatze"), art: "katze", stil: { keineStreifen: true }, stimme: 1.05, quelle: "dlc", paket: "einzeln", effekt: "blasen", aura: "#8dff7a", klasse: "haustier-geist", 
+        farben: { 1: "#3a3a4a", 2: "#1d1d28", 3: "#8dff7a", 4: "#4a4a5a", 5: "#8dff7a", 6: "#c9b0f5", 7: "#08080c" } },
+    { id: "mondwolf", name: t("Mondwolf"), art: "katze", stil: { fuchs: true, keineStreifen: true }, laut: "wuff", stimme: 0.85, quelle: "dlc", paket: "einzeln", effekt: "funkeln", aura: "#9fe0ff", schwebt: true, 
+        farben: { 1: "#e8f0ff", 2: "#9fb4e0", 3: "#2a3a7a", 4: "#ffffff", 5: "#9fe0ff", 6: "#c9d6ff", 7: "#1d2a5a" } },
+    { id: "goldhase", name: t("Goldhase"), art: "katze", stil: { hase: true, keineStreifen: true }, stimme: 1.5, quelle: "dlc", paket: "einzeln", effekt: "funkeln", aura: "#ffd93d", 
+        farben: { 1: "#ffe066", 2: "#e0a800", 3: "#8a5a08", 4: "#fff6c0", 5: "#5a3a08", 6: "#ffb3c0", 7: "#6a4a08" } },
+
     // ----- Mythisch: nur fuer Beta-Tester (sichtbar nur, wenn man ihn hat) -----
     { id: "betatester", name: "Beta Tester", art: "engel", quelle: "beta", seltenheit: 5, laut: "block", stimme: 1.3,
         aura: "#fff3a0", schwebt: true, klasse: "haustier-engel", effekt: "funkeln",
