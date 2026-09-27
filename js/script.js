@@ -877,6 +877,10 @@ function gibBauernXp(menge) {
     // Das Level ist nur zum Angeben: keine Vorteile im Spiel, nur Auren
     const neueAura = FIGUR_AUREN.filter(au => au.level > vorher && au.level <= jetzt).pop();
     zeigeBanner("⭐", tf("Level {0}!", jetzt), neueAura ? tf("Neue Aura: {0}", neueAura.name) : t("Weiter so!"), "#2e9e2e", 3000);
+    // kleine Feier: Konfetti in der Mitte oben, bei neuer Aura in ihrer Farbe
+    Klang.stern();
+    const farben = neueAura ? [neueAura.farbe, "#ffffff", "#ffd93d"] : ["#7ed957", "#ffd93d", "#ffffff"];
+    partikel(window.innerWidth / 2, 90, farben, neueAura ? 40 : 22, neueAura ? 160 : 110);
     if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
 }
 
