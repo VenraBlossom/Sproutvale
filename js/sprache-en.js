@@ -2490,7 +2490,8 @@ Object.assign(UEBERSETZUNG, {
     "Fehler behoben: Das Markt-Fenster war immer sichtbar.": "Bug fixed: the market window was always visible.",
     "Erste veröffentlichte Version: neuer Markt, neue Schrift, Feedback über Discord, Vollbild.": "First released version: new market, new font, feedback via Discord, fullscreen.",
     "📜 Patch Notes": "📜 Patch notes",
-    "Patch Notes": "Patch notes"
+    "Patch Notes": "Patch notes",
+    "Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).": "Patch notes: read up on every version since Alpha 0.2.0 (click the version number in the main menu)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
