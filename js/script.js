@@ -937,10 +937,19 @@ function wuerfleRaritaetIndex() {
     return 0;
 }
 
+// Legendaere Saat ist frueh im Run nur halb so viel wert (x25 statt x50), bis zur 2. Rechnung bzw. zum 2. Meilenstein.
+// Sonst entscheidet ein frueher Glueckstreffer den ganzen Run (Zinseszins ueber die Upgrades).
+const JACKPOT_FRUEH_MULTI = 25;
+const JACKPOT_FRUEH_BIS = 2;
+function jackpotFrueh() {
+    return Boolean(run) && (run.sandbox ? run.meilensteine || 0 : run.bezahlteRechnungen || 0) < JACKPOT_FRUEH_BIS;
+}
+
 // Multiplikator einer Münz-Farbe (mit Edelsteinschleifer, Geizige Kundschaft, Schildkroete)
 function raritaetsMulti(index) {
     if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen") + 0.5 * segen("gutesaat"));
-    return RARITAETEN[index].multi * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? (1 + level("jackpotjaeger")) * (1 + 0.2 * kuschel("pfau")) : 1);
+    const basis = index === JACKPOT_INDEX && jackpotFrueh() ? JACKPOT_FRUEH_MULTI : RARITAETEN[index].multi;
+    return basis * (1 + edelsteinBonus()) * (index === JACKPOT_INDEX ? (1 + level("jackpotjaeger")) * (1 + 0.2 * kuschel("pfau")) : 1);
 }
 
 function wuerfleVariante() {

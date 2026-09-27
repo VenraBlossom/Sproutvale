@@ -88,6 +88,11 @@ const SPIEL_VERSION = "Alpha 0.9.2";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Alpha 0.9.3", punkte: [
+        t("Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab."),
+        t("Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert."),
+        t("Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da.")
+    ] },
     { version: "Alpha 0.9.2", punkte: [
         t("Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).")
     ] },
@@ -437,7 +442,7 @@ const SKILLS = [
         t("+1% Chance auf epische Saaten (lila, x12,5 Gold)."),
         () => prozentText(raritaetsChancen()[3]) + t(" Chance auf Episch"), { vorMax: true }),
     stern("gelb", "ernte", "🟡", [960, 0], "lila", t("Goldrausch"), 2500, 2.2, 4,
-        t("+0,5% Chance auf legendäre Saat (gelb, x50 Gold)."),
+        t("+0,5% Chance auf legendäre Saat (gelb, x50 Gold, vor der 2. Rechnung x25)."),
         () => prozentText(raritaetsChancen()[4]) + t(" Chance auf legendäre Saat"), { vorMax: true }),
     stern("edelstein", "ernte", "💍", [1180, 0], "gelb", t("Edelsteinschleifer"), 5000, 2.3, 5,
         t("Alle Farb-Multiplikatoren (außer Gewöhnlich) werden um 10% stärker."),
@@ -775,7 +780,7 @@ const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 // ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
-    gelb: t("Mehr legendäre Saat (x50 Gold)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
+    gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
     schwereMuenzen: t("Gewöhnliche Saat mehr wert"), doppelernte: t("Doppelt so viel Saat"), fuellhorn: t("Mehr Gold"),
     goldmarie: t("Gold verdoppeln"), ernterausch: t("Jede 30. Ernte: 6 Sek. x3 Gold"), sternenstaub: t("Mehr Sternensamen"),

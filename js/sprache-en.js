@@ -2494,7 +2494,12 @@ Object.assign(UEBERSETZUNG, {
     "Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).": "Patch notes: read up on every version since Alpha 0.2.0 (click the version number in the main menu).",
     "Kein laufender Hof. Der nächste Endlos-Run beginnt bei Tag 1, Mondblüten und Upgrades bleiben erhalten.": "No farm in progress. The next Endless run starts at day 1, your Moonpetals and upgrades are kept.",
     "♾️ In Endlos gibt es keine Mondphasen. Deine Auswahl gilt für deine Story-Runs.": "♾️ Endless has no moon phases. Your choice applies to your Story runs.",
-    "In Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.": "Endless has no moon phases. This is the phase for your next Story runs."
+    "In Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.": "Endless has no moon phases. This is the phase for your next Story runs.",
+    "+0,5% Chance auf legendäre Saat (gelb, x50 Gold, vor der 2. Rechnung x25).": "+0.5% chance for a Legendary Drop (yellow, x50 gold, x25 before the 2nd bill).",
+    "Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)": "More Legendary Drops (x50 gold, x25 before the 2nd bill)",
+    "Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab.": "Balancing: Legendary Drops give x25 instead of x50 gold until the 2nd bill. Runs depend less on early luck.",
+    "Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert.": "Endless: after a restart your save stays in the Moon Pond.",
+    "Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da.": "Moon phases can be chosen in the Moon Pond in Endless too (they apply to Story), the moon icon at the top is always there."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
