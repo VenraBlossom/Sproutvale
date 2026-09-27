@@ -1342,7 +1342,7 @@ const HAUSTIER_SKINS = [
     { id: "maedchen", name: t("Katzenmädchen"), art: "maedchen", stimme: 1.35, quelle: "dlc", paket: "einzeln", effekt: "herzen",
         idle: "tanz", aura: "#ff9ad5",
         farben: { 1: "#ffffff", 2: "#5a3222", 3: "#3a3a5a", 4: "#ffe2cf", 5: "#b0402a", 6: "#ff9aa8", 7: "#2a1610" } },
-    { id: "kitty", name: t("Schleifenkatze"), art: "katze", stil: { schleife: true, keineStreifen: true }, stimme: 1.3,
+    { id: "kitty", name: t("Kitty"), art: "katze", stil: { schleife: true, keineStreifen: true }, stimme: 1.3,
         quelle: "dlc", paket: "einzeln", effekt: "herzen",
         idle: "schleife", aura: "#ff4a6a",
         farben: { 1: "#ffffff", 2: "#fbfbff", 3: "#dcdce8", 4: "#ffffff", 5: "#1e1016", 6: "#ffb3c0", 7: "#8a8aa0" } },
