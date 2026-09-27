@@ -28,6 +28,13 @@ function leeresProfil() {
 
 function profil() {
     if (!meta.profil || !meta.profil.teile) meta.profil = leeresProfil();
+    const teile = meta.profil.teile;
+    Object.entries(FIGUR_UMZUG).forEach(([kategorie, liste]) => {
+        const neu = liste[teile[kategorie]];
+        if (!neu) return;
+        teile[kategorie] = neu[0];
+        teile.farben = { ...(teile.farben || {}), [kategorie]: neu[1] };
+    });
     return meta.profil;
 }
 
@@ -46,11 +53,23 @@ function figurTeileAus(teile, pruefen = true) {
     // Eigene Farben (nicht bei legendaeren Teilen): als eigene Variante, damit der Bild-Zwischenspeicher sie trennt
     const farben = teile.farben || {};
     FIGUR_FARBBAR.forEach(k => {
-        const hex = farben[k];
-        if (!hex || kosmetikSeltenheit(ergebnis[k]) >= 4) return;
-        ergebnis[k] = { ...ergebnis[k], id: ergebnis[k].id + "~" + hex, farben: { ...(ergebnis[k].farben || {}), ...figurFarbwechsel(k, hex) } };
+        const haupt = farben[k];
+        const zweit = farben[k + "2"];
+        if ((!haupt && !zweit) || kosmetikSeltenheit(ergebnis[k]) >= 4) return;
+        ergebnis[k] = { ...ergebnis[k], id: ergebnis[k].id + "~" + (haupt || "") + "~" + (zweit || ""),
+            farben: { ...(ergebnis[k].farben || {}), ...(haupt ? figurFarbwechsel(k, haupt) : {}), ...(zweit ? figurZweitfarbe(k, zweit) : {}) } };
     });
     return ergebnis;
+}
+
+// Welche Farb-Buchstaben die Zweitfarbe ersetzt (Muster, Streifen, Band, Glaeser ...)
+function figurZweitfarbe(kategorie, hex) {
+    if (kategorie === "oberteil") return { k: hex };
+    if (kategorie === "hose") return { u: hex };
+    if (kategorie === "schuhe") return { l: hex };
+    if (kategorie === "kopf") return { c: hex };
+    if (kategorie === "accessoire") return { z: hex };
+    return {};
 }
 
 // Welche Farb-Buchstaben eine eigene Farbe ersetzt (hell und dunkel werden abgeleitet)
@@ -59,13 +78,27 @@ function figurFarbwechsel(kategorie, hex) {
     const hell = mischeHex(hex, "#ffffff", 0.35);
     if (kategorie === "oberteil") return { 6: hex, 8: dunkel, o: hell };
     if (kategorie === "hose") return { 3: hex, 9: dunkel };
-    if (kategorie === "schuhe") return { 1: hex, l: hell };
+    if (kategorie === "schuhe") return { 1: hex };
+    if (kategorie === "kopf") return { a: hex, b: dunkel };
+    if (kategorie === "accessoire") return { x: hex, y: dunkel };
     return { 5: hex };
 }
 
-function profilTitel() {
-    const titel = FIGUR_TITEL.find(ti => ti.id === profil().titel);
-    return titel && titel.bedingung(meta) ? titel : FIGUR_TITEL[0];
+// Gewaehlte Aura (nur freigeschaltete, sonst die hoechste erlaubte Stufe darunter)
+function profilAura() {
+    const level = bauernRang();
+    const gewaehlt = FIGUR_AUREN.find(au => au.id === profil().aura);
+    return gewaehlt && gewaehlt.level <= level ? gewaehlt : FIGUR_AUREN[0];
+}
+function auraVon(id) {
+    return FIGUR_AUREN.find(au => au.id === id) || FIGUR_AUREN[0];
+}
+// Aura an ein Element haengen (Figur oder Namensschild)
+function setzeAura(element, aura) {
+    element.style.setProperty("--aura", aura.farbe);
+    element.classList.toggle("aura-stark", Boolean(aura.stark));
+    element.classList.toggle("aura-puls", Boolean(aura.puls));
+    element.classList.toggle("aura-regenbogen", Boolean(aura.regenbogen));
 }
 
 function profilName() {
@@ -290,11 +323,14 @@ function figurGesicht(g, blick, cx, ay, teil, anim) {
         a.rechteck(vorne ? cx - 2 : cx + 0.5, ay + 5, vorne ? 4 : 3, 1, "d");
         a.feinLinie(mundX, ay + 3.5, mundX + (vorne ? 2 : 1), ay + 3.5, "m");
         break;
-    case "pflaster":
-        a.rechteck(vorne ? cx + 2 : cx + 1.5, ay - 1.5, 2, 1, "G");
-        a.fein(vorne ? cx + 2.5 : cx + 2, ay - 1.5, "H");
-        a.fein(vorne ? cx + 3.5 : cx + 3, ay - 1, "H");
+    case "pflaster": {
+        // Pflaster quer auf der Wange (auf der Stirn lagen die Haare darueber)
+        const px = vorne ? cx + 1.5 : cx + 1;
+        a.rechteck(px, ay + 2.5, 2.5, 1, "G");
+        a.fein(px + 1, ay + 2.5, "H");
+        a.fein(px + 1.5, ay + 3, "H");
         break;
+    }
     case "streifen":
         wangen.forEach(x => { a.feinLinie(x - 0.5, ay + 2, x + 1, ay + 2, "G"); a.feinLinie(x - 0.5, ay + 3, x + 1, ay + 3, "H"); });
         break;
@@ -704,13 +740,16 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.rechteck(cx - 6, oben + 1 + hueft, 13, 0.5, "b");
     } else if (form === "schleife") {
         // grosse rote Schleife seitlich am Kopf, mit Knoten in der Mitte
-        const sx = blick === "vorne" ? cx + 3 : blick === "hinten" ? cx - 3 : cx - 1;
-        const sy = oben + 0.5;
-        p.ellipse(sx - 1.6, sy, 1.6, 1.4, "a");
-        p.ellipse(sx + 1.6, sy, 1.6, 1.4, "a");
-        p.punkt(sx, sy, "b");
-        p.fein(sx - 2, sy - 0.5, "c");
-        p.fein(sx + 1.5, sy - 0.5, "c");
+        const sx = blick === "vorne" ? cx + 3 : blick === "hinten" ? cx - 3 : cx - 0.5;
+        const sy = oben;
+        p.ellipse(sx - 2.2, sy, 2.2, 1.9, "a");
+        p.ellipse(sx + 2.2, sy, 2.2, 1.9, "a");
+        // dunkle Falten in den Schlaufen und ein runder Knoten in der Mitte
+        p.feinLinie(sx - 3, sy, sx - 1.5, sy, "b");
+        p.feinLinie(sx + 1.5, sy, sx + 3, sy, "b");
+        p.ellipse(sx, sy, 1.1, 1.1, "b");
+        p.fein(sx - 3, sy - 1, "c");
+        p.fein(sx + 1.5, sy - 1, "c");
     } else if (form === "stirnband") {
         p.rechteck(cx - 4.5, cy - 2.5, 9.5, 1, "a");
         p.feinLinie(cx - 4.5, cy - 2, cx + 4.5, cy - 2, "b");
@@ -1770,10 +1809,11 @@ function zeichneFigur(f, jetzt) {
         zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt, blick);
         f.bildEl.huelle.style.transform = blick === "seite" && f.richtung < 0 ? "scaleX(-1)" : "";
         figurFunkeln(f, teile);
-        // Kleine Aura: in der Farbe des leuchtenden Teils, sonst ein warmes Licht
-        const leuchtend = Object.values(teile).filter(tl => tl.fxFarbe).sort((a, b) => kosmetikSeltenheit(b) - kosmetikSeltenheit(a))[0];
+        // Aura aus dem Level (im Profil gewaehlt), beim Mitspieler seine eigene
+        const aura = f.partner ? auraVon(koop.partnerProfil && koop.partnerProfil.aura) : profilAura();
         f.bildEl.huelle.classList.add("figur-aura");
-        f.bildEl.huelle.style.setProperty("--aura", leuchtend ? leuchtend.fxFarbe : "#fff3c4");
+        setzeAura(f.bildEl.huelle, aura);
+        if (f.schild) setzeAura(f.schild, aura);
         return;
     }
     // Begleiter des Mitspielers: gleiches Bild und dieselben Effekte wie der eigene
@@ -1906,7 +1946,7 @@ function zeigePartnerEmote(id) {
 // Profil an den Mitspieler schicken (Name, Aussehen, eigener Begleiter)
 function koopSendeProfil() {
     if (typeof koop === "undefined" || !koop.verbunden) return;
-    koopSende("profil", { name: profilName(), titel: profilTitel().name, teile: figurTeileIds(), begleiter: meta.kosmetik.haustier || "rot" });
+    koopSende("profil", { name: profilName(), level: bauernRang(), aura: profilAura().id, teile: figurTeileIds(), begleiter: meta.kosmetik.haustier || "rot" });
 }
 
 function figurTeileIds() {
@@ -1953,16 +1993,27 @@ function aktualisiereProfilKnopf() {
     const mini = erstelleFigurBild(2);
     zeigeFigurBild(mini, figurTeileAus(profil().teile), "stehen", 0, false, "vorne");
     const rang = bauernRang();
-    knopf.append(mini.huelle, el("span", "profil-knopf-text", null, [
-        el("span", null, profil().name ? profil().name : t("Profil")),
-        el("span", "profil-rang", tf("Rang {0}", rang) + " · " + profilTitel().name)
-    ]));
-    // Fortschritt bis zum naechsten Bauernrang
     const xp = meta.bauernXp || 0;
     const von = rangSchwelle(rang), bis = rangSchwelle(rang + 1);
-    setzeTipp(knopf, "## " + tf("🧑‍🌾 Bauernrang {0}", rang) + "\n= " + tf("Für immer +{0}% Gold", rang - 1) + "\n" +
+    const name = el("span", "profil-knopf-name", profil().name ? profil().name : t("Profil"));
+    setzeAura(name, profilAura());
+    knopf.append(mini.huelle, el("span", "profil-knopf-text", null, [
+        name,
+        el("span", "profil-rang", tf("Level {0}", rang)),
+        xpLeiste((xp - von) / (bis - von))
+    ]));
+    setzeTipp(knopf, "## " + tf("⭐ Level {0}", rang) + "\n= " + tf("Für immer +{0}% Gold", rang - 1) + "\n" +
         tf("Erfahrung: {0} / {1}", zahl(xp - von), zahl(bis - von)) + "\n- " +
-        t("Jede Ernte gibt Erfahrung (höhere Pflanzen mehr). Jeder Rang +1% Gold, alle 5 Ränge ein Kuschel-Gutschein."));
+        t("Erfahrung gibt es für fast alles: Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere und Erfolge.") + "\n- " +
+        t("Jedes Level +1% Gold. Alle 5 Level ein Kuschel-Gutschein und eine neue Aura (im Profil wählbar)."));
+}
+
+function xpLeiste(anteil) {
+    const leiste = el("span", "xp-leiste");
+    const fuellung = el("span", "xp-fuellung");
+    fuellung.style.width = Math.max(0, Math.min(100, anteil * 100)) + "%";
+    leiste.appendChild(fuellung);
+    return leiste;
 }
 
 // Kleiner Ausschnitt der eigenen Figur als Symbol fuer eine Kategorie (Kopf, Oberkoerper oder Beine)
@@ -2020,25 +2071,37 @@ function renderProfil() {
     nameZeile.appendChild(eingabe);
     links.appendChild(nameZeile);
 
-    // Titel: freigeschaltete zum Auswaehlen, gesperrte mit Bedingung
-    const titelZeile = el("label", "profil-name-zeile", null, [el("span", null, t("Titel"))]);
-    const titelWahl = document.createElement("select");
-    titelWahl.className = "profil-titel-wahl";
-    FIGUR_TITEL.forEach(ti => {
-        const frei = ti.bedingung(meta);
-        const option = el("option", null, frei ? ti.name : "🔒 " + ti.name + " (" + ti.text + ")");
-        option.value = ti.id;
-        option.disabled = !frei;
-        titelWahl.appendChild(option);
+    // Level mit Erfahrungsleiste
+    const level = bauernRang();
+    const xp = meta.bauernXp || 0;
+    const von = rangSchwelle(level), bis = rangSchwelle(level + 1);
+    links.appendChild(el("div", "profil-level", null, [
+        el("span", "profil-level-zahl", tf("⭐ Level {0}", level)),
+        xpLeiste((xp - von) / (bis - von)),
+        el("span", "profil-level-xp", zahl(xp - von) + " / " + zahl(bis - von) + " XP")
+    ]));
+
+    // Aura: alle 5 Level eine neue, gesperrte zeigen das noetige Level
+    const auraReihe = el("div", "profil-auren", null, [el("span", "profil-farben-titel", t("✨ Aura:"))]);
+    const aktuelleAura = profilAura();
+    FIGUR_AUREN.forEach(au => {
+        const frei = au.level <= level;
+        const knopf = el("button", "profil-aura" + (au.id === aktuelleAura.id ? " gewaehlt" : "") + (frei ? "" : " gesperrt"), frei ? "" : "🔒");
+        knopf.style.setProperty("--aura", au.farbe);
+        setzeAura(knopf, au);
+        setzeTipp(knopf, au.name + (frei ? "" : " · " + tf("ab Level {0}", au.level)));
+        if (frei) knopf.addEventListener("click", () => {
+            profil().aura = au.id;
+            speichereMeta();
+            Klang.klick(6);
+            aktualisiereProfilKnopf();
+            renderProfil();
+        });
+        auraReihe.appendChild(knopf);
     });
-    titelWahl.value = profilTitel().id;
-    titelWahl.addEventListener("change", () => {
-        profil().titel = titelWahl.value;
-        speichereMeta();
-        aktualisiereProfilKnopf();
-    });
-    titelZeile.appendChild(titelWahl);
-    links.appendChild(titelZeile);
+    links.appendChild(auraReihe);
+    setzeAura(buehne, aktuelleAura);
+    buehne.classList.add("profil-buehne-aura");
 
     // Hinweis, wenn etwas nur anprobiert ist
     const nichtBesessen = FIGUR_KATEGORIEN.filter(k => !istKosmetikFrei(figurTeil(k.id, profilVorschau[k.id]), "figur_" + k.id));
@@ -2062,32 +2125,37 @@ function renderProfil() {
     rechts.appendChild(reiter);
 
     // Eigene Farbe fuer Kleidung und Augen (fuer alle frei, nicht bei legendaeren Teilen)
+    // Hauptfarbe (das Teil selbst) und Zweitfarbe (Streifen, Band, Sohle, Glaeser ...)
     if (FIGUR_FARBBAR.includes(profilKategorie)) {
-        const farbReihe = el("div", "profil-farben", null, [el("span", "profil-farben-titel", t("🎨 Farbe:"))]);
-        const aktuell = (profilVorschau.farben || {})[profilKategorie] || null;
-        const setzeFarbe = hex => {
-            if (!profilVorschau) return;
-            profilVorschau.farben = { ...(profilVorschau.farben || {}), [profilKategorie]: hex };
-            if (!hex) delete profilVorschau.farben[profilKategorie];
-            profil().teile.farben = { ...profilVorschau.farben };
-            speichereMeta();
-            Klang.klick(6);
-            renderProfil();
-        };
-        const original = el("button", "profil-farbe original" + (!aktuell ? " gewaehlt" : ""), "✕");
-        setzeTipp(original, t("Originalfarbe"));
-        original.addEventListener("click", () => setzeFarbe(null));
-        farbReihe.appendChild(original);
-        FIGUR_PALETTE.forEach(hex => {
-            const feld = el("button", "profil-farbe" + (aktuell === hex ? " gewaehlt" : ""));
-            feld.style.background = hex;
-            feld.addEventListener("click", () => setzeFarbe(hex));
-            farbReihe.appendChild(feld);
+        const reihen = [[profilKategorie, FIGUR_ZWEITFARBE.includes(profilKategorie) ? t("🎨 Hauptfarbe:") : t("🎨 Farbe:")]];
+        if (FIGUR_ZWEITFARBE.includes(profilKategorie)) reihen.push([profilKategorie + "2", t("🎨 Zweitfarbe:")]);
+        reihen.forEach(([schluessel, titel]) => {
+            const farbReihe = el("div", "profil-farben", null, [el("span", "profil-farben-titel", titel)]);
+            const aktuell = (profilVorschau.farben || {})[schluessel] || null;
+            const setzeFarbe = hex => {
+                if (!profilVorschau) return;
+                profilVorschau.farben = { ...(profilVorschau.farben || {}), [schluessel]: hex };
+                if (!hex) delete profilVorschau.farben[schluessel];
+                profil().teile.farben = { ...profilVorschau.farben };
+                speichereMeta();
+                Klang.klick(6);
+                renderProfil();
+            };
+            const original = el("button", "profil-farbe original" + (!aktuell ? " gewaehlt" : ""), "✕");
+            setzeTipp(original, t("Originalfarbe"));
+            original.addEventListener("click", () => setzeFarbe(null));
+            farbReihe.appendChild(original);
+            FIGUR_PALETTE.forEach(hex => {
+                const feld = el("button", "profil-farbe" + (aktuell === hex ? " gewaehlt" : ""));
+                feld.style.background = hex;
+                feld.addEventListener("click", () => setzeFarbe(hex));
+                farbReihe.appendChild(feld);
+            });
+            rechts.appendChild(farbReihe);
         });
         if (kosmetikSeltenheit(figurTeil(profilKategorie, profilVorschau[profilKategorie])) >= 4) {
-            farbReihe.appendChild(el("span", "profil-farben-hinweis", t("Legendäre Teile behalten ihre Farben.")));
+            rechts.appendChild(el("span", "profil-farben-hinweis", t("Legendäre Teile behalten ihre Farben.")));
         }
-        rechts.appendChild(farbReihe);
     }
 
     const raster = el("div", "profil-inventar");
@@ -2099,7 +2167,7 @@ function renderProfil() {
         const kachel = el("button", "profil-kachel" + (gewaehlt ? " gewaehlt" : "") + (frei ? "" : " gesperrt"));
         kachel.style.setProperty("--seltenheit", seltenheit.rand);
         // Kacheln zeigen jedes Teil in seiner Originalfarbe
-        const probe = { ...profilVorschau, [profilKategorie]: teil.id, farben: { ...(profilVorschau.farben || {}), [profilKategorie]: null } };
+        const probe = { ...profilVorschau, [profilKategorie]: teil.id, farben: { ...(profilVorschau.farben || {}), [profilKategorie]: null, [profilKategorie + "2"]: null } };
         const mini = erstelleFigurBild(3);
         zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false, "vorne");
         kachel.appendChild(mini.huelle);

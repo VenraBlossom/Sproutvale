@@ -29,7 +29,8 @@ const KOSMETIK_LISTEN = {
     figur_hose: FIGUR_TEILE.hose,
     figur_schuhe: FIGUR_TEILE.schuhe,
     figur_kopf: FIGUR_TEILE.kopf,
-    figur_accessoire: FIGUR_TEILE.accessoire
+    figur_accessoire: FIGUR_TEILE.accessoire,
+    figur_gesicht: FIGUR_TEILE.gesicht
 };
 
 // frei = immer, erspielt = Bedingung einmal erfuellt (bleibt dann fuer immer),

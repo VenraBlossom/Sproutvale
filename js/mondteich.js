@@ -209,6 +209,7 @@ function zieheKuschel(mitGutschein) {
     const tier = zufall(KUSCHELTIERE.filter(k => k.raritaet === raritaet && !(run.sandbox && SANDBOX_AUS_KUSCHEL.includes(k.id))));
     const stufeVorher = kuschel(tier.id);
     meta.kuscheltiere[tier.id] = (meta.kuscheltiere[tier.id] || 0) + 1;
+    gibBauernXp(30);
     const stufeNachher = kuschel(tier.id);
     speichereMeta();
     zeigeKapsel({ tier, raritaet, neu: stufeVorher === 0, stufe: stufeNachher, aufgestiegen: stufeVorher > 0 && stufeNachher > stufeVorher });
@@ -367,6 +368,7 @@ function loeseSternenfallAus() {
     const geschenk = 5 * sfLevel("himmelsgabe");
     meta.sternensplitter += splitter;
     meta.sternenfaelle += 1;
+    gibBauernXp(1000 + 400 * splitter); // Sternensplitter sind selten, darum viel Erfahrung
     meta.mondblueten = 0;
     meta.mondbluetenSeitSternenfall = 0;
     meta.upgrades = {};

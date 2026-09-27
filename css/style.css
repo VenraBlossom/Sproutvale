@@ -11491,3 +11491,96 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-radius: 6px;
     background: #fff6dc;
 }
+
+/* Level, Erfahrungsleiste und Auren */
+.xp-leiste {
+    display: block;
+    width: 100%;
+    min-width: 70px;
+    height: 6px;
+    margin-top: 2px;
+    background: rgba(40, 25, 10, 0.35);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.xp-fuellung {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #7ed957, #ffd84a);
+}
+.profil-knopf-name {
+    text-shadow: 0 0 4px var(--aura, #b8b8c0), 0 0 2px var(--aura, #b8b8c0);
+}
+.figur-name {
+    box-shadow: 0 0 6px 1px var(--aura, #b8b8c0);
+}
+.figur-bild.figur-aura.aura-stark {
+    filter: drop-shadow(0 0 5px var(--aura)) drop-shadow(0 0 2px var(--aura));
+}
+.aura-puls {
+    animation: aura-puls 1.6s ease-in-out infinite;
+}
+@keyframes aura-puls {
+    0%, 100% { filter: drop-shadow(0 0 3px var(--aura)); }
+    50% { filter: drop-shadow(0 0 9px var(--aura)) brightness(1.08); }
+}
+.aura-regenbogen {
+    animation: aura-regenbogen 3s linear infinite;
+}
+@keyframes aura-regenbogen {
+    from { filter: drop-shadow(0 0 6px var(--aura)) hue-rotate(0deg); }
+    to { filter: drop-shadow(0 0 6px var(--aura)) hue-rotate(360deg); }
+}
+.profil-knopf-name.aura-regenbogen, .figur-name.aura-regenbogen {
+    animation: none;
+    text-shadow: 0 0 4px #ff4a4a, 0 0 6px #4ad0ff;
+}
+.profil-level {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 6px 0;
+    font-weight: 800;
+}
+.profil-level .xp-leiste {
+    height: 10px;
+}
+.profil-level-xp {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+.profil-auren {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0 8px;
+}
+.profil-aura {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #4a2f15;
+    background: var(--aura);
+    box-shadow: 0 0 6px var(--aura);
+    cursor: pointer;
+    padding: 0;
+    font-size: 10px;
+}
+.profil-aura.gesperrt {
+    opacity: 0.35;
+    cursor: default;
+    box-shadow: none;
+}
+.profil-aura.gewaehlt {
+    outline: 3px solid #ffd23a;
+    outline-offset: 1px;
+}
+.profil-buehne-aura > .figur-bild {
+    filter: drop-shadow(0 0 8px var(--aura));
+}
+.karte-teich-hinweis {
+    margin-top: 8px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}

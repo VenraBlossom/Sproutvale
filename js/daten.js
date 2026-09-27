@@ -1384,7 +1384,7 @@ const ERFOLG_KETTEN = [
     { id: "stellarium", icon: "🌌", text: z => t("Kaufe ") + z + t(" Sterne in einem einzigen Run"),
         wert: (m, r) => (r ? SKILLS.filter(d => (r.level[d.id] || 0) > 0 && d.id !== "p_weizen").length : 0),
         ziele: [25, 60, 120, 200] },
-    { id: "rang", icon: "🧑‍🌾", text: z => t("Erreiche Bauernrang ") + z,
+    { id: "rang", icon: "🧑‍🌾", text: z => t("Erreiche Level ") + z,
         wert: m => (typeof bauernRang === "function" ? bauernRang(m.bauernXp || 0) : 1),
         ziele: [5, 10, 25, 50, 100] },
     { id: "segensammler", icon: "🙏", text: z => t("Wähle ") + z + t(" verschiedene Segen"),
@@ -2162,28 +2162,48 @@ const FIGUR_KATEGORIEN = [
 ];
 
 // Eigene Farben fuer Kleidung und Augen (gilt nicht fuer legendaere Teile, die haben ihre eigenen Farben)
-const FIGUR_FARBBAR = ["oberteil", "hose", "schuhe", "augen"];
+const FIGUR_FARBBAR = ["oberteil", "hose", "schuhe", "kopf", "accessoire", "augen"];
+// Diese Kategorien haben zusaetzlich eine Zweitfarbe (z.B. die Streifen beim Ringelshirt, das Band am Hut)
+const FIGUR_ZWEITFARBE = ["oberteil", "hose", "schuhe", "kopf", "accessoire"];
+// Entfernte reine Farb-Varianten: wer sie trug, bekommt das Grundteil in dieser Farbe
+const FIGUR_UMZUG = {
+    oberteil: { shirt_rot: ["shirt_weiss", "#d9483f"], shirt_gruen: ["shirt_weiss", "#5fb03c"], shirt_schwarz: ["shirt_weiss", "#2e2e36"],
+        shirt_blau: ["shirt_weiss", "#3a6ad0"], shirt_gelb: ["shirt_weiss", "#f0d040"], shirt_rosa: ["shirt_weiss", "#ff9ac0"],
+        shirt_lila: ["shirt_weiss", "#9a6ad0"], shirt_grau: ["shirt_weiss", "#a0a0aa"], pulli_gruen: ["pulli", "#5a9a4a"] },
+    hose: { braun: ["jeans", "#7a5a3a"], schwarz: ["jeans", "#2c2c34"], gruen: ["jeans", "#4a7a3a"], beige: ["jeans", "#d8c090"],
+        grau: ["jeans", "#6a6a78"], rock_blau: ["rock", "#3a6ad0"] },
+    schuhe: { schwarz: ["braun", "#1e1e24"], rot: ["braun", "#c8302a"], blau: ["weiss", "#3a6ad0"] },
+    kopf: { muetze_gruen: ["muetze", "#4a8a3a"], kappe_rot: ["kappe", "#c8302a"] },
+    accessoire: { schal_blau: ["schal", "#3a6ad0"], brille_rot: ["brille", "#c8302a"], sonnenbrille: ["brille", "#1e1e24"] },
+    augen: { blau: ["braun", "#2a5ac0"], gruen: ["braun", "#2a8a3a"], grau: ["braun", "#5a5a6a"], haselnuss: ["braun", "#7a5a2a"],
+        bernstein: ["braun", "#c8801a"] }
+};
 const FIGUR_PALETTE = ["#e8434a", "#f08a24", "#f5d547", "#8fcf5c", "#3f8a32", "#5aa9e6", "#2f6fb8", "#1b3f73",
     "#a877e0", "#6b3fa0", "#ff8fb1", "#8f6139", "#5c5c66", "#1c1b24", "#f4f4f4", "#d9b56a"];
 
-// Titel unter dem Namen: werden durch Fortschritt freigeschaltet (m = Fortschritt des Spielstands)
-const FIGUR_TITEL = [
-    { id: "neuling", name: t("Neuling"), bedingung: () => true, text: t("Von Anfang an") },
-    { id: "hobby", name: t("Hobbygärtner"), bedingung: () => bauernRang() >= 5, text: t("Bauernrang 5") },
-    { id: "feldarbeiter", name: t("Feldarbeiter"), bedingung: () => bauernRang() >= 10, text: t("Bauernrang 10") },
-    { id: "erntemeister", name: t("Erntemeister"), bedingung: () => bauernRang() >= 25, text: t("Bauernrang 25") },
-    { id: "sternenbauer", name: t("Sternenbauer"), bedingung: () => bauernRang() >= 50, text: t("Bauernrang 50") },
-    { id: "legende", name: t("Legende von Sproutvale"), bedingung: () => bauernRang() >= 100, text: t("Bauernrang 100") },
-    { id: "bezwinger", name: t("Rechnungsbezwinger"), bedingung: m => (m.besterRun ? m.besterRun.rechnungen : 0) >= 8, text: t("8 Rechnungen in einem Run") },
-    { id: "mondwanderer", name: t("Mondwanderer"), bedingung: m => (m.mondphaseFrei || 0) >= 3, text: t("3. Mondphase freigeschaltet") },
-    { id: "sternenfaller", name: t("Sternenfaller"), bedingung: m => (m.sternenfaelle || 0) >= 1, text: t("Einen Sternenfall ausgelöst") },
-    { id: "kuschelsammler", name: t("Kuschelsammler"), bedingung: m => Object.keys(m.kuscheltiere || {}).length >= 15, text: t("15 verschiedene Kuscheltiere") },
-    { id: "gluckspilz", name: t("Glückspilz"), bedingung: m => (m.lebenszeit.jackpots || 0) >= 100, text: t("100 legendäre Saaten") },
-    { id: "kombokoenig", name: t("Kombokönig"), bedingung: m => (m.lebenszeit.maxKombo || 0) >= 300, text: t("300er-Kombo") },
-    { id: "streichelprofi", name: t("Streichelprofi"), bedingung: m => (m.lebenszeit.streicheln || 0) >= 3333, text: t("3.333-mal gestreichelt") },
-    { id: "pflanzenmeister", name: t("Pflanzenmeister"), bedingung: m => PFLANZEN_VORLAGEN.some(p => (m.kodex.pflanzen[p.id] || 0) >= MEISTER_SCHWELLEN[6]), text: t("Meisterschaft 7 bei einer Pflanze") },
-    { id: "puenktlich", name: t("Überpünktlich"), bedingung: m => (m.lebenszeit.fruehBezahlt || 0) >= 10, text: t("10 Rechnungen früher bezahlt") },
-    { id: "weltenhueter", name: t("Hüter des Weltenbaums"), bedingung: m => (m.kodex.pflanzen.weltenbaum || 0) >= 1, text: t("Einen Weltenbaum geerntet") }
+// Auren um Namen und Figur: alle 5 Level eine neue (Level 1 grau). Hohe Auren leuchten staerker oder wechseln die Farbe.
+const FIGUR_AUREN = [
+    { level: 1, id: "grau", name: t("Grau"), farbe: "#b8b8c0" },
+    { level: 5, id: "gruen", name: t("Wiesengrün"), farbe: "#7ed957" },
+    { level: 10, id: "gelb", name: t("Sonnengelb"), farbe: "#ffd84a" },
+    { level: 15, id: "himmel", name: t("Himmelblau"), farbe: "#6cc4ff" },
+    { level: 20, id: "rosa", name: t("Blütenrosa"), farbe: "#ff9ac8" },
+    { level: 25, id: "orange", name: t("Kürbisorange"), farbe: "#ff9a3a" },
+    { level: 30, id: "lila", name: t("Lavendel"), farbe: "#b58cff" },
+    { level: 35, id: "minze", name: t("Minze"), farbe: "#6fffc8" },
+    { level: 40, id: "rot", name: t("Mohnrot"), farbe: "#ff5a5a" },
+    { level: 45, id: "silber", name: t("Mondsilber"), farbe: "#e8f0ff" },
+    { level: 50, id: "gold", name: t("Gold"), farbe: "#ffcc33", stark: true },
+    { level: 55, id: "smaragd", name: t("Smaragd"), farbe: "#2fe07a", stark: true },
+    { level: 60, id: "saphir", name: t("Saphir"), farbe: "#3a7bff", stark: true },
+    { level: 65, id: "rubin", name: t("Rubin"), farbe: "#ff2e5a", stark: true },
+    { level: 70, id: "amethyst", name: t("Amethyst"), farbe: "#a64dff", stark: true },
+    { level: 75, id: "sonne", name: t("Sonnenfeuer"), farbe: "#ff8a1a", stark: true, puls: true },
+    { level: 80, id: "mond", name: t("Mondschein"), farbe: "#cfe4ff", stark: true, puls: true },
+    { level: 85, id: "polar", name: t("Polarlicht"), farbe: "#5affc8", stark: true, puls: true },
+    { level: 90, id: "sternen", name: t("Sternenstaub"), farbe: "#fff6a0", stark: true, puls: true },
+    { level: 95, id: "kosmos", name: t("Kosmos"), farbe: "#ff6ad5", stark: true, puls: true },
+    { level: 100, id: "regenbogen", name: t("Regenbogen"), farbe: "#ff4a4a", stark: true, regenbogen: true }
 ];
 
 const EPISCH = { quelle: "dlc", paket: "unterstuetzer" };
@@ -2211,12 +2231,7 @@ const FIGUR_TEILE = {
             farben: { 4: "#3a4a9a", s: "#26306e", r: "#8a6af0", m: "#c9b0f5", v: "#fff6a0" } }
     ],
     augen: [
-        { id: "braun", name: t("Braun"), quelle: "frei", farben: { 5: "#4a2a12" } },
-        { id: "blau", name: t("Blau"), quelle: "frei", farben: { 5: "#2a5ac0" } },
-        { id: "gruen", name: t("Grün"), quelle: "frei", farben: { 5: "#2a8a3a" } },
-        { id: "grau", name: t("Grau"), quelle: "frei", farben: { 5: "#5a5a6a" } },
-        { id: "haselnuss", name: t("Haselnuss"), quelle: "frei", farben: { 5: "#7a5a2a" } },
-        { id: "bernstein", name: t("Bernstein"), quelle: "frei", farben: { 5: "#c8801a" } },
+        { id: "braun", name: t("Augen"), quelle: "frei", farben: { 5: "#4a2a12" } },
         { id: "rot", name: t("Rot"), ...EPISCH, farben: { 5: "#c8201a" } },
         { id: "gold", name: t("Gold"), ...EPISCH, farben: { 5: "#d49a10" } },
         { id: "lila", name: t("Lila"), ...EPISCH, farben: { 5: "#7a2ad0" } },
@@ -2271,17 +2286,8 @@ const FIGUR_TEILE = {
     ],
     oberteil: [
         { id: "latz", name: t("Latzhose"), quelle: "frei", form: "latz", farben: { 6: "#4a7ad0", 8: "#3a5ea8", k: "#f4ead4" } },
-        { id: "shirt_weiss", name: t("Weißes Shirt"), quelle: "frei", farben: { 6: "#f4f4f4", 8: "#cfcfd8", k: "#cfcfd8" } },
-        { id: "shirt_rot", name: t("Rotes Shirt"), quelle: "frei", farben: { 6: "#d9483f", 8: "#a8322a", k: "#a8322a" } },
-        { id: "shirt_gruen", name: t("Grünes Shirt"), quelle: "frei", farben: { 6: "#5fb03c", 8: "#3e8a28", k: "#3e8a28" } },
-        { id: "shirt_schwarz", name: t("Schwarzes Shirt"), quelle: "frei", farben: { 6: "#2e2e36", 8: "#1c1c22", k: "#1c1c22" } },
-        { id: "shirt_blau", name: t("Blaues Shirt"), quelle: "frei", farben: { 6: "#3a6ad0", 8: "#2a4a9a", k: "#2a4a9a" } },
-        { id: "shirt_gelb", name: t("Gelbes Shirt"), quelle: "frei", farben: { 6: "#f0d040", 8: "#c8a020", k: "#c8a020" } },
-        { id: "shirt_rosa", name: t("Rosa Shirt"), quelle: "frei", farben: { 6: "#ff9ac0", 8: "#e070a0", k: "#e070a0" } },
-        { id: "shirt_lila", name: t("Lila Shirt"), quelle: "frei", farben: { 6: "#9a6ad0", 8: "#7a4ab0", k: "#7a4ab0" } },
-        { id: "shirt_grau", name: t("Graues Shirt"), quelle: "frei", farben: { 6: "#a0a0aa", 8: "#7a7a86", k: "#7a7a86" } },
-        { id: "pulli", name: t("Gelber Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#f0c83a", 8: "#c89a1a", k: "#c89a1a" } },
-        { id: "pulli_gruen", name: t("Grüner Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#5a9a4a", 8: "#3e7a30", k: "#3e7a30" } },
+        { id: "shirt_weiss", name: t("T-Shirt"), quelle: "frei", farben: { 6: "#f4f4f4", 8: "#cfcfd8", k: "#cfcfd8" } },
+        { id: "pulli", name: t("Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#f0c83a", 8: "#c89a1a", k: "#c89a1a" } },
         { id: "karo", name: t("Karohemd"), quelle: "frei", form: "karo", farben: { 6: "#c8302a", 8: "#8a1a18", k: "#f4e4d0" } },
         { id: "hoodie", name: t("Hoodie"), ...EPISCH, form: "hoodie", farben: { 6: "#7a3ab0", 8: "#55287e", k: "#9a5ad0" } },
         { id: "kimono", name: t("Kimono"), ...EPISCH, form: "kimono", farben: { 6: "#e8566a", 8: "#b83a4c", k: "#f4d060" } },
@@ -2301,12 +2307,6 @@ const FIGUR_TEILE = {
     ],
     hose: [
         { id: "jeans", name: t("Jeans"), quelle: "frei", farben: { 3: "#3a5a9a", 9: "#2a4478" } },
-        { id: "braun", name: t("Braune Hose"), quelle: "frei", farben: { 3: "#7a5a3a", 9: "#5a4028" } },
-        { id: "schwarz", name: t("Schwarze Hose"), quelle: "frei", farben: { 3: "#2c2c34", 9: "#1a1a20" } },
-        { id: "gruen", name: t("Grüne Hose"), quelle: "frei", farben: { 3: "#4a7a3a", 9: "#345a28" } },
-        { id: "beige", name: t("Beige Hose"), quelle: "frei", farben: { 3: "#d8c090", 9: "#b8a070" } },
-        { id: "grau", name: t("Graue Jeans"), quelle: "frei", farben: { 3: "#6a6a78", 9: "#4e4e5a" } },
-        { id: "rock_blau", name: t("Blauer Rock"), quelle: "frei", form: "rock", farben: { 3: "#3a6ad0", 9: "#2a4a9a" } },
         { id: "rock", name: t("Rock"), quelle: "frei", form: "rock", farben: { 3: "#c83a3a", 9: "#9a2a2a" } },
         { id: "shorts", name: t("Shorts"), ...EPISCH, form: "shorts", farben: { 3: "#c8a060", 9: "#a07a40" } },
         { id: "latzrot", name: t("Rote Latzhose"), ...EPISCH, farben: { 3: "#c8302a", 9: "#8a1a18" } },
@@ -2319,11 +2319,8 @@ const FIGUR_TEILE = {
             farben: { 3: "#1d2a6a", 9: "#121a48" } }
     ],
     schuhe: [
-        { id: "braun", name: t("Braune Schuhe"), quelle: "frei", farben: { 1: "#5a3a1a", l: "#7a5a3a" } },
-        { id: "schwarz", name: t("Schwarze Schuhe"), quelle: "frei", farben: { 1: "#1e1e24", l: "#3a3a44" } },
+        { id: "braun", name: t("Schuhe"), quelle: "frei", farben: { 1: "#5a3a1a", l: "#7a5a3a" } },
         { id: "weiss", name: t("Turnschuhe"), quelle: "frei", farben: { 1: "#f4f4f4", l: "#d0d0d8" } },
-        { id: "rot", name: t("Rote Schuhe"), quelle: "frei", farben: { 1: "#c8302a", l: "#e8605a" } },
-        { id: "blau", name: t("Blaue Turnschuhe"), quelle: "frei", farben: { 1: "#3a6ad0", l: "#ffffff" } },
         { id: "gummistiefel", name: t("Gummistiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#f0c83a", l: "#c89a1a" } },
         { id: "rotestiefel", name: t("Rote Stiefel"), ...EPISCH, form: "stiefel", farben: { 1: "#c8302a", l: "#8a1a18" } },
         { id: "clogs", name: t("Holzschuhe"), ...EPISCH, form: "clogs", farben: { 1: "#d8a860", l: "#f0cc88" } },
@@ -2354,8 +2351,6 @@ const FIGUR_TEILE = {
         { id: "muetze", name: t("Mütze"), quelle: "frei", form: "muetze", farben: { a: "#c8302a", b: "#9a2420", c: "#ffffff" } },
         { id: "kappe", name: t("Kappe"), quelle: "frei", form: "kappe", farben: { a: "#3a6ad0", b: "#2a4a9a", c: "#ffffff" } },
         { id: "schleife", name: t("Rote Schleife"), quelle: "frei", form: "schleife", farben: { a: "#e8243a", b: "#a81a2a", c: "#ff8a9a" } },
-        { id: "muetze_gruen", name: t("Grüne Mütze"), quelle: "frei", form: "muetze", farben: { a: "#4a8a3a", b: "#2e6a24", c: "#ffffff" } },
-        { id: "kappe_rot", name: t("Rote Kappe"), quelle: "frei", form: "kappe", farben: { a: "#c8302a", b: "#8a1a18", c: "#ffffff" } },
         { id: "stirnband", name: t("Stirnband"), quelle: "frei", form: "stirnband", farben: { a: "#3a8ad0", b: "#2a6aa8", c: "#ffffff" } },
         { id: "blumenkranz", name: t("Blumenkranz"), ...EPISCH, form: "kranz", farben: { a: "#5fb03c", b: "#ff8fb8", c: "#ffd23a" } },
         { id: "hexenhut", name: t("Hexenhut"), ...EPISCH, form: "hexe", farben: { a: "#3a2a5a", b: "#241a3a", c: "#a86ae0" } },
@@ -2378,10 +2373,7 @@ const FIGUR_TEILE = {
     accessoire: [
         { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
         { id: "brille", name: t("Brille"), quelle: "frei", form: "brille", farben: { x: "#3a2a1a", y: "#cfe8ff", z: "#ffffff" } },
-        { id: "sonnenbrille", name: t("Sonnenbrille"), quelle: "frei", form: "brille", farben: { x: "#1e1e24", y: "#2a2a3a", z: "#6a6a8a" } },
         { id: "schal", name: t("Schal"), quelle: "frei", form: "schal", farben: { x: "#c8302a", y: "#9a2420", z: "#f4e4d0" } },
-        { id: "schal_blau", name: t("Blauer Schal"), quelle: "frei", form: "schal", farben: { x: "#3a6ad0", y: "#2a4a9a", z: "#f4f4f4" } },
-        { id: "brille_rot", name: t("Rote Brille"), quelle: "frei", form: "brille", farben: { x: "#c8302a", y: "#e8f4ff", z: "#ffffff" } },
         { id: "rucksack", name: t("Rucksack"), quelle: "frei", form: "rucksack", farben: { x: "#7a9a3a", y: "#5a7a2a", z: "#c89a3a" } },
         { id: "kette", name: t("Perlenkette"), quelle: "frei", form: "kette", farben: { x: "#fff4e8", y: "#e8d8c8", z: "#ffffff" } },
         { id: "fliege", name: t("Fliege"), ...EPISCH, form: "fliege", farben: { x: "#c8302a", y: "#8a1a18", z: "#ff6a5a" } },

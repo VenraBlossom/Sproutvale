@@ -150,6 +150,9 @@ window.debug = {
         if (!jetzt) return;
         debug[art](wert - jetzt());
     },
+    // Level: debug.level(50) setzt das Level, debug.xp(1000) gibt Erfahrung
+    level(n) { meta.bauernXp = rangSchwelle(Math.max(1, Math.floor(n))); speichereMeta(); aktualisiereProfilKnopf(); },
+    xp(menge) { gibBauernXp(menge); speichereMeta(); },
     // Fenster mit allen Befehlen, Werte direkt eintragen: debug.help()
     help() { zeigeDebugFenster(); },
     // Ein Bot tritt deiner Lobby bei und spielt mit: debug.bot("ABC123") (Code aus dem Duo-Fenster)
@@ -204,6 +207,9 @@ const DEBUG_BEFEHLE = [
     { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100, min: 0 }] },
     { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5, min: 0 }] },
+    { gruppe: "Level" },
+    { name: "level", text: "Level setzen", felder: [{ typ: "zahl", wert: 50, min: 1 }] },
+    { name: "xp", text: "Erfahrung geben", felder: [{ typ: "zahl", wert: 10000, min: 0 }] },
     { gruppe: "Run" },
     { name: "energie", text: "Energie setzen", felder: [{ typ: "zahl", wert: 100, min: 0 }] },
     { name: "tag", text: "Tag setzen", felder: [{ typ: "zahl", wert: 10, min: 1 }] },

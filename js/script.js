@@ -787,11 +787,17 @@ function meisterStufe(pflanzenId) {
     return MEISTER_SCHWELLEN.filter(schwelle => ernten >= schwelle).length;
 }
 
-// ---------- BAUERNRANG (dauerhaft, ueber alle Runs und Spielstaende) ----------
-// Jede Ernte gibt Erfahrung (hoehere Pflanzen mehr). Der Rang steigt ohne Ende: +1% Gold pro Rang,
-// alle 5 Raenge ein Kuschel-Gutschein.
+// ---------- LEVEL (dauerhaft, ueber alle Modi und Spielstaende) ----------
+// Erfahrung gibt es fuer fast alles: Ernten, Tage, Rechnungen, Gold und Sternensamen am Feierabend,
+// Mondblueten am Run-Ende, Sternensplitter, Kuscheltiere und Erfolge. Gold und Sternensamen zaehlen
+// logarithmisch, damit Milliarden spaeter nicht alles sprengen. Level 100 braucht ~2,45 Mio. Erfahrung
+// (Langzeit-Ziel), danach geht es ohne Ende weiter. +1% Gold pro Level, alle 5 Level ein Gutschein und eine Aura.
 function rangSchwelle(rang) {
-    return rang <= 1 ? 0 : Math.round(60 * Math.pow(rang - 1, 1.8));
+    return rang <= 1 ? 0 : Math.round(250 * Math.pow(rang - 1, 2));
+}
+// Erfahrung fuer Waehrungen: waechst nur langsam mit der Menge
+function xpAusMenge(menge, faktor) {
+    return menge > 0 ? Math.round(faktor * Math.log10(1 + menge)) : 0;
 }
 function bauernRang(xp = meta.bauernXp || 0) {
     let rang = 1;
@@ -809,8 +815,9 @@ function gibBauernXp(menge) {
     let gutscheine = 0;
     for (let r = vorher + 1; r <= jetzt; r++) if (r % 5 === 0) gutscheine += 1;
     meta.gutscheine += gutscheine;
-    zeigeBanner("🧑‍🌾", tf("Bauernrang {0}!", jetzt), tf("Für immer +{0}% Gold", jetzt - 1) +
-        (gutscheine ? " · +" + gutscheine + t(" Kuschel-Gutschein") : ""), "#2e9e2e", 3000);
+    const neueAura = FIGUR_AUREN.filter(au => au.level > vorher && au.level <= jetzt).pop();
+    zeigeBanner("⭐", tf("Level {0}!", jetzt), tf("Für immer +{0}% Gold", jetzt - 1) +
+        (gutscheine ? " · +" + gutscheine + t(" Kuschel-Gutschein") : "") + (neueAura ? " · " + tf("Neue Aura: {0}", neueAura.name) : ""), "#2e9e2e", 3000);
     if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
 }
 
@@ -2924,6 +2931,7 @@ function holeErfolgAb(kette, knopf) {
     offen.forEach(id => { meta.erfolgeAbgeholt[id] = true; });
     const menge = offen.length * ERFOLG_BELOHNUNG_GUTSCHEINE;
     meta.gutscheine += menge;
+    gibBauernXp(150 * offen.length);
     speichereMeta();
     Klang.geschenk();
     if (knopf) {
@@ -3351,6 +3359,7 @@ function pruefeMeilensteine() {
 function naechsterSandboxTag() {
     run.tagMs -= SANDBOX_TAG_MS;
     meta.lebenszeit.tage += 1;
+    gibTagesXp();
     haken("tagEnde");
 
     run.tag += 1;
@@ -3418,6 +3427,7 @@ function zahleRechnung(faellig) {
     run.gold -= koopEigenerAnteil(faellig);
     run.bezahlteRechnungen += 1;
     meta.lebenszeit.rechnungen += 1;
+    gibBauernXp(40 + 30 * run.bezahlteRechnungen);
     run.gnadenRechnung = 0;
     run.rechnungsRabatt = 0;
     run.segenAusstehend = true;
@@ -3491,6 +3501,11 @@ function aktualisiereLebenszeitMaxima() {
     if (run.sandbox) l.maxMeilensteine = Math.max(l.maxMeilensteine || 0, run.meilensteine);
 }
 
+// Feierabend: Tag geschafft, dazu etwas fuer Gold und Sternensamen im Beutel
+function gibTagesXp() {
+    gibBauernXp(25 + Math.min(run.tag, 50) + xpAusMenge(run.gold, 12) + xpAusMenge(run.skillpunkte, 10));
+}
+
 function beendeTag() {
     run.phase = "vorTag";
     bjSchliesseOffeneHand();
@@ -3502,6 +3517,7 @@ function beendeTag() {
     run.samenUnterwegs = false;
     buffAnzeige.classList.add("versteckt");
     meta.lebenszeit.tage += 1;
+    gibTagesXp();
     haken("tagEnde");
 
     if (istVerstaerkt("tod")) {
@@ -3631,6 +3647,7 @@ function beendeRun(offenerBetrag, freiwillig) {
     if (metaLevel("saatbank") > 0) meta.saatbank = Math.floor(run.skillpunkte * 0.05 * metaLevel("saatbank"));
     meta.mondbluetenSeitSternenfall += mondblueten;
     meta.lebenszeit.runs += 1;
+    gibBauernXp(100 + Math.round(40 * Math.sqrt(mondblueten)));
     aktualisiereLebenszeitMaxima();
     const tage = freiwillig ? run.tag - 1 : run.tag;
     const schnappschuss = { ...runSchnappschuss(), tage };
@@ -3798,8 +3815,12 @@ function renderTagesKarte() {
     const istRunEnde = modus === "runEnde";
     karteShop.classList.toggle("versteckt", istRunEnde);
     karteSkilltree.classList.toggle("versteckt", istRunEnde);
+    // Zum Mondteich am Run-Anfang kommt man nur ueber den echten Teich im Hintergrund
+    kartePrestige.classList.add("versteckt");
     const hatMeta = meta.mondblueten > 0 || meta.tarot.length > 0 || Object.keys(meta.upgrades).length > 0 || meta.gutscheine > 0;
-    kartePrestige.classList.toggle("versteckt", modus !== "start" || !hatMeta);
+    if (modus === "start" && hatMeta && !run.sandbox) {
+        tagesKarteInhalt.appendChild(el("p", "karte-teich-hinweis", t("🌙 Tipp: Klick auf den Mondteich im Hintergrund, um vor dem ersten Tag noch einzukaufen.")));
+    }
     karteHaendler.classList.toggle("versteckt", !run.haendler || istRunEnde);
     karteWeiter.textContent = istRunEnde ? t("Zum Mondteich") : tf("Tag {0} starten", run.tag);
     karteWeiter.disabled = Boolean(run.segenAuswahl);
