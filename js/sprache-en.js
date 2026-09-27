@@ -3013,7 +3013,13 @@ Object.assign(UEBERSETZUNG, {
     "Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen.": "All emojis in the game are now pixel art. Lobby codes only have 5 characters.",
     "Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.": "Fixes: crows could not land, Glowshroom House could not be selected, aura was lost when loading.",
     "Spielen": "Play",
-    "👀 Nur ansehen: Kaufen geht erst im neuen Run. Klick auf den leuchtenden Mondteich, um weiterzumachen.": "👀 Just looking: buying is only possible in the new run. Click the glowing Moon Pond to continue."
+    "👀 Nur ansehen: Kaufen geht erst im neuen Run. Klick auf den leuchtenden Mondteich, um weiterzumachen.": "👀 Just looking: buying is only possible in the new run. Click the glowing Moon Pond to continue.",
+    "Der Beta-Tester-Engel ist jetzt von vorne zu sehen, ganz in Weiß und Grau, mit schlagenden Flügeln und Schwert.": "The Beta Tester angel is now seen from the front, all white and grey, with flapping wings and a sword.",
+    "Engelsflügel der Figur im selben Stil wie beim Engel.": "The character's angel wings now match the angel's style.",
+    "Hauptmenü-Knöpfe im Pixel-Stil mit gezeichneten Symbolen statt Emojis.": "Main menu buttons in pixel style with drawn icons instead of emojis.",
+    "Intro: kleiner CRT-Filter auf dem Automaten, kein Licht-Fehler mehr über dem Automaten.": "Intro: a small CRT filter on the cabinet, no more light glitch over the cabinet.",
+    "Nach dem Einklappen geht es per Klick auf den Mondteich zurück, der Teich leuchtet stärker.": "After folding it away you return by clicking the Moon Pond, which glows stronger.",
+    "Haus-Skins zeigen im Haus-Fenster eigene Vorschaubilder. Schlafanzug entfernt.": "House skins show their own previews in the farmhouse window. Pyjamas removed."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

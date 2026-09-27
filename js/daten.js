@@ -84,10 +84,18 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.1.0";
+const SPIEL_VERSION = "Beta 0.1.1";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.1.1", punkte: [
+        t("Der Beta-Tester-Engel ist jetzt von vorne zu sehen, ganz in Weiß und Grau, mit schlagenden Flügeln und Schwert."),
+        t("Engelsflügel der Figur im selben Stil wie beim Engel."),
+        t("Hauptmenü-Knöpfe im Pixel-Stil mit gezeichneten Symbolen statt Emojis."),
+        t("Intro: kleiner CRT-Filter auf dem Automaten, kein Licht-Fehler mehr über dem Automaten."),
+        t("Nach dem Einklappen geht es per Klick auf den Mondteich zurück, der Teich leuchtet stärker."),
+        t("Haus-Skins zeigen im Haus-Fenster eigene Vorschaubilder. Schlafanzug entfernt.")
+    ] },
     { version: "Beta 0.1.0", punkte: [
         t("Patch Notes sind jetzt eine Dorfzeitung (Sproutvale Tagblatt) mit Zeitungs-Knopf unten links im Hauptmenü."),
         t("Hof-Stile: Ab dem 2. Run wählst du zu Beginn 1 von 3 Stilen, die den Run verändern."),
