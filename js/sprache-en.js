@@ -2919,7 +2919,13 @@ Object.assign(UEBERSETZUNG, {
     "Flickenhemd": "Patched Shirt",
     "Laubweste": "Leaf Vest",
     "Schultervogel": "Shoulder Bird",
-    " · Kaufen geht, sobald Sproutvale auf Steam ist. Anprobieren geht schon jetzt.": " · Buying is possible once Sproutvale is on Steam. You can already try things on."
+    " · Kaufen geht, sobald Sproutvale auf Steam ist. Anprobieren geht schon jetzt.": " · Buying is possible once Sproutvale is on Steam. You can already try things on.",
+    "Schaffe ": "Complete ",
+    " Herausforderung": " challenge",
+    " Herausforderungen": " challenges",
+    "-mal das Erntefieber": " Harvest Fevers",
+    "Spiele ": "Play ",
+    " verschiedene Hof-Stile": " different farm styles"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
