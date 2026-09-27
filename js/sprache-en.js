@@ -2810,7 +2810,10 @@ Object.assign(UEBERSETZUNG, {
     "Der nächste Tag beginnt mit 30 Sekunden doppeltem Gold.": "The next day starts with 30 seconds of double gold.",
     "Saatregen": "Seed Rain",
     "Am nächsten Tag haben alle Felder schon zum Start einen Samen.": "Tomorrow every field already has a seed at the start.",
-    "Am nächsten Tag ist jede Saat mindestens ungewöhnlich.": "Tomorrow every drop is at least uncommon."
+    "Am nächsten Tag ist jede Saat mindestens ungewöhnlich.": "Tomorrow every drop is at least uncommon.",
+    "Schließe ": "Make ",
+    " Pakt": " pact",
+    " Pakte": " pacts"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

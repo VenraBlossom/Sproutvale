@@ -1409,6 +1409,9 @@ const ERFOLG_KETTEN = [
     { id: "segensammler", icon: "🙏", text: z => t("Wähle ") + z + t(" verschiedene Segen"),
         wert: m => Object.keys(m.kodex.segen || {}).length,
         ziele: [10, 25, 35] },
+    { id: "paktierer", icon: "⚠️", nurStandard: true, text: z => t("Schließe ") + z + (z === 1 ? t(" Pakt") : t(" Pakte")),
+        wert: m => SEGEN.filter(s => s.pakt).reduce((summe, s) => summe + ((m.kodex.segen || {})[s.id] || 0), 0),
+        ziele: [1, 10, 30] },
     { id: "fruehzahler", icon: "🧾", nurStandard: true, text: z => t("Bezahle ") + z + (z === 1 ? t(" Rechnung") : t(" Rechnungen")) + t(" vor dem Zahltag"),
         wert: m => m.lebenszeit.fruehBezahlt || 0,
         ziele: [1, 10, 50] }
