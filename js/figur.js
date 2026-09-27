@@ -98,9 +98,18 @@ function auraVon(id) {
 function auraStaerke(level) {
     return Math.min(10, Math.floor(Math.max(1, level) / 10));
 }
+// Regenbogen-Aura: die Farbe laeuft ueber die Zeit durch (per Code, weil die Figur ihre Klassen oft neu setzt
+// und eine CSS-Animation dadurch immer wieder von vorn beginnen wuerde)
+function regenbogenFarbe() {
+    return "hsl(" + Math.round((performance.now() / 12) % 360) + ", 95%, 62%)";
+}
+setInterval(() => {
+    document.querySelectorAll(".aura-regenbogen").forEach(e => e.style.setProperty("--aura", regenbogenFarbe()));
+}, 80);
+
 function setzeAura(element, aura, level = bauernRang()) {
     const stufe = auraStaerke(level);
-    element.style.setProperty("--aura", aura.farbe);
+    element.style.setProperty("--aura", aura.regenbogen ? regenbogenFarbe() : aura.farbe);
     element.style.setProperty("--aura-g", (2 + stufe * 0.9).toFixed(1) + "px");
     element.style.setProperty("--aura-g2", (stufe * 0.6).toFixed(1) + "px");
     element.classList.toggle("aura-stark", Boolean(aura.stark));

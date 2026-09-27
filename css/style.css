@@ -12162,3 +12162,14 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     0% { transform: translateY(40px) rotate(-8deg) scale(0.6); opacity: 0; }
     100% { transform: none; opacity: 1; }
 }
+
+/* Regenbogen-Aura: Farbe kommt per Code (--aura), keine eigene Animation mehr */
+.aura-regenbogen {
+    animation: none;
+}
+.figur-name.aura-regenbogen {
+    box-shadow: 0 0 calc(var(--aura-g, 2px) + 2px) var(--aura-g2, 0px) var(--aura);
+}
+.profil-knopf-name.aura-regenbogen {
+    text-shadow: 0 0 var(--aura-g, 2px) var(--aura), 0 0 2px var(--aura);
+}
