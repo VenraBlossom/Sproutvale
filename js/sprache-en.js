@@ -2788,7 +2788,29 @@ Object.assign(UEBERSETZUNG, {
     "Mondteich am Run-Anfang nur noch über den Teich im Hintergrund.": "At the start of a run the Moon Pond is only reachable through the pond in the background.",
     "Neu in den Einstellungen: CRT-Filter.": "New in the settings: CRT filter.",
     "Weiter so!": "Keep it up!",
-    "Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar).": "Your level gives no advantages in the game. Every 5 levels you get a new aura (choose it in your profile)."
+    "Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar).": "Your level gives no advantages in the game. Every 5 levels you get a new aura (choose it in your profile).",
+    "⚠️ Pakt": "⚠️ Pact",
+    " Gold Vorschuss": " gold advance",
+    "+50% Gold aus allen Ernten, aber -15% Energie an jedem Tag.": "+50% gold from all harvests, but -15% energy every day.",
+    "Nachtschicht": "Night Shift",
+    "+25% Energie an jedem Tag, aber alle Pflanzen wachsen 15% langsamer.": "+25% energy every day, but all plants grow 15% slower.",
+    "Sternentausch": "Star Trade",
+    "Sternensaat ist 60% mehr wert, aber du bekommst 15% weniger Gold.": "Star Seed drops are worth 60% more, but you get 15% less gold.",
+    "Eile": "Hurry",
+    "Alle Pflanzen wachsen 30% schneller, aber jede Ernte gibt 10% weniger Gold.": "All plants grow 30% faster, but every harvest gives 10% less gold.",
+    "Hohes Risiko": "High Stakes",
+    "+3% Chance auf legendäre Saat, aber alle weiteren Rechnungen kosten 10% mehr.": "+3% chance for Legendary Drops, but all further bills cost 10% more.",
+    "Vorschuss": "Advance",
+    "Du bekommst sofort die Hälfte der nächsten Rechnung als Gold. Alle weiteren Rechnungen kosten 12% mehr.": "You get half of the next bill as gold right now. All further bills cost 12% more.",
+    "Kargheit": "Frugality",
+    "-3 Klicks pro Samen, aber -10% Energie an jedem Tag.": "-3 clicks per seed, but -10% energy every day.",
+    "Düngersack": "Fertilizer Sack",
+    "Am nächsten Tag sind 4 Felder mehr gedüngt (doppeltes Gold).": "Tomorrow 4 more fields are fertilized (double gold).",
+    "Sonnenschein in der Flasche": "Bottled Sunshine",
+    "Der nächste Tag beginnt mit 30 Sekunden doppeltem Gold.": "The next day starts with 30 seconds of double gold.",
+    "Saatregen": "Seed Rain",
+    "Am nächsten Tag haben alle Felder schon zum Start einen Samen.": "Tomorrow every field already has a seed at the start.",
+    "Am nächsten Tag ist jede Saat mindestens ungewöhnlich.": "Tomorrow every drop is at least uncommon."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -420,6 +420,14 @@ function wendeWareAn(id) {
         run.naechsterTag.goldeneSamen += 1;
     } else if (id === "elixier") {
         run.naechsterTag.energie += 60;
+    } else if (id === "duengersack") {
+        run.naechsterTag.extraDuenger += 4;
+    } else if (id === "sonnenflasche") {
+        run.naechsterTag.goldBuffSek += 30;
+    } else if (id === "saatregen") {
+        run.naechsterTag.samenregen = true;
+    } else if (id === "kleeblatt") {
+        run.naechsterTag.mindestGruen = true;
     } else if (id === "gutschein") {
         meta.gutscheine += 1;
         speichereMeta();

@@ -1090,7 +1090,15 @@ const SEGEN = [
     { id: "jackpotfieber", badge: "🎰", name: t("Goldfieber"), text: t("+1% Chance auf legendäre Saat.") },
     { id: "gluehfreund", badge: "🪲", name: t("Glühwürmchen-Freund"), text: t("Glühwürmchen geben doppelt so viele Sternensamen.") },
     { id: "gutesaat", badge: "🌾", name: t("Gute Saat"), text: t("Gewöhnliche Saat ist 50% mehr wert.") },
-    { id: "komborausch", badge: "🎵", name: t("Kombo-Rausch"), text: t("Jeder 4. Klick zählt für die Kombo doppelt.") }
+    { id: "komborausch", badge: "🎵", name: t("Kombo-Rausch"), text: t("Jeder 4. Klick zählt für die Kombo doppelt.") },
+    // Pakte: stark, aber mit einem Nachteil (erscheinen manchmal als rote Karte in der Auswahl)
+    { id: "goldrausch", badge: "🔥", name: t("Goldrausch"), pakt: true, max: 2, text: t("+50% Gold aus allen Ernten, aber -15% Energie an jedem Tag.") },
+    { id: "nachtschicht", badge: "🌘", name: t("Nachtschicht"), pakt: true, max: 2, text: t("+25% Energie an jedem Tag, aber alle Pflanzen wachsen 15% langsamer.") },
+    { id: "sternentausch", badge: "💫", name: t("Sternentausch"), pakt: true, max: 2, text: t("Sternensaat ist 60% mehr wert, aber du bekommst 15% weniger Gold.") },
+    { id: "eile", badge: "⏩", name: t("Eile"), pakt: true, max: 2, text: t("Alle Pflanzen wachsen 30% schneller, aber jede Ernte gibt 10% weniger Gold.") },
+    { id: "hochrisiko", badge: "🎲", name: t("Hohes Risiko"), pakt: true, max: 2, text: t("+3% Chance auf legendäre Saat, aber alle weiteren Rechnungen kosten 10% mehr.") },
+    { id: "vorschuss", badge: "💰", name: t("Vorschuss"), pakt: true, max: 2, text: t("Du bekommst sofort die Hälfte der nächsten Rechnung als Gold. Alle weiteren Rechnungen kosten 12% mehr.") },
+    { id: "kargheit", badge: "🪨", name: t("Kargheit"), pakt: true, max: 2, text: t("-3 Klicks pro Samen, aber -10% Energie an jedem Tag.") }
 ];
 const SEGEN_NACH_ID = Object.fromEntries(SEGEN.map(s => [s.id, s]));
 
@@ -1300,7 +1308,11 @@ const HAENDLER_WAREN = [
         text: t("+ Sternensamen (100 + so viele, wie du heute gesammelt hast).") },
     { id: "goldsamen", name: t("Goldener Samen"), symbol: "🌟", preis: 0.5, text: t("Dein erster Samen am nächsten Tag wird golden.") },
     { id: "elixier", name: t("Energie-Elixier"), symbol: "🧃", preis: 0.25, text: t("+60 Energie am nächsten Tag.") },
-    { id: "gutschein", name: t("Kuschel-Gutschein"), symbol: "🎟️", preis: 3, text: t("Ein Gutschein für den Kuschel-Automaten im Mondteich (bleibt für immer).") }
+    { id: "gutschein", name: t("Kuschel-Gutschein"), symbol: "🎟️", preis: 3, text: t("Ein Gutschein für den Kuschel-Automaten im Mondteich (bleibt für immer).") },
+    { id: "duengersack", name: t("Düngersack"), symbol: "🧪", preis: 0.3, text: t("Am nächsten Tag sind 4 Felder mehr gedüngt (doppeltes Gold).") },
+    { id: "sonnenflasche", name: t("Sonnenschein in der Flasche"), symbol: "☀️", preis: 0.4, text: t("Der nächste Tag beginnt mit 30 Sekunden doppeltem Gold.") },
+    { id: "saatregen", name: t("Saatregen"), symbol: "🌧️", preis: 0.35, text: t("Am nächsten Tag haben alle Felder schon zum Start einen Samen.") },
+    { id: "kleeblatt", name: t("Vierblättriges Kleeblatt"), symbol: "🍀", preis: 0.3, text: t("Am nächsten Tag ist jede Saat mindestens ungewöhnlich.") }
 ];
 
 // ---------- ERFOLGE (dauerhaft, je 1x freischaltbar) ----------

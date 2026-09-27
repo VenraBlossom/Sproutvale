@@ -531,12 +531,12 @@ function glueckBonus() {
 
 // Weniger Klicks pro Samen geht nicht mehr (weitere Stufen "Schnellere Aussaat" bringen nichts)
 function klicksAmMinimum() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks");
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks") + 3 * Math.floor(segen("kargheit"));
     return (KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel")) <= KONFIG.minKlicksProSamen;
 }
 
 function klicksProSamen() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks");
+    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks") + 3 * Math.floor(segen("kargheit"));
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
     return (bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks) + (bossIst("muede") ? 5 : 0);
 }
@@ -548,6 +548,8 @@ function energieMax() {
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
     energie *= (1 + metaWert("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
     energie *= 1 + werkzeugWert("taschenuhr");
+    // Pakte
+    energie *= Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit")) * (1 + 0.25 * segen("nachtschicht"));
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     energie *= 1 + 0.03 * kuschel("faultier");
     if (bossIst("kurzeTage")) energie *= 0.8;
@@ -563,7 +565,7 @@ function raritaetsChancen() {
     const gruen = (level("gruen") > 0 ? 0.12 + 0.03 * level("gruen") : 0) + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
     const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
-    const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
+    const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + 0.03 * segen("hochrisiko") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
@@ -647,7 +649,9 @@ function goldMulti() {
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
-    return summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
+    // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
+    const pakte = (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
+    return pakte * summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
         (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
         (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
@@ -656,7 +660,7 @@ function goldMulti() {
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
-        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) *
+        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
         (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
 }
@@ -690,7 +694,8 @@ function rechnungsBetrag(nummer) {
     const rabatt = metaWert("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
         0.03 * kuschel("wal");
     const phase = run ? run.mondphase || 0 : 0;
-    const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1);
+    const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1) *
+        (1 + 0.1 * segen("hochrisiko") + 0.12 * segen("vorschuss"));
     const extra = phase >= 5 ? 3 * (phase - 4) : 0; // Sternenmond, Sternenmond II ... je +x3
     let betrag = KONFIG.rechnungBasis;
     for (let i = 0; i < nummer; i++) betrag *= (KONFIG.rechnungFaktorenStart[i] || KONFIG.rechnungFaktor) + extra;
@@ -879,8 +884,9 @@ function wachstumsTempo() {
 }
 
 function wachstumsTempoOhneJahreszeit() {
-    return 1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
-        gachaBonus("wachstum") + grundwert("g_wachstum") + 0.02 * level("feldkunde");
+    const pakte = Math.max(0.2, 1 - 0.15 * segen("nachtschicht")) * (1 + 0.3 * segen("eile"));
+    return pakte * (1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
+        gachaBonus("wachstum") + grundwert("g_wachstum") + 0.02 * level("feldkunde"));
 }
 
 function basisStufenZeitSek(pflanze) {
@@ -921,7 +927,8 @@ function sandboxTageszeit() {
 const SANDBOX_AUS_STERNE = ["s_energie", "g_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
     "v_blitz", "pb_sonnenblume"];
 const SANDBOX_AUS_SHOP = ["energie", "laterne"];
-const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule", "kraftpaket"];
+const SEGEN_PAKT_CHANCE = 0.4;
+const SANDBOX_AUS_SEGEN = ["sparfuchs", "fruehstueck", "nachteule", "kraftpaket", "goldrausch", "nachtschicht", "kargheit", "hochrisiko", "vorschuss"];
 const SANDBOX_AUS_WERKZEUGE = ["sparstrumpf", "taschenuhr", "laterne"];
 const SANDBOX_AUS_WAREN = ["elixier"];
 const SANDBOX_AUS_META = ["verhandlung", "ausdauer", "fruehervogel"];
@@ -3185,7 +3192,14 @@ let segenSperreBis = 0;
 function zeigeSegenAuswahl(auswahl) {
     // Segen mit "max" (z.B. Flinke Haende) verschwinden aus der Auswahl, wenn man sie so oft hat
     const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && (run.segen[s.id] || 0) >= s.max));
-    run.segenAuswahl = auswahl || mische(moeglich).slice(0, segenAuswahlAnzahl()).map(s => s.id);
+    if (!auswahl) {
+        const normal = mische(moeglich.filter(s => !s.pakt)).slice(0, segenAuswahlAnzahl());
+        const pakte = moeglich.filter(s => s.pakt);
+        // 40% Chance: die letzte Karte ist ein Pakt (stark, aber mit Nachteil)
+        if (pakte.length > 0 && normal.length > 1 && Math.random() < SEGEN_PAKT_CHANCE) normal[normal.length - 1] = zufall(pakte);
+        auswahl = normal.map(s => s.id);
+    }
+    run.segenAuswahl = auswahl;
     segenFenster.classList.remove("versteckt");
     segenSperreBis = performance.now() + SEGEN_SPERRE_MS;
     segenKarten.classList.add("gesperrt");
@@ -3198,10 +3212,12 @@ function zeigeSegenAuswahl(auswahl) {
         const s = SEGEN_NACH_ID[id];
         const karte = document.createElement("button");
         karte.classList.add("segen-karte");
+        if (s.pakt) karte.classList.add("segen-pakt");
         karte.style.animationDelay = i * 0.08 + "s";
         const stufe = run.segen[id] || 0;
         karte.append(
             pixelIcon(s.badge, 64, "segen-bild"),
+            ...(s.pakt ? [el("div", "segen-pakt-schild", t("⚠️ Pakt"))] : []),
             el("div", "segen-name", s.name),
             el("div", "segen-text", s.text),
             el("div", "segen-stufe", (stufe > 0 ? t("Du hast ihn schon ") + stufe + t("x, stapelt sich") : t("Neu")) +
@@ -3216,6 +3232,12 @@ function zeigeSegenAuswahl(auswahl) {
 function waehleSegen(id, karte) {
     if (!run.segenAuswahl || performance.now() < segenSperreBis) return;
     run.segen[id] = (run.segen[id] || 0) + 1;
+    // Pakt "Vorschuss": sofort die Haelfte der naechsten Rechnung (schon mit dem Aufschlag gerechnet)
+    if (id === "vorschuss" && !run.sandbox) {
+        const vorschuss = aufrunden(0.5 * rechnungsBetrag(run.bezahlteRechnungen) / (run.koop ? KOOP_ANFORDERUNG : 1));
+        run.gold += vorschuss;
+        zeigeToast("💰 +" + zahl(vorschuss) + t(" Gold Vorschuss"));
+    }
     // Frueh bezahlte Rechnung: dieser Segen wirkt staerker
     if (run.fruehBonus) {
         if (!run.segenExtra) run.segenExtra = {};

@@ -11755,3 +11755,19 @@ body.crt #crt-filter::after {
 .figur-bild.figur-aura.aura-stark {
     filter: drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 calc(var(--aura-g2, 0px) + 3px) var(--aura));
 }
+
+/* Pakt-Segen: rote Karte mit Warnschild */
+.segen-karte.segen-pakt {
+    border-color: #b8232a;
+    background: linear-gradient(#fff0ea, #ffd6cc);
+    box-shadow: 0 0 0 2px #ff6a5a inset, 0 6px 0 #7a1418;
+}
+.segen-pakt-schild {
+    font-size: 0.75em;
+    font-weight: 800;
+    color: #fff;
+    background: #b8232a;
+    border-radius: 6px;
+    padding: 1px 8px;
+    margin-bottom: 2px;
+}
