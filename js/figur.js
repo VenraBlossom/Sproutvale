@@ -55,7 +55,7 @@ function figurTeileAus(teile, pruefen = true) {
     FIGUR_FARBBAR.forEach(k => {
         const haupt = farben[k];
         const zweit = farben[k + "2"];
-        if ((!haupt && !zweit) || kosmetikSeltenheit(ergebnis[k]) >= 4) return;
+        if (!haupt && !zweit) return;
         ergebnis[k] = { ...ergebnis[k], id: ergebnis[k].id + "~" + (haupt || "") + "~" + (zweit || ""),
             farben: { ...(ergebnis[k].farben || {}), ...(haupt ? figurFarbwechsel(k, haupt) : {}), ...(zweit ? figurZweitfarbe(k, zweit) : {}) } };
     });
@@ -94,8 +94,15 @@ function auraVon(id) {
     return FIGUR_AUREN.find(au => au.id === id) || FIGUR_AUREN[0];
 }
 // Aura an ein Element haengen (Figur oder Namensschild)
-function setzeAura(element, aura) {
+// Die Aura wird alle 10 Level dicker (bis Level 100), egal welche Aura gewaehlt ist
+function auraStaerke(level) {
+    return Math.min(10, Math.floor(Math.max(1, level) / 10));
+}
+function setzeAura(element, aura, level = bauernRang()) {
+    const stufe = auraStaerke(level);
     element.style.setProperty("--aura", aura.farbe);
+    element.style.setProperty("--aura-g", (2 + stufe * 0.9).toFixed(1) + "px");
+    element.style.setProperty("--aura-g2", (stufe * 0.6).toFixed(1) + "px");
     element.classList.toggle("aura-stark", Boolean(aura.stark));
     element.classList.toggle("aura-puls", Boolean(aura.puls));
     element.classList.toggle("aura-regenbogen", Boolean(aura.regenbogen));
@@ -1811,9 +1818,10 @@ function zeichneFigur(f, jetzt) {
         figurFunkeln(f, teile);
         // Aura aus dem Level (im Profil gewaehlt), beim Mitspieler seine eigene
         const aura = f.partner ? auraVon(koop.partnerProfil && koop.partnerProfil.aura) : profilAura();
+        const auraLevel = f.partner ? (koop.partnerProfil && koop.partnerProfil.level) || 1 : bauernRang();
         f.bildEl.huelle.classList.add("figur-aura");
-        setzeAura(f.bildEl.huelle, aura);
-        if (f.schild) setzeAura(f.schild, aura);
+        setzeAura(f.bildEl.huelle, aura, auraLevel);
+        if (f.schild) setzeAura(f.schild, aura, auraLevel);
         return;
     }
     // Begleiter des Mitspielers: gleiches Bild und dieselben Effekte wie der eigene
@@ -2100,8 +2108,8 @@ function renderProfil() {
         auraReihe.appendChild(knopf);
     });
     links.appendChild(auraReihe);
-    setzeAura(buehne, aktuelleAura);
-    buehne.classList.add("profil-buehne-aura");
+    figur.huelle.classList.add("figur-aura");
+    setzeAura(figur.huelle, aktuelleAura);
 
     // Hinweis, wenn etwas nur anprobiert ist
     const nichtBesessen = FIGUR_KATEGORIEN.filter(k => !istKosmetikFrei(figurTeil(k.id, profilVorschau[k.id]), "figur_" + k.id));
@@ -2153,9 +2161,6 @@ function renderProfil() {
             });
             rechts.appendChild(farbReihe);
         });
-        if (kosmetikSeltenheit(figurTeil(profilKategorie, profilVorschau[profilKategorie])) >= 4) {
-            rechts.appendChild(el("span", "profil-farben-hinweis", t("Legendäre Teile behalten ihre Farben.")));
-        }
     }
 
     const raster = el("div", "profil-inventar");

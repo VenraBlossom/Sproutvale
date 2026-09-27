@@ -11584,3 +11584,271 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 0.85em;
     opacity: 0.85;
 }
+
+/* Aura v2: Dicke waechst alle 10 Level (--aura-g), Regenbogen wechselt nur die Leuchtfarbe, nicht die Figur */
+.figur-bild.figur-aura,
+.profil-buehne-aura > .figur-bild {
+    filter: drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 var(--aura-g2, 0px) var(--aura));
+}
+.figur-bild.figur-aura.aura-stark {
+    filter: drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 calc(var(--aura-g2, 0px) + 2px) var(--aura)) drop-shadow(0 0 1px var(--aura));
+}
+.figur-name {
+    box-shadow: 0 0 calc(var(--aura-g, 2px) + 2px) var(--aura-g2, 0px) var(--aura, #b8b8c0);
+}
+.profil-knopf-name {
+    text-shadow: 0 0 var(--aura-g, 2px) var(--aura, #b8b8c0), 0 0 2px var(--aura, #b8b8c0);
+}
+.aura-puls {
+    animation: aura-puls2 1.6s ease-in-out infinite;
+}
+@keyframes aura-puls2 {
+    0%, 100% { filter: drop-shadow(0 0 var(--aura-g, 2px) var(--aura)); }
+    50% { filter: drop-shadow(0 0 calc(var(--aura-g, 2px) * 2) var(--aura)) drop-shadow(0 0 var(--aura-g2, 0px) var(--aura)); }
+}
+.aura-regenbogen {
+    animation: aura-regenbogen2 3s linear infinite;
+}
+@keyframes aura-regenbogen2 {
+    0% { filter: drop-shadow(0 0 var(--aura-g, 2px) #ff4a4a) drop-shadow(0 0 var(--aura-g2, 0px) #ff4a4a); }
+    17% { filter: drop-shadow(0 0 var(--aura-g, 2px) #ffa53a) drop-shadow(0 0 var(--aura-g2, 0px) #ffa53a); }
+    33% { filter: drop-shadow(0 0 var(--aura-g, 2px) #ffe84a) drop-shadow(0 0 var(--aura-g2, 0px) #ffe84a); }
+    50% { filter: drop-shadow(0 0 var(--aura-g, 2px) #5aff7a) drop-shadow(0 0 var(--aura-g2, 0px) #5aff7a); }
+    67% { filter: drop-shadow(0 0 var(--aura-g, 2px) #4ad0ff) drop-shadow(0 0 var(--aura-g2, 0px) #4ad0ff); }
+    83% { filter: drop-shadow(0 0 var(--aura-g, 2px) #b05aff) drop-shadow(0 0 var(--aura-g2, 0px) #b05aff); }
+    100% { filter: drop-shadow(0 0 var(--aura-g, 2px) #ff4a4a) drop-shadow(0 0 var(--aura-g2, 0px) #ff4a4a); }
+}
+/* Namensschild und Knoepfe: kein filter-Regenbogen, sonst faerbt sich die Schrift */
+.figur-name.aura-regenbogen, .profil-knopf-name.aura-regenbogen, .profil-aura.aura-regenbogen {
+    animation: none;
+    filter: none;
+}
+.profil-aura.aura-regenbogen {
+    background: conic-gradient(#ff4a4a, #ffe84a, #5aff7a, #4ad0ff, #b05aff, #ff4a4a);
+}
+.profil-aura.aura-puls {
+    animation: none;
+    filter: none;
+}
+.profil-auren {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 14px;
+}
+
+/* ---------- Intro: Arcade-Automat ---------- */
+#intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: radial-gradient(ellipse at 50% 40%, #2a1f3a, #0b0812 75%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.6s ease;
+}
+#intro.weg {
+    opacity: 0;
+    pointer-events: none;
+}
+.arcade {
+    position: relative;
+    width: min(62vh, 80vw);
+    aspect-ratio: 3 / 4;
+    background: linear-gradient(90deg, #3a1f5c, #5a2f8a 12%, #6b3fa0 50%, #5a2f8a 88%, #3a1f5c);
+    border-radius: 18px 18px 6px 6px;
+    box-shadow: 0 0 0 6px #1a0f2a, 0 30px 60px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4% 7% 0;
+    box-sizing: border-box;
+    transition: transform 0.9s ease-in;
+}
+#intro.rein .arcade {
+    transform: scale(3.2) translateY(9%);
+}
+.arcade-marquee {
+    width: 100%;
+    height: 11%;
+    border-radius: 8px;
+    background: linear-gradient(#ffcf4a, #f08a24);
+    box-shadow: 0 0 18px #ffb03a, inset 0 -4px 0 rgba(0, 0, 0, 0.25);
+    font-family: inherit;
+    font-weight: 900;
+    color: #5a1f0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(12px, 3.2vh, 28px);
+    letter-spacing: 3px;
+}
+.arcade-bildschirm-rahmen {
+    margin-top: 6%;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #111;
+    border-radius: 12px;
+    padding: 5%;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 0 4px #000, inset 0 0 20px #000;
+}
+.arcade-bildschirm {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #050505;
+    border-radius: 14px / 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6%;
+}
+/* Einschalten wie ein alter Roehrenbildschirm: erst ein Strich, dann das Bild */
+.arcade-bildschirm::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: #fff;
+    box-shadow: 0 0 20px #fff;
+    transform: scaleX(0);
+    opacity: 0;
+}
+#intro.an .arcade-bildschirm::before {
+    animation: crt-an 0.45s ease-out forwards;
+}
+@keyframes crt-an {
+    0% { transform: scaleX(0); opacity: 1; }
+    50% { transform: scaleX(1); height: 2px; top: 50%; opacity: 1; }
+    100% { transform: scaleX(1); height: 100%; top: 0; opacity: 0; }
+}
+.arcade-bildschirm::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 4px);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+.intro-logo {
+    width: 42%;
+    image-rendering: auto;
+    border-radius: 10px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.5s ease, transform 0.8s ease;
+}
+.intro-text {
+    font-family: inherit;
+    font-weight: 800;
+    color: #f4f0ff;
+    text-shadow: 0 0 8px #b58cff;
+    font-size: clamp(10px, 2.6vh, 22px);
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.3s;
+}
+#intro.zeigt .intro-logo {
+    opacity: 1;
+    transform: scale(1);
+}
+#intro.zeigt .intro-text {
+    opacity: 1;
+}
+.arcade-steuerung {
+    margin-top: 7%;
+    width: 110%;
+    height: 16%;
+    background: linear-gradient(#4a2a70, #2e1850);
+    border-radius: 6px;
+    transform: perspective(200px) rotateX(35deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9%;
+}
+.arcade-stick {
+    width: 9%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff7a7a, #c8202a);
+    box-shadow: 0 6px 0 #1a0f2a;
+}
+.arcade-tasten {
+    display: flex;
+    gap: 14%;
+    width: 30%;
+}
+.arcade-tasten span {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff39a, #e0b020);
+    box-shadow: 0 4px 0 #1a0f2a;
+}
+.arcade-tasten span:nth-child(2) {
+    background: radial-gradient(circle at 35% 35%, #9ae0ff, #2a8ad0);
+}
+.intro-ueberspringen {
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 12px;
+}
+
+/* ---------- CRT-Filter (Einstellungen) ---------- */
+#crt-filter {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    pointer-events: none;
+    background: repeating-linear-gradient(rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
+    box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.55);
+    animation: crt-flackern 0.12s steps(2) infinite;
+}
+body.crt #crt-filter {
+    display: block;
+}
+body.crt #crt-filter::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.35));
+}
+@keyframes crt-flackern {
+    from { opacity: 0.94; }
+    to { opacity: 1; }
+}
+.arcade {
+    width: auto;
+    height: 94vh;
+    max-width: 90vw;
+    padding: 3% 6% 0;
+}
+.arcade-bildschirm-rahmen {
+    margin-top: 5%;
+    padding: 4%;
+}
+.intro-logo {
+    width: 52%;
+}
+.intro-text {
+    white-space: nowrap;
+    text-align: center;
+    font-size: clamp(10px, 3vh, 24px);
+}
+/* Aura praesenter: fester Rand (zwei kleine Schatten) plus Leuchten, das mit dem Level waechst */
+.figur-bild.figur-aura {
+    filter: drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 var(--aura-g2, 0px) var(--aura));
+}
+.figur-bild.figur-aura.aura-stark {
+    filter: drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 calc(var(--aura-g2, 0px) + 3px) var(--aura));
+}

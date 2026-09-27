@@ -2183,7 +2183,7 @@ const FIGUR_PALETTE = ["#e8434a", "#f08a24", "#f5d547", "#8fcf5c", "#3f8a32", "#
 
 // Auren um Namen und Figur: alle 5 Level eine neue (Level 1 grau). Hohe Auren leuchten staerker oder wechseln die Farbe.
 const FIGUR_AUREN = [
-    { level: 1, id: "grau", name: t("Grau"), farbe: "#b8b8c0" },
+    { level: 1, id: "grau", name: t("Grau"), farbe: "#9a9aa8" },
     { level: 5, id: "gruen", name: t("Wiesengrün"), farbe: "#7ed957" },
     { level: 10, id: "gelb", name: t("Sonnengelb"), farbe: "#ffd84a" },
     { level: 15, id: "himmel", name: t("Himmelblau"), farbe: "#6cc4ff" },
@@ -2364,8 +2364,6 @@ const FIGUR_TEILE = {
         { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", anim: true, fx: "glow", fxFarbe: "#fff6a0",
             farben: { a: "#fff6a0", b: "#ffe066", c: "#ffffff" } },
         { id: "pilzhut", name: t("Pilzhut"), ...LEGENDAER, form: "pilz", anim: true, farben: { a: "#e8434a", b: "#b82a30", c: "#ffffff" } },
-        { id: "zauberhut", name: t("Zauberhut"), ...LEGENDAER, form: "zauberer", anim: true, fx: "funkeln", fxFarbe: "#c9b0f5",
-            farben: { a: "#3a2a8a", b: "#26186a", c: "#ffe066" } },
         { id: "regenwolke", name: t("Regenwolke"), ...LEGENDAER, form: "regenwolke", anim: true, fx: "schweben",
             farben: { a: "#f4f6fa", b: "#b8c4d8", c: "#5ab8f0" } }
     ],

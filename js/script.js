@@ -4932,6 +4932,7 @@ document.querySelectorAll("[data-option]").forEach(schalter => {
         speichereEinstellungen();
         if (schalter.dataset.option === "tipps" && !schalter.checked) versteckeTipp();
         if (schalter.dataset.option === "farbenblind") document.body.classList.toggle("farbenblind", schalter.checked);
+        if (schalter.dataset.option === "crt") document.body.classList.toggle("crt", schalter.checked);
         if (schalter.dataset.option === "hintergrundStumm") Klang.setzeLautstaerken();
     });
 });

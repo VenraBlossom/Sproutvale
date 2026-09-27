@@ -2777,7 +2777,8 @@ Object.assign(UEBERSETZUNG, {
     "T-Shirt": "T-Shirt",
     "Pulli": "Sweater",
     "🎨 Hauptfarbe:": "🎨 Main color:",
-    "🎨 Zweitfarbe:": "🎨 Second color:"
+    "🎨 Zweitfarbe:": "🎨 Second color:",
+    "📺 CRT-Filter (alter Röhrenbildschirm)": "📺 CRT filter (old tube screen)"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

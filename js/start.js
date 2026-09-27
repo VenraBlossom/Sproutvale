@@ -486,3 +486,24 @@ aktualisiereProfilKnopf();
         wahl.appendChild(karte);
     });
 })();
+
+// ---------- INTRO: Arcade-Automat mit "Venray Studios presents" ----------
+(function spieleIntro() {
+    const intro = document.getElementById("intro");
+    if (!intro) return;
+    const zeiten = [];
+    const fertig = () => {
+        zeiten.forEach(clearTimeout);
+        intro.classList.add("weg");
+        setTimeout(() => intro.remove(), 700);
+    };
+    intro.addEventListener("click", fertig);
+    document.addEventListener("keydown", function taste() {
+        document.removeEventListener("keydown", taste);
+        if (document.body.contains(intro)) fertig();
+    });
+    zeiten.push(setTimeout(() => intro.classList.add("an"), 600));      // Bildschirm geht an
+    zeiten.push(setTimeout(() => intro.classList.add("zeigt"), 1000));  // Logo und Text
+    zeiten.push(setTimeout(() => intro.classList.add("rein"), 3300));   // in den Bildschirm hineinzoomen
+    zeiten.push(setTimeout(fertig, 3900));
+})();
