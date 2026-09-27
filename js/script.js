@@ -3426,6 +3426,7 @@ function bezahleFrueher(selbst = true) {
     if (selbst && run.koop) koopSende("frueh");
     const rechnung = naechsteRechnung();
     const tageFrueher = rechnung.tageBis;
+    meta.lebenszeit.fruehBezahlt = (meta.lebenszeit.fruehBezahlt || 0) + 1;
     zahleRechnung(rechnung.betrag);
     // Der naechste Zahltag ist in 5 Tagen, gezaehlt ab dem Tag, der als naechstes kommt
     run.rechnungVersatz = (run.tag - 1) % KONFIG.tageProRechnung;

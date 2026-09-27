@@ -2631,7 +2631,12 @@ Object.assign(UEBERSETZUNG, {
     "Uralte Wurzeln": "Ancient Roots",
     "Weltenbäume lassen 2 zusätzliche Saaten fallen.": "World Trees drop 2 extra drops.",
     "Uralt und mächtig: zählt für die Artenvielfalt doppelt.": "Ancient and mighty: counts double for Variety.",
-    "3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus.": "3 new late-game plants: Crystal Rose, Sunfruit and World Tree, each with its own trait and bonus."
+    "3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus.": "3 new late-game plants: Crystal Rose, Sunfruit and World Tree, each with its own trait and bonus.",
+    "Erreiche Bauernrang ": "Reach Farmer Rank ",
+    "Wähle ": "Choose ",
+    " verschiedene Segen": " different blessings",
+    " vor dem Zahltag": " before payday",
+    "Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen.": "More achievements: higher tiers in almost every chain and new chains for Farmer Rank, blessings and early paid bills."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
