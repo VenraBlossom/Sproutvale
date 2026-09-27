@@ -186,50 +186,92 @@ window.debug = {
     resetMeta() { Object.assign(meta, leererMetaStand()); speichereMeta(); loescheRunSpeicher(); }
 };
 
-// Fenster zu debug.help(): jeder Befehl mit Eingabefeldern (Zahl, Text, Auswahl, Haken) und einem Knopf zum Ausfuehren
+// Fenster zu debug.help() (auch mit F12): jeder Befehl mit Eingaben und einem Knopf zum Ausfuehren.
+// Feldtypen: zahl (min/max, die Grenzen stehen grau im Feld), wahl (oeffnet ein "Inventar" mit allen Moeglichkeiten
+// als Kacheln; optionen kann von den anderen Feldern abhaengen), haken, text
+const WERKZEUG_DEBUG_MAX = 20; // Werkzeuge haben kein festes Maximum (Stufe = 1 + bezahlte Rechnungen), 20 reicht fuer jeden Run
+const DEBUG_AUS = { wert: null, name: "Aus", symbol: "🚫" };
+const DEBUG_POSEN = ["stehen", "laufen", "sitzen", "liegen", "schlafen"];
+
+function debugKosmetikOptionen(kategorie) {
+    return (KOSMETIK_LISTEN[kategorie] || []).map(e => ({ wert: e.id, name: e.name, symbol: e.symbol || e.emoji || e.badge }));
+}
+
 const DEBUG_BEFEHLE = [
     { gruppe: "Währungen (+ = dazu, = = auf den Wert setzen)" },
-    { name: "gold", text: "Gold", setzen: true, felder: [{ typ: "zahl", wert: 1000000 }] },
-    { name: "sternensamen", text: "Sternensamen", setzen: true, felder: [{ typ: "zahl", wert: 100 }] },
-    { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100 }] },
-    { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10 }] },
-    { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5 }] },
+    { name: "gold", text: "Gold", setzen: true, felder: [{ typ: "zahl", wert: 1000000, min: 0 }] },
+    { name: "sternensamen", text: "Sternensamen", setzen: true, felder: [{ typ: "zahl", wert: 100, min: 0 }] },
+    { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100, min: 0 }] },
+    { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10, min: 0 }] },
+    { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5, min: 0 }] },
     { gruppe: "Run" },
-    { name: "energie", text: "Energie setzen", felder: [{ typ: "zahl", wert: 100 }] },
-    { name: "tag", text: "Tag setzen", felder: [{ typ: "zahl", wert: 10 }] },
-    { name: "jahreszeit", text: "Jahreszeit", felder: [{ typ: "auswahl", optionen: [[0, "Frühling"], [1, "Sommer"], [2, "Herbst"], [3, "Winter"]] }] },
-    { name: "tageszeit", text: "Tageszeit (leer = aus)", felder: [{ typ: "zahl", wert: "", leerNull: true, schritt: 0.1 }] },
+    { name: "energie", text: "Energie setzen", felder: [{ typ: "zahl", wert: 100, min: 0 }] },
+    { name: "tag", text: "Tag setzen", felder: [{ typ: "zahl", wert: 10, min: 1 }] },
+    { name: "jahreszeit", text: "Jahreszeit", felder: [{ typ: "wahl", optionen: () => JAHRESZEITEN.map((z, i) => ({ wert: i, name: z.name, symbol: z.symbol })) }] },
+    { name: "tageszeit", text: "Tageszeit (0 Morgen, 1 Nacht, leer = aus)", felder: [{ typ: "zahl", wert: "", leerNull: true, min: 0, max: 1, schritt: 0.1 }] },
     { name: "segen", text: "Segen-Auswahl zeigen" },
-    { name: "werkzeug", text: "Werkzeug geben (Id, Stufe)", felder: [{ typ: "text", wert: "sanduhr" }, { typ: "zahl", wert: 1 }] },
-    { name: "boss", text: "Boss-Regel (Id)", felder: [{ typ: "text", wert: "" }] },
-    { name: "variante", text: "Pflanzen-Variante (leer = aus)", felder: [{ typ: "text", wert: "", leerNull: true }] },
-    { name: "meister", text: "Meisterschaft (Pflanze, Ernten)", felder: [{ typ: "text", wert: "weizen" }, { typ: "zahl", wert: 1000 }] },
+    { name: "werkzeug", text: "Werkzeug geben (Stufe)", felder: [
+        { typ: "wahl", optionen: () => WERKZEUGE.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol })) },
+        { typ: "zahl", wert: 1, min: 1, max: WERKZEUG_DEBUG_MAX }] },
+    { name: "boss", text: "Boss-Regel", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...BOSS_REGELN.map(r => ({ wert: r.id, name: r.name, symbol: r.symbol }))] }] },
+    { name: "variante", text: "Pflanzen-Variante", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...VARIANTEN.map(v => ({ wert: v.id, name: v.titel, symbol: v.badge }))] }] },
+    { name: "meister", text: "Meisterschaft (Pflanze, Ernten)", felder: [
+        { typ: "wahl", optionen: () => PFLANZEN_VORLAGEN.map(p => ({ wert: p.id, name: p.name, symbol: p.emoji })) },
+        { typ: "zahl", wert: 1000, min: 0 }] },
     { gruppe: "Ereignisse" },
-    { name: "wetter", text: "Wetter (Id, leer = aus)", felder: [{ typ: "text", wert: "regen", leerNull: true }] },
+    { name: "wetter", text: "Wetter", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...WETTER.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol }))] }] },
     { name: "stern", text: "Sternschnuppe" },
     { name: "gluehwuermchen", text: "Glühwürmchen" },
     { name: "kraehe", text: "Krähe" },
     { name: "goldregen", text: "Goldregen" },
     { name: "haendler", text: "Wanderhändler" },
-    { name: "pose", text: "Begleiter-Pose", felder: [{ typ: "text", wert: "schlafen" }] },
+    { name: "pose", text: "Begleiter-Pose", felder: [{ typ: "wahl", optionen: () => DEBUG_POSEN.map(p => ({ wert: p, name: p })) }] },
     { gruppe: "Freischalten" },
-    { name: "mondphase", text: "Mondphasen frei bis", felder: [{ typ: "zahl", wert: 5 }] },
-    { name: "kuschel", text: "Kuscheltier (Id, Anzahl)", felder: [{ typ: "text", wert: "" }, { typ: "zahl", wert: 1 }] },
+    { name: "mondphase", text: "Mondphasen frei bis", felder: [{ typ: "wahl", optionen: () => MONDPHASEN.map((m, i) => ({ wert: i, name: m.name, symbol: m.symbol })) }] },
+    { name: "kuschel", text: "Kuscheltier (Anzahl, 16 = Stufe 5)", felder: [
+        { typ: "wahl", optionen: () => KUSCHELTIERE.map(k => ({ wert: k.id, name: k.name, symbol: k.symbol })) },
+        { typ: "zahl", wert: 1, min: 1, max: Math.pow(2, KUSCHEL_KONFIG.maxStufe - 1) }] },
     { name: "dlc", text: "Unterstützer-Paket", felder: [{ typ: "haken", wert: true }] },
     { name: "einzelDlc", text: "Alle legendären Einzel-Inhalte" },
     { name: "sandbox", text: "Endlos freischalten" },
     { name: "alles", text: "ALLES freischalten" },
     { name: "allesWeg", text: "Alle Skins sperren" },
-    { name: "kosmetik", text: "Skin (Kategorie, Id)", felder: [{ typ: "text", wert: "samenladen" }, { typ: "text", wert: "" }] },
-    { name: "liste", text: "Skins einer Kategorie (Konsole)", felder: [{ typ: "text", wert: "haustier" }] },
+    { name: "kosmetik", text: "Skin (Kategorie, Skin)", felder: [
+        { typ: "wahl", optionen: () => Object.keys(KOSMETIK_LISTEN).map(k => ({ wert: k, name: k })) },
+        { typ: "wahl", optionen: werte => debugKosmetikOptionen(werte[0]) }] },
+    { name: "liste", text: "Skins einer Kategorie (Konsole)", felder: [{ typ: "wahl", optionen: () => Object.keys(KOSMETIK_LISTEN).map(k => ({ wert: k, name: k })) }] },
     { gruppe: "Duo" },
-    { name: "bot", text: "Bot tritt Lobby bei (Code)", felder: [{ typ: "text", wert: "" }] },
+    { name: "bot", text: "Bot tritt Lobby bei (leer = deine Lobby)", felder: [{ typ: "text", wert: "", platzhalter: "ABC123" }] },
     { name: "botWeg", text: "Bot entfernen" },
     { gruppe: "Gefahr" },
     { name: "resetMeta", text: "Gesamten Fortschritt löschen", gefahr: true }
 ];
 
+// "Inventar": alle Moeglichkeiten als Kacheln, Klick waehlt aus
+function zeigeDebugInventar(titel, optionen, gewaehlt, fertig) {
+    const raster = el("div", "debug-inventar");
+    const kacheln = optionen.map(o => {
+        const kachel = el("button", "debug-kachel" + (o.wert === gewaehlt ? " aktiv" : ""), null, [
+            o.symbol ? pixelIcon(o.symbol, 32) : el("span", "debug-kachel-leer", "•"),
+            el("span", null, o.name)
+        ]);
+        raster.appendChild(kachel);
+        return [kachel, o];
+    });
+    const schliesse = zeigePopup({ titel: "🎒 " + titel, farbe: "#44506b", breite: 720, klasse: "debug-fenster", inhalt: raster });
+    kacheln.forEach(([kachel, o]) => kachel.addEventListener("click", () => {
+        fertig(o);
+        schliesse();
+    }));
+}
+
+let debugFensterSchliessen = null;
+
 function zeigeDebugFenster() {
+    if (debugFensterSchliessen) {
+        debugFensterSchliessen();
+        return;
+    }
     const liste = el("div", "debug-liste");
     DEBUG_BEFEHLE.forEach(b => {
         if (b.gruppe) {
@@ -238,30 +280,57 @@ function zeigeDebugFenster() {
         }
         const zeile = el("div", "debug-zeile");
         zeile.appendChild(el("span", "debug-name", b.text));
-        const eingaben = (b.felder || []).map(f => {
-            let feld;
-            if (f.typ === "auswahl") {
-                feld = el("select", "debug-feld");
-                f.optionen.forEach(([wert, text]) => {
-                    const o = el("option", null, text);
-                    o.value = wert;
-                    feld.appendChild(o);
-                });
-            } else {
-                feld = el("input", "debug-feld" + (f.typ === "haken" ? " debug-haken" : ""));
-                feld.type = f.typ === "zahl" ? "number" : f.typ === "haken" ? "checkbox" : "text";
-                if (f.typ === "haken") feld.checked = f.wert;
-                else feld.value = f.wert;
-                if (f.schritt) feld.step = f.schritt;
+        const werte = [];
+        const zuruecksetzen = [];
+        const eingaben = (b.felder || []).map((f, index) => {
+            if (f.typ === "wahl") {
+                const erste = () => f.optionen(werte)[0] || DEBUG_AUS;
+                let gewaehlt = erste();
+                werte[index] = gewaehlt.wert;
+                const knopf = el("button", "knopf debug-wahl");
+                const zeige = () => {
+                    knopf.innerHTML = "";
+                    if (gewaehlt.symbol) knopf.appendChild(pixelIcon(gewaehlt.symbol, 20));
+                    knopf.appendChild(el("span", null, gewaehlt.name + " ▾"));
+                };
+                zeige();
+                // Haengt ein spaeteres Feld von diesem ab (Skin nach Kategorie), faengt es wieder vorne an
+                zuruecksetzen[index] = () => {
+                    gewaehlt = erste();
+                    werte[index] = gewaehlt.wert;
+                    zeige();
+                };
+                knopf.addEventListener("click", () => zeigeDebugInventar(b.text, f.optionen(werte), gewaehlt.wert, o => {
+                    gewaehlt = o;
+                    werte[index] = o.wert;
+                    zeige();
+                    zuruecksetzen.forEach((neu, i) => { if (i > index && neu) neu(); });
+                }));
+                zeile.appendChild(knopf);
+                return () => werte[index];
             }
+            const feld = el("input", "debug-feld" + (f.typ === "haken" ? " debug-haken" : ""));
+            feld.type = f.typ === "zahl" ? "number" : f.typ === "haken" ? "checkbox" : "text";
+            if (f.typ === "haken") feld.checked = f.wert;
+            else feld.value = f.wert;
+            if (f.schritt) feld.step = f.schritt;
+            if (f.min !== undefined) feld.min = f.min;
+            if (f.max !== undefined) feld.max = f.max;
+            if (f.typ === "zahl" && f.max !== undefined) feld.placeholder = f.min + "-" + f.max;
+            if (f.platzhalter) feld.placeholder = f.platzhalter;
             // Tasten im Feld nicht als Spiel-Tastenkuerzel werten
-            feld.addEventListener("keydown", event => event.stopPropagation());
+            feld.addEventListener("keydown", event => { if (event.key !== "F12") event.stopPropagation(); });
             zeile.appendChild(feld);
             return () => {
                 if (f.typ === "haken") return feld.checked;
                 if (f.leerNull && feld.value === "") return null;
-                if (f.typ === "zahl" || f.typ === "auswahl") return Number(feld.value);
-                return feld.value;
+                if (f.typ !== "zahl") return feld.value;
+                // Zahlen bleiben in den Grenzen, die es im Spiel gibt
+                let zahlWert = Number(feld.value) || 0;
+                if (f.min !== undefined) zahlWert = Math.max(f.min, zahlWert);
+                if (f.max !== undefined) zahlWert = Math.min(f.max, zahlWert);
+                feld.value = zahlWert;
+                return zahlWert;
             };
         });
         const ausfuehren = (aktion, name) => {
@@ -286,8 +355,17 @@ function zeigeDebugFenster() {
         }
         liste.appendChild(zeile);
     });
-    zeigePopup({ titel: "🛠️ Debug", farbe: "#44506b", breite: 640, klasse: "debug-fenster", inhalt: liste });
+    debugFensterSchliessen = zeigePopup({ titel: "🛠️ Debug (F12)", farbe: "#44506b", breite: 680, klasse: "debug-fenster", inhalt: liste,
+        onSchliessen: () => { debugFensterSchliessen = null; } });
 }
+
+// F12 oeffnet und schliesst das Debug-Fenster (statt der Konsole)
+window.addEventListener("keydown", event => {
+    if (event.key !== "F12") return;
+    event.preventDefault();
+    event.stopPropagation();
+    zeigeDebugFenster();
+}, true);
 
 // ---------- START ----------
 

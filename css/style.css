@@ -11306,3 +11306,40 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 18px;
 }
 .prestige-fuss { gap: 10px; }
+.debug-wahl {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 150px;
+    padding: 2px 8px;
+    font-size: 14px;
+}
+.debug-inventar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 6px;
+}
+.debug-kachel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    font: inherit;
+    font-size: 13px;
+    background: #f6ecd2;
+    border: 2px solid #b89a6a;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.debug-kachel:hover {
+    background: #fff6dc;
+}
+.debug-kachel.aktiv {
+    border-color: #2e9e2e;
+    background: #e4f5d4;
+}
+.debug-kachel-leer {
+    font-size: 24px;
+    line-height: 32px;
+}

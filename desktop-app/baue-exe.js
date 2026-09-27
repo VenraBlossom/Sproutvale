@@ -9,7 +9,7 @@
 //
 // "npm run release"  Version zum Weitergeben (dist-release). Alle Spieldateien stecken in resources/spiel.
 //                    Dazu entsteht dist-release/Sproutvale.rar zum Hochladen (ZIP, falls WinRAR fehlt).
-//                    Darin: Ordner "Sproutvale" mit Sproutvale.exe. F12 (Entwickler-Werkzeuge, debug-Befehle) geht auch dort.
+//                    Darin: Ordner "Sproutvale" mit Sproutvale.exe. F12 (Debug-Fenster) geht auch dort, Strg+Umschalt+F12 = Entwickler-Werkzeuge.
 // ============================================================
 
 const path = require("path");
