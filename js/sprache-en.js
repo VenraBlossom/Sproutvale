@@ -2888,7 +2888,11 @@ Object.assign(UEBERSETZUNG, {
     "Teehaus": "Tea House",
     "Riesenrad": "Ferris Wheel",
     "Ufo-Landeplatz": "UFO Landing Pad",
-    "Ufo": "UFO"
+    "Ufo": "UFO",
+    "Wikingerhelm": "Viking Helmet",
+    "Partyhut": "Party Hat",
+    "Hasenohren": "Bunny Ears",
+    "Einhorn-Horn": "Unicorn Horn"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

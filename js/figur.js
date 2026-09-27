@@ -757,6 +757,49 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.ellipse(sx, sy, 1.1, 1.1, "b");
         p.fein(sx - 3, sy - 1, "c");
         p.fein(sx + 1.5, sy - 1, "c");
+    } else if (form === "wikinger") {
+        // runder Helm mit Band, Nieten und zwei Hoernern
+        p.ellipse(cx, oben + 1, 5, 3.4, "a", (x, y) => y + 0.5 < oben + 2);
+        p.rechteck(cx - 5, oben + 1, 10.5, 1, "b");
+        for (let x = cx - 4; x <= cx + 4; x += 2) p.fein(x, oben + 1.5, "w");
+        p.feinLinie(cx - 2, oben - 1.5, cx, oben - 2, "w");
+        const hoerner = blick === "seite" ? [1] : [-1, 1];
+        hoerner.forEach(r => {
+            const x0 = blick === "seite" ? cx + 3 : cx + r * 4.5;
+            for (let i = 0; i < 4; i++) p.rechteck(x0 + r * i * 0.8 - 0.5, oben - i, 1.5, 1, "c");
+            p.fein(x0 + r * 3.2, oben - 4, "c");
+        });
+    } else if (form === "partyhut") {
+        // spitzer Partyhut mit Streifen und Bommel, leicht schraeg
+        for (let i = 0; i < 7; i++) {
+            const breite = 7 - i;
+            p.rechteck(cx - breite / 2 + i * 0.15, oben + 1 - i, breite, 1, i % 2 ? "a" : "b");
+        }
+        p.ellipse(cx + 1.2, oben - 6.6, 1.3, 1.3, "c");
+        p.fein(cx + 0.8, oben - 7.2, "w");
+        p.feinLinie(cx - 3, oben + 1.5, cx - 1, oben + 3.5, "w");
+    } else if (form === "hasenohren") {
+        // zwei lange Ohren, eins knickt ab und zu um
+        const ohren = blick === "seite" ? [cx - 0.5, cx + 1.5] : [cx - 2.5, cx + 2.5];
+        ohren.forEach((x, i) => {
+            const knick = i === 1 && anim % 4 === 0;
+            if (knick) {
+                p.ellipse(x, oben - 1.5, 1.2, 1.8, "a");
+                p.ellipse(x + 2, oben - 2.8, 2, 1, "a");
+            } else {
+                p.ellipse(x, oben - 3.5, 1.3, 3.6, "a");
+                if (blick !== "hinten") p.ellipse(x, oben - 3.3, 0.5, 2.6, "b");
+            }
+        });
+        p.rechteck(cx - 4, oben + 0.5, 8.5, 1, "c");
+    } else if (form === "einhorn") {
+        // gedrehtes Horn mit Glitzer, der hochwandert
+        const hx = blick === "seite" ? cx + 1.5 : cx;
+        for (let i = 0; i < 6; i++) p.rechteck(hx - 1.5 + i * 0.25, oben - i, 3 - i * 0.5, 1, i % 2 ? "a" : "b");
+        p.fein(hx, oben - 6.5, "c");
+        p.fein(hx - 1 + (anim % 3) * 0.5, oben - 0.5 - (anim % 4) * 1.4, "w");
+        // kleine Maehne vorne
+        if (blick !== "hinten") [[cx - 2, "b"], [cx - 1, "c"], [cx + 1, "b"]].forEach(([x, f]) => p.fein(x, oben + 1, f));
     } else if (form === "stirnband") {
         p.rechteck(cx - 4.5, cy - 2.5, 9.5, 1, "a");
         p.feinLinie(cx - 4.5, cy - 2, cx + 4.5, cy - 2, "b");
