@@ -2918,7 +2918,8 @@ Object.assign(UEBERSETZUNG, {
     "Imkeranzug": "Beekeeper Suit",
     "Flickenhemd": "Patched Shirt",
     "Laubweste": "Leaf Vest",
-    "Schultervogel": "Shoulder Bird"
+    "Schultervogel": "Shoulder Bird",
+    " · Kaufen geht, sobald Sproutvale auf Steam ist. Anprobieren geht schon jetzt.": " · Buying is possible once Sproutvale is on Steam. You can already try things on."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

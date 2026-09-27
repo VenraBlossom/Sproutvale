@@ -2307,6 +2307,6 @@ function renderProfil() {
     });
     rechts.appendChild(raster);
     rechts.appendChild(el("div", "profil-legende", t("Gewöhnlich: frei · Episch: im Unterstützer-Paket · Legendär (mit Effekten): einzeln je ") +
-        euro(LEGENDAER_PREIS)));
+        euro(LEGENDAER_PREIS) + t(" · Kaufen geht, sobald Sproutvale auf Steam ist. Anprobieren geht schon jetzt.")));
     inhalt.appendChild(rechts);
 }
