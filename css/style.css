@@ -12173,3 +12173,10 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 .profil-knopf-name.aura-regenbogen {
     text-shadow: 0 0 var(--aura-g, 2px) var(--aura), 0 0 2px var(--aura);
 }
+.haus-vorschau.vorschau-haus-leuchten {
+    animation: haus-vorschau-leuchten 2s steps(6) infinite;
+}
+@keyframes haus-vorschau-leuchten {
+    0%, 100% { filter: drop-shadow(0 0 3px var(--leuchten)); }
+    50% { filter: drop-shadow(0 0 10px var(--leuchten)) brightness(1.08); }
+}

@@ -1022,6 +1022,24 @@ function kosmetikBild(kategorie, eintrag) {
             return el("div", "rahmen-vorschau " + eintrag.css, null, [pixelIcon("🧸", 48)]);
         case "musik":
             return pixelIcon(MUSIK_SYMBOLE[eintrag.id] || "🎵", 64, "haus-vorschau");
+        case "haus": {
+            // Bauernhaus in den Farben des Skins, mit seinen Pixel-Details (legendaere leuchten)
+            const sprite = Object.keys(eintrag.farben || {}).length ? spriteVariante("bauernhaus_" + eintrag.id, "bauernhaus", eintrag.farben) : "bauernhaus";
+            const leinwand = document.createElement("canvas");
+            leinwand.width = 24;
+            leinwand.height = 18;
+            const stift = leinwand.getContext("2d");
+            stift.drawImage(spriteLeinwand(sprite), 0, 0);
+            if (eintrag.extra) zeichneHausExtra(eintrag.extra, (x, y, farbe) => { stift.fillStyle = farbe; stift.fillRect(x, y, 1, 1); });
+            bild.src = leinwand.toDataURL();
+            bild.style.width = 24 * 4 + "px";
+            bild.style.height = 18 * 4 + "px";
+            if (eintrag.funken) {
+                bild.classList.add("vorschau-haus-leuchten");
+                bild.style.setProperty("--leuchten", eintrag.funken[0]);
+            }
+            return bild;
+        }
         default: {
             // Pflanzen-Look: Vorschau mit der Tomate
             const hatFarben = eintrag.farben && Object.keys(eintrag.farben).length > 0;
