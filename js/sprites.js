@@ -2402,21 +2402,33 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
     return p.raster;
 }
 
-// Engel (Beta Tester, mythisch): ritterlicher Engel in silberner Ruestung mit Goldkanten, grossen Federfluegeln,
-// goldenem Heiligenschein-Ring und einem goettlichen Schwert. Doppelt so feines Raster wie die anderen Begleiter
-// (44x32 statt 22x16, gleiche Groesse im Spiel). Die Ruestung hat leuchtende Risse, die pulsieren.
+// Engel (Beta Tester, mythisch): von vorne, ganz in Weiss und Grau. Silbernes Haar, weisse Ruestung mit grauen Kanten,
+// zwei grosse Federfluegel links und rechts (schlagen), heller Heiligenschein-Ring und ein aufrechtes Schwert in der Hand.
+// Doppelt so feines Raster wie die anderen Begleiter (44x32 statt 22x16, gleiche Groesse im Spiel).
 const ENGEL_B = 44, ENGEL_H = 32;
 function engelRaster(pose, bild, blinzelt) {
-    const raster = Array.from({ length: ENGEL_H }, () => Array(ENGEL_B).fill(null));
+    const leer = () => Array.from({ length: ENGEL_H }, () => Array(ENGEL_B).fill(null));
+    const raster = leer();
+    // Jedes Teil (Fluegel, Koerper, Schwert) wird auf eine eigene Ebene gemalt und bekommt seinen eigenen Umriss,
+    // damit sich weiss auf weiss trotzdem klar abhebt
+    let ebene = leer();
     const punkt = (x, y, f) => {
         x = Math.round(x); y = Math.round(y);
-        if (x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H) raster[y][x] = f;
+        if (x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H) ebene[y][x] = f;
+    };
+    const ebeneFertig = (mitUmriss = true) => {
+        const voll = (x, y) => x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H && ebene[y][x];
+        for (let y = 0; y < ENGEL_H; y++) for (let x = 0; x < ENGEL_B; x++) {
+            if (voll(x, y)) raster[y][x] = ebene[y][x];
+            else if (mitUmriss && (voll(x - 1, y) || voll(x + 1, y) || voll(x, y - 1) || voll(x, y + 1))) raster[y][x] = "7";
+        }
+        ebene = leer();
     };
     const rechteck = (x, y, b, h, f) => { for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < b; dx++) punkt(x + dx, y + dy, f); };
-    const ellipse = (cx, cy, rx, ry, f, wenn) => {
+    const ellipse = (cx, cy, rx, ry, f) => {
         for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
             const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
-            if (dx * dx + dy * dy <= 1 && (!wenn || wenn(x, y))) punkt(x, y, f);
+            if (dx * dx + dy * dy <= 1) punkt(x, y, f);
         }
     };
     const linie = (x0, y0, x1, y1, dicke, f) => {
@@ -2429,101 +2441,96 @@ function engelRaster(pose, bild, blinzelt) {
     const geschlossen = blinzelt || pose === "schlafen";
     const sitzt = pose === "sitzen" || pose === "liegen" || pose === "schlafen";
     const bob = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : [0, 0, -1, -1][katzenAnim % 4];
-    const y0 = (sitzt ? 2 : 0) + bob;
+    const y0 = (sitzt ? 1 : 0) + bob;
+    // Fluegelschlag: 0 = ausgebreitet, 3 = hochgeschlagen (im Sitzen nur leicht)
     const flap = sitzt ? [0, 1, 0, 1][katzenAnim % 4] : [0, 2, 3, 1][katzenAnim % 4];
+    const cx = 22;
 
-    // ---- Fluegel (hinten): grosse Federreihen, die Spitzen schlagen auf und ab ----
-    const wurzelX = 22, wurzelY = 13 + y0;
-    const spitzen = [[5, 1], [3, 5], [2, 9], [3, 13], [5, 17], [8, 20], [12, 22]];
-    spitzen.forEach(([sx, sy], i) => {
-        const ty = sy + flap * (1 - i / spitzen.length) - (sitzt ? -3 : 0) + y0;
-        linie(wurzelX, wurzelY, sx + (sitzt ? 3 : 0), ty, 3, "W");
-        linie(wurzelX, wurzelY + 1, sx + 1 + (sitzt ? 3 : 0), ty + 1, 1, i % 2 ? "V" : "v");
+    // ---- Fluegel links und rechts (gespiegelt), Federreihen mit grauen Kanten ----
+    const spitzen = [[2, 5], [1, 10], [2, 15], [4, 20], [8, 24]];
+    [-1, 1].forEach(seite => {
+        const wx = cx + seite * 4, wy = 13 + y0;
+        const sp = x => (seite < 0 ? x : ENGEL_B - 1 - x);
+        spitzen.forEach(([sx, sy], i) => {
+            const hoch = flap * (1.6 - i * 0.3);
+            const tx = sp(sx + flap * 0.8), ty = sy - hoch + y0 + (sitzt ? 3 : 0);
+            linie(wx, wy, tx, ty, 3, "W");
+            linie(wx, wy + 1, tx + seite * -1, ty + 1, 1, i % 2 ? "V" : "v");
+        });
+        const ex = cx + seite * 10;
+        [[ex, 9 - flap * 0.6, 6, 4.2], [cx + seite * 8, 13 - flap * 0.2, 4.5, 3]].forEach(([x, y, rx, ry]) => ellipse(x, y + y0, rx, ry, "W"));
+        for (let i = 0; i < 4; i++) punkt(cx + seite * (7 + i * 2), 11 + y0 - flap * 0.4 + (i % 2), "V");
     });
-    ellipse(15, 10 + y0 + flap * 0.4, 7.5, 5, "W");
-    ellipse(17, 13 + y0 + flap * 0.2, 5.5, 3.2, "W");
-    for (let x = 10; x <= 20; x += 3) { punkt(x, 12 + y0 + flap * 0.3, "V"); punkt(x + 1, 13 + y0 + flap * 0.3, "V"); }
-    for (let x = 12; x <= 20; x += 3) punkt(x, 15 + y0, "V");
 
-    // ---- Beine mit Beinschienen und Goldstiefeln ----
-    if (!sitzt) {
-        rechteck(24, 24 + y0, 3, 5, "a"); rechteck(24, 24 + y0, 1, 5, "Q");
-        rechteck(28, 24 + y0, 3, 5, "A"); rechteck(30, 24 + y0, 1, 5, "a");
-        rechteck(23, 29 + y0, 4, 2, "g"); rechteck(28, 29 + y0, 4, 2, "G");
-        punkt(29, 26 + y0, "G"); punkt(25, 26 + y0, "g");
-    } else {
-        rechteck(26, 24 + y0, 7, 3, "A"); rechteck(26, 26 + y0, 7, 1, "a");
-        rechteck(32, 23 + y0, 3, 4, "G");
+    ebeneFertig();
+
+    // ---- Robe: weit, weiss mit grauen Falten, darunter graue Stiefel ----
+    for (let y = 0; y < 8; y++) {
+        const halb = 3 + Math.floor(y / 2);
+        rechteck(cx - halb, 20 + y + y0, halb * 2 + 1, 1, "C");
+        punkt(cx - halb, 20 + y + y0, "c");
+        punkt(cx + halb, 20 + y + y0, "c");
     }
-    // ---- Rock/Tassets aus Stoff mit Goldsaum ----
-    for (let y = 0; y < 5; y++) rechteck(22 - Math.floor(y / 2), 19 + y + y0, 11 + Math.floor(y / 2) * 2, 1, y > 3 ? "G" : "C");
-    for (let y = 19; y <= 23; y++) punkt(22 - Math.floor((y - 19) / 2), y + y0, "c");
-    punkt(26, 21 + y0, "c"); punkt(29, 22 + y0, "c");
+    for (let y = 21; y < 28; y += 2) { punkt(cx - 2, y + y0, "c"); punkt(cx + 2, y + 1 + y0, "c"); }
+    rechteck(cx - 6, 27 + y0, 13, 1, "a");
+    if (!sitzt) { rechteck(cx - 3, 28 + y0, 3, 2, "Q"); rechteck(cx + 1, 28 + y0, 3, 2, "Q"); }
 
-    // ---- Brustpanzer: Licht vorne, Schatten hinten, Goldkragen und Guertel ----
-    rechteck(23, 12 + y0, 8, 8, "A");
-    rechteck(23, 12 + y0, 2, 8, "a"); rechteck(23, 18 + y0, 8, 1, "a");
-    punkt(23, 14 + y0, "Q"); punkt(23, 17 + y0, "Q");
-    rechteck(23, 12 + y0, 8, 1, "G");
-    rechteck(23, 19 + y0, 8, 1, "G");
-    rechteck(26, 13 + y0, 2, 5, "w");
-    // Edelstein in der Mitte und leuchtende Risse (pulsieren)
-    const glut = katzenAnim % 2 ? "L" : "G";
-    punkt(28, 15 + y0, "R"); punkt(29, 15 + y0, glut);
-    linie(24, 14 + y0, 26, 17 + y0, 1, glut);
-    linie(29, 17 + y0, 30, 14 + y0, 1, glut);
+    // ---- Brustpanzer: weiss, graue Kanten und Mittelnaht, leuchtender Kristall in der Mitte ----
+    rechteck(cx - 3, 12 + y0, 7, 8, "A");
+    rechteck(cx - 3, 12 + y0, 1, 8, "a"); rechteck(cx + 3, 12 + y0, 1, 8, "a");
+    rechteck(cx - 3, 12 + y0, 7, 1, "k"); rechteck(cx - 3, 19 + y0, 7, 1, "Q");
+    punkt(cx, 17 + y0, "a"); punkt(cx, 18 + y0, "a");
+    const glut = katzenAnim % 2 ? "L" : "w";
+    punkt(cx, 15 + y0, glut); punkt(cx - 1, 15 + y0, "L"); punkt(cx + 1, 15 + y0, "L"); punkt(cx, 14 + y0, "L"); punkt(cx, 16 + y0, "L");
+    // Schulterpanzer
+    ellipse(cx - 4.5, 13 + y0, 2.3, 1.8, "A"); ellipse(cx + 4.5, 13 + y0, 2.3, 1.8, "A");
+    punkt(cx - 5, 12 + y0, "w"); punkt(cx + 4, 12 + y0, "w");
+    // Arme: links haengt, rechts haelt das Schwert
+    rechteck(cx - 6, 14 + y0, 2, 5, "A"); rechteck(cx - 6, 19 + y0, 2, 2, "a");
+    rechteck(cx + 5, 14 + y0, 2, 4, "A"); rechteck(cx + 5, 18 + y0, 3, 2, "a");
 
-    // ---- Schulterpanzer vorne ----
-    ellipse(30.5, 13.5 + y0, 2.8, 2.2, "A");
-    rechteck(29, 15 + y0, 4, 1, "G");
-    punkt(30, 12 + y0, "w");
+    ebeneFertig();
 
-    // ---- Schwert: goettliche Klinge schraeg nach oben, goldene Parierstange mit Edelstein ----
-    const hx = 34, hy = 18 + y0;
-    linie(hx, hy - 1, 42, 2 + y0, 2, "B");
-    linie(hx + 1, hy - 2, 43, 2 + y0, 1, "b");
-    punkt(42, 1 + y0, "w"); punkt(43, 1 + y0, "B");
-    const glanz = (katzenAnim % 4) * 2;
-    punkt(hx + 2 + glanz, hy - 3 - glanz * 1.9, "w");
-    linie(hx - 2, hy - 3, hx + 2, hy + 1, 2, "G");
-    punkt(hx, hy - 1, "R");
-    linie(hx - 1, hy, hx - 3, hy + 3, 2, "g");
-    punkt(hx - 4, hy + 4, "G");
+    // ---- Schwert aufrecht rechts neben dem Koerper: Klinge nach oben, Parierstange, Griff ----
+    const sx = cx + 8;
+    rechteck(sx, 3 + y0, 2, 14, "B");
+    rechteck(sx + 1, 3 + y0, 1, 14, "b");
+    punkt(sx, 2 + y0, "B");
+    rechteck(sx - 2, 17 + y0, 6, 1, "G");
+    punkt(sx - 2, 16 + y0, "G"); punkt(sx + 3, 16 + y0, "G");
+    rechteck(sx, 18 + y0, 2, 3, "Q");
+    punkt(sx, 21 + y0, "G"); punkt(sx + 1, 21 + y0, "G");
+    punkt(sx, 3 + y0 + (katzenAnim % 4) * 3, "w");
 
-    // ---- Arm vorne (Panzerhandschuh haelt das Schwert) ----
-    linie(31, 15 + y0, 33, 18 + y0, 2, "A");
-    rechteck(32, 17 + y0, 3, 2, "a");
+    ebeneFertig();
 
-    // ---- Kopf: blondes Haar mit Straehnen nach hinten, Gesicht nach rechts ----
-    const kx = 26, ky = 7 + y0;
-    ellipse(kx, ky, 3.8, 4, "H");
-    ellipse(kx + 1.6, ky + 0.8, 2.6, 3, "S");
-    rechteck(kx - 4, ky - 1, 3, 6, "H"); rechteck(kx - 4, ky + 3, 2, 3, "h");
-    punkt(kx - 1, ky - 3, "h"); punkt(kx + 1, ky - 3, "H"); punkt(kx + 2, ky - 2, "H");
-    punkt(kx, ky - 1, "h"); punkt(kx + 3, ky - 1, "H");
+    // ---- Kopf: silbernes Haar, Pony, lange Straehnen seitlich ----
+    const ky = 7 + y0;
+    ellipse(cx, ky, 3.8, 4, "H");
+    rechteck(cx - 4, ky, 1, 6, "h"); rechteck(cx + 4, ky, 1, 6, "h");
+    rechteck(cx - 3, ky + 3, 1, 3, "H"); rechteck(cx + 3, ky + 3, 1, 3, "H");
+    ellipse(cx, ky + 1.2, 2.6, 2.8, "S");
+    rechteck(cx - 2, ky - 2, 5, 1, "H");
+    punkt(cx - 1, ky - 1, "H"); punkt(cx + 1, ky - 1, "h");
     if (geschlossen) {
-        punkt(kx + 2, ky + 1, "7"); punkt(kx + 3, ky + 1, "7");
+        punkt(cx - 1, ky + 1, "E"); punkt(cx - 2, ky + 1, "E");
+        punkt(cx + 1, ky + 1, "E"); punkt(cx + 2, ky + 1, "E");
     } else {
-        punkt(kx + 2, ky + 1, "E"); punkt(kx + 2, ky, "w"); punkt(kx + 3, ky + 1, "E");
+        punkt(cx - 1, ky + 1, "E"); punkt(cx + 1, ky + 1, "E");
+        punkt(cx - 1, ky, "w"); punkt(cx + 1, ky, "w");
     }
-    punkt(kx + 3, ky + 3, "X");
-    punkt(kx + 1, ky + 2, "X");
+    punkt(cx, ky + 3, "X");
 
-    // ---- Umriss (nicht um den Heiligenschein) ----
-    const kopie = raster.map(z => [...z]);
-    const voll = (x, y) => x >= 0 && y >= 0 && x < ENGEL_B && y < ENGEL_H && kopie[y][x];
-    for (let y = 0; y < ENGEL_H; y++) for (let x = 0; x < ENGEL_B; x++) {
-        if (voll(x, y)) continue;
-        if (voll(x - 1, y) || voll(x + 1, y) || voll(x, y - 1) || voll(x, y + 1)) raster[y][x] = "7";
-    }
+    ebeneFertig();
 
-    // ---- Heiligenschein: goldener Ring ueber dem Kopf, ein Glanz laeuft herum ----
+    // ---- Heiligenschein: heller Ring ueber dem Kopf, ein Glanz laeuft herum ----
     for (let w = 0; w < 36; w++) {
         const winkel = (w / 36) * Math.PI * 2;
-        punkt(kx + Math.cos(winkel) * 5, ky - 6 + Math.sin(winkel) * 1.4, w < 18 ? "r" : "R");
+        punkt(cx + Math.cos(winkel) * 4.6, ky - 5.6 + Math.sin(winkel) * 1.2, w < 18 ? "r" : "R");
     }
-    const lauf = (katzenAnim * 9) % 36;
-    punkt(kx + Math.cos((lauf / 36) * Math.PI * 2) * 5, ky - 6 + Math.sin((lauf / 36) * Math.PI * 2) * 1.4, "w");
+    const lauf = ((katzenAnim * 9) % 36) / 36 * Math.PI * 2;
+    punkt(cx + Math.cos(lauf) * 4.6, ky - 5.6 + Math.sin(lauf) * 1.2, "w");
+    ebeneFertig(false);
     return raster;
 }
 
