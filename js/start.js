@@ -143,6 +143,13 @@ window.debug = {
     meister(pflanze, ernten) { meta.kodex.pflanzen[pflanze] = ernten; speichereMeta(); aktualisiereAlles(); },
     // Jahreszeit testen: debug.jahreszeit(2) springt in den Herbst (0 Fruehling, 1 Sommer, 2 Herbst, 3 Winter)
     jahreszeit(index) { run.tag = index * JAHRESZEITEN_KONFIG.tageProJahreszeit + 1; aktualisiereAlles(); },
+    // Waehrung auf einen Wert setzen (statt dazugeben): debug.setze("gold", 500)
+    setze(art, wert) {
+        const jetzt = { gold: () => run.gold, sternensamen: () => run.skillpunkte, mondblueten: () => meta.mondblueten,
+            splitter: () => meta.sternensplitter, gutscheine: () => meta.gutscheine }[art];
+        if (!jetzt) return;
+        debug[art](wert - jetzt());
+    },
     // Fenster mit allen Befehlen, Werte direkt eintragen: debug.help()
     help() { zeigeDebugFenster(); },
     // Ein Bot tritt deiner Lobby bei und spielt mit: debug.bot("ABC123") (Code aus dem Duo-Fenster)
@@ -181,12 +188,12 @@ window.debug = {
 
 // Fenster zu debug.help(): jeder Befehl mit Eingabefeldern (Zahl, Text, Auswahl, Haken) und einem Knopf zum Ausfuehren
 const DEBUG_BEFEHLE = [
-    { gruppe: "Währungen" },
-    { name: "gold", text: "Gold dazu", felder: [{ typ: "zahl", wert: 1000000 }] },
-    { name: "sternensamen", text: "Sternensamen dazu", felder: [{ typ: "zahl", wert: 100 }] },
-    { name: "mondblueten", text: "Mondblüten dazu", felder: [{ typ: "zahl", wert: 100 }] },
-    { name: "splitter", text: "Sternensplitter dazu", felder: [{ typ: "zahl", wert: 10 }] },
-    { name: "gutscheine", text: "Gutscheine dazu", felder: [{ typ: "zahl", wert: 5 }] },
+    { gruppe: "Währungen (+ = dazu, = = auf den Wert setzen)" },
+    { name: "gold", text: "Gold", setzen: true, felder: [{ typ: "zahl", wert: 1000000 }] },
+    { name: "sternensamen", text: "Sternensamen", setzen: true, felder: [{ typ: "zahl", wert: 100 }] },
+    { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100 }] },
+    { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10 }] },
+    { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5 }] },
     { gruppe: "Run" },
     { name: "energie", text: "Energie setzen", felder: [{ typ: "zahl", wert: 100 }] },
     { name: "tag", text: "Tag setzen", felder: [{ typ: "zahl", wert: 10 }] },
@@ -257,18 +264,26 @@ function zeigeDebugFenster() {
                 return feld.value;
             };
         });
-        const los = el("button", "knopf " + (b.gefahr ? "knopf-rot" : "knopf-gruen"), "▶");
-        los.addEventListener("click", () => {
+        const ausfuehren = (aktion, name) => {
             if (b.gefahr && !confirm(b.text + "?")) return;
             try {
-                debug[b.name](...eingaben.map(lies => lies()));
-                zeigeToast("🛠️ debug." + b.name + " ✔");
+                aktion(...eingaben.map(lies => lies()));
+                zeigeToast("🛠️ debug." + name + " ✔");
             } catch (fehler) {
                 console.error(fehler);
-                zeigeToast("🛠️ debug." + b.name + ": " + fehler.message);
+                zeigeToast("🛠️ debug." + name + ": " + fehler.message);
             }
-        });
+        };
+        const los = el("button", "knopf " + (b.gefahr ? "knopf-rot" : "knopf-gruen"), b.setzen ? "+" : "▶");
+        setzeTipp(los, b.setzen ? "Dazugeben" : "Ausführen");
+        los.addEventListener("click", () => ausfuehren(debug[b.name], b.name));
         zeile.appendChild(los);
+        if (b.setzen) {
+            const setzen = el("button", "knopf", "=");
+            setzeTipp(setzen, "Auf diesen Wert setzen");
+            setzen.addEventListener("click", () => ausfuehren(wert => debug.setze(b.name, wert), "setze"));
+            zeile.appendChild(setzen);
+        }
         liste.appendChild(zeile);
     });
     zeigePopup({ titel: "🛠️ Debug", farbe: "#44506b", breite: 640, klasse: "debug-fenster", inhalt: liste });
