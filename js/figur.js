@@ -10,11 +10,13 @@
 // ============================================================
 
 const FIGUR_BREITE = 18;
-const FIGUR_HOEHE = 26;
-const FIGUR_SCHICHTEN = ["umriss", "haut", "augen", "kleidung", "haare", "kopf", "werkzeug"];
+const FIGUR_OBEN = 5;   // Platz ueber dem Kopf (hohe Huete, Heiligenschein, Flammenhaar)
+const FIGUR_HOEHE = 26 + FIGUR_OBEN;
+// Schichten von hinten nach vorne (hinten = Fluegel, Rucksack, Umhang)
+const FIGUR_SCHICHTEN = ["umriss", "hinten", "haut", "augen", "kleidung", "haare", "kopf", "accessoire", "werkzeug"];
 const FIGUR_BILDER = { stehen: 2, laufen: 4, sitzen: 2, schlafen: 2, winken: 2, jubeln: 2, tanzen: 4, hacken: 4 };
 const FIGUR_BILD_DAUER = { stehen: 700, laufen: 130, sitzen: 800, schlafen: 1100, winken: 220, jubeln: 260, tanzen: 240, hacken: 230 };
-const FIGUR_FESTE_FARBEN = { w: "#ffffff", 7: "#2a1a12", t: "#9a6634", e: "#b8c0cc", x: "#6b4a2a" };
+const FIGUR_FESTE_FARBEN = { w: "#ffffff", 7: "#2a1a12", t: "#9a6634", e: "#b8c0cc" };
 
 // ---------- PROFIL ----------
 
@@ -51,9 +53,10 @@ function profilName() {
 
 function figurGitter() {
     const raster = Array.from({ length: FIGUR_HOEHE }, () => Array(FIGUR_BREITE).fill(null));
+    // Gezeichnet wird in Koordinaten ohne den Platz oben (0 = Kopfbereich), gespeichert um FIGUR_OBEN verschoben
     const setze = (x, y, farbe) => {
         const px = Math.round(x);
-        const py = Math.round(y);
+        const py = Math.round(y) + FIGUR_OBEN;
         if (px >= 0 && py >= 0 && px < FIGUR_BREITE && py < FIGUR_HOEHE) raster[py][px] = farbe;
     };
     return {
@@ -63,7 +66,7 @@ function figurGitter() {
             for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < b; dx++) setze(x + dx, y + dy, farbe);
         },
         ellipse(cx, cy, rx, ry, farbe, filter) {
-            for (let y = 0; y < FIGUR_HOEHE; y++) {
+            for (let y = -FIGUR_OBEN; y < FIGUR_HOEHE - FIGUR_OBEN; y++) {
                 for (let x = 0; x < FIGUR_BREITE; x++) {
                     const dx = (x + 0.5 - cx) / rx;
                     const dy = (y + 0.5 - cy) / ry;
@@ -78,7 +81,7 @@ function figurGitter() {
     };
 }
 
-// Koerperhaltung fuer eine Pose (Positionen in Pixeln des 18x26-Rasters, Blick nach rechts)
+// Koerperhaltung fuer eine Pose (Positionen in Pixeln des 18x26-Rasters)
 function figurHaltung(pose, bild) {
     const h = { wippen: 0, sitzt: false, beinVorn: 0, beinHinten: 0, armVorn: "unten", armHinten: "unten", armSchwung: 0, lehnen: 0, werkzeug: null };
     if (pose === "laufen") {
@@ -106,15 +109,17 @@ function figurHaltung(pose, bild) {
         h.armVorn = ["vorn", "hoch", "schlag", "schlag"][bild % 4];
         h.armHinten = h.armVorn;
         h.werkzeug = ["hacke_vorn", "hacke_hoch", "hacke_unten", "hacke_unten"][bild % 4];
-    } else if (pose === "stehen") {
-        h.wippen = 0;
     }
     return h;
 }
 
-function figurKopf(g, cx, cy, geschlossen, augen, blinzelt) {
-    g.haut.ellipse(cx, cy, 4.6, 4.6, "4");
-    g.haut.punkt(cx - 3, cy + 2, "s");
+// ---------- KOPF ----------
+
+// Seitenansicht (Blick nach rechts): grosse Chibi-Augen, Wange, kleiner Mund
+function figurKopfSeite(g, cx, cy, geschlossen, augen, blinzelt) {
+    g.haut.ellipse(cx, cy, 4.6, 4.5, "4");
+    g.haut.ellipse(cx - 0.4, cy + 0.2, 4.4, 4.3, "s", (x, y) => y + 0.5 > cy + 2.4 && x + 0.5 < cx + 1);
+    g.haut.punkt(cx - 1, cy + 0.5, "s");
     g.haut.punkt(cx + 3, cy + 1.6, "r");
     if (!geschlossen) g.haut.punkt(cx + 2, cy + 2.8, "m");
     const ax = Math.round(cx + 1);
@@ -123,165 +128,343 @@ function figurKopf(g, cx, cy, geschlossen, augen, blinzelt) {
         g.augen.punkt(ax, ay, "7");
         g.augen.punkt(ax + 1, ay, "7");
     } else if (augen.form === "herz") {
-        g.augen.punkt(ax, ay - 1, "5");
-        g.augen.punkt(ax + 1, ay - 1, "5");
-        g.augen.punkt(ax, ay, "5");
-        g.augen.punkt(ax + 1, ay, "5");
+        g.augen.rechteck(ax, ay - 1, 2, 2, "5");
         g.augen.punkt(ax + 0.5, ay + 1, "5");
     } else {
         g.augen.punkt(ax, ay - 1, "w");
         g.augen.punkt(ax + 1, ay - 1, "5");
-        g.augen.punkt(ax, ay, "5");
-        g.augen.punkt(ax + 1, ay, "5");
+        g.augen.rechteck(ax, ay, 2, 1, "5");
     }
 }
 
-function figurHaare(g, cx, cy, form, bild) {
+// Vorderansicht: zwei Augen, zwei Wangen, Laecheln
+function figurKopfVorne(g, cx, cy, geschlossen, augen, blinzelt) {
+    g.haut.ellipse(cx, cy, 4.8, 4.5, "4");
+    g.haut.ellipse(cx, cy, 4.8, 4.5, "s", (x, y) => y + 0.5 > cy + 2.8);
+    const ay = Math.round(cy);
+    const links = Math.round(cx - 3);
+    const rechts = Math.round(cx + 2);
+    [links, rechts].forEach(ax => {
+        if (geschlossen || blinzelt) {
+            g.augen.rechteck(ax, ay, 2, 1, "7");
+        } else if (augen.form === "herz") {
+            g.augen.rechteck(ax, ay - 1, 2, 2, "5");
+            g.augen.punkt(ax + (ax === links ? 1 : 0), ay + 1, "5");
+        } else {
+            g.augen.punkt(ax, ay - 1, "w");
+            g.augen.punkt(ax + 1, ay - 1, "5");
+            g.augen.rechteck(ax, ay, 2, 1, "5");
+        }
+    });
+    g.haut.punkt(links - 1, ay + 1.5, "r");
+    g.haut.punkt(rechts + 2, ay + 1.5, "r");
+    if (!geschlossen) {
+        g.haut.punkt(cx - 0.6, ay + 2.4, "m");
+        g.haut.punkt(cx + 0.4, ay + 2.4, "m");
+    }
+}
+
+// Rueckansicht: nur Hinterkopf (die Haare liegen darueber)
+function figurKopfHinten(g, cx, cy) {
+    g.haut.ellipse(cx, cy, 4.8, 4.5, "4");
+    g.haut.punkt(cx - 5, cy + 0.5, "s");
+    g.haut.punkt(cx + 4, cy + 0.5, "s");
+}
+
+// ---------- HAARE ----------
+
+function figurHaare(g, blick, cx, cy, form, bild) {
     const p = g.haare;
     if (form === "glatze") return;
-    const kappe = () => {
-        p.ellipse(cx, cy, 5, 5, "2", (x, y) => y + 0.5 < cy - 1.2 || (x + 0.5 < cx - 1.4 && y + 0.5 < cy + 2.2));
-        p.punkt(cx + 3, cy - 2, "2");
-        [[cx - 1, cy - 4], [cx, cy - 4], [cx + 1, cy - 3.6]].forEach(([x, y]) => p.punkt(x, y, "h"));
-    };
+    const glanz = pts => pts.forEach(([x, y]) => p.punkt(x, y, "h"));
+
     if (form === "iro") {
-        p.rechteck(cx - 2, cy - 6, 5, 2, "2");
-        p.rechteck(cx - 3, cy - 5, 2, 2, "2");
-        p.rechteck(cx - 1, cy - 6, 2, 1, "h");
+        if (blick === "vorne" || blick === "hinten") {
+            p.rechteck(cx - 1, cy - 7, 2, 4, "2");
+            p.punkt(cx - 1, cy - 7, "h");
+        } else {
+            p.rechteck(cx - 3, cy - 6, 6, 2, "2");
+            p.rechteck(cx - 4, cy - 5, 2, 2, "2");
+            p.rechteck(cx - 2, cy - 6, 3, 1, "h");
+        }
         return;
     }
     if (form === "wolke") {
-        const wippen = bild % 2 ? -0.5 : 0;
-        [[cx - 3, cy - 3], [cx, cy - 4.5], [cx + 3, cy - 3.2], [cx - 4.2, cy], [cx - 4, cy + 2.6]].forEach(([x, y]) =>
-            p.ellipse(x, y + wippen, 2.6, 2.3, "2"));
-        p.ellipse(cx, cy - 2.6 + wippen, 4.8, 3, "2", (x, y) => y + 0.5 < cy - 0.8 || x + 0.5 < cx - 1.4);
-        [[cx - 1, cy - 5.5], [cx + 2, cy - 4.8], [cx - 4, cy - 2]].forEach(([x, y]) => p.punkt(x, y + wippen, "h"));
+        const w = bild % 2 ? -0.5 : 0;
+        const kugeln = blick === "seite"
+            ? [[cx - 3, cy - 3], [cx, cy - 4.5], [cx + 3, cy - 3.2], [cx - 4.2, cy], [cx - 4, cy + 2.6]]
+            : [[cx - 4, cy - 2.6], [cx - 1.5, cy - 4.8], [cx + 1.5, cy - 4.8], [cx + 4, cy - 2.6], [cx - 5, cy + 1], [cx + 5, cy + 1]];
+        kugeln.forEach(([x, y]) => p.ellipse(x, y + w, 2.6, 2.3, "2"));
+        glanz([[cx - 1, cy - 6 + w], [cx + 2, cy - 5.4 + w], [cx - 4, cy - 3 + w]]);
+        if (blick === "hinten") p.ellipse(cx, cy, 5, 4.8, "2");
         return;
     }
-    kappe();
+
+    if (blick === "hinten") {
+        // Hinterkopf: die Haare decken den ganzen Kopf
+        p.ellipse(cx, cy, 5, 4.8, "2");
+        glanz([[cx - 2, cy - 3.6], [cx - 1, cy - 4], [cx + 1, cy - 3.8]]);
+        if (form === "kurz" || form === "flamme" || form === "stachel" || form === "locken" || form === "dutt") {
+            p.rechteck(cx - 3, cy + 3.5, 6, 1, "2");
+        }
+    } else if (blick === "vorne") {
+        // Oben und an den Seiten, vorne ein gezackter Pony
+        p.ellipse(cx, cy, 5, 4.8, "2", (x, y) => y + 0.5 < cy - 1.4 || ((x + 0.5 < cx - 3.7 || x + 0.5 > cx + 3.7) && y + 0.5 < cy + 1.6));
+        const pony = Math.round(cy - 1.4);
+        [cx - 4, cx - 3, cx - 1, cx, cx + 2, cx + 3].forEach(x => p.punkt(x, pony, "2"));
+        glanz([[cx - 2, cy - 3.8], [cx - 1, cy - 4.2], [cx + 2, cy - 3.6]]);
+    } else {
+        // Seite: Kappe oben und hinten, vorne eine kleine Strähne, Koteletten
+        p.ellipse(cx, cy, 5, 4.9, "2", (x, y) => y + 0.5 < cy - 1.2 || (x + 0.5 < cx - 1.4 && y + 0.5 < cy + 2.4));
+        p.punkt(cx + 3, cy - 2, "2");
+        p.punkt(cx + 4, cy - 1.4, "2");
+        p.rechteck(cx - 1, cy - 1, 1, 2, "2");
+        glanz([[cx - 1, cy - 4], [cx, cy - 4.2], [cx + 1, cy - 3.8]]);
+    }
+
+    const seite = blick === "seite";
     if (form === "lang" || form === "sterne") {
-        p.rechteck(cx - 5, cy, 3, 8, "2");
-        p.punkt(cx - 2, cy + 3, "2");
-        if (form === "sterne") [[cx - 4, cy + 2], [cx - 3, cy + 6], [cx - 1, cy - 3], [cx + 2, cy - 3.8]].forEach(([x, y]) => p.punkt(x, y, "h"));
+        if (seite) {
+            p.rechteck(cx - 5, cy, 3, 8, "2");
+            p.punkt(cx - 2, cy + 3, "2");
+            p.punkt(cx - 4, cy + 7, "h");
+        } else {
+            p.rechteck(cx - 6, cy - 1, 2, 9, "2");
+            p.rechteck(cx + 4, cy - 1, 2, 9, "2");
+            if (blick === "hinten") p.rechteck(cx - 4, cy + 2, 8, 6, "2");
+        }
+        if (form === "sterne") glanz(seite ? [[cx - 4, cy + 2], [cx - 3, cy + 5], [cx + 2, cy - 3.8]] : [[cx - 5, cy + 3], [cx + 5, cy + 5], [cx, cy - 4]]);
     } else if (form === "zopf") {
         const schwung = bild % 2 ? 1 : 0;
-        p.rechteck(cx - 7 + schwung, cy - 1, 2, 6, "2");
-        p.punkt(cx - 5, cy - 1, "h");
+        if (seite) {
+            p.rechteck(cx - 7 + schwung, cy - 1, 2, 6, "2");
+            p.punkt(cx - 5, cy - 1, "h");
+        } else if (blick === "hinten") {
+            p.rechteck(cx - 1 + schwung, cy + 2, 2, 7, "2");
+            p.punkt(cx - 1 + schwung, cy + 2, "h");
+        } else {
+            p.rechteck(cx + 5, cy - 1 + schwung, 2, 5, "2");
+        }
     } else if (form === "zoepfe") {
-        p.rechteck(cx - 5, cy + 1, 2, 7, "2");
-        p.punkt(cx - 5, cy + 8, "h");
-        p.punkt(cx - 4, cy + 8, "h");
+        if (seite) {
+            p.rechteck(cx - 5, cy + 1, 2, 7, "2");
+            p.rechteck(cx - 5, cy + 8, 2, 1, "h");
+        } else {
+            p.rechteck(cx - 6, cy + 1, 2, 7, "2");
+            p.rechteck(cx + 4, cy + 1, 2, 7, "2");
+            p.rechteck(cx - 6, cy + 8, 2, 1, "h");
+            p.rechteck(cx + 4, cy + 8, 2, 1, "h");
+        }
     } else if (form === "locken") {
-        [[cx - 5, cy - 2], [cx - 3, cy - 4.6], [cx, cy - 5.4], [cx + 3, cy - 4.4], [cx - 5.2, cy + 1.4]].forEach(([x, y]) => p.ellipse(x, y, 1.6, 1.6, "2"));
+        const kugeln = seite
+            ? [[cx - 5, cy - 2], [cx - 3, cy - 4.6], [cx, cy - 5.4], [cx + 3, cy - 4.4], [cx - 5.2, cy + 1.4]]
+            : [[cx - 4.4, cy - 3], [cx - 1.6, cy - 5], [cx + 1.6, cy - 5], [cx + 4.4, cy - 3], [cx - 5.4, cy + 0.6], [cx + 5.4, cy + 0.6]];
+        kugeln.forEach(([x, y]) => p.ellipse(x, y, 1.6, 1.6, "2"));
     } else if (form === "dutt") {
-        p.ellipse(cx - 3, cy - 5, 2, 2, "2");
-        p.punkt(cx - 3, cy - 5.5, "h");
+        const x = seite ? cx - 3 : cx;
+        p.ellipse(x, cy - 5.4, 2, 1.9, "2");
+        p.punkt(x, cy - 6, "h");
     } else if (form === "stachel") {
-        [[cx - 4, cy - 6, cx - 3, cy - 3], [cx - 1, cy - 7, cx, cy - 4], [cx + 2, cy - 6.5, cx + 2, cy - 4], [cx - 6, cy - 3, cx - 4, cy - 2]]
-            .forEach(([x0, y0, x1, y1]) => p.linie(x0, y0, x1, y1, "2"));
+        const spitzen = seite
+            ? [[cx - 4, cy - 6, cx - 3, cy - 3], [cx - 1, cy - 7, cx, cy - 4], [cx + 2, cy - 6.5, cx + 2, cy - 4], [cx - 6, cy - 3, cx - 4, cy - 2]]
+            : [[cx - 4, cy - 6.5, cx - 3, cy - 3.5], [cx, cy - 8, cx, cy - 4.5], [cx + 4, cy - 6.5, cx + 3, cy - 3.5], [cx - 6, cy - 3, cx - 4, cy - 2], [cx + 6, cy - 3, cx + 4, cy - 2]];
+        spitzen.forEach(([x0, y0, x1, y1]) => p.linie(x0, y0, x1, y1, "2"));
     } else if (form === "flamme") {
-        const hoehen = [[3, 5, 2, 4], [4, 3, 5, 2]][bild % 2];
-        [cx - 3, cx - 1, cx + 1, cx + 3].forEach((x, i) => p.rechteck(x, cy - 4 - hoehen[i], 1, hoehen[i], i % 2 ? "h" : "2"));
+        const hoehen = [[3, 5, 2, 4, 3], [4, 3, 5, 2, 4]][bild % 2];
+        const spalten = seite ? [cx - 3, cx - 1, cx + 1, cx + 3] : [cx - 4, cx - 2, cx, cx + 2, cx + 4];
+        spalten.forEach((x, i) => p.rechteck(x, cy - 4 - hoehen[i], 1, hoehen[i], i % 2 ? "h" : "2"));
     }
 }
 
-function figurHut(g, cx, cy, form, bild) {
+// ---------- HUT ----------
+
+function figurHut(g, blick, cx, cy, form, bild) {
     const p = g.kopf;
     const oben = Math.round(cy - 4.6);
+    const vorne = blick !== "seite";
     if (form === "strohhut") {
-        p.rechteck(cx - 7, oben + 1, 14, 1, "a");
-        p.rechteck(cx - 3, oben - 2, 7, 3, "a");
-        p.rechteck(cx - 3, oben, 7, 1, "c");
-        p.punkt(cx - 6, oben + 1, "b");
-        p.punkt(cx + 5, oben + 1, "b");
+        p.rechteck(cx - 7, oben + 1, 15, 1, "a");
+        p.rechteck(vorne ? cx - 4 : cx - 3, oben - 2, vorne ? 9 : 7, 3, "a");
+        p.rechteck(vorne ? cx - 4 : cx - 3, oben, vorne ? 9 : 7, 1, "c");
+        [cx - 6, cx - 2, cx + 3, cx + 6].forEach(x => p.punkt(x, oben + 1, "b"));
+        p.punkt(cx - 1, oben - 2, "b");
     } else if (form === "muetze") {
-        p.ellipse(cx, oben + 1, 5, 3.4, "a", (x, y) => y + 0.5 < oben + 2.2);
-        p.rechteck(cx - 5, oben + 1, 10, 1, "b");
-        p.ellipse(cx - 1, oben - 2.4, 1.3, 1.3, "c");
+        p.ellipse(cx, oben + 1, 5.2, 3.6, "a", (x, y) => y + 0.5 < oben + 2.2);
+        p.rechteck(cx - 5, oben + 1, 11, 1, "b");
+        for (let x = cx - 4; x <= cx + 4; x += 2) p.punkt(x, oben - 1, "b");
+        p.ellipse(vorne ? cx : cx - 1, oben - 2.4, 1.4, 1.4, "c");
     } else if (form === "kappe") {
-        p.ellipse(cx, oben + 1, 4.9, 3.2, "a", (x, y) => y + 0.5 < oben + 2);
-        p.rechteck(cx + 2, oben + 1, 5, 1, "b");
+        p.ellipse(cx, oben + 1, 5, 3.3, "a", (x, y) => y + 0.5 < oben + 2);
+        if (vorne) p.rechteck(cx - 4, oben + 1, 9, 1, "b");
+        else p.rechteck(cx + 2, oben + 1, 5, 1, "b");
         p.punkt(cx, oben - 1, "c");
+        if (blick === "vorne") p.punkt(cx, oben, "c");
     } else if (form === "kranz") {
-        p.rechteck(cx - 5, oben + 1, 10, 1, "a");
-        [cx - 4, cx - 1, cx + 2].forEach((x, i) => p.punkt(x, oben, i % 2 ? "c" : "b"));
-        [cx - 3, cx, cx + 3].forEach((x, i) => p.punkt(x, oben + 1, i % 2 ? "b" : "c"));
+        p.rechteck(cx - 5, oben + 1, 11, 1, "a");
+        const blueten = vorne ? [cx - 4, cx - 2, cx, cx + 2, cx + 4] : [cx - 4, cx - 1, cx + 2];
+        blueten.forEach((x, i) => {
+            p.punkt(x, oben, i % 2 ? "c" : "b");
+            p.punkt(x, oben + 1, i % 2 ? "b" : "c");
+        });
     } else if (form === "hexe") {
-        p.rechteck(cx - 7, oben + 1, 14, 1, "a");
-        p.rechteck(cx - 3, oben - 1, 6, 2, "a");
-        p.rechteck(cx - 2, oben - 3, 4, 2, "a");
-        p.rechteck(cx - 2, oben - 5, 2, 2, "a");
-        p.punkt(cx - 3, oben - 6, "a");
-        p.rechteck(cx - 3, oben, 6, 1, "c");
+        p.rechteck(cx - 8, oben + 1, 17, 1, "a");
+        p.rechteck(cx - 4, oben - 1, 9, 2, "a");
+        p.rechteck(cx - 3, oben - 3, 7, 2, "a");
+        p.rechteck(cx - 2, oben - 5, 5, 2, "a");
+        p.rechteck(cx - 1, oben - 6, 3, 1, "a");
+        p.punkt(vorne ? cx + 2 : cx - 2, oben - 7, "a");
+        p.rechteck(cx - 4, oben, 9, 1, "c");
+        p.punkt(cx, oben, "b");
     } else if (form === "ohren") {
-        [cx - 3, cx + 1].forEach(x0 => {
+        (vorne ? [cx - 5, cx + 3] : [cx - 3, cx + 1]).forEach(x0 => {
             p.rechteck(x0, oben - 1, 3, 2, "a");
             p.punkt(x0 + 1, oben - 2, "a");
-            p.punkt(x0 + 1, oben - 1, "b");
+            if (blick !== "hinten") p.punkt(x0 + 1, oben - 1, "b");
         });
     } else if (form === "kopfhoerer") {
-        p.ellipse(cx, cy, 5.4, 5.4, "a", (x, y) => y + 0.5 < oben + 1.2);
-        p.rechteck(cx - 2, cy - 1, 2, 3, "b");
+        p.ellipse(cx, cy, 5.6, 5.5, "a", (x, y) => y + 0.5 < oben + 1.2);
+        if (vorne) {
+            p.rechteck(cx - 6, cy - 1, 2, 3, "b");
+            p.rechteck(cx + 5, cy - 1, 2, 3, "b");
+        } else {
+            p.rechteck(cx - 2, cy - 1, 2, 3, "b");
+            p.punkt(cx - 2, cy - 1, "c");
+        }
     } else if (form === "krone") {
-        p.rechteck(cx - 3, oben - 1, 7, 2, "a");
-        [cx - 3, cx, cx + 3].forEach(x => p.punkt(x, oben - 2, "a"));
-        p.punkt(cx, oben, "c");
-        p.rechteck(cx - 3, oben + 1, 7, 1, "b");
+        p.rechteck(cx - 4, oben - 1, 9, 2, "a");
+        [cx - 4, cx - 2, cx, cx + 2, cx + 4].forEach((x, i) => p.punkt(x, oben - 2 - (i % 2 ? 0 : 1), "a"));
+        [cx - 2, cx + 2].forEach(x => p.punkt(x, oben, "c"));
+        p.punkt(cx, oben - 1, "c");
+        p.rechteck(cx - 4, oben + 1, 9, 1, "b");
     } else if (form === "schein") {
+        // Ring ueber dem Kopf, schwebt leicht auf und ab
         const y = oben - 3 + (bild % 2 ? -1 : 0);
-        p.ellipse(cx, y, 4.2, 1.4, "a", (x, yy) => !(Math.abs(x + 0.5 - cx) < 2.6 && Math.abs(yy + 0.5 - y) < 0.7));
+        p.rechteck(cx - 2, y - 1, 5, 1, "a");
+        p.rechteck(cx - 2, y + 1, 5, 1, "b");
+        p.punkt(cx - 3, y, "a");
+        p.punkt(cx + 3, y, "b");
+        p.punkt(cx - 1, y - 1, "c");
     } else if (form === "pilz") {
-        p.ellipse(cx, oben + 0.5, 6.4, 3.6, "a", (x, y) => y + 0.5 < oben + 1.6);
-        [[cx - 3, oben - 1], [cx + 1, oben - 2], [cx + 4, oben], [cx - 5, oben + 1]].forEach(([x, y]) => p.punkt(x, y, "c"));
+        p.ellipse(cx, oben + 0.6, 6.6, 3.8, "a", (x, y) => y + 0.5 < oben + 1.6);
+        [[cx - 3, oben - 1], [cx + 1, oben - 2], [cx + 4, oben], [cx - 5, oben + 1], [cx + 2, oben]].forEach(([x, y]) => p.punkt(x, y, "c"));
         p.rechteck(cx - 6, oben + 1, 13, 1, "b");
     }
 }
 
-function figurOberteil(g, h, x0, y0, oberteil) {
+// ---------- OBERTEIL ----------
+
+// x0 = linke Kante des Oberkoerpers, y0 = Schulterhoehe. Seite: 5 breit (Blick nach rechts), vorne/hinten: 6 breit
+function figurOberteil(g, blick, h, x0, y0, oberteil, ohneArme) {
     const k = g.kleidung;
     const form = oberteil.form;
-    // Umhang und Kleid haengen hinter bzw. um den Koerper
+    const breite = blick === "seite" ? 5 : 6;
+    const mitte = x0 + breite / 2;
+    // Umhang haengt hinter dem Koerper
     if (form === "umhang") {
         const wehen = h.armSchwung ? 1 : 0;
-        k.rechteck(x0 - 2 - wehen, y0, 3, h.sitzt ? 6 : 10, "8");
-        [[x0 - 2, y0 + 3], [x0 - 1 - wehen, y0 + 7]].forEach(([x, y]) => k.punkt(x, y, "k"));
+        const lang = h.sitzt ? 6 : 10;
+        if (blick === "seite") {
+            g.hinten.rechteck(x0 - 2 - wehen, y0, 3, lang, "8");
+            [[x0 - 2 - wehen, y0 + 3], [x0 - 1 - wehen, y0 + 7]].forEach(([x, y]) => g.hinten.punkt(x, y, "k"));
+        } else {
+            g.hinten.rechteck(x0 - 2, y0, breite + 4, lang, "8");
+            [[x0 - 1, y0 + 4], [x0 + breite, y0 + 7], [x0 + 2, y0 + 8]].forEach(([x, y]) => g.hinten.punkt(x, y, "k"));
+        }
     }
-    k.rechteck(x0, y0, 5, 6, "6");
-    k.rechteck(x0, y0, 1, 6, "8");
+    k.rechteck(x0, y0, breite, 6, "6");
+    // Schatten: hinten bzw. unten
+    if (blick === "seite") k.rechteck(x0, y0, 1, 6, "8");
+    else k.rechteck(x0, y0 + 5, breite, 1, "8");
+
     if (form === "latz") {
-        k.rechteck(x0, y0, 5, 2, "k");
-        k.punkt(x0 + 1, y0, "6");
-        k.punkt(x0 + 3, y0, "6");
-        k.punkt(x0 + 3, y0 + 3, "8");
+        if (blick === "seite") {
+            k.rechteck(x0, y0, breite, 2, "k");
+            k.punkt(x0 + 3, y0, "6");
+            k.punkt(x0 + 3, y0 + 3, "8");
+        } else if (blick === "vorne") {
+            k.rechteck(x0, y0, breite, 6, "k");
+            k.rechteck(x0 + 1, y0 + 2, breite - 2, 4, "6");
+            k.punkt(x0 + 1, y0, "6");
+            k.punkt(x0 + 1, y0 + 1, "6");
+            k.punkt(x0 + breite - 2, y0, "6");
+            k.punkt(x0 + breite - 2, y0 + 1, "6");
+            k.punkt(mitte - 0.5, y0 + 3, "8");
+        } else {
+            k.rechteck(x0, y0, breite, 4, "k");
+            k.linie(x0 + 1, y0, x0 + breite - 2, y0 + 3, "6");
+            k.linie(x0 + breite - 2, y0, x0 + 1, y0 + 3, "6");
+            k.rechteck(x0, y0 + 4, breite, 2, "6");
+        }
     } else if (form === "pulli") {
-        k.rechteck(x0, y0 + 5, 5, 1, "8");
+        k.rechteck(x0, y0 + 5, breite, 1, "8");
+        if (blick === "vorne") k.rechteck(x0 + 2, y0, 2, 1, "8");
     } else if (form === "karo") {
-        for (let y = 0; y < 6; y++) for (let x = 0; x < 5; x++) if ((x + y) % 3 === 0) k.punkt(x0 + x, y0 + y, "8");
-        k.punkt(x0 + 3, y0, "k");
-        k.punkt(x0 + 4, y0, "k");
+        for (let y = 0; y < 6; y++) for (let x = 0; x < breite; x++) if ((x + y) % 3 === 0) k.punkt(x0 + x, y0 + y, "8");
+        if (blick === "vorne") {
+            k.punkt(mitte - 1, y0, "k");
+            k.punkt(mitte, y0, "k");
+            k.rechteck(mitte - 0.5, y0 + 1, 1, 5, "k");
+        } else if (blick === "seite") {
+            k.punkt(x0 + 3, y0, "k");
+            k.punkt(x0 + 4, y0, "k");
+        }
     } else if (form === "hoodie") {
-        k.rechteck(x0 - 1, y0 - 1, 3, 2, "8");
-        k.rechteck(x0 + 2, y0 + 3, 3, 2, "k");
+        if (blick === "seite") {
+            k.rechteck(x0 - 1, y0 - 1, 3, 2, "8");
+            k.rechteck(x0 + 2, y0 + 3, 3, 2, "k");
+        } else if (blick === "vorne") {
+            k.rechteck(x0, y0, breite, 1, "8");
+            k.punkt(mitte - 1, y0 + 1, "k");
+            k.punkt(mitte, y0 + 1, "k");
+            k.rechteck(x0 + 1, y0 + 3, breite - 2, 2, "k");
+        } else {
+            k.rechteck(x0 + 1, y0, breite - 2, 3, "8");
+        }
     } else if (form === "kimono") {
-        k.linie(x0 + 4, y0, x0 + 2, y0 + 3, "k");
-        k.rechteck(x0, y0 + 3, 5, 1, "k");
+        if (blick === "vorne") {
+            k.linie(x0, y0, mitte - 0.5, y0 + 3, "k");
+            k.linie(x0 + breite - 1, y0, mitte + 0.5, y0 + 3, "k");
+        } else if (blick === "seite") {
+            k.linie(x0 + 4, y0, x0 + 2, y0 + 3, "k");
+        }
+        k.rechteck(x0, y0 + 3, breite, 1, "k");
+        if (blick === "hinten") k.rechteck(mitte - 1.5, y0 + 2, 3, 3, "k");
     } else if (form === "matrose") {
-        k.rechteck(x0, y0, 3, 2, "k");
-        k.punkt(x0 + 4, y0 + 1, "k");
-        k.punkt(x0 + 4, y0 + 2, "k");
+        if (blick === "vorne") {
+            k.rechteck(x0, y0, 2, 2, "k");
+            k.rechteck(x0 + breite - 2, y0, 2, 2, "k");
+            k.punkt(mitte - 0.5, y0 + 2, "k");
+        } else if (blick === "hinten") {
+            k.rechteck(x0, y0, breite, 3, "k");
+            k.rechteck(x0 + 1, y0 + 1, breite - 2, 1, "6");
+        } else {
+            k.rechteck(x0, y0, 3, 2, "k");
+            k.punkt(x0 + 4, y0 + 1, "k");
+            k.punkt(x0 + 4, y0 + 2, "k");
+        }
     } else if (form === "weste") {
-        k.rechteck(x0 + 3, y0, 2, 6, "k");
-        k.punkt(x0 + 3, y0 + 2, "8");
-        k.punkt(x0 + 3, y0 + 4, "8");
+        if (blick === "vorne") {
+            k.rechteck(mitte - 1, y0, 2, 6, "k");
+            k.punkt(mitte - 2, y0 + 2, "8");
+            k.punkt(mitte + 1, y0 + 2, "8");
+        } else if (blick === "seite") {
+            k.rechteck(x0 + 3, y0, 2, 6, "k");
+            k.punkt(x0 + 3, y0 + 2, "8");
+            k.punkt(x0 + 3, y0 + 4, "8");
+        }
     } else if (form === "umhang") {
-        k.punkt(x0 + 4, y0, "k");
+        k.punkt(blick === "seite" ? x0 + 4 : mitte - 0.5, y0, "k");
+        if (blick === "vorne") k.punkt(mitte + 0.5, y0, "k");
     } else if (form === "kleid") {
-        k.rechteck(x0 - 1, y0 + 4, 7, 3, "6");
-        [[x0, y0 + 5], [x0 + 3, y0 + 1], [x0 + 5, y0 + 6], [x0 + 2, y0 + 4]].forEach(([x, y]) => k.punkt(x, y, "k"));
+        k.rechteck(x0 - 1, y0 + 4, breite + 2, 3, "6");
+        k.rechteck(x0 - 2, y0 + 6, breite + 4, 1, "8");
+        [[x0, y0 + 5], [x0 + 3, y0 + 1], [x0 + breite, y0 + 6], [x0 + 2, y0 + 4]].forEach(([x, y]) => k.punkt(x, y, "k"));
     }
 }
 
-// Arm: von der Schulter (sx, sy) in eine Richtung, farbe = Aermel, Hand in Hautfarbe
+// ---------- ARME, BEINE, WERKZEUG ----------
+
+// Arm von der Schulter (sx, sy); farbe = Aermel, dahinter liegende Arme sind etwas dunkler (Hand "s")
 function figurArm(g, sx, sy, art, schwung, farbe, hinten) {
     const k = g.kleidung;
     const hand = hinten ? "s" : "4";
@@ -318,78 +501,242 @@ function figurWerkzeug(g, art, x, y) {
     }
 }
 
-// Die ganze Figur als Schichten (je ein Raster) plus Umriss um alles
-function figurRaster(pose, bild, blinzelt, teile) {
+// Beine mit Hose und Schuhen; x-Werte der beiden Beine, oben = Hueft-Hoehe
+function figurBeine(g, beine, oben, hose, schuhe, blick) {
+    const k = g.kleidung;
+    const stiefel = schuhe.form === "stiefel";
+    const rock = hose.form === "rock";
+    beine.forEach(([x, dunkel]) => {
+        const hoch = 24 - oben;
+        // Rock: die Beine darunter sind Haut, Shorts: nur oben Stoff
+        if (rock) g.haut.rechteck(x, oben + 2, 2, hoch - 2, dunkel ? "s" : "4");
+        else if (hose.form === "shorts") {
+            k.rechteck(x, oben, 2, 3, dunkel ? "9" : "3");
+            g.haut.rechteck(x, oben + 3, 2, hoch - 3, dunkel ? "s" : "4");
+        } else k.rechteck(x, oben, 2, hoch, dunkel ? "9" : "3");
+        if (stiefel) k.rechteck(x, 21, 2, 3, "1");
+        // Schuhe: seitlich nach vorne, sonst breit
+        if (blick === "seite") {
+            k.rechteck(x, 24, 3, 1, "1");
+            k.punkt(x + 2, 24, "l");
+        } else {
+            k.rechteck(x - (x < 9 ? 1 : 0), 24, 3, 1, "1");
+            k.punkt(x < 9 ? x - 1 : x + 2, 24, "l");
+        }
+        if (schuhe.form === "wolke") {
+            k.punkt(x - 1, 23, "l");
+            k.punkt(x + 2, 23, "l");
+        }
+    });
+    if (rock) {
+        const breit = blick === "seite" ? 0 : 1;
+        k.rechteck(6 - breit, oben, 6 + 2 * breit, 2, "3");
+        k.rechteck(5 - breit, oben + 2, 8 + 2 * breit, 1, "9");
+    }
+    if (hose.form === "sterne") {
+        beine.forEach(([x], i) => {
+            k.punkt(x + (i % 2), oben + 2, "k");
+            k.punkt(x + 1 - (i % 2), oben + 4, "k");
+        });
+    }
+}
+
+// ---------- ACCESSOIRES ----------
+
+function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild) {
+    const a = g.accessoire;
+    const hinten = g.hinten;
+    const form = acc.form;
+    if (!form || form === "keins") return;
+    const ay = Math.round(cy);
+    const seite = blick === "seite";
+    const breite = seite ? 5 : 6;
+    if (form === "brille" || form === "herzbrille") {
+        if (blick === "hinten") {
+            a.punkt(cx - 5, ay - 1, "x");
+            a.punkt(cx + 4, ay - 1, "x");
+            return;
+        }
+        const glaeser = seite ? [Math.round(cx + 1)] : [Math.round(cx - 3), Math.round(cx + 2)];
+        glaeser.forEach(gx => {
+            a.rechteck(gx, ay - 1, 2, 2, "y");
+            if (form === "herzbrille") {
+                a.punkt(gx, ay - 1, "x");
+                a.punkt(gx + 1, ay - 1, "x");
+                a.punkt(gx + 0.5, ay + 1, "x");
+            } else {
+                a.punkt(gx, ay - 1, "z");
+            }
+        });
+        if (seite) a.rechteck(cx - 2, ay - 1, 3, 1, "x");
+        else {
+            a.rechteck(cx - 1, ay - 1, 3, 1, "x");
+            a.punkt(cx - 4, ay - 1, "x");
+            a.punkt(cx + 4, ay - 1, "x");
+        }
+    } else if (form === "monokel") {
+        if (blick === "hinten") return;
+        const gx = seite ? Math.round(cx + 1) : Math.round(cx + 2);
+        a.rechteck(gx - 1, ay - 2, 4, 1, "x");
+        a.rechteck(gx - 1, ay + 1, 4, 1, "x");
+        a.rechteck(gx - 1, ay - 1, 1, 2, "x");
+        a.rechteck(gx + 2, ay - 1, 1, 2, "x");
+        a.linie(gx + 2, ay + 2, gx + 2, ay + 5, "x");
+    } else if (form === "schal") {
+        a.rechteck(seite ? x0 - 1 : x0 - 1, y0 - 1, breite + 2, 2, "x");
+        for (let x = 0; x < breite + 2; x += 2) a.punkt(x0 - 1 + x, y0 - 1, "y");
+        if (seite) a.rechteck(x0 - 2, y0 + 1, 2, 4, "x");
+        else if (blick === "vorne") a.rechteck(x0 + breite - 2, y0 + 1, 2, 4, "x");
+        else a.rechteck(x0 + 1, y0 + 1, 2, 3, "x");
+        a.punkt(seite ? x0 - 2 : x0 + breite - 2, y0 + 5, "z");
+    } else if (form === "rucksack") {
+        if (seite) {
+            hinten.rechteck(x0 - 3, y0, 3, 5, "x");
+            hinten.rechteck(x0 - 3, y0, 3, 1, "y");
+            hinten.punkt(x0 - 2, y0 + 2, "z");
+            a.linie(x0, y0, x0 + 1, y0 + 3, "y");
+        } else if (blick === "vorne") {
+            a.rechteck(x0 + 1, y0, 1, 4, "y");
+            a.rechteck(x0 + breite - 2, y0, 1, 4, "y");
+        } else {
+            a.rechteck(x0, y0, breite, 5, "x");
+            a.rechteck(x0, y0, breite, 1, "y");
+            a.rechteck(x0 + 1, y0 + 2, breite - 2, 2, "y");
+            a.punkt(x0 + breite / 2, y0 + 1, "z");
+        }
+    } else if (form === "kette" || form === "lei") {
+        if (blick === "hinten") return;
+        const farben = form === "lei" ? ["x", "y", "z"] : ["x", "y"];
+        // Bogen ueber die Brust (Blumenkette: doppelt so breit)
+        const punkte = seite ? [[x0 + 4, y0], [x0 + 4, y0 + 1], [x0 + 3, y0 + 2]]
+            : [[x0, y0], [x0 + 1, y0 + 1], [x0 + 2, y0 + 2], [x0 + 3, y0 + 2], [x0 + 4, y0 + 1], [x0 + 5, y0]];
+        if (form === "lei" && !seite) punkte.push([x0 + 1, y0 + 2], [x0 + 2, y0 + 3], [x0 + 3, y0 + 3], [x0 + 4, y0 + 2], [x0, y0 + 1], [x0 + 5, y0 + 1]);
+        punkte.forEach(([x, y], i) => a.punkt(x, y, farben[i % farben.length]));
+    } else if (form === "fliege") {
+        if (blick === "hinten") return;
+        const x = seite ? x0 + 4 : Math.round(x0 + breite / 2 - 1);
+        if (seite) {
+            a.punkt(x, y0, "x");
+            a.punkt(x, y0 + 1, "y");
+        } else {
+            a.rechteck(x - 1, y0, 1, 2, "x");
+            a.rechteck(x + 2, y0, 1, 2, "x");
+            a.rechteck(x, y0, 2, 1, "y");
+            a.punkt(x, y0 + 1, "z");
+        }
+    } else if (form === "fluegel" || form === "fledermaus") {
+        // Fluegel am Ruecken, schlagen im Takt
+        const auf = bild % 2 === 0;
+        const fleder = form === "fledermaus";
+        const fluegel = (fx, richtung) => {
+            const spitze = auf ? -6 : -3;
+            if (fleder) {
+                hinten.linie(fx, y0, fx + richtung * 5, y0 + spitze, "x");
+                hinten.linie(fx + richtung * 5, y0 + spitze, fx + richtung * 6, y0 + 4, "x");
+                for (let i = 1; i <= 5; i++) hinten.linie(fx, y0 + 1, fx + richtung * i, y0 + spitze + i + 1, i % 2 ? "y" : "x");
+                hinten.punkt(fx + richtung * 3, y0 + 2, "z");
+            } else {
+                hinten.ellipse(fx + richtung * 3, y0 + spitze / 2, 3, 3.4, "x");
+                hinten.ellipse(fx + richtung * 2, y0 + 4, 2, 2, "y");
+                hinten.punkt(fx + richtung * 3, y0 + spitze / 2 - 1, "z");
+            }
+        };
+        if (seite) fluegel(x0, -1);
+        else {
+            fluegel(x0, -1);
+            fluegel(x0 + breite - 1, 1);
+        }
+    }
+}
+
+// ---------- DIE GANZE FIGUR ----------
+// blick: "seite" (Blick nach rechts, fuer links wird gespiegelt), "vorne" oder "hinten"
+function figurRaster(pose, bild, blinzelt, teile, blick = "seite") {
     const g = {};
     FIGUR_SCHICHTEN.forEach(s => { g[s] = figurGitter(); });
     const h = figurHaltung(pose, bild);
+    // Werkzeug und Laufen gehen nur von der Seite
+    if (h.werkzeug || pose === "laufen") blick = "seite";
     const geschlossen = pose === "schlafen";
     const w = h.wippen;
     const cx = 9 + h.lehnen;
-    const hose = teile.hose;
-    const schuhe = teile.schuhe;
+    const aermel = teile.oberteil.form === "latz" ? "k" : "6";
 
-    if (h.sitzt) {
-        // sitzt auf dem Boden, Beine nach vorne
-        const cy = 10.5 + w;
-        const y0 = 15 + w;
-        g.kleidung.rechteck(8, 21, 6, 2, "3");
-        g.kleidung.rechteck(8, 22, 6, 1, "9");
-        if (hose.form === "shorts") g.haut.rechteck(12, 21, 2, 2, "4");
-        if (hose.form === "rock") g.kleidung.rechteck(6, 20, 6, 2, "3");
-        g.kleidung.rechteck(14, 20, 1, 3, "1");
-        g.kleidung.punkt(14, 20, "l");
-        figurOberteil(g, h, 6, y0, teile.oberteil);
-        g.haut.rechteck(8, y0 - 1, 2, 1, "4");
-        figurArm(g, 9, y0 + 1, "vorn", 0, teile.oberteil.form === "latz" ? "k" : "6", false);
-        figurKopf(g, cx, cy, geschlossen, teile.augen, blinzelt);
-        figurHaare(g, cx, cy, teile.frisur.form, bild);
-        figurHut(g, cx, cy, teile.kopf.form, bild);
-    } else {
-        const cy = 6.6 + w;
-        const y0 = 12 + w;
-        // Beine (hinten dunkler), Schuhe; Stiefel sind hoeher
-        const beinOben = 18 + w;
-        const stiefel = schuhe.form === "stiefel";
-        [[7 + h.beinHinten, "9"], [9 + h.beinVorn, "3"]].forEach(([x, farbe]) => {
-            g.kleidung.rechteck(x, beinOben, 2, 25 - beinOben, farbe);
-            if (hose.form === "shorts") g.haut.rechteck(x, beinOben + 3, 2, 22 - beinOben, farbe === "9" ? "s" : "4");
-            if (stiefel) g.kleidung.rechteck(x, 22, 2, 3, "1");
-            g.kleidung.rechteck(x, 24, 3, 1, "1");
-            g.kleidung.punkt(x + 2, 24, "l");
-            if (schuhe.form === "wolke") {
-                g.kleidung.punkt(x - 1, 24, "l");
-                g.kleidung.punkt(x + 1, 23, "l");
-            }
-        });
-        if (hose.form === "rock") {
-            g.kleidung.rechteck(6, beinOben, 6, 2, "3");
-            g.kleidung.rechteck(5, beinOben + 2, 8, 1, "9");
+    if (blick === "seite") {
+        if (h.sitzt) {
+            const cy = 10.5 + w;
+            const y0 = 15 + w;
+            g.kleidung.rechteck(8, 21, 6, 2, "3");
+            g.kleidung.rechteck(8, 22, 6, 1, "9");
+            if (teile.hose.form === "shorts") g.haut.rechteck(11, 21, 3, 2, "4");
+            if (teile.hose.form === "rock") g.kleidung.rechteck(6, 20, 6, 2, "3");
+            g.kleidung.rechteck(14, 20, 1, 3, "1");
+            g.kleidung.punkt(14, 20, "l");
+            figurOberteil(g, "seite", h, 6, y0, teile.oberteil);
+            g.haut.rechteck(8, y0 - 1, 2, 1, "4");
+            figurArm(g, 9, y0 + 1, "vorn", 0, aermel, false);
+            figurKopfSeite(g, cx, cy, geschlossen, teile.augen, blinzelt);
+            figurHaare(g, "seite", cx, cy, teile.frisur.form, bild);
+            figurHut(g, "seite", cx, cy, teile.kopf.form, bild);
+            figurAccessoire(g, "seite", cx, cy, y0, 6, teile.accessoire, bild);
+        } else {
+            const cy = 6.6 + w;
+            const y0 = 12 + w;
+            figurBeine(g, [[7 + h.beinHinten, true], [9 + h.beinVorn, false]], 18 + w, teile.hose, teile.schuhe, "seite");
+            figurArm(g, 6 + h.lehnen, y0 + 1, h.armHinten, -h.armSchwung, "8", true);
+            figurOberteil(g, "seite", h, 6 + h.lehnen, y0, teile.oberteil);
+            g.haut.rechteck(8 + h.lehnen, y0 - 1, 2, 1, "4");
+            figurArm(g, 9 + h.lehnen, y0 + 1, h.armVorn, h.armSchwung, aermel, false);
+            if (h.werkzeug) figurWerkzeug(g, h.werkzeug, 10 + h.lehnen, y0 + 1);
+            figurKopfSeite(g, cx, cy, geschlossen, teile.augen, blinzelt);
+            figurHaare(g, "seite", cx, cy, teile.frisur.form, bild);
+            figurHut(g, "seite", cx, cy, teile.kopf.form, bild);
+            figurAccessoire(g, "seite", cx, cy, y0, 6 + h.lehnen, teile.accessoire, bild);
         }
-        if (hose.form === "sterne") [[7, 20], [10, 22], [8, 23]].forEach(([x, y]) => g.kleidung.punkt(x + h.beinVorn * (x > 8 ? 1 : 0), y, "k"));
-        // hinterer Arm hinter dem Koerper
-        figurArm(g, 6 + h.lehnen, y0 + 1, h.armHinten, -h.armSchwung, "8", true);
-        figurOberteil(g, h, 6 + h.lehnen, y0, teile.oberteil);
-        g.haut.rechteck(8 + h.lehnen, y0 - 1, 2, 1, "4");
-        // Bei der Latzhose sind die Aermel vom Hemd darunter
-        figurArm(g, 9 + h.lehnen, y0 + 1, h.armVorn, h.armSchwung, teile.oberteil.form === "latz" ? "k" : "6", false);
-        if (h.werkzeug) figurWerkzeug(g, h.werkzeug, 10 + h.lehnen, y0 + 1);
-        figurKopf(g, cx, cy, geschlossen, teile.augen, blinzelt);
-        figurHaare(g, cx, cy, teile.frisur.form, bild);
-        figurHut(g, cx, cy, teile.kopf.form, bild);
+    } else {
+        // Von vorne bzw. hinten: symmetrisch, der Koerper ist 6 Pixel breit
+        const vorne = blick === "vorne";
+        const cy = (h.sitzt ? 10.6 : 6.6) + w;
+        const y0 = (h.sitzt ? 16 : 12) + w;
+        const x0 = 6 + h.lehnen;
+        if (h.sitzt) {
+            // sitzt im Schneidersitz, die Knie zeigen nach vorne
+            g.kleidung.rechteck(4, 22, 10, 2, "3");
+            g.kleidung.rechteck(4, 23, 10, 1, "9");
+            if (teile.hose.form === "shorts" || teile.hose.form === "rock") g.haut.rechteck(4, 23, 10, 1, "4");
+            g.kleidung.rechteck(3, 23, 2, 2, "1");
+            g.kleidung.rechteck(13, 23, 2, 2, "1");
+        } else {
+            figurBeine(g, [[6 + h.beinVorn * 0, false], [10, false]], 18 + w, teile.hose, teile.schuhe, blick);
+            // Huefte (verbindet die Beine)
+            if (teile.hose.form !== "rock") g.kleidung.rechteck(6, 18 + w, 6, 1, teile.hose.form === "shorts" ? "3" : "3");
+        }
+        figurOberteil(g, blick, h, x0, y0, teile.oberteil);
+        g.haut.rechteck(x0 + 2, y0 - 1, 2, 1, vorne ? "4" : "s");
+        // Arme links und rechts vom Koerper
+        const armL = h.armHinten === "hoch" ? "hoch" : "unten";
+        const armR = h.armVorn === "hoch" || h.armVorn === "winken" || h.armVorn === "winken2" ? h.armVorn : "unten";
+        figurArm(g, x0 - 2, y0, h.sitzt ? "unten" : armL, 0, aermel, !vorne);
+        figurArm(g, x0 + 6, y0, h.sitzt ? "unten" : armR, 0, aermel, !vorne);
+        if (vorne) figurKopfVorne(g, cx, cy, geschlossen, teile.augen, blinzelt);
+        else figurKopfHinten(g, cx, cy);
+        figurHaare(g, blick, cx, cy, teile.frisur.form, bild);
+        figurHut(g, blick, cx, cy, teile.kopf.form, bild);
+        figurAccessoire(g, blick, cx, cy, y0, x0, teile.accessoire, bild);
     }
 
-    // Umriss: jedes leere Pixel neben irgendeiner Schicht
+    // Umriss: jedes leere Pixel neben irgendeiner Schicht (direkt im Raster, ohne Verschiebung)
     const voll = (x, y) => x >= 0 && y >= 0 && x < FIGUR_BREITE && y < FIGUR_HOEHE &&
         FIGUR_SCHICHTEN.some(s => s !== "umriss" && g[s].raster[y][x]);
     for (let y = 0; y < FIGUR_HOEHE; y++) {
         for (let x = 0; x < FIGUR_BREITE; x++) {
             if (voll(x, y)) continue;
-            if (voll(x - 1, y) || voll(x + 1, y) || voll(x, y - 1) || voll(x, y + 1)) g.umriss.punkt(x, y, "7");
+            if (voll(x - 1, y) || voll(x + 1, y) || voll(x, y - 1) || voll(x, y + 1)) g.umriss.raster[y][x] = "7";
         }
     }
-    // Schatten auf dem Boden
-    if (!h.sitzt) for (let x = 5; x < 14; x++) if (!g.umriss.raster[25][x] && !voll(x, 25)) g.umriss.punkt(x, 25, "q");
+    // Schatten auf dem Boden (unterste Zeile)
+    const boden = FIGUR_HOEHE - 1;
+    for (let x = 4; x < 15; x++) if (!g.umriss.raster[boden][x] && !voll(x, boden)) g.umriss.raster[boden][x] = "q";
     return g;
 }
 
@@ -399,15 +746,15 @@ function figurFarben(teile) {
     return {
         ...FIGUR_FESTE_FARBEN, q: "rgba(0, 0, 0, 0.18)",
         ...teile.haut.farben, ...teile.augen.farben, ...teile.haarfarbe.farben, ...teile.oberteil.farben,
-        ...teile.hose.farben, ...teile.schuhe.farben, ...(teile.kopf.farben || {})
+        ...teile.hose.farben, ...teile.schuhe.farben, ...(teile.kopf.farben || {}), ...(teile.accessoire.farben || {})
     };
 }
 
 // Bild-URLs aller Schichten fuer eine Pose (zwischengespeichert)
-function figurUrls(teile, pose, bild, blinzelt) {
-    const schluessel = FIGUR_KATEGORIEN.map(k => teile[k.id].id).join(",") + "|" + pose + "|" + bild + "|" + (blinzelt ? 1 : 0);
+function figurUrls(teile, pose, bild, blinzelt, blick = "seite") {
+    const schluessel = FIGUR_KATEGORIEN.map(k => teile[k.id].id).join(",") + "|" + pose + "|" + bild + "|" + (blinzelt ? 1 : 0) + "|" + blick;
     if (!figurUrlCache[schluessel]) {
-        const g = figurRaster(pose, bild, blinzelt, teile);
+        const g = figurRaster(pose, bild, blinzelt, teile, blick);
         const farben = figurFarben(teile);
         const urls = {};
         FIGUR_SCHICHTEN.forEach(s => {
@@ -423,7 +770,8 @@ function figurUrls(teile, pose, bild, blinzelt) {
 function figurSchichtFx(teile) {
     return {
         haut: teile.haut.fx, augen: teile.augen.fx, haare: teile.haarfarbe.fx || teile.frisur.fx,
-        kleidung: teile.oberteil.fx || teile.hose.fx || teile.schuhe.fx, kopf: teile.kopf.fx
+        kleidung: teile.oberteil.fx || teile.hose.fx || teile.schuhe.fx, kopf: teile.kopf.fx,
+        accessoire: teile.accessoire.fx, hinten: teile.accessoire.fx || teile.oberteil.fx
     };
 }
 
@@ -444,8 +792,8 @@ function erstelleFigurBild(groesse) {
     return { huelle, bilder, letzte: {} };
 }
 
-function zeigeFigurBild(bild, teile, pose, nummer, blinzelt) {
-    const urls = figurUrls(teile, pose, nummer % (FIGUR_BILDER[pose] || 1), blinzelt);
+function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
+    const urls = figurUrls(teile, pose, nummer % (FIGUR_BILDER[pose] || 1), blinzelt, blick);
     const fx = figurSchichtFx(teile);
     FIGUR_SCHICHTEN.forEach(s => {
         const img = bild.bilder[s];
@@ -459,7 +807,7 @@ function zeigeFigurBild(bild, teile, pose, nummer, blinzelt) {
         if (img.className !== klasse) img.className = klasse;
     });
     // Farbe fuer Leuchten und Funkeln
-    const leuchtTeil = [teile.augen, teile.kopf, teile.frisur, teile.haarfarbe, teile.haut, teile.oberteil].find(tl => tl.fxFarbe);
+    const leuchtTeil = [teile.augen, teile.kopf, teile.accessoire, teile.frisur, teile.haarfarbe, teile.haut, teile.oberteil].find(tl => tl.fxFarbe);
     if (leuchtTeil) bild.huelle.style.setProperty("--fx-farbe", leuchtTeil.fxFarbe);
     bild.huelle.classList.toggle("fx-schwebt", Object.values(teile).some(tl => tl.fx === "schweben" || tl.fx === "geist"));
 }
@@ -518,11 +866,21 @@ function entferneFigur(f) {
     if (i >= 0) figuren.splice(i, 1);
 }
 
-function figurPose(f, zustand, ms) {
+// Blickrichtung zur Pose: Laufen und Hacken von der Seite, Sitzen und Emotes von vorne,
+// beim Stehen schaut die Figur mal nach vorne, mal zur Seite, mal nach hinten (auf den Hof)
+function blickFuer(zustand) {
+    if (zustand === "laufen" || zustand === "hacken") return "seite";
+    if (zustand !== "stehen") return "vorne";
+    const wurf = Math.random();
+    return wurf < 0.55 ? "vorne" : wurf < 0.85 ? "seite" : "hinten";
+}
+
+function figurPose(f, zustand, ms, blick) {
     f.zustand = zustand;
     f.zustandMs = ms;
     f.bild = 0;
     f.bildMs = 0;
+    f.blick = blick || blickFuer(zustand);
 }
 
 function figurLaufeZu(f, ziel) {
@@ -637,8 +995,9 @@ function zeichneFigur(f, jetzt) {
     const blinzelt = f.blinzeltBis > jetzt;
     if (f.art === "mensch") {
         const teile = figurTeileAus(f.teile, !f.partner);
-        zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt);
-        f.bildEl.huelle.style.transform = f.richtung < 0 ? "scaleX(-1)" : "";
+        const blick = f.blick || "seite";
+        zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt, blick);
+        f.bildEl.huelle.style.transform = blick === "seite" && f.richtung < 0 ? "scaleX(-1)" : "";
         figurFunkeln(f, teile);
         return;
     }
@@ -786,7 +1145,7 @@ function figurTeileIds() {
 
 let profilKategorie = "haut";
 let profilVorschau = null;     // anprobierte Teile (auch nicht besessene)
-let profilPose = "laufen";
+let profilPose = null;         // null = steht ruhig und schaut nach vorne
 let profilTakt = null;
 
 function oeffneProfil() {
@@ -799,7 +1158,7 @@ function oeffneProfil() {
     profilTakt = setInterval(() => {
         bild += 1;
         const vorschau = document.querySelector("#profil-fenster .profil-vorschau-figur");
-        if (vorschau && vorschau.figur) zeigeFigurBild(vorschau.figur, figurTeileAus(profilVorschau, false), profilPose, bild, bild % 17 === 0);
+        if (vorschau && vorschau.figur) zeigeFigurBild(vorschau.figur, figurTeileAus(profilVorschau, false), profilPose || "stehen", bild, bild % 17 === 0, "vorne");
     }, 180);
 }
 
@@ -816,7 +1175,7 @@ function aktualisiereProfilKnopf() {
     if (!knopf) return;
     knopf.innerHTML = "";
     const mini = erstelleFigurBild(2);
-    zeigeFigurBild(mini, figurTeileAus(profil().teile), "stehen", 0, false);
+    zeigeFigurBild(mini, figurTeileAus(profil().teile), "stehen", 0, false, "vorne");
     knopf.append(mini.huelle, el("span", null, profil().name ? profil().name : t("Profil")));
 }
 
@@ -830,15 +1189,16 @@ function renderProfil() {
     const figur = erstelleFigurBild(8);
     figur.huelle.classList.add("profil-vorschau-figur");
     figur.huelle.figur = figur;
-    zeigeFigurBild(figur, figurTeileAus(profilVorschau, false), profilPose, 0, false);
+    zeigeFigurBild(figur, figurTeileAus(profilVorschau, false), profilPose || "stehen", 0, false, "vorne");
     buehne.appendChild(figur.huelle);
     links.appendChild(buehne);
 
     const posen = el("div", "profil-posen");
     [["laufen", "🚶"], ["winken", "👋"], ["hacken", "⛏️"], ["tanzen", "💃"], ["jubeln", "🎉"], ["sitzen", "🪑"]].forEach(([pose, symbol]) => {
         const knopf = el("button", "knopf profil-pose" + (pose === profilPose ? " aktiv" : ""), null, [pixelIcon(symbol, 20)]);
+        // Nochmal anklicken schaltet die Animation wieder aus
         knopf.addEventListener("click", () => {
-            profilPose = pose;
+            profilPose = profilPose === pose ? null : pose;
             renderProfil();
         });
         posen.appendChild(knopf);
@@ -889,7 +1249,7 @@ function renderProfil() {
         kachel.style.setProperty("--seltenheit", seltenheit.rand);
         const probe = { ...profilVorschau, [profilKategorie]: teil.id };
         const mini = erstelleFigurBild(3);
-        zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false);
+        zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false, "vorne");
         kachel.appendChild(mini.huelle);
         kachel.appendChild(el("div", "profil-kachel-name", teil.name));
         kachel.appendChild(el("div", "profil-kachel-status", frei ? (teil.fx ? "✨ " + seltenheit.name : seltenheit.name) : "🔒 " + dlcPreisText(teil)));

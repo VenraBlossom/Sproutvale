@@ -1041,7 +1041,7 @@ function renderKoopLobby() {
         const zeile = el("div", "koop-spieler-zeile" + klasse);
         if (teile) {
             const mini = erstelleFigurBild(2);
-            zeigeFigurBild(mini, figurTeileAus(teile, false), "stehen", 0, false);
+            zeigeFigurBild(mini, figurTeileAus(teile, false), "stehen", 0, false, "vorne");
             zeile.appendChild(mini.huelle);
         }
         zeile.appendChild(el("span", null, text));

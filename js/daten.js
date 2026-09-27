@@ -1823,7 +1823,8 @@ const FIGUR_KATEGORIEN = [
     { id: "oberteil", name: t("Oberteil"), symbol: "👕" },
     { id: "hose", name: t("Hose"), symbol: "👖" },
     { id: "schuhe", name: t("Schuhe"), symbol: "👟" },
-    { id: "kopf", name: t("Kopf"), symbol: "👒" }
+    { id: "kopf", name: t("Kopf"), symbol: "👒" },
+    { id: "accessoire", name: t("Accessoire"), symbol: "🎀" }
 ];
 
 const EPISCH = { quelle: "dlc", paket: "unterstuetzer" };
@@ -1937,10 +1938,29 @@ const FIGUR_TEILE = {
         { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", fx: "glow", fxFarbe: "#fff6a0",
             farben: { a: "#fff6a0", b: "#ffe066", c: "#ffffff" } },
         { id: "pilzhut", name: t("Pilzhut"), ...LEGENDAER, form: "pilz", fx: "schweben", farben: { a: "#e8434a", b: "#b82a30", c: "#ffffff" } }
+    ],
+    // Farben: x Rahmen/Hauptfarbe, y Glas/Zweitfarbe, z Glanz/Akzent
+    accessoire: [
+        { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
+        { id: "brille", name: t("Brille"), quelle: "frei", form: "brille", farben: { x: "#3a2a1a", y: "#cfe8ff", z: "#ffffff" } },
+        { id: "sonnenbrille", name: t("Sonnenbrille"), quelle: "frei", form: "brille", farben: { x: "#1e1e24", y: "#2a2a3a", z: "#6a6a8a" } },
+        { id: "schal", name: t("Schal"), quelle: "frei", form: "schal", farben: { x: "#c8302a", y: "#9a2420", z: "#f4e4d0" } },
+        { id: "rucksack", name: t("Rucksack"), quelle: "frei", form: "rucksack", farben: { x: "#7a9a3a", y: "#5a7a2a", z: "#c89a3a" } },
+        { id: "kette", name: t("Perlenkette"), quelle: "frei", form: "kette", farben: { x: "#fff4e8", y: "#e8d8c8", z: "#ffffff" } },
+        { id: "fliege", name: t("Fliege"), ...EPISCH, form: "fliege", farben: { x: "#c8302a", y: "#8a1a18", z: "#ff6a5a" } },
+        { id: "herzbrille", name: t("Herzbrille"), ...EPISCH, form: "herzbrille", farben: { x: "#ff4a8a", y: "#ff9ac0", z: "#ffffff" } },
+        { id: "monokel", name: t("Monokel"), ...EPISCH, form: "monokel", farben: { x: "#d4a02a", y: "#e8f4ff", z: "#fff6c0" } },
+        { id: "blumenkette", name: t("Blumenkette"), ...EPISCH, form: "lei", farben: { x: "#ff8fb8", y: "#ffd23a", z: "#5fb03c" } },
+        { id: "feenfluegel", name: t("Feenflügel"), ...LEGENDAER, form: "fluegel", fx: "funkeln", fxFarbe: "#bff0ff",
+            farben: { x: "#bff0ff", y: "#ffffff", z: "#ffc2e8" } },
+        { id: "fledermausfluegel", name: t("Fledermausflügel"), ...LEGENDAER, form: "fledermaus", fx: "glow", fxFarbe: "#b04ae0",
+            farben: { x: "#3a1a4a", y: "#5a2a6a", z: "#b04ae0" } }
+
     ]
 };
 
-const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut" };
+const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut",
+    accessoire: "keins" };
 
 // Emotes mit Rechtsklick auf die eigene Figur
 const FIGUR_EMOTES = [
