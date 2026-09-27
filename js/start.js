@@ -693,6 +693,12 @@ aktualisiereProfilKnopf();
         if (Math.sin(zeit * 13) < -0.93) px(0, 14, B, 3, "rgba(20,8,32,0.8)");
         // Kleine Bildschirme am Rand: Monster laufen hin und her, dazu Scanlines und Schein auf dem Teppich
         const farben = ["#7ed957", "#ffcf4a", "#4ad0ff", "#ff5ad0"];
+        // nur links und rechts neben dem grossen Automaten malen (sonst liegen die Bilder darueber)
+        c.save();
+        c.beginPath();
+        c.rect(0, 0, A.x - 14, H);
+        c.rect(A.x + A.w + 14, 0, B - A.x - A.w - 14, H);
+        c.clip();
         neben.forEach((n, i) => {
             px(n.sx, n.sy, n.sw, n.sh, ["#0c1a3a", "#2a0c1a", "#0c2a14", "#2a1a08"][i]);
             const schritt = Math.floor(zeit * 3 + i) % 2;
@@ -702,6 +708,7 @@ aktualisiereProfilKnopf();
             for (let yy = n.sy; yy < n.sy + n.sh; yy += 2) px(n.sx, yy, n.sw, 1, "rgba(0,0,0,0.3)");
             px(n.sx - 2, n.sy - 2, n.sw + 4, n.sh + 4, farben[i] + "12");
         });
+        c.restore();
         // Leuchtschild pulsiert leicht
         const puls = 0.08 + 0.06 * Math.sin(zeit * 4);
         px(A.x + 21, 8, A.w - 42, 42, "rgba(255,255,255," + puls.toFixed(3) + ")");
