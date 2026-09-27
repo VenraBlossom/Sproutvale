@@ -477,6 +477,11 @@ function level(id) {
 }
 
 // Stufe eines Segens; dazu kommt der Bonus fuer frueh bezahlte Rechnungen (run.segenExtra, z.B. +0,3 = 30% staerker)
+// Gewaehlter Hof-Stil dieses Runs (1 = aktiv)
+function stil(id) {
+    return run && run.stil === id ? 1 : 0;
+}
+
 function segen(id) {
     return (run.segen[id] || 0) + ((run.segenExtra && run.segenExtra[id]) || 0);
 }
@@ -548,6 +553,7 @@ function energieMax() {
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
     energie *= (1 + metaWert("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
     energie *= 1 + werkzeugWert("taschenuhr");
+    energie *= 1 + 0.2 * stil("fruehaufsteher");
     // Pakte
     energie *= Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit")) * (1 + 0.25 * segen("nachtschicht"));
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
@@ -564,8 +570,8 @@ function raritaetsChancen() {
     // Am Anfang gibt es nur gewoehnliche Saat: jede Farbe schaltet ihr Stern im Stellarium erst frei (Stufe 1)
     const gruen = (level("gruen") > 0 ? 0.12 + 0.03 * level("gruen") : 0) + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
-    const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling;
-    const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + 0.03 * segen("hochrisiko") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
+    const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling + 0.03 * stil("gluecksritter");
+    const gelb = (level("gelb") > 0 ? 0.005 + 0.005 * level("gelb") : 0) + 0.01 * segen("jackpotfieber") + 0.03 * segen("hochrisiko") + 0.01 * stil("gluecksritter") + tw("schicksal") + 0.003 * kuschel("einhorn") + werkzeugWert("gluecksmuenze") / 10;
     return [Math.max(0, 1 - gruen - blau - lila - gelb), gruen, blau, lila, gelb];
 }
 
@@ -650,7 +656,7 @@ function goldMulti() {
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
-    const pakte = (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
+    const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
     return pakte * summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
         (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
         (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
@@ -660,7 +666,7 @@ function goldMulti() {
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
-        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) *
+        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
         (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
 }
@@ -691,7 +697,7 @@ function feldKosten(seite = eigeneSeite()) {
 }
 
 function rechnungsBetrag(nummer) {
-    const rabatt = metaWert("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") +
+    const rabatt = metaWert("verhandlung") + tw("herrscher") + run.rechnungsRabatt + 0.08 * segen("sparfuchs") + 0.1 * stil("sparfuchs") +
         0.03 * kuschel("wal");
     const phase = run ? run.mondphase || 0 : 0;
     const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1) *
@@ -827,7 +833,8 @@ function meisterBonus() {
 }
 
 function verkaufswert(pflanze) {
-    return aufrunden((pflanze.verkaufswert + level("erntekorb")) * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
+    const weizenbauer = stil("weizenbauer") ? (pflanze.id === "weizen" ? 1.8 : 0.9) : 1;
+    return aufrunden(weizenbauer * (pflanze.verkaufswert + level("erntekorb")) * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
         (1 + level("pg_" + pflanze.id)));
 }
 
@@ -880,11 +887,12 @@ function jahreszeitRestTage() {
 }
 
 function wachstumsTempo() {
-    return (jahreszeit().wachstum || 1) * wachstumsTempoOhneJahreszeit() * (1 + werkzeugWert("sanduhr"));
+    const fieber = run && run.fieberMs > 0 ? ERNTEFIEBER_KONFIG.tempo : 1;
+    return fieber * (jahreszeit().wachstum || 1) * wachstumsTempoOhneJahreszeit() * (1 + werkzeugWert("sanduhr"));
 }
 
 function wachstumsTempoOhneJahreszeit() {
-    const pakte = Math.max(0.2, 1 - 0.15 * segen("nachtschicht")) * (1 + 0.3 * segen("eile"));
+    const pakte = Math.max(0.2, 1 - 0.15 * segen("nachtschicht")) * (1 + 0.3 * segen("eile")) * (1 + 0.15 * stil("gaertner"));
     return pakte * (1 + tw("sonne") + 0.10 * segen("wachstum") + 0.04 * kuschel("pinguin") + 0.12 * sfLevel("ewigerfruehling") +
         gachaBonus("wachstum") + grundwert("g_wachstum") + 0.02 * level("feldkunde"));
 }
@@ -3736,7 +3744,35 @@ function starteNeuenRun(sandbox = false) {
         run.segenAusstehend = true;
         zeigeSegenAuswahl();
     }
+    // Ab dem 2. Story-Run: Hof-Stil waehlen
+    if (!sandbox && !run.koop && (meta.lebenszeit.runs || 0) >= 1) zeigeStilAuswahl();
     aktualisiereAlles();
+}
+
+function zeigeStilAuswahl() {
+    const angebot = mische([...HOF_STILE]).slice(0, 3);
+    const reihe = el("div", "stil-karten");
+    let schliessen = null;
+    angebot.forEach(s => {
+        const karte = el("button", "stil-karte", null, [
+            pixelIcon(s.symbol, 48, "stil-bild"),
+            el("div", "stil-name", s.name),
+            el("div", "stil-text", s.text)
+        ]);
+        karte.addEventListener("click", () => {
+            run.stil = s.id;
+            if (!meta.kodex.stile) meta.kodex.stile = {};
+            meta.kodex.stile[s.id] = (meta.kodex.stile[s.id] || 0) + 1;
+            speichereMeta();
+            Klang.segen();
+            if (schliessen) schliessen();
+            if (run.karte) renderTagesKarte();
+            aktualisiereAlles();
+        });
+        reihe.appendChild(karte);
+    });
+    schliessen = zeigePopup({ titel: t("🏡 Wähle deinen Hof-Stil"), breite: 640, schliessbar: false,
+        inhalt: el("div", null, null, [el("p", "stil-hinweis", t("Er gilt für den ganzen Run.")), reihe]) });
 }
 
 // ---------- TAGES-KARTE ----------
@@ -3787,6 +3823,7 @@ function renderTagesKarte() {
         }
     } else if (modus === "feierabend") {
         tagesKarteTitel.textContent = t("Feierabend! Tag ") + (run.tag - 1) + t(" geschafft");
+        html += `<p class="karte-zeitung">📰 <b>${t("Dorfzeitung:")}</b> ${zufall(DORFZEITUNG.map(f => f(meta, run)).filter(Boolean))}</p>`;
         const gewinnFarbe = RARITAETEN[s.hoechsterGewinnRaritaet].rand;
         html += `<div class="karte-statistik">
             <div><span>${t("Ernten")}</span><b>${zahl(s.ernten)}</b></div>
@@ -3840,6 +3877,8 @@ function renderTagesKarte() {
         }
     }
 
+    const hofStil = HOF_STILE.find(s => s.id === run.stil);
+    if (hofStil && !run.sandbox) html += `<p class="karte-stil">${hofStil.symbol} <b>${hofStil.name}:</b> ${hofStil.text}</p>`;
     tagesKarteInhalt.innerHTML = html;
     const fruehKnopf = tagesKarteInhalt.querySelector(".karte-frueh-bezahlen");
     if (fruehKnopf) fruehKnopf.addEventListener("click", () => bezahleFrueher());

@@ -316,6 +316,25 @@ function goldregenTick() {
     }
 }
 
+// Erntefieber: ein paar Sekunden wachsen alle Pflanzen rasend schnell, der Rand leuchtet
+function fieberTick(dtMs) {
+    if (tagesPlan.fieber !== null && tagesPlan.fieber !== undefined && tagesPlan.ms >= tagesPlan.fieber) {
+        tagesPlan.fieber = null;
+        run.fieberMs = ERNTEFIEBER_KONFIG.dauerMs;
+        meta.lebenszeit.fieber = (meta.lebenszeit.fieber || 0) + 1;
+        zeigeBanner("🔥", t("Erntefieber!"), t("Ein paar Sekunden wächst alles rasend schnell. Ernte, was du kannst!"), "#e8602a", 2600);
+        Klang.goldregen();
+        document.body.classList.add("erntefieber");
+    }
+    if (run.fieberMs > 0) {
+        run.fieberMs -= dtMs;
+        if (run.fieberMs <= 0) {
+            run.fieberMs = 0;
+            document.body.classList.remove("erntefieber");
+        }
+    }
+}
+
 // ---------- BOSS-RECHNUNGEN ----------
 
 function waehleBossRegel() {
@@ -338,14 +357,14 @@ function werkzeugPlaetze() {
 
 function haendlerChance() {
     if (run && hatWerkzeug("kompass")) return 1;
-    return Math.min(1, HAENDLER_KONFIG.chance * (1 + 0.5 * level("haendlerfreund")) + 0.1 * metaLevel("haendlerglueck") +
+    return Math.min(1, (1 + stil("haendler")) * HAENDLER_KONFIG.chance * (1 + 0.5 * level("haendlerfreund")) + 0.1 * metaLevel("haendlerglueck") +
         0.05 * kuschel("papagei"));
 }
 
 // Preise richten sich nach der naechsten Rechnung (in der Sandbox nach dem naechsten Meilenstein)
 function haendlerBasis() {
     const nummer = run.sandbox ? run.meilensteine : run.bezahlteRechnungen;
-    return rechnungsBetrag(nummer) * (1 - 0.15 * kuschel("greif")) * (1 - Math.min(0.5, werkzeugWert("kompass")));
+    return rechnungsBetrag(nummer) * (1 - 0.25 * stil("haendler")) * (1 - 0.15 * kuschel("greif")) * (1 - Math.min(0.5, werkzeugWert("kompass")));
 }
 
 function werkzeugPreis(werkzeug) {
@@ -426,7 +445,7 @@ function wendeWareAn(id) {
         run.naechsterTag.goldBuffSek += 30;
     } else if (id === "saatregen") {
         run.naechsterTag.samenregen = true;
-    } else if (id === "kleeblatt") {
+    } else if (id === "gluecksklee") {
         run.naechsterTag.mindestGruen = true;
     } else if (id === "gutschein") {
         meta.gutscheine += 1;
@@ -569,6 +588,9 @@ registriereHaken("tagStart", fortsetzen => {
     tagesPlan.blitzMs = 5000;
     planeKraehen();
     tagesPlan.goldregen = Math.random() < GOLDREGEN_KONFIG.chance * (1 + 0.5 * level("goldschauer")) ? tagesDauerMs() * (0.2 + Math.random() * 0.5) : null;
+    const f = ERNTEFIEBER_KONFIG;
+    tagesPlan.fieber = run.tag >= f.abTag && Math.random() < f.chance ? tagesDauerMs() * (0.15 + Math.random() * 0.55) : null;
+    run.fieberMs = 0;
     zeigeWetter(!fortsetzen && !imHauptmenue());
     if (haendlerSchliessen) haendlerSchliessen();
 });
@@ -577,12 +599,16 @@ registriereHaken("tagTick", dtMs => {
     tagesPlan.ms += dtMs;
     kraehenTick(dtMs);
     goldregenTick();
+    fieberTick(dtMs);
     if (wetterIst("gewitter")) gewitterTick(dtMs);
 });
 
 registriereHaken("tagEnde", () => {
     entferneAlleKraehen();
     tagesPlan.goldregen = null;
+    tagesPlan.fieber = null;
+    run.fieberMs = 0;
+    document.body.classList.remove("erntefieber");
     run.wetter = null;
     zeigeWetter();
 });

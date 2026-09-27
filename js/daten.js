@@ -1312,8 +1312,46 @@ const HAENDLER_WAREN = [
     { id: "duengersack", name: t("Düngersack"), symbol: "🧪", preis: 0.3, text: t("Am nächsten Tag sind 4 Felder mehr gedüngt (doppeltes Gold).") },
     { id: "sonnenflasche", name: t("Sonnenschein in der Flasche"), symbol: "☀️", preis: 0.4, text: t("Der nächste Tag beginnt mit 30 Sekunden doppeltem Gold.") },
     { id: "saatregen", name: t("Saatregen"), symbol: "🌧️", preis: 0.35, text: t("Am nächsten Tag haben alle Felder schon zum Start einen Samen.") },
-    { id: "kleeblatt", name: t("Vierblättriges Kleeblatt"), symbol: "🍀", preis: 0.3, text: t("Am nächsten Tag ist jede Saat mindestens ungewöhnlich.") }
+    { id: "gluecksklee", name: t("Glücksklee"), symbol: "🍀", preis: 0.3, text: t("Am nächsten Tag ist jede Saat mindestens ungewöhnlich.") }
 ];
+
+// ---------- HOF-STILE (ab dem 2. Run waehlt man zu Beginn jedes Story-Runs 1 von 3) ----------
+const HOF_STILE = [
+    { id: "weizenbauer", symbol: "🌾", name: t("Weizenbauer"), text: t("Weizen ist 80% mehr wert, alle anderen Pflanzen 10% weniger.") },
+    { id: "haendler", symbol: "🧳", name: t("Händlerfreund"), text: t("Der Wanderhändler kommt doppelt so oft und ist 25% billiger.") },
+    { id: "sterndeuter", symbol: "🔭", name: t("Sterndeuter"), text: t("Sternensaat ist 50% mehr wert, aber du bekommst 10% weniger Gold.") },
+    { id: "gaertner", symbol: "🌱", name: t("Gärtner"), text: t("Alle Pflanzen wachsen 15% schneller.") },
+    { id: "gluecksritter", symbol: "🍀", name: t("Glücksritter"), text: t("+3% Chance auf epische und +1% auf legendäre Saat.") },
+    { id: "sparfuchs", symbol: "🐷", name: t("Sparfuchs"), text: t("Alle Rechnungen kosten 10% weniger.") },
+    { id: "fruehaufsteher", symbol: "🌅", name: t("Frühaufsteher"), text: t("+20% Energie an jedem Tag.") },
+    { id: "tierfreund", symbol: "🐾", name: t("Tierflüsterer"), text: t("Streicheln gibt dreimal so viel Gold.") }
+];
+
+// ---------- DORFZEITUNG (eine Schlagzeile am Feierabend, nur zum Schmunzeln) ----------
+const DORFZEITUNG = [
+    () => t("Bürgermeister verwechselt Kürbis mit Hut. Trägt ihn trotzdem weiter."),
+    () => t("Krähen gründen Gewerkschaft. Fordern mehr Weizen und weniger Vogelscheuchen."),
+    () => t("Wanderhändler schwört: Seine Taschenuhr ist „fast neu“."),
+    () => t("Studie: 9 von 10 Karotten bevorzugen lockere Erde."),
+    () => t("Mondteich leuchtet wieder. Anwohner vermuten „irgendwas mit Magie“."),
+    () => t("Sonnenblume wächst höher als Scheune. Scheune nimmt es persönlich."),
+    () => t("Dorfbäckerei führt Weizen-Weizen-Brot ein. Kunden sind verwirrt, aber satt."),
+    () => t("Sternschnuppe landet im Brunnen. Wunsch: „Mehr Sternschnuppen“."),
+    () => t("Kuscheltier-Automat angeblich „nicht manipuliert“, sagt der Kuscheltier-Automat."),
+    () => t("Rechnungsbote geht in Urlaub. Rechnungen kommen trotzdem pünktlich."),
+    () => t("Igel rollt drei Kilometer bergab. Nennt es „Sport“."),
+    () => t("Neuer Rekord: Bauer klickt so schnell, dass der Samenladen um eine Pause bittet."),
+    () => t("Eichhörnchen beim Horten von Sternensamen erwischt. Zeigt keine Reue."),
+    () => t("Wetterfrosch sagt Wetter voraus. Liegt zu 50% richtig."),
+    () => t("Tarotkarte „Der Narr“ zieht sich selbst. Alle sind beeindruckt."),
+    () => t("Bienen streiken nicht. Sie summen nur lauter."),
+    (m, r) => r.statistik.ernten < 100 ? null : tf("Rekordbauer erntet heute {0} Pflanzen. Nachbarn werden nervös.", zahl(r.statistik.ernten)),
+    (m, r) => r.felder.length < 8 ? null : tf("Hof zählt jetzt {0} Felder. Maulwürfe beantragen Mitsprache.", r.felder.length),
+    (m, r) => (m.lebenszeit.streicheln || 0) < 100 ? null : tf("Begleiter wurde schon {0}-mal gestreichelt. Fordert trotzdem mehr.", zahl(m.lebenszeit.streicheln || 0))
+];
+
+// ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------
+const ERNTEFIEBER_KONFIG = { chance: 0.07, abTag: 3, dauerMs: 12000, tempo: 6 };
 
 // ---------- ERFOLGE (dauerhaft, je 1x freischaltbar) ----------
 // Jede Kette zeigt immer nur das naechste offene Ziel. Jede Stufe = spaeter ein Steam-Achievement.

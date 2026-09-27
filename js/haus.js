@@ -1493,7 +1493,7 @@ function gibStreichelGold() {
     const raritaet = wuerfleRaritaetIndex();
     const basis = Math.max(KONFIG.streichelMindestGold[raritaet], streichelZiel() * KONFIG.streichelAnteile[raritaet]);
     const menge = Math.max(1, Math.round(basis * (herz ? KONFIG.streichelHerzFaktor : 1) *
-        (1 + 0.25 * kuschel("kuschelkatze")) * (1 + segen("tierfreund"))));
+        (1 + 0.25 * kuschel("kuschelkatze")) * (1 + segen("tierfreund")) * (1 + 2 * stil("tierfreund"))));
     const rect = haustier.bild.getBoundingClientRect();
     spawnLootKugel(rect.left + rect.width / 2, rect.top + rect.height * 0.6, menge, raritaet, "gold", {
         streicheln: true,
