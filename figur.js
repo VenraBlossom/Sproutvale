@@ -727,16 +727,17 @@ function oeffneEmoteMenue(f, event) {
     schliesseEmoteMenue();
     emoteMenue = el("div", "emote-menue");
     FIGUR_EMOTES.forEach(e => {
-        const knopf = el("button", "knopf emote-knopf", null, [pixelIcon(e.symbol, 24), el("span", null, e.name)]);
+        const knopf = el("button", "knopf emote-knopf", null, [pixelIcon(e.symbol, 32)]);
+        setzeTipp(knopf, e.name);
         knopf.addEventListener("click", () => {
             spieleEmote(f, e);
-            if (typeof koopAktiv === "function" && koopAktiv()) koopSende("emote", { id: e.id });
+            if (typeof koop !== "undefined" && koop.verbunden) koopSende("emote", { id: e.id });
             schliesseEmoteMenue();
         });
         emoteMenue.appendChild(knopf);
     });
-    emoteMenue.style.left = Math.min(event.clientX, window.innerWidth - 220) + "px";
-    emoteMenue.style.top = Math.max(10, event.clientY - 260) + "px";
+    emoteMenue.style.left = Math.min(event.clientX, window.innerWidth - 200) + "px";
+    emoteMenue.style.top = Math.max(10, event.clientY - 120) + "px";
     document.body.appendChild(emoteMenue);
     setTimeout(() => document.addEventListener("pointerdown", emoteMenueAussen), 0);
 }

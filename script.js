@@ -1523,11 +1523,19 @@ function klickFeld(feld) {
     return true;
 }
 
+// Wie viele Felder kann ich haben? Solo alle Plaetze, im Koop nur die Plaetze meiner Seite
+function maxEigeneFelder() {
+    const seite = eigeneSeite();
+    return seite ? FELD_POSITIONEN.filter(pos => (seite === "links") === pos.links).length : MAX_FELDER;
+}
+
 function kaufeFeld() {
+    // Im Koop nur auf der eigenen Seite (der Platz des Mitspielers gehoert ihm)
+    const slot = naechsterSlot(eigeneSeite());
     const kosten = feldKosten();
-    if (!darfEinkaufen() || run.gold < kosten || run.felder.length >= MAX_FELDER) return;
+    if (slot < 0 || !darfEinkaufen() || run.gold < kosten || run.felder.length >= maxEigeneFelder()) return;
     run.gold -= kosten;
-    erstelleFeld();
+    erstelleFeld(slot);
     Klang.kaufen();
     const { x, y } = feldMitte(run.felder[run.felder.length - 1]);
     partikel(x, y, ["#8a5a2b", "#c89b6a", "#6cc24a"], 10, 50);
@@ -3692,7 +3700,7 @@ function aktualisiereHinweisPunkte() {
     let shopLeistbar = false;
     let sternLeistbar = false;
     if (darfEinkaufen()) {
-        shopLeistbar = run.gold >= feldKosten() && run.felder.length < MAX_FELDER ||
+        shopLeistbar = run.gold >= feldKosten() && run.felder.length < maxEigeneFelder() ||
             SHOP_UPGRADES.some(def => shopUpgradeFrei(def) && level(def.id) < def.max &&
                 run.gold >= kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)));
         sternLeistbar = SKILLS.some(knotenLeistbar);
@@ -3895,9 +3903,9 @@ function renderShop() {
 
     if (aktiverShopReiter === "allgemein") {
         raster.appendChild(marktKarte({
-            icon: "🌱", name: t("Neues Feld"), lvl: run.felder.length, max: MAX_FELDER,
+            icon: "🌱", name: t("Neues Feld"), lvl: run.felder.length, max: maxEigeneFelder(),
             beschreibung: t("Erweitert deinen Acker um ein Feld. Geht auch über das + Schild auf dem Acker."),
-            jetzt: run.felder.length + t(" von ") + MAX_FELDER + t(" Feldern"),
+            jetzt: run.felder.length + t(" von ") + maxEigeneFelder() + t(" Feldern"),
             kosten: feldKosten(), onKauf: kaufeFeld
         }));
         SHOP_UPGRADES.filter(shopUpgradeFrei).forEach(def => raster.appendChild(marktKarte({

@@ -11073,3 +11073,15 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .figur-begleiter {
     z-index: 2;
 }
+
+/* Emote-Menue: nur Symbole */
+.emote-menue {
+    grid-template-columns: repeat(4, 44px);
+    width: auto;
+}
+.emote-knopf {
+    justify-content: center;
+    padding: 4px;
+    width: 44px;
+    height: 44px;
+}
