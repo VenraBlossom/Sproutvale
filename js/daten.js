@@ -84,10 +84,20 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Alpha 1.0.1";
+const SPIEL_VERSION = "Beta 0.0.1";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.0.1", punkte: [
+        t("Neues Intro: eine Arcade-Halle, der Automat zeigt „Venray Studios presents“."),
+        t("Level statt Bauernrang: Erfahrung gibt es für fast alles (Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere, Erfolge). Level 100 ist ein Langzeit-Ziel, danach geht es endlos weiter."),
+        t("Erfahrungsleiste am Profil und im Profil-Fenster. Das Level steht auch in der Duo-Lobby."),
+        t("Auren statt Titel: alle 5 Level eine neue Aura um Figur und Namen (im Profil wählbar), alle 10 Level wird sie stärker."),
+        t("Kleidung, Kopf und Accessoire haben jetzt Haupt- und Zweitfarbe, auch legendäre Teile. Doppelte Farb-Teile wurden entfernt (du bekommst das Grundteil in deiner Farbe)."),
+        t("Rote Schleife größer, Pflaster sichtbar, Zauberhut entfernt, Gesicht im Debug-Menü."),
+        t("Mondteich am Run-Anfang nur noch über den Teich im Hintergrund."),
+        t("Neu in den Einstellungen: CRT-Filter.")
+    ] },
     { version: "Alpha 1.0.1", punkte: [
         t("Story-Spielstand löschen (Hauptmenü) setzt jetzt den ganzen Story-Fortschritt zurück. Kosmetik, Käufe, Profil, Bauernrang, Einstellungen und Endlos bleiben.")
     ] },

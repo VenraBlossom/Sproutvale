@@ -2778,7 +2778,15 @@ Object.assign(UEBERSETZUNG, {
     "Pulli": "Sweater",
     "🎨 Hauptfarbe:": "🎨 Main color:",
     "🎨 Zweitfarbe:": "🎨 Second color:",
-    "📺 CRT-Filter (alter Röhrenbildschirm)": "📺 CRT filter (old tube screen)"
+    "📺 CRT-Filter (alter Röhrenbildschirm)": "📺 CRT filter (old tube screen)",
+    "Neues Intro: eine Arcade-Halle, der Automat zeigt „Venray Studios presents“.": "New intro: an arcade hall, the cabinet shows „Venray Studios presents“.",
+    "Level statt Bauernrang: Erfahrung gibt es für fast alles (Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere, Erfolge). Level 100 ist ein Langzeit-Ziel, danach geht es endlos weiter.": "Level instead of Farmer Rank: you get experience for almost everything (harvests, days, bills, gold, Star Seeds, Moonpetals, Star Shards, plushies, achievements). Level 100 is a long-term goal, after that it goes on forever.",
+    "Erfahrungsleiste am Profil und im Profil-Fenster. Das Level steht auch in der Duo-Lobby.": "Experience bar on the profile and in the profile window. Your level is also shown in the Duo lobby.",
+    "Auren statt Titel: alle 5 Level eine neue Aura um Figur und Namen (im Profil wählbar), alle 10 Level wird sie stärker.": "Auras instead of titles: a new aura around your character and name every 5 levels (choose it in your profile), and it gets stronger every 10 levels.",
+    "Kleidung, Kopf und Accessoire haben jetzt Haupt- und Zweitfarbe, auch legendäre Teile. Doppelte Farb-Teile wurden entfernt (du bekommst das Grundteil in deiner Farbe).": "Clothes, head and accessory now have a main and a second color, legendary parts too. Duplicate color items were removed (you get the base item in your color).",
+    "Rote Schleife größer, Pflaster sichtbar, Zauberhut entfernt, Gesicht im Debug-Menü.": "Red bow bigger, band-aid visible, wizard hat removed, face in the debug menu.",
+    "Mondteich am Run-Anfang nur noch über den Teich im Hintergrund.": "At the start of a run the Moon Pond is only reachable through the pond in the background.",
+    "Neu in den Einstellungen: CRT-Filter.": "New in the settings: CRT filter."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
