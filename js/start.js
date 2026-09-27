@@ -160,7 +160,7 @@ window.debug = {
         debug.botWeg();
         const sauber = String(code || koop.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (sauber.length !== KOOP_KONFIG.codeLaenge) {
-            console.warn("debug.bot: Lobby-Code fehlt (6 Zeichen). Erst im Duo-Fenster eine Lobby erstellen.");
+            console.warn("debug.bot: Lobby-Code fehlt (5 Zeichen). Erst im Duo-Fenster eine Lobby erstellen.");
             return;
         }
         const rahmen = el("iframe", "debug-bot-rahmen");

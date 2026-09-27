@@ -2997,7 +2997,8 @@ Object.assign(UEBERSETZUNG, {
     "Mitternachtskatze": "Midnight Cat",
     "Hexenkatze": "Witch Cat",
     "Mondwolf": "Moon Wolf",
-    "Goldhase": "Golden Bunny"
+    "Goldhase": "Golden Bunny",
+    "Der Code hat {0} Zeichen.": "The code has {0} characters."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

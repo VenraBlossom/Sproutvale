@@ -21,7 +21,7 @@ const KOOP_KONFIG = {
     praefix: "sproutvale-v1-",
     ice: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
     codeZeichen: "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
-    codeLaenge: 6,
+    codeLaenge: 5,
     infoMs: 400,            // so oft wird geprueft, ob sich Gold oder Felder geaendert haben
     infoSpaetestensMs: 2000, // spaetestens dann wird die Info trotzdem geschickt (Lebenszeichen)
     stilleMs: 15000,        // so lange ohne Nachricht, dann gilt der Mitspieler als weg
@@ -71,7 +71,7 @@ function partnerSeite() {
 // Der Lobby-Code ist standardmaessig versteckt (z.B. fuer Streamer, damit niemand ungefragt beitritt)
 function koopCodeText() {
     if (!koop.code) return "…";
-    return koop.codeSichtbar ? koop.code : "X X X X X X";
+    return koop.codeSichtbar ? koop.code : Array(KOOP_KONFIG.codeLaenge).fill("X").join(" ");
 }
 
 // Knopf zum Zeigen/Verstecken des Codes; nachher = was danach neu gezeichnet werden soll
@@ -347,7 +347,7 @@ async function koopNeuerCode() {
 async function koopBeitreten(eingabe) {
     const code = String(eingabe || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     if (code.length !== KOOP_KONFIG.codeLaenge) {
-        koopFehler(t("Der Code hat 6 Zeichen."));
+        koopFehler(tf("Der Code hat {0} Zeichen.", KOOP_KONFIG.codeLaenge));
         return;
     }
     koopVerlassen(true);
@@ -1060,7 +1060,7 @@ function renderKoopLobby() {
         const eingabe = document.createElement("input");
         eingabe.className = "koop-code-eingabe";
         eingabe.type = "password"; // auch der eingetippte Code bleibt fuer Zuschauer unsichtbar
-        eingabe.maxLength = 7;
+        eingabe.maxLength = KOOP_KONFIG.codeLaenge + 1;
         eingabe.placeholder = t("Code");
         eingabe.autocomplete = "off";
         const beitreten = el("button", "knopf koop-gross", t("🚪 Beitreten"));
