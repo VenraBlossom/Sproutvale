@@ -1886,6 +1886,7 @@ function figurAusschnitt(kategorie) {
 }
 
 function renderProfil() {
+    if (!profilVorschau) return; // Fenster ist schon zu (z.B. schneller Doppelklick beim Schliessen)
     const inhalt = $("profil-inhalt");
     inhalt.innerHTML = "";
 
@@ -1963,6 +1964,7 @@ function renderProfil() {
         kachel.appendChild(el("div", "profil-kachel-name", teil.name));
         kachel.appendChild(el("div", "profil-kachel-status", frei ? (teil.fx ? "✨ " + seltenheit.name : seltenheit.name) : "🔒 " + dlcPreisText(teil)));
         kachel.addEventListener("click", () => {
+            if (!profilVorschau) return;
             profilVorschau[profilKategorie] = teil.id;
             // Besessene Teile werden gleich uebernommen, andere nur anprobiert
             if (frei) {

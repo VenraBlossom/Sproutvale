@@ -2434,7 +2434,26 @@ Object.assign(UEBERSETZUNG, {
     "🔕 Im Hintergrund stumm": "🔕 Mute in background",
     "📤 Spielstand sichern": "📤 Back up save",
     "Als Datei speichern": "Save as file",
-    "📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen.": "📤 Save backed up. Use “Load save” to bring it back."
+    "📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen.": "📤 Save backed up. Use “Load save” to bring it back.",
+    "Duo läuft viel flüssiger: Figuren werden schneller gezeichnet.": "Duo runs much smoother: characters are drawn faster.",
+    "Duo: Der Lobby-Code ist versteckt (Anzeigen per Klick), Beitritt mit Namen, der Host kann Mitspieler rauswerfen.": "Duo: the lobby code is hidden (show it with a click), joins are shown by name, the host can kick players.",
+    "Duo: Felder kosten doppelt so viel wie solo.": "Duo: fields cost twice as much as solo.",
+    "Mehr Mondblüten für bezahlte Rechnungen: schon der erste Run bringt ein spürbares Upgrade.": "More Moonpetals for paid bills: even your first run gets you a noticeable upgrade.",
+    "Duo: Rechnungen früher bezahlen geht jetzt auch zu zweit.": "Duo: you can now pay bills early together.",
+    "Neue Figur-Teile: Cargohose, Zerrissene Jeans, Sandalen, Cowboystiefel (episch), Lavahose und Blitzschuhe (legendär).": "New character parts: Cargo Pants, Ripped Jeans, Sandals, Cowboy Boots (epic), Lava Pants and Lightning Shoes (legendary).",
+    "Spielstand als Datei sichern (Einstellungen, Spielstand).": "Back up your save as a file (Settings, Save).",
+    "Neue Einstellung: Im Hintergrund stumm.": "New setting: mute in background.",
+    "Figuren laufen rechts, Begleiter links auf dem Hof.": "Characters walk on the right, companions on the left of the farm.",
+    "Viele fehlende englische Texte ergänzt, Regengeräusch im Menü behoben.": "Many missing English texts added, rain sound in the menu fixed.",
+    "Cargohose": "Cargo Pants",
+    "Zerrissene Jeans": "Ripped Jeans",
+    "Lavahose": "Lava Pants",
+    "Sandalen": "Sandals",
+    "Cowboystiefel": "Cowboy Boots",
+    "Blitzschuhe": "Lightning Shoes",
+    "Neu in {0}": "New in {0}",
+    "Weiter spielen": "Keep playing",
+    "📜 Was ist neu?": "📜 What's new?"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
