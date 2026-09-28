@@ -927,48 +927,49 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     });
 });
 
-// Neue Sterne mit autoPos: in der Naehe ihres Wunschplatzes einen freien Platz suchen (kein Stern darf einen anderen verdecken)
-(function platziereNeueSterne() {
-    const ABSTAND = 130;
-    const LINIE = 45; // so weit muss ein Stern von fremden Linien weg sein
+// Feste Plaetze fuer Sterne, deren Position nicht in ihrer Definition steht (die Sterne bleiben immer an derselben Stelle).
+// Bei neuen Sternen: Platz von Hand waehlen und mit pruefeSternbild() (Konsole) kontrollieren, dass nichts kreuzt.
+const STERN_POSITIONEN = {
+    saatkette: [1180, -660], goldenestunde: [-107, 1513], morgenkombo: [-285, -183], bodenkunde: [138, 1287], feldkunde: [440, 1620], grosseernte: [1620, -540],
+    sternenschauer: [820, -1100], sternenmeer: [1620, -880], pk_weizen: [-390, -420], pe_weizen: [375, -185], pr_weizen: [-625, -557], pk_karotte: [-423, -610],
+    pe_karotte: [614, -773], pr_karotte: [-573, -710], pk_kartoffel: [-459, -990], pe_kartoffel: [691, -1040], pr_kartoffel: [-609, -1090], pk_erdbeere: [-555, -1370],
+    pe_erdbeere: [595, -1420], pr_erdbeere: [-705, -1470], pk_tomate: [-571, -1750], pe_tomate: [579, -1800], pr_tomate: [-721, -1850], pk_mais: [-483, -2130],
+    pe_mais: [667, -2180], pr_mais: [-633, -2230], pk_kuerbis: [-420, -2510], pe_kuerbis: [730, -2560], pr_kuerbis: [-570, -2610], pk_sonnenblume: [-474, -2890],
+    pe_sonnenblume: [676, -2940], pr_sonnenblume: [-624, -2990], pk_blaubeere: [-566, -3270], pe_blaubeere: [584, -3320], pr_blaubeere: [-716, -3370], pk_melone: [-561, -3650],
+    pe_melone: [589, -3700], pr_melone: [-711, -3750], pk_reis: [-466, -4030], pe_reis: [684, -4080], pr_reis: [-616, -4130], pk_kaffee: [-421, -4410],
+    pe_kaffee: [729, -4460], pr_kaffee: [-571, -4510], pk_riesenpilz: [-491, -4790], pe_riesenpilz: [659, -4840], pr_riesenpilz: [-641, -4890], pk_eisblume: [-574, -5170],
+    pe_eisblume: [576, -5220], pr_eisblume: [-724, -5270], pk_mondlilie: [-548, -5550], pe_mondlilie: [602, -5600], pr_mondlilie: [-698, -5650], pk_kristallrose: [-452, -5930],
+    pr_kristallrose: [-602, -6030], pk_sonnenfrucht: [-426, -6310], pr_sonnenfrucht: [-576, -6410], pk_weltenbaum: [-509, -6690], pr_weltenbaum: [-659, -6790]
+};
+SKILLS.forEach(s => { if (STERN_POSITIONEN[s.id]) s.pos = STERN_POSITIONEN[s.id]; });
+
+// Prueft das Stellarium: Sterne zu nah beieinander, Sterne auf fremden Linien, kreuzende Linien. Verschiebt nichts,
+// meldet nur in der Konsole (wird beim Laden einmal aufgerufen, damit Fehler bei Updates sofort auffallen).
+function pruefeSternbild() {
     const nachId = Object.fromEntries(SKILLS.map(s => [s.id, s]));
-    const abstandZurLinie = (p, a, b) => {
-        const vx = b[0] - a[0], vy = b[1] - a[1];
-        const l = vx * vx + vy * vy || 1;
+    const linien = SKILLS.filter(s => s.vor && nachId[s.vor] && s.pos && nachId[s.vor].pos).map(s => [nachId[s.vor], s]);
+    const abstand = (p, a, b) => {
+        const vx = b[0] - a[0], vy = b[1] - a[1], l = vx * vx + vy * vy || 1;
         const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l));
         return Math.hypot(p[0] - a[0] - t * vx, p[1] - a[1] - t * vy);
     };
-    const linien = () => SKILLS.filter(s => s.vor && s.pos && nachId[s.vor] && nachId[s.vor].pos).map(s => [nachId[s.vor], s]);
-    const frei = (pos, selbst) => {
-        if (!SKILLS.every(s => s === selbst || !s.pos || Math.hypot(s.pos[0] - pos[0], s.pos[1] - pos[1]) >= ABSTAND)) return false;
-        // nicht auf einer fremden Linie liegen
-        if (linien().some(([a, b]) => a !== selbst && b !== selbst && abstandZurLinie(pos, a.pos, b.pos) < LINIE)) return false;
-        // die eigene Linie darf durch keinen anderen Stern laufen
-        const vor = nachId[selbst.vor];
-        if (!vor || !vor.pos) return true;
-        if (!SKILLS.every(s => s === selbst || s === vor || !s.pos || abstandZurLinie(s.pos, vor.pos, pos) >= LINIE)) return false;
-        // und keine fremde Linie kreuzen (Linien, die sich einen Stern teilen, duerfen sich dort beruehren)
-        return linien().every(([a, b]) => a === selbst || b === selbst || a === vor || b === vor || !kreuzen(vor.pos, pos, a.pos, b.pos));
-    };
-    // Schneiden sich zwei Strecken p1-p2 und p3-p4?
-    const kreuzen = (p1, p2, p3, p4) => {
-        const seite = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
-        return seite(p1, p2, p3) !== seite(p1, p2, p4) && seite(p3, p4, p1) !== seite(p3, p4, p2);
-    };
-    SKILLS.filter(s => s.autoPos).forEach(s => {
-        if (frei(s.pos, s)) return;
-        const [wx, wy] = s.pos;
-        for (let r = 40; r <= 600; r += 40) {
-            for (let w = 0; w < 16; w++) {
-                const kandidat = [Math.round(wx + r * Math.cos(w * Math.PI / 8)), Math.round(wy + r * Math.sin(w * Math.PI / 8))];
-                if (frei(kandidat, s)) {
-                    s.pos = kandidat;
-                    return;
-                }
-            }
-        }
-    });
-})();
+    const seite = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+    const kreuzen = (p1, p2, p3, p4) => seite(p1, p2, p3) !== seite(p1, p2, p4) && seite(p3, p4, p1) !== seite(p3, p4, p2);
+    const fehler = [];
+    SKILLS.forEach((a, i) => SKILLS.slice(i + 1).forEach(b => {
+        if (a.pos && b.pos && Math.hypot(a.pos[0] - b.pos[0], a.pos[1] - b.pos[1]) < 100) fehler.push("zu nah: " + a.id + " / " + b.id);
+    }));
+    linien.forEach(([a, b]) => SKILLS.forEach(st => {
+        if (st !== a && st !== b && st.pos && abstand(st.pos, a.pos, b.pos) < 35) fehler.push("Stern auf Linie: " + st.id + " auf " + a.id + "-" + b.id);
+    }));
+    linien.forEach(([a, b], i) => linien.slice(i + 1).forEach(([c, d]) => {
+        if (a === c || a === d || b === c || b === d) return;
+        if (kreuzen(a.pos, b.pos, c.pos, d.pos)) fehler.push("Linien kreuzen: " + a.id + "-" + b.id + " / " + c.id + "-" + d.id);
+    }));
+    if (fehler.length) console.warn("Stellarium hat Ueberschneidungen: " + fehler.join(" | "));
+    return fehler;
+}
+pruefeSternbild();
 
 // Preise anheben: ein erster Run soll nicht fast das ganze Stellarium freischalten (Ausgleich ueber Mondblueten)
 SKILLS.forEach(def => {
