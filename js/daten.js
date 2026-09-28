@@ -660,7 +660,7 @@ const SKILLS = [
     stern("saatspatz", "helfer", "🐦", [-520, 440], "eichhoernchen", t("Saat-Spatz"), 800, 2.2, 5,
         t("Ein Spatz wirft regelmäßig einen Samen auf ein freies Feld."),
         () => (level("saatspatz") > 0 ? t("Alle ") + sekText(spatzIntervallSek()) : t("Noch kein Spatz"))),
-    stern("gluehglas", "helfer", "🫙", [-740, 440], "saatspatz", t("Glühwürmchenglas"), 900, 2, 4,
+    stern("gluehglas", "helfer", "🫙", [-620, 560], "saatspatz", t("Glühwürmchenglas"), 900, 2, 4,
         t("Glühwürmchen kommen 25% öfter."),
         () => "+" + prozentText(0.25 * level("gluehglas")) + t(" Glühwürmchen")),
     stern("biene", "helfer", "🐝", [-960, 220], "igel", t("Bienenstock"), 1500, 2.1, 5,
@@ -860,8 +860,9 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     const basis = index === 0 ? 40 : p.unlockKosten;
     // Der Weizen hat seinen Ast schraeg ueber der Mitte, damit er den anderen Aesten nicht im Weg ist
     const versatz = index === 0
-        ? { pw: [-170, -250], pp: [-320, -310], pu: [170, -250], pb: [320, -310], pg: [480, -380] }
-        : { pw: [x - 190, y + 60], pp: [x - 340, y - 10], pu: [x + 190, y + 60], pb: [x + 340, y - 10], pg: [x + 500, y - 80] };
+        ? { pw: [-170, -250], pp: [-320, -310], pu: [170, -250], pb: [320, -310], pg: [480, -380], pk: [-470, -420], pr: [-610, -520] }
+        : { pw: [x - 190, y + 60], pp: [x - 340, y - 10], pu: [x + 190, y + 60], pb: [x + 340, y - 10], pg: [x + 500, y - 80],
+            pk: [x - 500, y - 90], pr: [x - 650, y - 190] };
     SKILLS.push({
         id: "p_" + p.id, ast: "pflanzen", art: "pflanze", pflanze: p.id, icon: p.emoji, pos: [x, y],
         vor: vorige ? "p_" + vorige.id : null, name: p.name, basiskosten: p.unlockKosten, faktor: 1, max: 1,
@@ -899,7 +900,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     });
     // Sternenfrucht: mehr Sternensaat von genau dieser Pflanze
     SKILLS.push({
-        id: "pk_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "✨", pos: [x - 500, y - 90], vor: "pp_" + p.id, autoPos: true,
+        id: "pk_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "✨", pos: versatz.pk, vor: "pp_" + p.id, autoPos: true,
         name: p.name + t(": Sternenfrucht"), basiskosten: rundePreis(basis * 0.8), faktor: 3, max: 3,
         beschreibung: t("+50% Sternensaat von ") + p.name + t(" (jede Stufe noch einmal +50%)."),
         info: () => "+" + 50 * level("pk_" + p.id) + t("% Sternensaat")
@@ -919,7 +920,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     }
     // Fruehreife: neue Samen dieser Pflanze starten eine Wachstumsstufe weiter
     SKILLS.push({
-        id: "pr_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🌿", pos: [x - 650, y - 190], vor: "pk_" + p.id, autoPos: true,
+        id: "pr_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🌿", pos: versatz.pr, vor: "pk_" + p.id, autoPos: true,
         name: p.name + t(": Frühreife"), basiskosten: rundePreis(basis * 1.5), faktor: 1, max: 1,
         beschreibung: t("Neue Samen von ") + p.name + t(" sind sofort Keimlinge: Sie starten eine Wachstumsstufe weiter."),
         info: () => (level("pr_" + p.id) > 0 ? t("Aktiv") : t("Nicht aktiv"))
@@ -944,7 +945,15 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         if (linien().some(([a, b]) => a !== selbst && b !== selbst && abstandZurLinie(pos, a.pos, b.pos) < LINIE)) return false;
         // die eigene Linie darf durch keinen anderen Stern laufen
         const vor = nachId[selbst.vor];
-        return !vor || !vor.pos || SKILLS.every(s => s === selbst || s === vor || !s.pos || abstandZurLinie(s.pos, vor.pos, pos) >= LINIE);
+        if (!vor || !vor.pos) return true;
+        if (!SKILLS.every(s => s === selbst || s === vor || !s.pos || abstandZurLinie(s.pos, vor.pos, pos) >= LINIE)) return false;
+        // und keine fremde Linie kreuzen (Linien, die sich einen Stern teilen, duerfen sich dort beruehren)
+        return linien().every(([a, b]) => a === selbst || b === selbst || a === vor || b === vor || !kreuzen(vor.pos, pos, a.pos, b.pos));
+    };
+    // Schneiden sich zwei Strecken p1-p2 und p3-p4?
+    const kreuzen = (p1, p2, p3, p4) => {
+        const seite = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+        return seite(p1, p2, p3) !== seite(p1, p2, p4) && seite(p3, p4, p1) !== seite(p3, p4, p2);
     };
     SKILLS.filter(s => s.autoPos).forEach(s => {
         if (frei(s.pos, s)) return;
