@@ -919,6 +919,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
             id: "pe_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🏺", pos: [versatz.pg[0] + 150, versatz.pg[1] - 60], vor: "pg_" + p.id, autoPos: true,
             name: p.name + t(": Erbsorte"), basiskosten: rundePreis(spaeter.unlockKosten * 0.4), faktor: 4, max: 3,
             bedingung: () => level("p_" + spaeter.id) > 0,
+            bedingungStern: "p_" + spaeter.id,
             bedingungText: tf("Erscheint, sobald du {0} freigeschaltet hast.", spaeter.name),
             beschreibung: tf("Alte Sorte, neu entdeckt: {0} wird wertvoller, bis zu 40% vom Grundwert von {1}. Dazu +100% Sternensaat pro Stufe.", p.name, spaeter.name),
             info: () => "x" + zahl(erbsortenFaktor(p.id, level("pe_" + p.id))) + t(" Wert")

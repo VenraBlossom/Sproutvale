@@ -4253,6 +4253,7 @@ function kaufeUpgrade(def, waehrung) {
     if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
     if (vorigePflanzeFehlt(def)) return;
+    if (def.bedingung && !def.bedingung()) return;
     // Herausforderung "Nur Weizen": keine neuen Pflanzen
     if (hf("nurweizen") && def.id.startsWith("p_") && def.id !== "p_weizen" && run.pflanzen.some(p => "p_" + p.id === def.id)) {
         Klang.fehler();
@@ -4794,6 +4795,26 @@ function renderSternDetails(def) {
         zeigtPreis ? [spriteIcon("sternensamen"), el("span", null, knopfText)] : null);
     knopf.disabled = !(offen && !istMax && darfEinkaufen() && run.skillpunkte >= kosten);
     knopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte"));
+    // Gesperrt: Klick springt zum Stern, der noch fehlt (bei Pflanzen ohne genug Ertrag ein Hinweis)
+    if (!offen) {
+        const fehlt = !def.vor || istVorgaengerErfuellt(def.vor, def.vorMax) ? (def.bedingungStern || null) : def.vor;
+        const pflanze = vorigePflanzeFehlt(def);
+        knopf.disabled = false;
+        knopf.classList.remove("knopf-gruen");
+        setzeTipp(knopf, fehlt ? t("Zum Stern, der dafür fehlt") : t("Was fehlt noch?"));
+        knopf.onclick = event => {
+            event.stopImmediatePropagation();
+            const ziel = fehlt && SKILL_NACH_ID[fehlt];
+            if (ziel && ziel.pos) {
+                aktiverStern = ziel.id;
+                springeZu(ziel.pos[0], ziel.pos[1]);
+                Klang.klick(8);
+                renderSkilltree();
+            } else if (pflanze) {
+                zeigeToast(tf("Kauf zuerst {0}x selbst Ertrag für {1} auf dem Markt ({2}/{0}).", PFLANZE_ERTRAG_VOR, pflanze.pflanze.name, pflanze.eigen));
+            }
+        };
+    }
     karte.appendChild(knopf);
     sternbildDetails.appendChild(karte);
     // Lange Namen ("Edelsteinschleifer") etwas kleiner schreiben, statt sie abzuschneiden oder im Wort zu trennen

@@ -3072,7 +3072,10 @@ Object.assign(UEBERSETZUNG, {
     "Stellarium: neue Sterne Erbsorte (alte Pflanzen holen auf), Große Ernte (+100% Gold) und Sternenschauer (+100% Sternensamen), die unendlichen am Ende ihrer Äste.": "Stellarium: new stars Heirloom Variety (old plants catch up), Great Harvest (+100% gold) and Star Shower (+100% Star Seeds), the infinite ones at the end of their branches.",
     "Stellarium: Sternensamen-Symbol vor den Preisen, keine kreuzenden Linien mehr, Sterne haben feste Plätze.": "Stellarium: Star Seed icon in front of prices, no more crossing lines, stars have fixed positions.",
     "Fix: Goldader zeigte +300%, wirkt aber +100% (Anzeige korrigiert).": "Fix: Gold Vein showed +300% but gives +100% (display corrected).",
-    "Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.": "Debug window translated and without suggested numbers."
+    "Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.": "Debug window translated and without suggested numbers.",
+    "Zum Stern, der dafür fehlt": "Go to the star that is missing",
+    "Was fehlt noch?": "What is still missing?",
+    "Kauf zuerst {0}x selbst Ertrag für {1} auf dem Markt ({2}/{0}).": "First buy Yield for {1} yourself {0} times in the market ({2}/{0})."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
