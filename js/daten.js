@@ -483,6 +483,18 @@ const BAUM_ZIELE = [
 ];
 
 // Alle normalen Sterne kosten STERN_PREIS_FAKTOR mal so viel wie eingetragen (Balancing an einer Stelle)
+// Erbsorte: wie viele Pflanzen weiter man sein muss, und wie viel vom Wert der spaeteren Pflanze Stufe 3 erreicht
+const ERBSORTE_ABSTAND = 3;
+const ERBSORTE_ANTEIL = 0.4;
+function erbsortenFaktor(pflanzenId, stufe) {
+    if (!stufe) return 1;
+    const index = PFLANZEN_VORLAGEN.findIndex(p => p.id === pflanzenId);
+    const spaeter = PFLANZEN_VORLAGEN[index + ERBSORTE_ABSTAND];
+    if (!spaeter) return 1;
+    const ziel = Math.max(1, (ERBSORTE_ANTEIL * spaeter.verkaufswert) / PFLANZEN_VORLAGEN[index].verkaufswert);
+    return Math.round(Math.pow(ziel, stufe / 3) * 10) / 10;
+}
+
 const STERN_PREIS_FAKTOR = 1.8;
 function stern(id, ast, icon, pos, vor, name, basiskosten, faktor, max, beschreibung, info, extra = {}) {
     return { id, ast, icon, pos, vor, name, basiskosten: rundePreis(basiskosten * STERN_PREIS_FAKTOR), faktor, max, beschreibung, info, ...extra };
@@ -519,7 +531,7 @@ const SKILLS = [
     stern("edelstein", "ernte", "💍", [1180, 0], "gelb", t("Edelsteinschleifer"), 5000, 2.3, 5,
         t("Alle Farb-Multiplikatoren (außer Gewöhnlich) werden um 10% stärker."),
         () => multiText(1 + edelsteinBonus()) + t(" auf die Farben")),
-    stern("sternengold", "ernte", "🔆", [1400, 0], "edelstein", t("Sternengold"), 8000, 1.4, Infinity,
+    stern("sternengold", "ernte", "🔆", [1620, 0], "goldschauer", t("Sternengold"), 8000, 1.4, Infinity,
         t("+4% Gold aus allen Ernten. Unendlich oft kaufbar."),
         () => "+" + prozentText(0.04 * level("sternengold")) + t(" Gold")),
     stern("glueck", "ernte", "🍀", [520, -220], "gruen", t("Glückskleeblatt"), 60, 1.9, 10,
@@ -566,7 +578,7 @@ const SKILLS = [
     stern("jackpotjaeger", "ernte", "🎰", [1620, -220], "midas", t("Goldgräber"), 25000, 4, 3,
         t("Legendäre Saaten sind pro Stufe noch einmal so viel wert (Stufe 1 = doppelt, Stufe 3 = vierfach)."),
         () => "x" + (1 + level("jackpotjaeger")) + t(" Wert der legendären Saat")),
-    stern("goldschauer", "ernte", "🌦️", [1620, 0], "sternengold", t("Goldschauer"), 3000, 2.5, 3,
+    stern("goldschauer", "ernte", "🌦️", [1400, 0], "edelstein", t("Goldschauer"), 3000, 2.5, 3,
         t("Der seltene Goldregen kommt pro Stufe 50% öfter."),
         () => "+" + 50 * level("goldschauer") + t("% Goldregen")),
     stern("schnuppenfaenger", "helfer", "🌠", [-960, 660], "magnetfeld", t("Sternschnuppen-Fänger"), 800, 2, 5,
@@ -774,6 +786,13 @@ const SKILLS = [
     stern("feldkunde", "hof", "📚", [440, 1620], "erntefest", t("Feldkunde"), 6000, 1.5, Infinity,
         t("Alle Pflanzen wachsen 2% schneller. Unendlich oft kaufbar."),
         () => "+" + 2 * level("feldkunde") + t("% Wachstum"), { autoPos: true }),
+    // Unendlich kaufbar, darum immer am Ende eines Astes
+    stern("grosseernte", "ernte", "🌾", [1620, -540], "goldmarie", t("Große Ernte"), 60000, 2.2, Infinity,
+        t("+100% Gold aus allen Ernten. Unendlich oft kaufbar."),
+        () => "+" + prozentText(level("grosseernte")) + t(" Gold"), { autoPos: true }),
+    stern("sternenschauer", "ernte", "💫", [740, -1100], "sternenflut", t("Sternenschauer"), 40000, 2.2, Infinity,
+        t("+100% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
+        () => "+" + prozentText(level("sternenschauer")) + t(" Sternensamen"), { autoPos: true }),
     stern("sternenmeer", "ernte", "🌊", [1620, -880], "milchstrasse", t("Sternenmeer"), 9000, 1.5, Infinity,
         t("+3% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
         () => "+" + 3 * level("sternenmeer") + t("% Sternensamen"), { autoPos: true }),
@@ -885,6 +904,19 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         beschreibung: t("+50% Sternensaat von ") + p.name + t(" (jede Stufe noch einmal +50%)."),
         info: () => "+" + 50 * level("pk_" + p.id) + t("% Sternensaat")
     });
+    // Erbsorte: alte Pflanzen holen auf. Erst frei, wenn die Pflanze 3 Stufen weiter freigeschaltet ist.
+    // Stufe 3 = 40% vom Grundwert dieser spaeteren Pflanze (waechst aber so schnell wie bisher), dazu +100% Sternensaat pro Stufe.
+    const spaeter = PFLANZEN_VORLAGEN[index + ERBSORTE_ABSTAND];
+    if (spaeter) {
+        SKILLS.push({
+            id: "pe_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🏺", pos: [versatz.pg[0] + 150, versatz.pg[1] - 60], vor: "pg_" + p.id, autoPos: true,
+            name: p.name + t(": Erbsorte"), basiskosten: rundePreis(spaeter.unlockKosten * 0.4), faktor: 4, max: 3,
+            bedingung: () => level("p_" + spaeter.id) > 0,
+            bedingungText: tf("Erscheint, sobald du {0} freigeschaltet hast.", spaeter.name),
+            beschreibung: tf("Alte Sorte, neu entdeckt: {0} wird wertvoller, bis zu 40% vom Grundwert von {1}. Dazu +100% Sternensaat pro Stufe.", p.name, spaeter.name),
+            info: () => "x" + zahl(erbsortenFaktor(p.id, level("pe_" + p.id))) + t(" Wert")
+        });
+    }
     // Fruehreife: neue Samen dieser Pflanze starten eine Wachstumsstufe weiter
     SKILLS.push({
         id: "pr_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🌿", pos: [x - 650, y - 190], vor: "pk_" + p.id, autoPos: true,
@@ -1019,6 +1051,10 @@ SKILLS.forEach(def => {
         def.wirkung = s => "+" + 50 * s + t("% Sternensaat");
     }
     if (def.id.startsWith("pr_")) def.kurz = t("Samen starten als Keimling");
+    if (def.id.startsWith("pe_")) {
+        def.kurz = t("Alte Pflanze holt auf");
+        def.wirkung = st => "x" + zahl(erbsortenFaktor(def.id.slice(3), st)) + t(" Wert, +") + 100 * st + t("% Sternensaat");
+    }
     if (def.id.startsWith("pg_")) {
         def.kurz = t("Mehr Wert für ") + def.name.split(":")[0];
         def.wirkung = s => "+" + 100 * s + t("% Wert");

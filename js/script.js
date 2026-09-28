@@ -705,7 +705,7 @@ function goldMulti() {
     const summe = 1 + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
-        1.0 * sfLevel("sternenregen") + level("fuellhorn") + gachaBonus("gold") + artenvielfalt() +
+        1.0 * sfLevel("sternenregen") + level("fuellhorn") + level("grosseernte") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
@@ -721,7 +721,7 @@ function sternWertMulti() {
         (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer"));
+        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer")) * (1 + level("sternenschauer"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -892,7 +892,7 @@ function meisterBonus() {
 function verkaufswert(pflanze) {
     const weizenbauer = (stil("weizenbauer") ? (pflanze.id === "weizen" ? 1.8 : 0.9) : 1) * (pflanze.id === "weizen" ? 1 + 0.5 * hfGeschafft("nurweizen") : 1);
     return aufrunden(weizenbauer * (pflanze.verkaufswert + level("erntekorb")) * ertragMulti(pflanze) * (1 + meisterBonus() * meisterStufe(pflanze.id)) *
-        (1 + level("pg_" + pflanze.id)));
+        (1 + level("pg_" + pflanze.id)) * erbsortenFaktor(pflanze.id, level("pe_" + pflanze.id)));
 }
 
 // Erntehase (Stellarium): erntet regelmaessig eine fertige Pflanze
@@ -2032,7 +2032,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     for (let i = 0; i < sternKugeln; i++) {
         const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
         const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index) *
-            (1 + 0.5 * level("pk_" + pflanze.id)) * // Stern "Sternenfrucht" dieser Pflanze
+            (1 + 0.5 * level("pk_" + pflanze.id)) * (1 + level("pe_" + pflanze.id)) * // Sterne "Sternenfrucht" und "Erbsorte"
             (pflanzenBonus(pflanze, "kristallrose") ? 3 : 1);
         const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
@@ -4488,7 +4488,7 @@ function vorigePflanzeFehlt(def) {
 }
 
 function istKnotenOffen(def) {
-    return (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) && !vorigePflanzeFehlt(def);
+    return (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) && !vorigePflanzeFehlt(def) && (!def.bedingung || def.bedingung());
 }
 
 function knotenKosten(def) {
@@ -4774,7 +4774,7 @@ function renderSternDetails(def) {
                 el("div", "stern-karte-ast", AST_NAMEN[def.ast] || "")
             ])
         ]),
-        verborgen ? el("div", "stern-karte-text", t("Noch verborgen")) : sternErklaerung(def)
+        verborgen ? el("div", "stern-karte-text", def.bedingungText && (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) ? def.bedingungText : t("Noch verborgen")) : sternErklaerung(def)
     );
     if (!verborgen) {
         // Was der Stern dir gerade bringt (ohne Pfeile, nur der Stand)

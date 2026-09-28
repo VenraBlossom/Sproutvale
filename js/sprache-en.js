@@ -3059,7 +3059,16 @@ Object.assign(UEBERSETZUNG, {
     "Auf diesen Wert setzen": "Set to this value",
     "🛠️ Debug (Strg+F12)": "🛠️ Debug (Ctrl+F12)",
     "Bitte erst eine Zahl eintragen.": "Please enter a number first.",
-    "Figur: ": "Character: "
+    "Figur: ": "Character: ",
+    "Große Ernte": "Great Harvest",
+    "Sternenschauer": "Star Shower",
+    "+100% Sternensamen aus allen Ernten. Unendlich oft kaufbar.": "+100% Star Seeds from all harvests. Can be bought infinitely.",
+    ": Erbsorte": ": Heirloom Variety",
+    "Erscheint, sobald du {0} freigeschaltet hast.": "Appears once you have unlocked {0}.",
+    "Alte Sorte, neu entdeckt: {0} wird wertvoller, bis zu 40% vom Grundwert von {1}. Dazu +100% Sternensaat pro Stufe.": "An old variety rediscovered: {0} becomes more valuable, up to 40% of the base value of {1}. Plus +100% Star Seed drops per level.",
+    " Wert": " value",
+    "Alte Pflanze holt auf": "Old plant catches up",
+    " Wert, +": " value, +"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
