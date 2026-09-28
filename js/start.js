@@ -200,6 +200,15 @@ function debugKosmetikOptionen(kategorie) {
     return (KOSMETIK_LISTEN[kategorie] || []).map(e => ({ wert: e.id, name: e.name, symbol: e.symbol || e.emoji || e.badge }));
 }
 
+// Skin-Kategorien mit ihrem Namen (Haus-Kategorien und Figur-Teile)
+function debugKategorien() {
+    return Object.keys(KOSMETIK_LISTEN).map(k => {
+        const haus = KOSMETIK_KATEGORIEN.find(x => x.id === k);
+        const figur = k.startsWith("figur_") && FIGUR_KATEGORIEN.find(x => x.id === k.slice(6));
+        return { wert: k, name: haus ? haus.name : figur ? t("Figur: ") + figur.name : k, symbol: haus ? haus.symbol : null };
+    });
+}
+
 const DEBUG_BEFEHLE = [
     { gruppe: "Währungen (+ = dazu, = = auf den Wert setzen)" },
     { name: "gold", text: "Gold", setzen: true, felder: [{ typ: "zahl", wert: 1000000, min: 0 }] },
@@ -243,9 +252,9 @@ const DEBUG_BEFEHLE = [
     { name: "alles", text: "ALLES freischalten" },
     { name: "allesWeg", text: "Alle Skins sperren" },
     { name: "kosmetik", text: "Skin (Kategorie, Skin)", felder: [
-        { typ: "wahl", optionen: () => Object.keys(KOSMETIK_LISTEN).map(k => ({ wert: k, name: k })) },
+        { typ: "wahl", optionen: debugKategorien },
         { typ: "wahl", optionen: werte => debugKosmetikOptionen(werte[0]) }] },
-    { name: "liste", text: "Skins einer Kategorie (Konsole)", felder: [{ typ: "wahl", optionen: () => Object.keys(KOSMETIK_LISTEN).map(k => ({ wert: k, name: k })) }] },
+    { name: "liste", text: "Skins einer Kategorie (Konsole)", felder: [{ typ: "wahl", optionen: debugKategorien }] },
     { gruppe: "Duo" },
     { name: "bot", text: "Bot tritt Lobby bei (leer = deine Lobby)", felder: [{ typ: "text", wert: "", platzhalter: "ABC123" }] },
     { name: "botWeg", text: "Bot entfernen" },
@@ -281,11 +290,11 @@ function zeigeDebugFenster() {
     const liste = el("div", "debug-liste");
     DEBUG_BEFEHLE.forEach(b => {
         if (b.gruppe) {
-            liste.appendChild(el("div", "debug-gruppe", b.gruppe));
+            liste.appendChild(el("div", "debug-gruppe", t(b.gruppe)));
             return;
         }
         const zeile = el("div", "debug-zeile");
-        zeile.appendChild(el("span", "debug-name", b.text));
+        zeile.appendChild(el("span", "debug-name", t(b.text)));
         const werte = [];
         const zuruecksetzen = [];
         const eingaben = (b.felder || []).map((f, index) => {
@@ -306,7 +315,7 @@ function zeigeDebugFenster() {
                     werte[index] = gewaehlt.wert;
                     zeige();
                 };
-                knopf.addEventListener("click", () => zeigeDebugInventar(b.text, f.optionen(werte), gewaehlt.wert, o => {
+                knopf.addEventListener("click", () => zeigeDebugInventar(t(b.text), f.optionen(werte), gewaehlt.wert, o => {
                     gewaehlt = o;
                     werte[index] = o.wert;
                     zeige();
@@ -317,8 +326,9 @@ function zeigeDebugFenster() {
             }
             const feld = el("input", "debug-feld" + (f.typ === "haken" ? " debug-haken" : ""));
             feld.type = f.typ === "zahl" ? "number" : f.typ === "haken" ? "checkbox" : "text";
+            // Zahlen ohne Vorschlag: das Feld ist leer, man traegt selbst ein
             if (f.typ === "haken") feld.checked = f.wert;
-            else feld.value = f.wert;
+            else feld.value = f.typ === "zahl" ? "" : f.wert;
             if (f.schritt) feld.step = f.schritt;
             if (f.min !== undefined) feld.min = f.min;
             if (f.max !== undefined) feld.max = f.max;
@@ -331,6 +341,7 @@ function zeigeDebugFenster() {
                 if (f.typ === "haken") return feld.checked;
                 if (f.leerNull && feld.value === "") return null;
                 if (f.typ !== "zahl") return feld.value;
+                if (feld.value === "") throw new Error(t("Bitte erst eine Zahl eintragen."));
                 // Zahlen bleiben in den Grenzen, die es im Spiel gibt
                 let zahlWert = Number(feld.value) || 0;
                 if (f.min !== undefined) zahlWert = Math.max(f.min, zahlWert);
@@ -340,7 +351,7 @@ function zeigeDebugFenster() {
             };
         });
         const ausfuehren = (aktion, name) => {
-            if (b.gefahr && !confirm(b.text + "?")) return;
+            if (b.gefahr && !confirm(t(b.text) + "?")) return;
             try {
                 aktion(...eingaben.map(lies => lies()));
                 zeigeToast("🛠️ debug." + name + " ✔");
@@ -350,18 +361,18 @@ function zeigeDebugFenster() {
             }
         };
         const los = el("button", "knopf " + (b.gefahr ? "knopf-rot" : "knopf-gruen"), b.setzen ? "+" : "▶");
-        setzeTipp(los, b.setzen ? "Dazugeben" : "Ausführen");
+        setzeTipp(los, b.setzen ? t("Dazugeben") : t("Ausführen"));
         los.addEventListener("click", () => ausfuehren(debug[b.name], b.name));
         zeile.appendChild(los);
         if (b.setzen) {
             const setzen = el("button", "knopf", "=");
-            setzeTipp(setzen, "Auf diesen Wert setzen");
+            setzeTipp(setzen, t("Auf diesen Wert setzen"));
             setzen.addEventListener("click", () => ausfuehren(wert => debug.setze(b.name, wert), "setze"));
             zeile.appendChild(setzen);
         }
         liste.appendChild(zeile);
     });
-    debugFensterSchliessen = zeigePopup({ titel: "🛠️ Debug (Strg+F12)", farbe: "#44506b", breite: 680, klasse: "debug-fenster", inhalt: liste,
+    debugFensterSchliessen = zeigePopup({ titel: t("🛠️ Debug (Strg+F12)"), farbe: "#44506b", breite: 680, klasse: "debug-fenster", inhalt: liste,
         onSchliessen: () => { debugFensterSchliessen = null; } });
 }
 

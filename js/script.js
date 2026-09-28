@@ -4788,7 +4788,10 @@ function renderSternDetails(def) {
     }
     let knopfText = istMax ? (def.max > 1 ? t("Maximal") : t("Freigeschaltet")) : zahl(kosten);
     if (!offen) knopfText = t("🔒 Gesperrt");
-    const knopf = el("button", "knopf knopf-gruen stern-karte-kaufen", knopfText);
+    // Preis mit Sternensamen-Symbol davor
+    const zeigtPreis = offen && !istMax;
+    const knopf = el("button", "knopf knopf-gruen stern-karte-kaufen", zeigtPreis ? null : knopfText,
+        zeigtPreis ? [spriteIcon("sternensamen"), el("span", null, knopfText)] : null);
     knopf.disabled = !(offen && !istMax && darfEinkaufen() && run.skillpunkte >= kosten);
     knopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte"));
     karte.appendChild(knopf);

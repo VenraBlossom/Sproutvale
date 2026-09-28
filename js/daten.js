@@ -871,7 +871,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         beschreibung: p.bonusText,
         info: () => (level("pb_" + p.id) > 0 ? t("Aktiv") : t("Nicht aktiv"))
     });
-    // Goldader: Sternensamen direkt in Gold verwandeln (+300% Wert pro Stufe fuer genau diese Pflanze)
+    // Goldader: Sternensamen direkt in Gold verwandeln (+100% Wert pro Stufe fuer genau diese Pflanze)
     SKILLS.push({
         id: "pg_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "💰", pos: versatz.pg, vor: "pb_" + p.id,
         name: p.name + t(": Goldader"), basiskosten: rundePreis(basis * 3), faktor: 4, max: 3,
@@ -1021,7 +1021,7 @@ SKILLS.forEach(def => {
     if (def.id.startsWith("pr_")) def.kurz = t("Samen starten als Keimling");
     if (def.id.startsWith("pg_")) {
         def.kurz = t("Mehr Wert für ") + def.name.split(":")[0];
-        def.wirkung = s => "+" + 300 * s + t("% Wert");
+        def.wirkung = s => "+" + 100 * s + t("% Wert");
     }
     if (def.variante) {
         def.kurz = t("Spezialpflanze: ") + def.variante.titel;
