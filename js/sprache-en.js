@@ -3068,7 +3068,11 @@ Object.assign(UEBERSETZUNG, {
     "Alte Sorte, neu entdeckt: {0} wird wertvoller, bis zu 40% vom Grundwert von {1}. Dazu +100% Sternensaat pro Stufe.": "An old variety rediscovered: {0} becomes more valuable, up to 40% of the base value of {1}. Plus +100% Star Seed drops per level.",
     " Wert": " value",
     "Alte Pflanze holt auf": "Old plant catches up",
-    " Wert, +": " value, +"
+    " Wert, +": " value, +",
+    "Stellarium: neue Sterne Erbsorte (alte Pflanzen holen auf), Große Ernte (+100% Gold) und Sternenschauer (+100% Sternensamen), die unendlichen am Ende ihrer Äste.": "Stellarium: new stars Heirloom Variety (old plants catch up), Great Harvest (+100% gold) and Star Shower (+100% Star Seeds), the infinite ones at the end of their branches.",
+    "Stellarium: Sternensamen-Symbol vor den Preisen, keine kreuzenden Linien mehr, Sterne haben feste Plätze.": "Stellarium: Star Seed icon in front of prices, no more crossing lines, stars have fixed positions.",
+    "Fix: Goldader zeigte +300%, wirkt aber +100% (Anzeige korrigiert).": "Fix: Gold Vein showed +300% but gives +100% (display corrected).",
+    "Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.": "Debug window translated and without suggested numbers."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

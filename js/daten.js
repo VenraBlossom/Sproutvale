@@ -84,10 +84,16 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.1.1";
+const SPIEL_VERSION = "Beta 0.1.2";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.1.2", punkte: [
+        t("Stellarium: neue Sterne Erbsorte (alte Pflanzen holen auf), Große Ernte (+100% Gold) und Sternenschauer (+100% Sternensamen), die unendlichen am Ende ihrer Äste."),
+        t("Stellarium: Sternensamen-Symbol vor den Preisen, keine kreuzenden Linien mehr, Sterne haben feste Plätze."),
+        t("Fix: Goldader zeigte +300%, wirkt aber +100% (Anzeige korrigiert)."),
+        t("Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.")
+    ] },
     { version: "Beta 0.1.1", punkte: [
         t("Der Beta-Tester-Engel ist jetzt von vorne zu sehen, ganz in Weiß und Grau, mit schlagenden Flügeln und Schwert."),
         t("Engelsflügel der Figur im selben Stil wie beim Engel."),
