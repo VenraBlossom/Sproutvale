@@ -3129,7 +3129,13 @@ Object.assign(UEBERSETZUNG, {
     "Als Dankeschön kannst du während der Beta alle Skins und Endlos benutzen. Den Beta-Tester-Begleiter behältst du für immer, auch nach dem Release.": "As a thank you, you can use all skins and Endless during the beta. You keep the Beta Tester companion forever, even after release.",
     "🧪 Beta": "🧪 Beta",
     "Okay! ❤️": "Okay! ❤️",
-    "💚 Alles freigeschaltet. Viel Spaß beim Testen!": "💚 Everything unlocked. Have fun testing!"
+    "💚 Alles freigeschaltet. Viel Spaß beim Testen!": "💚 Everything unlocked. Have fun testing!",
+    "Pokale neu: Holz, Gold, Platin und Kristall. Jeder gewonnene Pokal vervielfacht für immer Gold, Sternensamen, Mondblüten und Sternensplitter (x1,5, x2, x3, x5, zusammengezählt).": "Trophies reworked: Wood, Gold, Platinum and Crystal. Every trophy you win permanently multiplies gold, Star Seeds, Moonpetals and Star Shards (x1.5, x2, x3, x5, added together).",
+    "Neuer Pokal-Knopf oben mit Vitrine. Pokale liegen nie auf einem Kredit und bleiben, bis der Spielstand gelöscht wird.": "New trophy button at the top with a showcase. Trophies are never on a loan and stay until the save is deleted.",
+    "BETA-Knopf im Hauptmenü: Als Dankeschön sind während der Beta alle Skins und Endlos frei. Der Beta-Tester-Begleiter bleibt für immer.": "BETA button in the main menu: as a thank you, all skins and Endless are unlocked during the beta. The Beta Tester companion stays forever.",
+    "Die 4. Rechnung ist günstiger (72.000 statt 150.000), dort blieb man vorher lange hängen.": "The 4th bill is cheaper (72,000 instead of 150,000), players used to get stuck there.",
+    "Intro: Copyright gut lesbar auf einem Automaten, Joystick vor dem Bildschirm.": "Intro: copyright clearly readable on a cabinet, joystick in front of the screen.",
+    "Fix: ständige Meldungen \"Neu im Haus\".": "Fix: constant \"New in the house\" messages."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

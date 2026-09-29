@@ -84,10 +84,18 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.2.0";
+const SPIEL_VERSION = "Beta 0.3.0";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.3.0", punkte: [
+        t("Pokale neu: Holz, Gold, Platin und Kristall. Jeder gewonnene Pokal vervielfacht für immer Gold, Sternensamen, Mondblüten und Sternensplitter (x1,5, x2, x3, x5, zusammengezählt)."),
+        t("Neuer Pokal-Knopf oben mit Vitrine. Pokale liegen nie auf einem Kredit und bleiben, bis der Spielstand gelöscht wird."),
+        t("BETA-Knopf im Hauptmenü: Als Dankeschön sind während der Beta alle Skins und Endlos frei. Der Beta-Tester-Begleiter bleibt für immer."),
+        t("Die 4. Rechnung ist günstiger (72.000 statt 150.000), dort blieb man vorher lange hängen."),
+        t("Intro: Copyright gut lesbar auf einem Automaten, Joystick vor dem Bildschirm."),
+        t("Fix: ständige Meldungen \"Neu im Haus\".")
+    ] },
     { version: "Beta 0.2.0", punkte: [
         t("Neues Spielziel: Pokale! Die 7. Rechnung ist ein Goldpokal, später kommen ein Platinpokal und ganz spät ein Kristallpokal. Bezahlst du ihn, hast du gewonnen und kannst neu starten oder weiterspielen. In Endlos an denselben Meilensteinen."),
         t("Sternensamen gibt es erst ab dem Stellarium. Das Stellarium kostet jetzt 200 Gold."),
