@@ -3109,7 +3109,14 @@ Object.assign(UEBERSETZUNG, {
     "🌙 Neuen Run starten": "🌙 Start a new run",
     "🏆 Gewonnen!": "🏆 Victory!",
     "Im Markt kannst du für 200 Gold das Stellarium freischalten. Ab dann lässt jede Ernte Sternensaat fallen, ": "In the market you can unlock the Stellarium for 200 gold. From then on every harvest drops Star Seeds, ",
-    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 200 Gold).": "✨ You unlock the Stellarium in the market (General, 200 gold)."
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 200 Gold).": "✨ You unlock the Stellarium in the market (General, 200 gold).",
+    "Neues Spielziel: Pokale! Die 7. Rechnung ist ein Goldpokal, später kommen ein Platinpokal und ganz spät ein Kristallpokal. Bezahlst du ihn, hast du gewonnen und kannst neu starten oder weiterspielen. In Endlos an denselben Meilensteinen.": "New goal: trophies! The 7th bill is a Gold Trophy, later come a Platinum Trophy and, very late, a Crystal Trophy. Pay it and you win, then start a new run or keep playing. In Endless at the same milestones.",
+    "Sternensamen gibt es erst ab dem Stellarium. Das Stellarium kostet jetzt 200 Gold.": "Star Seeds only drop once the Stellarium is unlocked. The Stellarium now costs 200 gold.",
+    "Klicks pro Samen: Start 30, mit allem zusammen bis 10 (Stellarium, Segen, Mondteich und Tarot). Schnellere Aussaat ist jetzt im Stellarium.": "Clicks per seed: start at 30, down to 10 with everything (Stellarium, blessings, Moon Pond and tarot). Faster Sowing is now in the Stellarium.",
+    "Mehr Sternensamen im späteren Spiel, Sternenstaub und Sternenmeer stärker, Pflanzen-Sterne günstiger.": "More Star Seeds later in the game, Stardust and Star Sea stronger, plant stars cheaper.",
+    "Neuer Helfer: die Schildkröte erntet langsam für dich. Der Cursor ist von Anfang an 15% größer.": "New helper: the turtle slowly harvests for you. The cursor is 15% bigger from the start.",
+    "Im Stellarium springt ein Klick auf „Gesperrt“ zum fehlenden Stern.": "In the Stellarium, clicking „Locked“ jumps to the missing star.",
+    "Intro: Copyright-Hinweis auf einem Automaten. Fix: Erbsorte ließ sich zu früh kaufen.": "Intro: copyright notice on a cabinet. Fix: Heirloom Variety could be bought too early."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

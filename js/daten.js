@@ -84,10 +84,19 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.1.2";
+const SPIEL_VERSION = "Beta 0.2.0";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.2.0", punkte: [
+        t("Neues Spielziel: Pokale! Die 7. Rechnung ist ein Goldpokal, später kommen ein Platinpokal und ganz spät ein Kristallpokal. Bezahlst du ihn, hast du gewonnen und kannst neu starten oder weiterspielen. In Endlos an denselben Meilensteinen."),
+        t("Sternensamen gibt es erst ab dem Stellarium. Das Stellarium kostet jetzt 200 Gold."),
+        t("Klicks pro Samen: Start 30, mit allem zusammen bis 10 (Stellarium, Segen, Mondteich und Tarot). Schnellere Aussaat ist jetzt im Stellarium."),
+        t("Mehr Sternensamen im späteren Spiel, Sternenstaub und Sternenmeer stärker, Pflanzen-Sterne günstiger."),
+        t("Neuer Helfer: die Schildkröte erntet langsam für dich. Der Cursor ist von Anfang an 15% größer."),
+        t("Im Stellarium springt ein Klick auf „Gesperrt“ zum fehlenden Stern."),
+        t("Intro: Copyright-Hinweis auf einem Automaten. Fix: Erbsorte ließ sich zu früh kaufen.")
+    ] },
     { version: "Beta 0.1.2", punkte: [
         t("Stellarium: neue Sterne Erbsorte (alte Pflanzen holen auf), Große Ernte (+100% Gold) und Sternenschauer (+100% Sternensamen), die unendlichen am Ende ihrer Äste."),
         t("Stellarium: Sternensamen-Symbol vor den Preisen, keine kreuzenden Linien mehr, Sterne haben feste Plätze."),
