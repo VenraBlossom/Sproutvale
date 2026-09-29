@@ -586,14 +586,21 @@ function glueckBonus() {
         0.05 * kuschel("manta") + 0.04 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
 }
 
+// Alles, was Klicks pro Samen spart. Voll ausgebaut sind es genau 20 (30 -> 10): Stellarium 13, Segen 2, Mondteich 3, Tarot 2.
+// Pakt, Werkzeug und Gacha helfen zusaetzlich, unter das Minimum geht es aber nie.
+function klickAbzug() {
+    return level("s_aussaat") + Math.min(2, aufrunden(tw("kraft"))) + 2 * Math.min(1, Math.floor(segen("flink"))) + metaLevel("geschickt") +
+        gachaBonus("klicks") + Math.floor(segen("kargheit"));
+}
+
 // Weniger Klicks pro Samen geht nicht mehr (weitere Stufen "Schnellere Aussaat" bringen nichts)
 function klicksAmMinimum() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks") + 3 * Math.floor(segen("kargheit"));
+    const abzug = klickAbzug();
     return (KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel")) <= KONFIG.minKlicksProSamen;
 }
 
 function klicksProSamen() {
-    const abzug = level("aussaat") + aufrunden(tw("kraft")) + 2 * Math.min(3, Math.floor(segen("flink"))) + gachaBonus("klicks") + 3 * Math.floor(segen("kargheit"));
+    const abzug = klickAbzug();
     const klicks = Math.max(KONFIG.minKlicksProSamen, Math.round((KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel"))));
     return (bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks) + (bossIst("muede") ? 5 : 0);
 }

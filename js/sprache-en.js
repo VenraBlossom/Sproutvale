@@ -3079,7 +3079,16 @@ Object.assign(UEBERSETZUNG, {
     "Eine Schildkröte kriecht gemütlich über den Acker und erntet ab und zu eine fertige Pflanze für dich. Langsam, aber zuverlässig.": "A turtle crawls leisurely across the field and harvests a ripe plant for you now and then. Slow but reliable.",
     "Noch keine Schildkröte": "No turtle yet",
     "Pflanzen, die er berührt. Bis Stufe 29.": "plants it touches. Up to level 29.",
-    "Erntet langsam für dich": "Slowly harvests for you"
+    "Erntet langsam für dich": "Slowly harvests for you",
+    "-1 Klick pro Samen (2 Stufen). Mit allem zusammen kommst du auf 10 Klicks: 2 hier, der Segen Flinke Hände, ": "-1 click per seed (2 levels). With everything together you reach 10 clicks: 2 here, the blessing Nimble Hands, ",
+    "Geschickte Hände im Mondteich und die Tarotkarte Die Kraft.": "Deft Hands in the Moon Pond and the tarot card Strength.",
+    "-1 Klick pro Samen (einmal wählbar).": "-1 click per seed (can be chosen once).",
+    "-1 Klick pro Samen, aber -10% Energie an jedem Tag.": "-1 click per seed, but -10% energy every day.",
+    "Geschickte Hände": "Deft Hands",
+    "-1 Klick pro Samen in jedem Run.": "-1 click per seed in every run.",
+    "-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), ": "-1 click per seed (13 levels). With everything together you go from 30 to 10 clicks: 13 here, the blessing Nimble Hands (2), ",
+    "Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2).": "Deft Hands in the Moon Pond (3) and the tarot card Strength (up to 2).",
+    "-2 Klicks pro Samen (einmal wählbar).": "-2 clicks per seed (can be chosen once)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

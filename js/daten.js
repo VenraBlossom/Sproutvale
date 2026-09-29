@@ -234,8 +234,8 @@ const NEUIGKEITEN = [
 const KONFIG = {
     klickGrenzeProSek: 10,            // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt weniger
     klickUeberGrenze: 0.75,           // (Autoklicker bleiben staerker, aber man muss keinen benutzen; die Sense ist ausgenommen)
-    startKlicksProSamen: 15,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
-    minKlicksProSamen: 6,             // nur im Lategame erreichbar, wenn man wirklich alles hat
+    startKlicksProSamen: 30,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
+    minKlicksProSamen: 10,            // nur erreichbar mit allem: Stellarium (13), Segen Flinke Haende (2), Mondteich Geschickte Haende (3), Tarot Kraft (2)
     klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
     startEnergie: 180,
     energieProSek: 5,
@@ -422,11 +422,6 @@ const SHOP_UPGRADES = [
     { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 700, faktor: 1, max: 1,
         beschreibung: t("Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
         info: () => t("Freigeschaltet") },
-    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9,
-        max: KONFIG.startKlicksProSamen - KONFIG.minKlicksProSamen,
-        beschreibung: t("-1 Klick pro Samen."),
-        erledigt: () => (klicksAmMinimum() ? t("die geringste Klickzahl pro Samen (mehr geht nicht)") : null),
-        info: () => klicksProSamen() + t(" Klicks pro Samen") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,
         beschreibung: t("+25 Energie pro Tag."),
         info: () => energieMax() + t(" Energie pro Tag") },
@@ -722,7 +717,10 @@ const SKILLS = [
         () => prozentText(haendlerChance()) + t(" Chance nach jedem Tag")),
 
     // ----- Hof (unten): schaltet die meisten Markt-Upgrades frei -----
-    shopStern("s_aussaat", "hof", [0, 300], "p_weizen", 20),
+    stern("s_aussaat", "hof", "🌰", [0, 300], "p_weizen", t("Schnellere Aussaat"), 8, 1.55, 13,
+        t("-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), ") +
+            t("Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2)."),
+        () => klicksProSamen() + t(" Klicks pro Samen")),
     shopStern("s_energie", "hof", [-220, 520], "s_aussaat", 60),
     stern("giessen", "hof", "💧", [0, 520], "s_aussaat", t("Gießkanne"), 50, 2, 8,
         t("Jeden Tag wird ein zufälliges Feld bewässert 💧: Es wächst den ganzen Tag doppelt so schnell."),
@@ -1145,7 +1143,7 @@ const SEGEN = [
     { id: "keimkraft", badge: "🌱", name: t("Keimkraft"), text: t("Jedes freie Feld hat zum Tagesstart 12% Chance, schon einen Samen zu haben.") },
     { id: "kompost", badge: "🪱", name: t("Kompost"), text: t("Jedes Feld hat jeden Tag 8% Chance, gedüngt zu sein (doppeltes Gold).") },
     { id: "regenwolke", badge: "🌧️", name: t("Regenwolke"), text: t("Jedes Feld hat jeden Tag 8% Chance, bewässert zu sein (wächst doppelt so schnell).") },
-    { id: "flink", badge: "👐", name: t("Flinke Hände"), max: 3, text: t("-2 Klicks pro Samen (höchstens 3-mal wählbar).") },
+    { id: "flink", badge: "👐", name: t("Flinke Hände"), max: 1, text: t("-2 Klicks pro Samen (einmal wählbar).") },
     { id: "saatsegen", badge: "🔗", name: t("Saatsegen"), text: t("+10% Chance, dass ein abgeerntetes Feld sofort einen neuen Samen bekommt.") },
     { id: "keimsegen", badge: "🌿", name: t("Keimsegen"), text: t("+10% Chance, dass ein neuer Samen gleich als Keimling startet.") },
     { id: "feldarbeit", badge: "⛏️", name: t("Feldarbeit"), text: t("Neue Felder kosten 20% weniger.") },
@@ -1180,7 +1178,7 @@ const SEGEN = [
     { id: "eile", badge: "⏩", name: t("Eile"), pakt: true, max: 2, text: t("Alle Pflanzen wachsen 30% schneller, aber jede Ernte gibt 10% weniger Gold.") },
     { id: "hochrisiko", badge: "🎲", name: t("Hohes Risiko"), pakt: true, max: 2, text: t("+3% Chance auf legendäre Saat, aber alle weiteren Rechnungen kosten 10% mehr.") },
     { id: "vorschuss", badge: "💰", name: t("Vorschuss"), pakt: true, max: 2, text: t("Du bekommst sofort die Hälfte der nächsten Rechnung als Gold. Alle weiteren Rechnungen kosten 12% mehr.") },
-    { id: "kargheit", badge: "🪨", name: t("Kargheit"), pakt: true, max: 2, text: t("-3 Klicks pro Samen, aber -10% Energie an jedem Tag.") }
+    { id: "kargheit", badge: "🪨", name: t("Kargheit"), pakt: true, max: 2, text: t("-1 Klick pro Samen, aber -10% Energie an jedem Tag.") }
 ];
 const SEGEN_NACH_ID = Object.fromEntries(SEGEN.map(s => [s.id, s]));
 
@@ -2219,6 +2217,8 @@ const META_UPGRADES = [
     { id: "saatbank", name: t("Saatbank"), basiskosten: 30, faktor: 2, max: 5,
         sichtbar: m => (m.lebenszeit.runs || 0) >= 5, sichtbarText: t("Erscheint nach 5 Runs."),
         beschreibung: t("Am Ende eines Runs wandern 5% deiner übrigen Sternensamen in den nächsten Run."), info: lvl => 5 * lvl + t("% der Sternensamen") },
+    { id: "geschickt", name: t("Geschickte Hände"), basiskosten: 40, faktor: 3, max: 3,
+        beschreibung: t("-1 Klick pro Samen in jedem Run."), info: lvl => "-" + lvl + t(" Klicks pro Samen") },
     { id: "mondlicht", name: t("Mondlicht"), basiskosten: 8, faktor: 1.4, max: Infinity,
         beschreibung: t("x1,15 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
         info: lvl => multiText(Math.pow(1.15, lvl)) + t(" Gold") }
@@ -2249,7 +2249,7 @@ const TAROT = [
     { id: "wagen", nummer: "VII", symbol: "🐎", name: t("Der Wagen"), wert: 25,
         text: f => "+" + aufrunden(25 * f) + t(" Energie pro Tag.") },
     { id: "kraft", nummer: "VIII", symbol: "🦁", name: t("Die Kraft"), wert: 1,
-        text: f => "-" + aufrunden(f) + (aufrunden(f) === 1 ? t(" Klick pro Samen.") : t(" Klicks pro Samen.")) },
+        text: f => "-" + Math.min(2, aufrunden(f)) + (Math.min(2, aufrunden(f)) === 1 ? t(" Klick pro Samen.") : t(" Klicks pro Samen.")) },
     { id: "eremit", nummer: "IX", symbol: "🏮", name: t("Der Eremit"), wert: 2,
         text: f => t("Der Igel-Sammler startet jeden Run auf Stufe ") + aufrunden(2 * f) + "." },
     { id: "schicksal", nummer: "X", symbol: "🎡", name: t("Rad des Schicksals"), wert: 0.005,
