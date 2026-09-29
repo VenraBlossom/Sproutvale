@@ -788,6 +788,18 @@ function naechsteRechnung() {
 }
 
 // Jede 3. Rechnung (Nr. 3, 6, 9 ...) ist eine Boss-Rechnung
+// Oben in der Leiste: Pokal-Bild statt Rechnung, wenn als naechstes ein Pokal kommt
+function zeigeRechnungsSymbol(pokal) {
+    const bild = rechnungDisplay.querySelector("img");
+    const name = pokal ? pokal.sprite : "rechnung";
+    if (bild && bild.dataset.aktuell !== name) {
+        setzeSpriteBild(bild, name, 2);
+        bild.dataset.aktuell = name;
+    }
+    rechnungDisplay.classList.toggle("pokal", Boolean(pokal));
+    if (pokal) rechnungDisplay.style.setProperty("--pokal", pokal.farbe);
+}
+
 function istBossRechnung(index) {
     const alle = run && run.mondphase >= 2 ? 2 : BOSS_KONFIG.alle;
     return (index + 1) % alle === 0;
@@ -3452,6 +3464,8 @@ function pruefeMeilensteine() {
     const neu = erreichteMeilensteine() - run.meilensteine;
     if (neu <= 0) return;
     for (let i = 0; i < neu; i++) {
+        const pokal = trophaeFuer(run.meilensteine);
+        if (pokal) setTimeout(() => zeigeSieg(pokal), 900);
         run.meilensteine += 1;
         const hierophant = aufrunden(tw("hierophant"));
         if (hierophant > 0) gibSternensamen(hierophant);
@@ -3538,8 +3552,41 @@ function bezahleRechnungen() {
 }
 
 // Rechnung bezahlen (am Zahltag oder frueher): Gold weg, Segen ausstehend, Boni
+// Sieg: Pokal gewonnen. In Story kann man einen neuen Run starten oder weiterspielen, in Endlos geht es einfach weiter.
+function zeigeSieg(pokal) {
+    if (!meta.trophaeen) meta.trophaeen = {};
+    const neu = !meta.trophaeen[pokal.id];
+    if (neu) meta.trophaeen[pokal.id] = { tag: run.tag, datum: new Date().toISOString().slice(0, 10) };
+    meta.lebenszeit.pokale = (meta.lebenszeit.pokale || 0) + 1;
+    speichereMeta();
+    Klang.geschenk();
+    const bild = document.createElement("img");
+    bild.className = "sieg-pokal";
+    setzeSpriteBild(bild, pokal.sprite, 12);
+    bild.style.setProperty("--pokal", pokal.farbe);
+    const inhalt = el("div", "sieg", null, [
+        bild,
+        el("div", "sieg-titel", tf("Du hast den {0} gewonnen!", pokal.name)),
+        el("div", "sieg-text", neu ? t("Zum ersten Mal! Er steht jetzt für immer in deiner Sammlung.") : t("Noch einmal geschafft!")),
+        el("div", "sieg-text", run.sandbox ? t("In Endlos geht es einfach weiter.") : t("Starte einen neuen Run oder spiel einfach weiter. Der nächste Pokal wartet schon."))
+    ]);
+    const knoepfe = run.sandbox || run.koop ? [{ text: t("▶ Weiterspielen"), klasse: "knopf-gruen" }] : [
+        { text: t("🌙 Neuen Run starten"), aktion: () => {
+            run.segenAuswahl = null;
+            segenFenster.classList.add("versteckt");
+            beendeRun(0, true);
+        } },
+        { text: t("▶ Weiterspielen"), klasse: "knopf-gruen" }
+    ];
+    zeigePopup({ titel: t("🏆 Gewonnen!"), farbe: "#b8862b", breite: 460, klasse: "sieg-fenster", inhalt, knoepfe });
+    const r = window.innerWidth / 2;
+    partikel(r, window.innerHeight / 2 - 60, [pokal.farbe, "#ffffff", "#ffd93d"], 60, 220);
+}
+
 function zahleRechnung(faellig) {
     const warBoss = istBossRechnung(run.bezahlteRechnungen);
+    const pokal = run.gnadenRechnung ? null : trophaeFuer(run.bezahlteRechnungen);
+    if (pokal) setTimeout(() => zeigeSieg(pokal), 900);
     run.gold -= koopEigenerAnteil(faellig);
     run.bezahlteRechnungen += 1;
     meta.lebenszeit.rechnungen += 1;
@@ -3767,9 +3814,10 @@ function zeigeRechnungsFrage() {
     const faellig = faelligeRechnung();
     if (!run.rechnungOffen || faellig <= 0) return;
     const kredit = !run.gnadenRechnung && istBossRechnung(run.bezahlteRechnungen);
+    const pokal = !run.gnadenRechnung && trophaeFuer(run.bezahlteRechnungen);
     Klang.rechnung();
     zeigePopup({
-        titel: kredit ? t("🏦 Der Kredit ist fällig!") : t("🧾 Die Rechnung ist fällig!"),
+        titel: pokal ? tf("🏆 Der {0} wartet!", pokal.name) : kredit ? t("🏦 Der Kredit ist fällig!") : t("🧾 Die Rechnung ist fällig!"),
         farbe: "#6b4220",
         breite: 540,
         schliessbar: false,
@@ -3788,7 +3836,7 @@ function zeigeRechnungsFrage() {
                 run.tag += 1; // der heutige Tag zaehlt als gespielt
                 beendeRun(0, true);
             } },
-            { text: kredit ? t("🏦 Kredit bezahlen") : t("🧾 Rechnung bezahlen"), klasse: "knopf-gruen", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
+            { text: pokal ? t("🏆 Pokal holen") : kredit ? t("🏦 Kredit bezahlen") : t("🧾 Rechnung bezahlen"), klasse: "knopf-gruen", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
                 if (run.koop) return koopRechnungEntscheidung(true, true);
                 run.rechnungOffen = false;
                 if (bezahleRechnungen()) schliesseFeierabendAb();
@@ -4001,7 +4049,7 @@ function renderTagesKarte() {
             const rechnung = naechsteRechnung();
             const warnung = rechnung.tageBis <= 2 && run.gold < rechnung.betrag;
             html += `<p class="karte-rechnung${warnung ? " warnung" : ""}${rechnung.boss ? " boss" : ""}">` +
-                `${rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)} Gold</b> ` +
+                `${trophaeFuer(run.bezahlteRechnungen) && !run.gnadenRechnung ? "🏆 " + trophaeFuer(run.bezahlteRechnungen).name : rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)} Gold</b> ` +
                 `${t("in")} ${tageText(rechnung.tageBis)}. ${t("Du hast")} ${zahl(run.gold)} Gold.</p>`;
             if (kannFrueherBezahlen()) {
                 html += `<button class="knopf knopf-gruen karte-frueh-bezahlen">🧾 ${tf("Jetzt bezahlen ({0} früher, nächster Segen +{1}%)",
@@ -4139,6 +4187,7 @@ function aktualisiereTopBar() {
         // Meilensteine erreicht man einfach (nichts wird abgezogen): angezeigt wird nur das naechste Ziel
         const ziel = meilensteinSchwelle(run.meilensteine + 1);
         rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(ziel) + t(" Gold");
+        zeigeRechnungsSymbol(trophaeFuer(run.meilensteine));
         setzeTipp(rechnungDisplay, "## " + t("🏁 Nächster Meilenstein") + "\n= " + zahl(ziel) + t(" Gold") + "\n" +
             t("Erreichst du, sobald du in diesem Spielstand insgesamt so viel Gold verdient hast. Es wird nichts abgezogen.") +
             "\n- " + t("Schon verdient: ") + zahl(run.gesamt.gold) + t(" Gold") +
@@ -4149,8 +4198,11 @@ function aktualisiereTopBar() {
         const rechnung = naechsteRechnung();
         rechnungDisplay.querySelector("span").textContent = zahl(rechnung.betrag) + t(" Gold in ") + tageText(rechnung.tageBis);
         rechnungDisplay.classList.toggle("boss", rechnung.boss);
+        const pokal = run.gnadenRechnung ? null : trophaeFuer(run.bezahlteRechnungen);
+        zeigeRechnungsSymbol(pokal);
         const fehlt = Math.max(0, rechnung.betrag - run.gold);
-        setzeTipp(rechnungDisplay, "## " + (run.gnadenRechnung ? t("⚖️ Gnadenfrist") : rechnung.boss ? t("🏦 Nächster Kredit") : t("🧾 Nächste Rechnung")) +
+        setzeTipp(rechnungDisplay, "## " + (pokal ? "🏆 " + pokal.name : run.gnadenRechnung ? t("⚖️ Gnadenfrist") : rechnung.boss ? t("🏦 Nächster Kredit") : t("🧾 Nächste Rechnung")) +
+            (pokal ? "\n" + t("Bezahlst du ihn wie eine Rechnung, hast du gewonnen!") : "") +
             "\n= " + zahl(rechnung.betrag) + t(" Gold") +
             "\n- " + t("Fällig am Ende von Tag ") + rechnung.tag + " (" + tageText(rechnung.tageBis) + ")" +
             "\n" + (fehlt > 0 ? "- " + t("Es fehlen noch ") + zahl(fehlt) + t(" Gold") : "> " + t("✔ Du hast genug Gold")) +
@@ -5433,7 +5485,7 @@ function oeffnePanel(panel) {
     haken("panelOffen", panel.id);
 }
 
-// Das Stellarium muss man einmal im Markt freischalten (250 Gold). Wer schon gespielt hat, hat es sofort.
+// Das Stellarium muss man einmal im Markt freischalten (200 Gold). Wer schon gespielt hat, hat es sofort.
 // Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
 function stellariumFrei() {
     if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
@@ -5444,7 +5496,7 @@ function stellariumFrei() {
 function oeffneSkilltree() {
     if (!stellariumFrei()) {
         Klang.fehler();
-        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 250 Gold)."));
+        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 200 Gold)."));
         return;
     }
     schliessePanels();

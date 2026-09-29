@@ -12278,3 +12278,38 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 @keyframes teich-leuchten-stark {
     50% { filter: drop-shadow(0 0 14px #f4eeff) drop-shadow(0 0 30px #b98cf0) drop-shadow(0 0 5px #ffffff) brightness(1.1); }
 }
+
+/* ---------- Pokale ---------- */
+#rechnung-display.pokal {
+    box-shadow: 0 0 0 2px var(--pokal), 0 0 12px var(--pokal);
+}
+#rechnung-display.pokal img {
+    animation: pokal-glanz 1.8s steps(4) infinite;
+}
+@keyframes pokal-glanz {
+    0%, 100% { filter: drop-shadow(0 0 2px var(--pokal)); }
+    50% { filter: drop-shadow(0 0 7px var(--pokal)) brightness(1.2); }
+}
+.sieg {
+    text-align: center;
+}
+.sieg-pokal {
+    width: 120px;
+    height: 120px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 12px var(--pokal));
+    animation: sieg-pokal 1.4s steps(6) infinite;
+}
+@keyframes sieg-pokal {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-6px) rotate(3deg); }
+}
+.sieg-titel {
+    font-size: 1.4em;
+    font-weight: 900;
+    margin: 8px 0 4px;
+}
+.sieg-text {
+    opacity: 0.85;
+    margin-top: 4px;
+}

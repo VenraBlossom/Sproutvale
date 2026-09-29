@@ -3092,7 +3092,24 @@ Object.assign(UEBERSETZUNG, {
     "Schaltet für immer das Stellarium frei. Ab dann lässt jede Ernte Sternensaat fallen, und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten, Helfer und vieles mehr.": "Unlocks the Stellarium forever. From then on every harvest drops Star Seeds, and in the Stellarium you spend them: on new plants, colourful drops, helpers and much more.",
     "Im Markt kannst du für 250 Gold das Stellarium freischalten. Ab dann lässt jede Ernte Sternensaat fallen, ": "In the market you can unlock the Stellarium for 250 gold. From then on every harvest drops Star Seeds, ",
     "und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten und Helfer.": "and in the Stellarium you spend them: on new plants, colourful drops and helpers.",
-    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 250 Gold).": "✨ You unlock the Stellarium in the market (General, 250 gold)."
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 250 Gold).": "✨ You unlock the Stellarium in the market (General, 250 gold).",
+    "Goldpokal": "Gold Trophy",
+    "Platinpokal": "Platinum Trophy",
+    "Kristallpokal": "Crystal Trophy",
+    " Pokal": " trophy",
+    " verschiedene Pokale": " different trophies",
+    "Bezahlst du ihn wie eine Rechnung, hast du gewonnen!": "Pay it like a bill and you win!",
+    "🏆 Der {0} wartet!": "🏆 The {0} awaits!",
+    "🏆 Pokal holen": "🏆 Claim trophy",
+    "Du hast den {0} gewonnen!": "You won the {0}!",
+    "Zum ersten Mal! Er steht jetzt für immer in deiner Sammlung.": "For the first time! It stays in your collection forever.",
+    "Noch einmal geschafft!": "Done it again!",
+    "In Endlos geht es einfach weiter.": "In Endless you simply carry on.",
+    "Starte einen neuen Run oder spiel einfach weiter. Der nächste Pokal wartet schon.": "Start a new run or just keep playing. The next trophy is already waiting.",
+    "🌙 Neuen Run starten": "🌙 Start a new run",
+    "🏆 Gewonnen!": "🏆 Victory!",
+    "Im Markt kannst du für 200 Gold das Stellarium freischalten. Ab dann lässt jede Ernte Sternensaat fallen, ": "In the market you can unlock the Stellarium for 200 gold. From then on every harvest drops Star Seeds, ",
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 200 Gold).": "✨ You unlock the Stellarium in the market (General, 200 gold)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -419,7 +419,7 @@ const SHOP_UPGRADES = [
     { id: "erntekorb", knoten: null, icon: "🧺", name: t("Erntekorb"), basiskosten: 8, faktor: 1.7, max: 10,
         beschreibung: t("+1 Gold für jede Ernte."),
         info: () => "+" + level("erntekorb") + t(" Gold pro Ernte") },
-    { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 250, faktor: 1, max: 1,
+    { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 200, faktor: 1, max: 1,
         beschreibung: t("Schaltet für immer das Stellarium frei. Ab dann lässt jede Ernte Sternensaat fallen, und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
         info: () => t("Freigeschaltet") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,
@@ -984,7 +984,7 @@ pruefeSternbild();
 // Preise anheben: ein erster Run soll nicht fast das ganze Stellarium freischalten (Ausgleich ueber Mondblueten)
 SKILLS.forEach(def => {
     if (def.id === "p_weizen") return;
-    def.basiskosten = rundePreis(def.basiskosten * (def.art === "pflanze" ? 1.3 : 1.8));
+    def.basiskosten = rundePreis(def.basiskosten * (def.art === "pflanze" ? 1.0 : 1.8));
 });
 
 const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
@@ -1501,6 +1501,18 @@ const BRIEFE = [
     { absender: t("Der Müller"), text: t("Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei."), geschenk: "energie" }
 ];
 
+// ---------- POKALE (Spielziel) ----------
+// Bestimmte Rechnungen (in Endlos: Meilensteine) sind Pokale. Man bezahlt sie wie eine Rechnung und hat damit gewonnen.
+// nummer = Index der Rechnung (0 = erste). Gold ~ nach 2 Std. Spielzeit, Platin ~ 3 Std. spaeter, Kristall fuers spaete Spiel.
+const TROPHAEEN = [
+    { id: "gold", nummer: 6, name: t("Goldpokal"), sprite: "sym_pokal_gold", farbe: "#ffd23a" },
+    { id: "platin", nummer: 10, name: t("Platinpokal"), sprite: "sym_pokal_platin", farbe: "#dfe8ff" },
+    { id: "kristall", nummer: 15, name: t("Kristallpokal"), sprite: "sym_pokal_kristall", farbe: "#ff9ad5" }
+];
+function trophaeFuer(index) {
+    return TROPHAEEN.find(tr => tr.nummer === index) || null;
+}
+
 // ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------
 const ERNTEFIEBER_KONFIG = { chance: 0.07, abTag: 3, dauerMs: 12000, tempo: 6 };
 
@@ -1598,6 +1610,9 @@ const ERFOLG_KETTEN = [
     { id: "segensammler", icon: "🙏", text: z => t("Wähle ") + z + t(" verschiedene Segen"),
         wert: m => Object.keys(m.kodex.segen || {}).length,
         ziele: [10, 25, 35] },
+    { id: "pokale", icon: "🏆", text: z => t("Gewinne ") + z + (z === 1 ? t(" Pokal") : t(" verschiedene Pokale")),
+        wert: m => Object.keys(m.trophaeen || {}).length,
+        ziele: [1, 2, 3] },
     { id: "briefe", icon: "📬", text: z => t("Bekomme ") + z + (z === 1 ? t(" Brief") : t(" Briefe")) + t(" aus dem Dorf"),
         wert: m => m.lebenszeit.briefe || 0,
         ziele: [1, 10, 30] },
