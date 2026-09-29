@@ -251,7 +251,7 @@ const KONFIG = {
     tageProRechnung: 5,
     rechnungBasis: 30,
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
-    rechnungFaktorenStart: [5, 40, 25], // 30, 150, dann nach dem Stellarium steiler: 6.000, 150.000, 3,9 Mio. ...
+    rechnungFaktorenStart: [5, 40, 12], // 30, 150, 6.000, 72.000 (vorher 150.000: dort blieb man mehrere Runs haengen), danach x26
     sternensamenProErnte: 6,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
     sternensamenSpaetFaktor: 1.4,     // ab der 6. Pflanze je +40% Sternensaat (damit Sternensamen mit dem Gold mitwachsen)
     sternensamenPflanzenFaktor: 1.14, // ... und jede hoehere Pflanze gibt 14% mehr (Kuerbis ~15, Mondlilie ~37): neue Pflanzen lohnen sich
