@@ -3075,7 +3075,11 @@ Object.assign(UEBERSETZUNG, {
     "Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.": "Debug window translated and without suggested numbers.",
     "Zum Stern, der dafür fehlt": "Go to the star that is missing",
     "Was fehlt noch?": "What is still missing?",
-    "Kauf zuerst {0}x selbst Ertrag für {1} auf dem Markt ({2}/{0}).": "First buy Yield for {1} yourself {0} times in the market ({2}/{0})."
+    "Kauf zuerst {0}x selbst Ertrag für {1} auf dem Markt ({2}/{0}).": "First buy Yield for {1} yourself {0} times in the market ({2}/{0}).",
+    "Eine Schildkröte kriecht gemütlich über den Acker und erntet ab und zu eine fertige Pflanze für dich. Langsam, aber zuverlässig.": "A turtle crawls leisurely across the field and harvests a ripe plant for you now and then. Slow but reliable.",
+    "Noch keine Schildkröte": "No turtle yet",
+    "Pflanzen, die er berührt. Bis Stufe 29.": "plants it touches. Up to level 29.",
+    "Erntet langsam für dich": "Slowly harvests for you"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

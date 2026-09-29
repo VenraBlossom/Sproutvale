@@ -244,9 +244,10 @@ const KONFIG = {
     rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
     rechnungFaktorenStart: [5, 40, 25], // 30, 150, dann nach dem Stellarium steiler: 6.000, 150.000, 3,9 Mio. ...
     sternensamenProErnte: 6,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
+    sternensamenSpaetFaktor: 1.4,     // ab der 6. Pflanze je +40% Sternensaat (damit Sternensamen mit dem Gold mitwachsen)
     sternensamenPflanzenFaktor: 1.14, // ... und jede hoehere Pflanze gibt 14% mehr (Kuerbis ~15, Mondlilie ~37): neue Pflanzen lohnen sich
     sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen (Bruchteile aus Upgrades werden gesammelt)
-    basisSammelRadius: 8,             // Radius um den Mauszeiger in Pixeln
+    basisSammelRadius: 9.2,           // Radius um den Mauszeiger in Pixeln (8 + 15%)
     sammelRadiusFaktor: 1.10,         // jede Stufe "Breiter Cursor" = +10%
     kugelRadius: 16,
     rasterSpalten: 12,                // 6 Spalten links, 6 rechts, dazwischen der Weg mit dem Samenladen
@@ -421,7 +422,8 @@ const SHOP_UPGRADES = [
     { id: "stellarium", knoten: null, icon: "✨", name: t("Stellarium"), basiskosten: 700, faktor: 1, max: 1,
         beschreibung: t("Schaltet für immer das Stellarium frei: Dort gibst du Sternensaat aus, für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
         info: () => t("Freigeschaltet") },
-    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9, max: 22,
+    { id: "aussaat", knoten: "s_aussaat", icon: "🌰", name: t("Schnellere Aussaat"), basiskosten: 8, faktor: 1.9,
+        max: KONFIG.startKlicksProSamen - KONFIG.minKlicksProSamen,
         beschreibung: t("-1 Klick pro Samen."),
         erledigt: () => (klicksAmMinimum() ? t("die geringste Klickzahl pro Samen (mehr geht nicht)") : null),
         info: () => klicksProSamen() + t(" Klicks pro Samen") },
@@ -564,9 +566,9 @@ const SKILLS = [
     stern("ernterausch", "ernte", "🔥", [1180, -220], "sternenklick", t("Ernterausch"), 1500, 1, 1,
         t("Jede 30. Ernte an einem Tag startet einen Ernterausch: 6 Sekunden lang dreifaches Gold."),
         () => (level("ernterausch") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
-    stern("sternenstaub", "ernte", "🌠", [740, -660], "schwereMuenzen", t("Sternenstaub"), 150, 1.8, 10,
+    stern("sternenstaub", "ernte", "🌠", [740, -660], "schwereMuenzen", t("Sternenstaub"), 150, 2.3, 10,
         t("+20% Sternensamen aus Ernten."),
-        () => "+" + prozentText(0.2 * level("sternenstaub")) + t(" Sternensamen")),
+        () => "+" + prozentText(0.4 * level("sternenstaub")) + t(" Sternensamen")),
     stern("sternenquelle", "ernte", "⛲", [960, -660], "sternenstaub", t("Sternenquelle"), 400, 2, 10,
         t("Jede Ernte gibt 2 Sternensamen mehr."),
         () => "+" + 2 * level("sternenquelle") + t(" pro Ernte")),
@@ -642,9 +644,9 @@ const SKILLS = [
         () => (level("sternenkalender") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
     // ----- Helfer (links) -----
-    stern("radius", "helfer", "🖐️", [-520, -220], "kombo", t("Breiter Cursor"), 150, 1.35, 30,
+    stern("radius", "helfer", "🖐️", [-520, -220], "kombo", t("Breiter Cursor"), 150, 1.35, 29,
         t("+10% Radius um deinen Cursor. Er sammelt Saaten ein und erntet beim Klicken alle fertigen ") +
-            t("Pflanzen, die er berührt. Bis Stufe 30."),
+            t("Pflanzen, die er berührt. Bis Stufe 29."),
         () => sammelRadius().toFixed(1).replace(".", ",") + t(" Pixel Radius")),
     stern("vogelscheuche", "helfer", "🧑‍🌾", [-300, 220], "kombo", t("Vogelscheuche"), 250, 1, 1,
         t("Die Vogelscheuche im Hof verscheucht jeden Tag die erste Krähe von allein."),
@@ -678,6 +680,9 @@ const SKILLS = [
     stern("eichhoernchen2", "helfer", "🐿️", [-740, 660], "eichhoernchen", t("Eichhörnchen-Kolonie"), 8000, 1.9, 10,
         t("Stufe 2 der Eichhörnchen: +2 automatische Klicks pro Sekunde."),
         () => helferKlicksProSek() + t(" Klicks pro Sekunde"), { vorMax: true, abzeichen: "Ⅱ" }),
+    stern("schildkroete", "helfer", "🐢", [-460, 90], "kombo", t("Schildkröte"), 60, 2, 5,
+        t("Eine Schildkröte kriecht gemütlich über den Acker und erntet ab und zu eine fertige Pflanze für dich. Langsam, aber zuverlässig."),
+        () => (level("schildkroete") > 0 ? t("Alle ") + sekText(schildkroeteSek()) : t("Noch keine Schildkröte"))),
     stern("erntehase", "helfer", "🐇", [-520, -440], "radius", t("Erntehase"), 600, 2.3, 5,
         t("Ein Hase hoppelt über den Acker und erntet regelmäßig eine fertige Pflanze für dich."),
         () => (level("erntehase") > 0 ? t("Alle ") + sekText(erntehaseSek()) : t("Noch kein Hase"))),
@@ -799,9 +804,9 @@ const SKILLS = [
     stern("sternenschauer", "ernte", "💫", [740, -1100], "sternenflut", t("Sternenschauer"), 40000, 2.2, Infinity,
         t("+100% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
         () => "+" + prozentText(level("sternenschauer")) + t(" Sternensamen"), { autoPos: true }),
-    stern("sternenmeer", "ernte", "🌊", [1620, -880], "milchstrasse", t("Sternenmeer"), 9000, 1.5, Infinity,
+    stern("sternenmeer", "ernte", "🌊", [1620, -880], "milchstrasse", t("Sternenmeer"), 9000, 1.75, Infinity,
         t("+3% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
-        () => "+" + 3 * level("sternenmeer") + t("% Sternensamen"), { autoPos: true }),
+        () => "+" + 8 * level("sternenmeer") + t("% Sternensamen"), { autoPos: true }),
 
     // ----- Grundwerte (unten links, am Hof): stärken alles, was du hast -----
     stern("g_gold", "hof", "🪙", [-700, 960], "sonnenuhr", t("Grundwert: Gold"), 400, 2, 10,
@@ -988,6 +993,7 @@ const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 
 // ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
+    schildkroete: t("Erntet langsam für dich"),
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
     gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
@@ -1030,7 +1036,7 @@ const STERN_WIRKUNG = {
     sternensammler: s => "+" + 5 * s + t("% Doppel-Sternensaat"), sternenklick: s => "+" + zahl(s * 0.25) + t(" ✨ pro Klick"),
     schwereMuenzen: s => "+" + 20 * s + t("% Wert"), doppelernte: s => "+" + 3 * s + t("% Doppelernte"),
     fuellhorn: s => "+" + 100 * s + t("% Gold"), goldmarie: s => "x" + Math.pow(2, s) + t(" Gold"),
-    sternenstaub: s => "+" + 20 * s + "% ✨", sternenquelle: s => "+" + 2 * s + t(" ✨ pro Ernte"),
+    sternenstaub: s => "+" + 40 * s + "% ✨", sternenquelle: s => "+" + 2 * s + t(" ✨ pro Ernte"),
     sternenflut: s => "x" + Math.pow(2, s) + " ✨", glueck2: s => "+" + 10 * s + t("% Doppel-Saat"),
     radius: s => "+" + Math.round((Math.pow(KONFIG.sammelRadiusFaktor, s) - 1) * 100) + t("% Cursor"),
     kombo: s => "+" + (0.1 * s).toFixed(1).replace(".", ",") + t(" Sek. Kombo"), eichhoernchen: s => s + t(" Klicks/Sek."),
@@ -1053,7 +1059,7 @@ const STERN_WIRKUNG = {
     g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
     g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles"),
     saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo"),
-    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 3 * s + t("% Sternensamen"),
+    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 8 * s + t("% Sternensamen"),
     bodenkunde: s => (30 - 5 * s) + t(" Ernten pro Stufe")
 };
 

@@ -638,7 +638,7 @@ function magnetStaerke() { return 40 * level("magnetfeld"); }
 function ueberflussChance(pflanze) { return 0.05 * pflanze.level.ueberfluss; }
 
 function sammelRadius() {
-    let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, Math.min(level("radius"), 30)) *
+    let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, Math.min(level("radius"), 29)) *
         (1 + 0.04 * kuschel("igelchen"));
     if (wetterIst("nebel") && !hatWerkzeug("strohhut")) radius *= 0.7;
     return radius;
@@ -718,10 +718,10 @@ function goldMulti() {
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
 function sternWertMulti() {
     return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
-        (1 + 0.2 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
+        (1 + 0.4 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.03 * level("sternenmeer")) * (1 + level("sternenschauer"));
+        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.08 * level("sternenmeer")) * (1 + level("sternenschauer"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -896,6 +896,17 @@ function verkaufswert(pflanze) {
 }
 
 // Erntehase (Stellarium): erntet regelmaessig eine fertige Pflanze
+// Sternensaat je Pflanze: die ersten 5 Pflanzen je +14% (wie bisher), danach je +40%, damit Sternensamen mit dem Gold mitwachsen
+function sternensaatPflanzenFaktor(index) {
+    const frueh = Math.min(index, 4);
+    return Math.pow(KONFIG.sternensamenPflanzenFaktor, frueh) * Math.pow(KONFIG.sternensamenSpaetFaktor, Math.max(0, index - 4));
+}
+
+// Schildkroete (Stellarium): erntet langsam eine fertige Pflanze
+function schildkroeteSek() {
+    return level("schildkroete") > 0 ? 45 - 7 * (level("schildkroete") - 1) : Infinity;
+}
+
 function erntehaseSek() {
     return level("erntehase") > 0 ? 12 / level("erntehase") : Infinity;
 }
@@ -2031,7 +2042,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     }
     for (let i = 0; i < sternKugeln; i++) {
         const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
-        const basis = KONFIG.sternensamenProErnte * Math.pow(KONFIG.sternensamenPflanzenFaktor, pflanze.index) *
+        const basis = KONFIG.sternensamenProErnte * sternensaatPflanzenFaktor(pflanze.index) *
             (1 + 0.5 * level("pk_" + pflanze.id)) * (1 + level("pe_" + pflanze.id)) * // Sterne "Sternenfrucht" und "Erbsorte"
             (pflanzenBonus(pflanze, "kristallrose") ? 3 : 1);
         const sterne = wuerfleSternWert(basis + extra);

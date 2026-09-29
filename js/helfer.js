@@ -296,6 +296,39 @@ function aktualisiereHasen(dtMs) {
     }
 }
 
+// ---------- SCHILDKROETE: kriecht langsam zur reifen Pflanze ----------
+
+function aktualisiereSchildkroete(dtMs) {
+    passeAnzahlAn("kroete", level("schildkroete") > 0 ? 1 : 0, () => {
+        const rect = fieldGrid.getBoundingClientRect();
+        neueHelferFigur("kroete", "🐢", 44, rect.right - 40, rect.bottom - 30);
+    });
+    const kroete = figurenVom("kroete")[0];
+    if (!kroete) return;
+    if (!kroete.auftrag) {
+        run.kroeteMs = (run.kroeteMs || 0) + dtMs;
+        if (run.kroeteMs >= schildkroeteSek() * 1000) {
+            const fertig = run.felder.filter(f => f.fertig && !f.kraehe && f.ernteKlicksRest <= 1);
+            if (fertig.length > 0) {
+                run.kroeteMs = 0;
+                const feld = zufall(fertig);
+                const { x, y } = feldMitte(feld);
+                kroete.auftrag = { feld };
+                kroete.ziel = { x, y: y + 6 };
+            }
+        }
+    }
+    if (kroete.auftrag) {
+        if (!bewegeFigur(kroete, 70, dtMs)) return;
+        const feld = kroete.auftrag.feld;
+        if (feld.fertig && !feld.kraehe) ernteFeld(feld, false);
+        kroete.auftrag = null;
+        kroete.ziel = null;
+    } else {
+        kroete.el.classList.remove("laeuft");
+    }
+}
+
 // ---------- IM SPIEL-TAKT ----------
 
 function aktualisiereHelferFiguren(dtMs) {
@@ -304,6 +337,7 @@ function aktualisiereHelferFiguren(dtMs) {
     aktualisiereBienen(dtMs);
     aktualisiereSpatzen(dtMs);
     aktualisiereHasen(dtMs);
+    aktualisiereSchildkroete(dtMs);
 }
 
 // Feierabend und Run-Ende: alle Helfer gehen nach Hause (reservierte Felder werden wieder frei)
