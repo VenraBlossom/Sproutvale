@@ -2150,7 +2150,9 @@ function gutschreibenGold(wert, raritaetIndex) {
     meta.lebenszeit.hoechsterGewinn = Math.max(meta.lebenszeit.hoechsterGewinn, wert);
 }
 
+// Sternensamen gibt es erst, wenn das Stellarium freigeschaltet ist (vorher gibt es nichts, wofuer man sie ausgeben koennte)
 function gibSternensamen(menge) {
+    if (!stellariumFrei()) return;
     run.skillpunkte += menge;
     run.gesamt.sternensamen += menge;
     run.statistik.sternensamen += menge;
@@ -2642,6 +2644,7 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
 // extra: { streicheln: true } = Muenze vom Haustier, { anzeige: "<3" } = eigener Text beim Einsammeln
 
 function spawnLootKugel(startX, startY, wert, raritaetIndex, typ = "gold", extra = {}) {
+    if (typ === "stern" && !stellariumFrei()) return null; // vor dem Stellarium faellt keine Sternensaat
     const el = document.createElement("img");
     el.classList.add("loot-kugel");
     if (typ === "stern") {
@@ -4094,6 +4097,7 @@ function aktivTipp() {
 function aktualisiereTopBar() {
     zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
+    skillpointDisplay.classList.toggle("versteckt", !stellariumFrei());
     kalenderDisplay.querySelector("span").textContent = t("Tag ") + run.tag;
     const gesamtSterne = run.gesamt.sternensamen || 0;
     setzeTipp(moneyDisplay, "## " + t("🪙 Gold") + "\n= " + zahl(run.gold) + "\n" + t("Für den Markt, neue Felder und die Rechnungen.") +
@@ -5429,7 +5433,7 @@ function oeffnePanel(panel) {
     haken("panelOffen", panel.id);
 }
 
-// Das Stellarium muss man einmal im Markt freischalten (700 Gold). Wer schon gespielt hat, hat es sofort.
+// Das Stellarium muss man einmal im Markt freischalten (250 Gold). Wer schon gespielt hat, hat es sofort.
 // Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
 function stellariumFrei() {
     if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
@@ -5440,7 +5444,7 @@ function stellariumFrei() {
 function oeffneSkilltree() {
     if (!stellariumFrei()) {
         Klang.fehler();
-        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 700 Gold)."));
+        zeigeToast(t("✨ Das Stellarium schaltest du im Markt frei (Allgemein, 250 Gold)."));
         return;
     }
     schliessePanels();

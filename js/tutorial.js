@@ -21,8 +21,8 @@ const TUTORIAL_SCHRITTE = [
         ziel: () => energieFuellung.parentElement, wann: () => run.phase === "tag", weiterBei: "tagEnde" },
     { text: t("Feierabend! Auf dem Markt kaufst du mit Gold neue Felder und mehr Ertrag für deine Pflanzen."),
         ziel: () => $("shop-button"), wann: () => run.phase === "vorTag", weiterBei: "panelOffen", bedingung: id => id === "shop-panel" },
-    { text: t("Die Sternensaat sammelst du jetzt schon. Später gibst du sie im Stellarium aus: für neue Pflanzen, bunte Saaten und Helfer. ") +
-        t("Das Stellarium schaltest du im Markt frei, sobald du 700 Gold hast."),
+    { text: t("Im Markt kannst du für 250 Gold das Stellarium freischalten. Ab dann lässt jede Ernte Sternensaat fallen, ") +
+        t("und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten und Helfer."),
         ziel: () => $("skilltree-button"), wann: () => run.phase === "vorTag", knopf: t("Verstanden") },
     { text: t("Alle 5 Tage kommt eine Rechnung. Kannst du sie nicht bezahlen, endet der Run. Für bezahlte Rechnungen gibt es ") +
         t("Mondblüten für dauerhafte Upgrades im Mondteich. Fahr über die Jahreszeiten-Uhr und den Kalender, um zu sehen, ") +

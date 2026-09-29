@@ -3088,7 +3088,11 @@ Object.assign(UEBERSETZUNG, {
     "-1 Klick pro Samen in jedem Run.": "-1 click per seed in every run.",
     "-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), ": "-1 click per seed (13 levels). With everything together you go from 30 to 10 clicks: 13 here, the blessing Nimble Hands (2), ",
     "Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2).": "Deft Hands in the Moon Pond (3) and the tarot card Strength (up to 2).",
-    "-2 Klicks pro Samen (einmal wählbar).": "-2 clicks per seed (can be chosen once)."
+    "-2 Klicks pro Samen (einmal wählbar).": "-2 clicks per seed (can be chosen once).",
+    "Schaltet für immer das Stellarium frei. Ab dann lässt jede Ernte Sternensaat fallen, und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten, Helfer und vieles mehr.": "Unlocks the Stellarium forever. From then on every harvest drops Star Seeds, and in the Stellarium you spend them: on new plants, colourful drops, helpers and much more.",
+    "Im Markt kannst du für 250 Gold das Stellarium freischalten. Ab dann lässt jede Ernte Sternensaat fallen, ": "In the market you can unlock the Stellarium for 250 gold. From then on every harvest drops Star Seeds, ",
+    "und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten und Helfer.": "and in the Stellarium you spend them: on new plants, colourful drops and helpers.",
+    "✨ Das Stellarium schaltest du im Markt frei (Allgemein, 250 Gold).": "✨ You unlock the Stellarium in the market (General, 250 gold)."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
