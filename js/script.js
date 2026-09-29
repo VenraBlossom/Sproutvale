@@ -270,19 +270,58 @@ function kaufPruefsumme(text) {
 // Sie bleibt auch nach dem Release erhalten und schaltet den mythischen Begleiter "Beta Tester" frei.
 const BETA_KEY = "sproutvale_beta";
 
-function istBetaTester() {
+// Inhalt der Beta-Datei lesen (kodiert, mit Pruefsumme; aeltere Dateien waren noch nicht kodiert)
+function leseBetaDaten() {
     try {
         const roh = JSON.parse(localStorage.getItem(BETA_KEY));
-        return Boolean(roh && typeof roh.daten === "string" && kaufPruefsumme(roh.daten) === roh.sig && JSON.parse(roh.daten).beta);
+        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return null;
+        const text = roh.daten.startsWith("{") ? roh.daten : decodeURIComponent(escape(atob(roh.daten)));
+        return JSON.parse(text);
     } catch (fehler) {
-        return false;
+        return null;
     }
 }
 
-function merkeBetaTester() {
-    if (istBetaTester() || !/^(Alpha|Beta)\b/.test(SPIEL_VERSION)) return;
-    const daten = JSON.stringify({ beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) });
+function schreibeBetaDaten(inhalt) {
+    const daten = btoa(unescape(encodeURIComponent(JSON.stringify(inhalt))));
     localStorage.setItem(BETA_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+}
+
+function istBetaTester() {
+    const daten = leseBetaDaten();
+    return Boolean(daten && daten.beta);
+}
+
+// Laeuft gerade eine Alpha- oder Beta-Version?
+function istBetaVersion() {
+    return /^(Alpha|Beta)\b/.test(SPIEL_VERSION);
+}
+
+function merkeBetaTester() {
+    if (!istBetaVersion()) return;
+    const daten = leseBetaDaten();
+    if (daten && daten.beta) {
+        // alte, noch nicht kodierte Datei einmal neu schreiben
+        const roh = JSON.parse(localStorage.getItem(BETA_KEY));
+        if (roh.daten.startsWith("{")) schreibeBetaDaten(daten);
+        return;
+    }
+    schreibeBetaDaten({ beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) });
+}
+
+// Waehrend der Beta: nach dem Klick auf "Okay!" im BETA-Fenster ist alles frei. Nach dem Release zaehlt das nicht mehr
+// (nur der Beta-Tester-Begleiter bleibt).
+function betaAllesFrei() {
+    if (!istBetaVersion()) return false;
+    const daten = leseBetaDaten();
+    return Boolean(daten && daten.alles);
+}
+
+function schalteBetaAllesFrei() {
+    const daten = leseBetaDaten() || { beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) };
+    daten.beta = true;
+    daten.alles = true;
+    schreibeBetaDaten(daten);
 }
 
 function dlcListen() {
@@ -5900,9 +5939,6 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
         // Story loeschen = der ganze Story-Fortschritt faengt neu an (Mondteich, Tarot, Kuscheltiere, Sternenfall,
         // Erfolge, Statistik, Meisterschaft). Kosmetik, Kaeufe, Profil und Endlos bleiben ("Run beenden" behaelt dagegen alles).
         const frisch = fortschrittVon(leererMetaStand());
-        // Pokale bleiben auch nach dem Reset
-        const pokale = metaProfil === "standard" ? meta.trophaeen : metaRuhend && metaRuhend.trophaeen;
-        if (pokale) frisch.trophaeen = { ...pokale };
         if (metaProfil === "standard") {
             Object.keys(fortschrittVon(meta)).forEach(schluessel => delete meta[schluessel]);
             Object.assign(meta, frisch);

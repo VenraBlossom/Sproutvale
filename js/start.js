@@ -823,14 +823,22 @@ aktualisiereProfilKnopf();
     }
 
     // Stick und Knoepfe liegen auf dem Bedienfeld (vorne, darum zuletzt)
+    // Der Joystick liegt auf einer eigenen Ebene ueber dem Bildschirm (mit Logo und "presents"), die Knoepfe darunter
+    const vorneLeinwand = document.getElementById("intro-vorne");
+    const vorne = vorneLeinwand ? vorneLeinwand.getContext("2d") : null;
     function maleSteuerung(zeit) {
         const by = 282, x = A.x;
         const wackeln = zeit > 1.2 && zeit < 1.6 ? Math.round(Math.sin(zeit * 40) * 2) : 0;
+        if (vorne) {
+            vorne.clearRect(0, 0, B, H);
+            ctx = vorne;
+        }
         // Staubschutz-Scheibe und Stange
         knopf(x + 124, by + 12, 10, "#1a1a1e", "#2e2e34", "#0a0a0c");
         px(x + 122 + wackeln / 2, by - 6, 4, 18, "#3a3a42");
         px(x + 122 + wackeln / 2, by - 6, 1, 18, "#6a6a72");
         kugel(x + 124 + wackeln, by - 10, 9, "#8a141a", "#d02a30", "#ff5a5a", "#ffd0d0");
+        ctx = c;
         knopf(x + 262, by + 11, 11, "#f5d547", "#fff3a0", "#b8961a");
         knopf(x + 296, by + 11, 11, "#5aa9e6", "#b0e0ff", "#2a6aa8");
         knopf(x + 330, by + 11, 11, "#7ed957", "#c8ffa8", "#3e8a28");
@@ -908,3 +916,26 @@ merkeBetaTester();
 document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, 28));
 });
+
+// ---------- BETA-KNOPF (nur waehrend der Beta) ----------
+(function betaKnopf() {
+    const knopf = document.getElementById("menue-beta");
+    if (!knopf || !istBetaVersion()) return;
+    knopf.classList.remove("versteckt");
+    knopf.addEventListener("click", () => {
+        Klang.geschenk();
+        const inhalt = el("div", "beta-dank", null, [
+            el("p", null, t("Danke, dass du Sproutvale testest! 💚")),
+            el("p", null, t("Das Spiel ist noch in der Beta. Schreib uns gerne dein Feedback: in den Einstellungen unter Feedback oder als Review.")),
+            el("p", null, t("Als Dankeschön kannst du während der Beta alle Skins und Endlos benutzen. Den Beta-Tester-Begleiter behältst du für immer, auch nach dem Release."))
+        ]);
+        zeigePopup({ titel: t("🧪 Beta"), farbe: "#7c4fb3", breite: 480, inhalt, knoepfe: [{ text: t("Okay! ❤️"), klasse: "knopf-gruen", aktion: () => {
+            schalteBetaAllesFrei();
+            if (typeof wendeKosmetikAn === "function") wendeKosmetikAn();
+            if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
+            zeigeToast(t("💚 Alles freigeschaltet. Viel Spaß beim Testen!"));
+            knopf.classList.add("gesehen");
+        } }] });
+    });
+    if (betaAllesFrei()) knopf.classList.add("gesehen");
+})();

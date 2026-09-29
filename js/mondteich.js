@@ -459,7 +459,7 @@ function renderSternenfall() {
 // ---------- SPIELMODI ----------
 
 function hatSandbox() {
-    return meta.sandbox || meta.dlc;
+    return meta.sandbox || meta.dlc || (typeof betaAllesFrei === "function" && betaAllesFrei());
 }
 
 function kaufeSandbox() {

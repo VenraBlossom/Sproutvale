@@ -41,6 +41,7 @@ function istKosmetikFrei(eintrag, kategorie) {
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
     if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
+    if (typeof betaAllesFrei === "function" && betaAllesFrei()) return true; // Beta: alles frei
     if (meta.freigeschaltet[schluessel]) return true;
     if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && Boolean(meta.dlc);
     // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)

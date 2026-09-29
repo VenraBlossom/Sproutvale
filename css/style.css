@@ -12409,3 +12409,46 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     86%, 92% { opacity: 0.35; }
     93%, 100% { opacity: 1; }
 }
+
+/* Intro: Joystick-Ebene ueber dem Bildschirm */
+#intro-vorne {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* BETA-Knopf im Hauptmenue: blinkt stark, bis man ihn angeklickt hat */
+.menue-beta {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    z-index: 3;
+    font-family: "Jersey 15", "Pixelify Sans", monospace;
+    font-size: 1.6em;
+    letter-spacing: 2px;
+    padding: 6px 16px;
+    color: #fff;
+    background: #e8434a;
+    border: 3px solid #5a0a14;
+    box-shadow: 0 4px 0 #5a0a14;
+    cursor: pointer;
+    animation: beta-blinken 0.7s steps(1) infinite;
+}
+.menue-beta.gesehen {
+    animation: none;
+    background: #7c4fb3;
+    border-color: #2e1450;
+    box-shadow: 0 4px 0 #2e1450;
+}
+@keyframes beta-blinken {
+    0%, 49% { background: #e8434a; transform: scale(1); }
+    50%, 100% { background: #ffd23a; color: #5a0a14; transform: scale(1.08); }
+}
+.beta-dank p {
+    margin: 6px 0;
+    line-height: 1.4;
+}

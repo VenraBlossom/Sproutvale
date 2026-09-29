@@ -3123,7 +3123,13 @@ Object.assign(UEBERSETZUNG, {
     "🏆 Pokale: alles x{0}": "🏆 Trophies: everything x{0}",
     "🏆 Pokale": "🏆 Trophies",
     "Bist du würdig genug?": "Are you worthy enough?",
-    "Alle Währungen x{0}": "All currencies x{0}"
+    "Alle Währungen x{0}": "All currencies x{0}",
+    "Danke, dass du Sproutvale testest! 💚": "Thank you for testing Sproutvale! 💚",
+    "Das Spiel ist noch in der Beta. Schreib uns gerne dein Feedback: in den Einstellungen unter Feedback oder als Review.": "The game is still in beta. Feel free to leave feedback: in the settings under Feedback or as a review.",
+    "Als Dankeschön kannst du während der Beta alle Skins und Endlos benutzen. Den Beta-Tester-Begleiter behältst du für immer, auch nach dem Release.": "As a thank you, you can use all skins and Endless during the beta. You keep the Beta Tester companion forever, even after release.",
+    "🧪 Beta": "🧪 Beta",
+    "Okay! ❤️": "Okay! ❤️",
+    "💚 Alles freigeschaltet. Viel Spaß beim Testen!": "💚 Everything unlocked. Have fun testing!"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
