@@ -12313,3 +12313,66 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.85;
     margin-top: 4px;
 }
+
+/* Pokal-Knopf oben und Vitrine */
+#pokal-knopf {
+    cursor: pointer;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+#pokal-knopf.hat-pokal img {
+    filter: drop-shadow(0 0 4px var(--pokal));
+}
+.pokal-vitrine {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    padding: 10px 0;
+}
+.pokal-platz {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.12);
+    border: 3px solid #4a3a2a;
+    border-radius: 6px;
+}
+.pokal-platz img {
+    width: 60px;
+    height: 60px;
+    image-rendering: pixelated;
+}
+.pokal-platz.gewonnen {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 12px var(--pokal) inset;
+}
+.pokal-platz.gewonnen img {
+    filter: drop-shadow(0 0 8px var(--pokal));
+}
+.pokal-spalte {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.pokal-bonus {
+    font-size: 0.8em;
+    font-weight: 800;
+    color: #3f8a32;
+    text-align: center;
+    max-width: 90px;
+}
+.pokal-frage {
+    text-align: center;
+    font-style: italic;
+    font-weight: 800;
+    margin-top: 6px;
+    opacity: 0.8;
+}
+.sieg-bonus {
+    margin-top: 8px;
+    font-weight: 800;
+    color: #3f8a32;
+}

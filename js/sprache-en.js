@@ -3116,7 +3116,14 @@ Object.assign(UEBERSETZUNG, {
     "Mehr Sternensamen im späteren Spiel, Sternenstaub und Sternenmeer stärker, Pflanzen-Sterne günstiger.": "More Star Seeds later in the game, Stardust and Star Sea stronger, plant stars cheaper.",
     "Neuer Helfer: die Schildkröte erntet langsam für dich. Der Cursor ist von Anfang an 15% größer.": "New helper: the turtle slowly harvests for you. The cursor is 15% bigger from the start.",
     "Im Stellarium springt ein Klick auf „Gesperrt“ zum fehlenden Stern.": "In the Stellarium, clicking „Locked“ jumps to the missing star.",
-    "Intro: Copyright-Hinweis auf einem Automaten. Fix: Erbsorte ließ sich zu früh kaufen.": "Intro: copyright notice on a cabinet. Fix: Heirloom Variety could be bought too early."
+    "Intro: Copyright-Hinweis auf einem Automaten. Fix: Erbsorte ließ sich zu früh kaufen.": "Intro: copyright notice on a cabinet. Fix: Heirloom Variety could be bought too early.",
+    "Holzpokal": "Wooden Trophy",
+    "Ist das erst der Anfang?": "Is this just the beginning?",
+    "Für immer: Gold, Sternensamen, Mondblüten und Sternensplitter x{0} (alle Pokale zusammen: x{1})": "Forever: gold, Star Seeds, Moonpetals and Star Shards x{0} (all trophies together: x{1})",
+    "🏆 Pokale: alles x{0}": "🏆 Trophies: everything x{0}",
+    "🏆 Pokale": "🏆 Trophies",
+    "Bist du würdig genug?": "Are you worthy enough?",
+    "Alle Währungen x{0}": "All currencies x{0}"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

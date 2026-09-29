@@ -1510,16 +1510,40 @@ const BRIEFE = [
     { absender: t("Der Müller"), text: t("Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei."), geschenk: "energie" }
 ];
 
-// ---------- POKALE (Spielziel) ----------
-// Bestimmte Rechnungen (in Endlos: Meilensteine) sind Pokale. Man bezahlt sie wie eine Rechnung und hat damit gewonnen.
-// nummer = Index der Rechnung (0 = erste). Gold ~ nach 2 Std. Spielzeit, Platin ~ 3 Std. spaeter, Kristall fuers spaete Spiel.
+// ---------- POKALE (Belohnung) ----------
+// Bestimmte Rechnungen (in Endlos: Meilensteine) sind Pokale. Man bezahlt sie wie eine Rechnung und bekommt den Pokal.
+// Jeder Pokal gilt fuer immer (auch nach einem Story-Reset) und vervielfacht Gold, Sternensamen, Mondblueten und
+// Sternensplitter (nicht die Gutscheine). Die Faktoren werden zusammengezaehlt: Holz + Gold = x3,5.
+// Ein gewonnener Pokal ist in spaeteren Runs wieder eine normale Rechnung.
+// nummer = Index der Rechnung (0 = erste), faellt sie auf einen Kredit, eine spaeter. Gedacht: Holz ~30-40 Min, Gold ~1,5-2 Std,
+// Platin ~5 Std, Kristall ~10-15 Std.
 const TROPHAEEN = [
-    { id: "gold", nummer: 6, name: t("Goldpokal"), sprite: "sym_pokal_gold", farbe: "#ffd23a" },
-    { id: "platin", nummer: 10, name: t("Platinpokal"), sprite: "sym_pokal_platin", farbe: "#dfe8ff" },
-    { id: "kristall", nummer: 15, name: t("Kristallpokal"), sprite: "sym_pokal_kristall", farbe: "#ff9ad5" }
+    { id: "holz", nummer: 2, name: t("Holzpokal"), sprite: "sym_pokal_holz", farbe: "#c08a50", faktor: 1.5 },
+    { id: "gold", nummer: 5, name: t("Goldpokal"), sprite: "sym_pokal_gold", farbe: "#ffd23a", faktor: 2 },
+    { id: "platin", nummer: 9, name: t("Platinpokal"), sprite: "sym_pokal_platin", farbe: "#dfe8ff", faktor: 3 },
+    { id: "kristall", nummer: 13, name: t("Kristallpokal"), sprite: "sym_pokal_kristall", farbe: "#ff9ad5", faktor: 5 }
 ];
+function hatPokal(id) {
+    return Boolean(meta.trophaeen && meta.trophaeen[id]);
+}
+// Ein Pokal ist nie ein Kredit: faellt seine Rechnung auf einen Kredit, kommt er eine Rechnung spaeter
+function pokalIndex(tr) {
+    let index = tr.nummer;
+    while (typeof istKreditIndex === "function" && istKreditIndex(index)) index += 1;
+    return index;
+}
+// Pokal, der diese Rechnung ersetzt (nur solange man ihn noch nicht hat)
 function trophaeFuer(index) {
-    return TROPHAEEN.find(tr => tr.nummer === index) || null;
+    return TROPHAEEN.find(tr => pokalIndex(tr) === index && !hatPokal(tr.id)) || null;
+}
+// Faktor als Text mit Komma (1,5)
+function faktorText(wert) {
+    return wert.toLocaleString(SPRACH_LOCALE, { maximumFractionDigits: 2 });
+}
+// Bonus aller gewonnenen Pokale zusammen (ohne Pokal = x1)
+function pokalFaktor() {
+    const summe = TROPHAEEN.filter(tr => hatPokal(tr.id)).reduce((a, tr) => a + tr.faktor, 0);
+    return summe > 0 ? summe : 1;
 }
 
 // ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------

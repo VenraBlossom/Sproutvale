@@ -355,7 +355,7 @@ function renderKuscheltiere() {
 // ---------- STERNENFALL (zweite Prestige-Ebene) ----------
 
 function sternenfallSplitter() {
-    return Math.floor(Math.sqrt(meta.mondbluetenSeitSternenfall / STERNENFALL_KONFIG.splitterTeiler));
+    return Math.floor(Math.sqrt(meta.mondbluetenSeitSternenfall / STERNENFALL_KONFIG.splitterTeiler) * pokalFaktor());
 }
 
 function kannSternenfall() {

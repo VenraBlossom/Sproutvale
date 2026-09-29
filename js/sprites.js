@@ -3445,6 +3445,28 @@ const PIXEL_SYMBOL_DATEN = {
         "....oo....",
         ".........."]],
     // Pokale (Rechnungen, mit denen man gewinnt)
+    pokal_holz: [{ o: "#3a2412", G: "#c08a50", g: "#8a5a2c", W: "#e8c090" }, [
+        ".oooooooo.",
+        "oGWGGGGGgo",
+        "GoWGGGGGoG",
+        "GoGGGGGgoG",
+        ".ooGGGgoo.",
+        "...oGgo...",
+        "....oo....",
+        "...oGGo...",
+        "..oggggo..",
+        "..oooooo.."]],
+    pokal_schwarz: [{ o: "#000000", G: "#1c1c22", g: "#101014", W: "#2e2e36" }, [
+        ".oooooooo.",
+        "oGWGGGGGgo",
+        "GoWGGGGGoG",
+        "GoGGGGGgoG",
+        ".ooGGGgoo.",
+        "...oGgo...",
+        "....oo....",
+        "...oGGo...",
+        "..oggggo..",
+        "..oooooo.."]],
     pokal_gold: [{ o: "#7a4a08", G: "#ffd23a", g: "#d09a10", W: "#fff6c0" }, [
         ".oooooooo.",
         "oGWGGGGGgo",

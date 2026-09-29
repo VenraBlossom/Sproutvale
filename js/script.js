@@ -717,14 +717,14 @@ function goldMulti() {
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
     const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
-    return pakte * summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
+    return pokalFaktor() * pakte * summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
         (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
         (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
 function sternWertMulti() {
-    return (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
+    return pokalFaktor() * (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
         (1 + 0.4 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
@@ -800,6 +800,12 @@ function zeigeRechnungsSymbol(pokal) {
     if (pokal) rechnungDisplay.style.setProperty("--pokal", pokal.farbe);
 }
 
+// Ist diese Rechnung ein Kredit? (ohne Ruecksicht auf Pokale, die kommen nie auf einen Kredit)
+function istKreditIndex(index) {
+    const alle = run && run.mondphase >= 2 ? 2 : BOSS_KONFIG.alle;
+    return (index + 1) % alle === 0;
+}
+
 function istBossRechnung(index) {
     const alle = run && run.mondphase >= 2 ? 2 : BOSS_KONFIG.alle;
     return (index + 1) % alle === 0;
@@ -855,7 +861,7 @@ function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 
     for (let i = 1; i <= anzahl; i++) summe += MONDBLUETEN_PRO_RECHNUNG * i * i;
     const bonus = (1 + tw("gericht") + 0.10 * kuschel("mondhase") + 0.3 * sfLevel("mondmagnet")) *
         (1 + MONDPHASE_BONUS * mondphase);
-    return aufrunden(summe * bonus * sternenfallFaktor());
+    return aufrunden(summe * bonus * sternenfallFaktor() * pokalFaktor());
 }
 
 // +25% pro Stufe, alle 10 Stufen zusaetzlich x2
@@ -3557,6 +3563,7 @@ function zeigeSieg(pokal) {
     if (!meta.trophaeen) meta.trophaeen = {};
     const neu = !meta.trophaeen[pokal.id];
     if (neu) meta.trophaeen[pokal.id] = { tag: run.tag, datum: new Date().toISOString().slice(0, 10) };
+    aktualisierePokalKnopf();
     meta.lebenszeit.pokale = (meta.lebenszeit.pokale || 0) + 1;
     speichereMeta();
     Klang.geschenk();
@@ -3567,10 +3574,12 @@ function zeigeSieg(pokal) {
     const inhalt = el("div", "sieg", null, [
         bild,
         el("div", "sieg-titel", tf("Du hast den {0} gewonnen!", pokal.name)),
-        el("div", "sieg-text", neu ? t("Zum ersten Mal! Er steht jetzt für immer in deiner Sammlung.") : t("Noch einmal geschafft!")),
-        el("div", "sieg-text", run.sandbox ? t("In Endlos geht es einfach weiter.") : t("Starte einen neuen Run oder spiel einfach weiter. Der nächste Pokal wartet schon."))
+        el("div", "sieg-bonus", tf("Für immer: Gold, Sternensamen, Mondblüten und Sternensplitter x{0} (alle Pokale zusammen: x{1})",
+            faktorText(pokal.faktor), faktorText(pokalFaktor()))),
+        pokal.id === "holz" ? null : el("div", "sieg-text", run.sandbox ? t("In Endlos geht es einfach weiter.") : t("Starte einen neuen Run oder spiel einfach weiter. Der nächste Pokal wartet schon."))
     ]);
-    const knoepfe = run.sandbox || run.koop ? [{ text: t("▶ Weiterspielen"), klasse: "knopf-gruen" }] : [
+    const knoepfe = pokal.id === "holz" ? [{ text: t("Ist das erst der Anfang?"), klasse: "knopf-gruen" }]
+        : run.sandbox || run.koop ? [{ text: t("▶ Weiterspielen"), klasse: "knopf-gruen" }] : [
         { text: t("🌙 Neuen Run starten"), aktion: () => {
             run.segenAuswahl = null;
             segenFenster.classList.add("versteckt");
@@ -3582,6 +3591,38 @@ function zeigeSieg(pokal) {
     const r = window.innerWidth / 2;
     partikel(r, window.innerHeight / 2 - 60, [pokal.farbe, "#ffffff", "#ffd93d"], 60, 220);
 }
+
+// Knopf oben in der Leiste: zeigt den besten Pokal (oder einen schwarzen Platzhalter) und oeffnet die Pokal-Vitrine
+const pokalKnopf = $("pokal-knopf");
+function aktualisierePokalKnopf() {
+    if (!pokalKnopf) return;
+    const bester = [...TROPHAEEN].reverse().find(tr => hatPokal(tr.id));
+    const bild = pokalKnopf.querySelector("img");
+    setzeSpriteBild(bild, bester ? bester.sprite : "sym_pokal_schwarz", 2);
+    pokalKnopf.classList.toggle("hat-pokal", Boolean(bester));
+    if (bester) pokalKnopf.style.setProperty("--pokal", bester.farbe);
+    setzeTipp(pokalKnopf, bester ? tf("🏆 Pokale: alles x{0}", faktorText(pokalFaktor())) : t("🏆 Pokale"));
+}
+function oeffnePokalVitrine() {
+    const reihe = el("div", "pokal-vitrine");
+    TROPHAEEN.forEach(tr => {
+        const hat = hatPokal(tr.id);
+        const platz = el("div", "pokal-platz" + (hat ? " gewonnen" : ""));
+        const bild = document.createElement("img");
+        setzeSpriteBild(bild, hat ? tr.sprite : "sym_pokal_schwarz", 6);
+        platz.style.setProperty("--pokal", tr.farbe);
+        platz.appendChild(bild);
+        // Beim Drueberfahren steht nur der Name, gewonnene zeigen darunter ihren Bonus
+        setzeTipp(platz, tr.name);
+        const spalte = el("div", "pokal-spalte", null, [platz]);
+        if (hat) spalte.appendChild(el("div", "pokal-bonus", tf("Alle Währungen x{0}", faktorText(tr.faktor))));
+        reihe.appendChild(spalte);
+    });
+    Klang.klick(8);
+    zeigePopup({ titel: t("🏆 Pokale"), farbe: "#3a3a44", breite: 520, klasse: "pokal-fenster",
+        inhalt: el("div", null, null, [reihe, el("div", "pokal-frage", t("Bist du würdig genug?"))]) });
+}
+if (pokalKnopf) pokalKnopf.addEventListener("click", oeffnePokalVitrine);
 
 function zahleRechnung(faellig) {
     const warBoss = istBossRechnung(run.bezahlteRechnungen);
@@ -4143,6 +4184,7 @@ function aktivTipp() {
 }
 
 function aktualisiereTopBar() {
+    aktualisierePokalKnopf();
     zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     skillpointDisplay.classList.toggle("versteckt", !stellariumFrei());
@@ -5858,6 +5900,9 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
         // Story loeschen = der ganze Story-Fortschritt faengt neu an (Mondteich, Tarot, Kuscheltiere, Sternenfall,
         // Erfolge, Statistik, Meisterschaft). Kosmetik, Kaeufe, Profil und Endlos bleiben ("Run beenden" behaelt dagegen alles).
         const frisch = fortschrittVon(leererMetaStand());
+        // Pokale bleiben auch nach dem Reset
+        const pokale = metaProfil === "standard" ? meta.trophaeen : metaRuhend && metaRuhend.trophaeen;
+        if (pokale) frisch.trophaeen = { ...pokale };
         if (metaProfil === "standard") {
             Object.keys(fortschrittVon(meta)).forEach(schluessel => delete meta[schluessel]);
             Object.assign(meta, frisch);
