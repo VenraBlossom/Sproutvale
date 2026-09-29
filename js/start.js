@@ -695,7 +695,7 @@ aktualisiereProfilKnopf();
     function maleNebenAutomaten() {
         neben = [
             maleNebenAutomat(-26, 70, 1.9, "#2a5ac0", "#5a8ae8", "#142e6a", "#ff8a3a", false),
-            maleNebenAutomat(56, 104, 1.45, "#b82a2a", "#e85a4a", "#5a1414", "#5affc8", false),
+            maleNebenAutomat(40, 104, 1.45, "#b82a2a", "#e85a4a", "#5a1414", "#5affc8", false),
             maleNebenAutomat(526, 104, 1.45, "#2f7a2a", "#6ac04a", "#143a12", "#ff5ad0", true),
             maleNebenAutomat(590, 70, 1.9, "#c89018", "#f0c040", "#6a4a08", "#4ad0ff", true)
         ];
@@ -786,10 +786,23 @@ aktualisiereProfilKnopf();
         c.clip();
         neben.forEach((n, i) => {
             px(n.sx, n.sy, n.sw, n.sh, ["#0c1a3a", "#2a0c1a", "#0c2a14", "#2a1a08"][i]);
-            const schritt = Math.floor(zeit * 3 + i) % 2;
-            const mx = n.sx + 3 + ((zeit * 12 + i * 20) % Math.max(1, n.sw - 16));
-            monster(Math.round(mx), n.sy + 4 + schritt, farben[i], 1);
-            px(n.sx + n.sw / 2 - 1, n.sy + n.sh - 5, 3, 2, "#ffffff");
+            if (i === 1) {
+                // Dieser Automat zeigt kein Spiel, sondern das Copyright (in der Pixel-Schrift, blinkt wie ein Attract-Screen)
+                c.textAlign = "center";
+                c.textBaseline = "middle";
+                c.fillStyle = Math.floor(zeit * 1.5) % 4 === 3 ? "#8a2a4a" : "#ffd6e0";
+                c.font = "9px 'Jersey 15', monospace";
+                c.fillText("© 2026", n.sx + n.sw / 2, n.sy + 8);
+                c.fillStyle = "#ffb0c8";
+                c.fillText("VENRAY", n.sx + n.sw / 2, n.sy + 17);
+                c.fillText("STUDIOS", n.sx + n.sw / 2, n.sy + 25);
+                c.textAlign = "left";
+            } else {
+                const schritt = Math.floor(zeit * 3 + i) % 2;
+                const mx = n.sx + 3 + ((zeit * 12 + i * 20) % Math.max(1, n.sw - 16));
+                monster(Math.round(mx), n.sy + 4 + schritt, farben[i], 1);
+                px(n.sx + n.sw / 2 - 1, n.sy + n.sh - 5, 3, 2, "#ffffff");
+            }
             for (let yy = n.sy; yy < n.sy + n.sh; yy += 2) px(n.sx, yy, n.sw, 1, "rgba(0,0,0,0.3)");
             px(n.sx - 2, n.sy - 2, n.sw + 4, n.sh + 4, farben[i] + "12");
         });
