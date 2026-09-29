@@ -12376,3 +12376,36 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-weight: 800;
     color: #3f8a32;
 }
+
+/* Copyright auf dem zweiten Automaten von rechts (Bildschirm 550/129, 46x37 von 640x360), scharfe Pixel-Schrift */
+#intro-buehne {
+    container-type: size;
+}
+.intro-copyright {
+    position: absolute;
+    left: 85.94%;
+    top: 35.9%;
+    width: 7.19%;
+    height: 10.17%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Jersey 15", "Pixelify Sans", monospace;
+    font-size: 1.25cqw;
+    line-height: 1.05;
+    letter-spacing: 0.05em;
+    color: #ffd6e0;
+    text-shadow: 0 0 0.3cqw #ff5ad0, 0.1cqw 0.1cqw 0 #3a0a24;
+    pointer-events: none;
+    z-index: 1;
+    animation: copyright-blinken 2.6s steps(1) infinite;
+}
+.intro-copyright span:first-child {
+    color: #ffffff;
+}
+@keyframes copyright-blinken {
+    0%, 85% { opacity: 1; }
+    86%, 92% { opacity: 0.35; }
+    93%, 100% { opacity: 1; }
+}

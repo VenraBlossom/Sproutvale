@@ -693,11 +693,14 @@ aktualisiereProfilKnopf();
 
     let neben = [];
     function maleNebenAutomaten() {
+        // Der gelbe ganz rechts wird zuerst gemalt, damit der gruene (mit dem Copyright) davor steht
+        const gelb = maleNebenAutomat(590, 70, 1.9, "#c89018", "#f0c040", "#6a4a08", "#4ad0ff", true);
         neben = [
             maleNebenAutomat(-26, 70, 1.9, "#2a5ac0", "#5a8ae8", "#142e6a", "#ff8a3a", false),
-            maleNebenAutomat(40, 104, 1.45, "#b82a2a", "#e85a4a", "#5a1414", "#5affc8", false),
-            maleNebenAutomat(526, 104, 1.45, "#2f7a2a", "#6ac04a", "#143a12", "#ff5ad0", true),
-            maleNebenAutomat(590, 70, 1.9, "#c89018", "#f0c040", "#6a4a08", "#4ad0ff", true)
+            maleNebenAutomat(56, 104, 1.45, "#b82a2a", "#e85a4a", "#5a1414", "#5affc8", false),
+            // etwas weiter nach aussen, damit sein Bildschirm (mit dem Copyright) ganz zu sehen ist
+            maleNebenAutomat(544, 104, 1.45, "#2f7a2a", "#6ac04a", "#143a12", "#ff5ad0", true),
+            gelb
         ];
     }
 
@@ -784,19 +787,11 @@ aktualisiereProfilKnopf();
         c.rect(0, 0, A.x - 14, H);
         c.rect(A.x + A.w + 14, 0, B - A.x - A.w - 14, H);
         c.clip();
-        neben.forEach((n, i) => {
+        // Reihenfolge wie beim Malen: der gelbe (3) zuerst, der gruene (2) davor
+        [0, 1, 3, 2].map(i => [neben[i], i]).forEach(([n, i]) => {
             px(n.sx, n.sy, n.sw, n.sh, ["#0c1a3a", "#2a0c1a", "#0c2a14", "#2a1a08"][i]);
-            if (i === 1) {
-                // Dieser Automat zeigt kein Spiel, sondern das Copyright (in der Pixel-Schrift, blinkt wie ein Attract-Screen)
-                c.textAlign = "center";
-                c.textBaseline = "middle";
-                c.fillStyle = Math.floor(zeit * 1.5) % 4 === 3 ? "#8a2a4a" : "#ffd6e0";
-                c.font = "9px 'Jersey 15', monospace";
-                c.fillText("© 2026", n.sx + n.sw / 2, n.sy + 8);
-                c.fillStyle = "#ffb0c8";
-                c.fillText("VENRAY", n.sx + n.sw / 2, n.sy + 17);
-                c.fillText("STUDIOS", n.sx + n.sw / 2, n.sy + 25);
-                c.textAlign = "left";
+            if (i === 2) {
+                // Dieser Automat zeigt kein Spiel: das Copyright liegt als scharfe Schrift darueber (.intro-copyright)
             } else {
                 const schritt = Math.floor(zeit * 3 + i) % 2;
                 const mx = n.sx + 3 + ((zeit * 12 + i * 20) % Math.max(1, n.sw - 16));
