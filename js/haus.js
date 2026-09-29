@@ -36,12 +36,19 @@ const KOSMETIK_LISTEN = {
 
 // frei = immer, erspielt = Bedingung einmal erfuellt (bleibt dann fuer immer),
 // dlc = Unterstuetzer-Paket (meta.dlc) oder einzeln gekauft (meta.freigeschaltet)
+// Frei durch Spielen/Kaufen, oder waehrend der Beta durch "alles frei"
 function istKosmetikFrei(eintrag, kategorie) {
+    if (!eintrag) return false;
+    if (istKosmetikFreiOhneBeta(eintrag, kategorie)) return true;
+    return eintrag.quelle !== "beta" && typeof betaAllesFrei === "function" && betaAllesFrei();
+}
+
+// Wirklich erspielt oder gekauft (zaehlt auch nach der Beta)
+function istKosmetikFreiOhneBeta(eintrag, kategorie) {
     if (!eintrag) return false;
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
     if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
-    if (typeof betaAllesFrei === "function" && betaAllesFrei()) return true; // Beta: alles frei
     if (meta.freigeschaltet[schluessel]) return true;
     if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && Boolean(meta.dlc);
     // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)
@@ -101,7 +108,7 @@ function pruefeNeueKosmetik() {
     let neu = false;
     Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => {
         liste.filter(e => e.quelle === "erspielt" && !meta.freigeschaltet[kategorie + ":" + e.id]).forEach(e => {
-            if (!istKosmetikFrei(e, kategorie)) return;
+            if (!istKosmetikFreiOhneBeta(e, kategorie)) return;
             neu = true;
             zeigeBanner("🏡", t("Neu im Haus: ") + e.name, t("Klick aufs Bauernhaus, um es auszuwählen"), "#2e9e2e", 3600);
             Klang.geschenk();
