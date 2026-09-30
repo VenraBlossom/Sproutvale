@@ -3137,7 +3137,13 @@ Object.assign(UEBERSETZUNG, {
     "Intro: Copyright gut lesbar auf einem Automaten, Joystick vor dem Bildschirm.": "Intro: copyright clearly readable on a cabinet, joystick in front of the screen.",
     "Fix: ständige Meldungen \"Neu im Haus\".": "Fix: constant \"New in the house\" messages.",
     "Helfer-Tempo +{0}%": "Helper speed +{0}%",
-    "/Klick +{0}%": "/click +{0}%"
+    "/Klick +{0}%": "/click +{0}%",
+    "Kombo stärker: ab x2 arbeiten alle Helfer 25% schneller pro Stufe und deine Klicks geben +100% Sternensamen pro Stufe. Beides steht unter der Kombo.": "Combo stronger: from x2 all helpers work 25% faster per level and your clicks give +100% Star Seeds per level. Both are shown below the combo.",
+    "Die Schildkröte ist weg, sie machte dasselbe wie der Erntehase.": "The turtle is gone, it did the same as the harvest bunny.",
+    "Kugeln vom Begleiter geben 20% weniger (Mindestbetrag bleibt).": "Companion orbs give 20% less (minimum stays).",
+    "\"Alle abholen\" gibt es jetzt auch bei nur einem Erfolg. Die Moduswahl zählt komplett geschaffte Erfolge aus Story und dem besten Endlos-Spielstand.": "\"Claim all\" now also appears for a single achievement. The mode selection counts fully completed achievements from Story plus your best Endless save.",
+    "Seltenheiten angepasst: Hasenohren legendär, Krone, Laubweste, Rote Wangen und Breites Grinsen episch, Vollbart und Schnurrbart gewöhnlich.": "Rarities changed: Bunny Ears legendary, Crown, Leaf Vest, Rosy Cheeks and Big Grin epic, Full Beard and Moustache common.",
+    "Duo: Die Lobby schließt sich, sobald du die Duo-Seite verlässt.": "Duo: The lobby closes as soon as you leave the Duo page."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

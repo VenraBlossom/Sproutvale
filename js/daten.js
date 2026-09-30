@@ -84,10 +84,18 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.3.0";
+const SPIEL_VERSION = "Beta 0.3.1";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.3.1", punkte: [
+        t("Kombo stärker: ab x2 arbeiten alle Helfer 25% schneller pro Stufe und deine Klicks geben +100% Sternensamen pro Stufe. Beides steht unter der Kombo."),
+        t("Die Schildkröte ist weg, sie machte dasselbe wie der Erntehase."),
+        t("Kugeln vom Begleiter geben 20% weniger (Mindestbetrag bleibt)."),
+        t("\"Alle abholen\" gibt es jetzt auch bei nur einem Erfolg. Die Moduswahl zählt komplett geschaffte Erfolge aus Story und dem besten Endlos-Spielstand."),
+        t("Seltenheiten angepasst: Hasenohren legendär, Krone, Laubweste, Rote Wangen und Breites Grinsen episch, Vollbart und Schnurrbart gewöhnlich."),
+        t("Duo: Die Lobby schließt sich, sobald du die Duo-Seite verlässt.")
+    ] },
     { version: "Beta 0.3.0", punkte: [
         t("Pokale neu: Holz, Gold, Platin und Kristall. Jeder gewonnene Pokal vervielfacht für immer Gold, Sternensamen, Mondblüten und Sternensplitter (x1,5, x2, x3, x5, zusammengezählt)."),
         t("Neuer Pokal-Knopf oben mit Vitrine. Pokale liegen nie auf einem Kredit und bleiben, bis der Spielstand gelöscht wird."),
