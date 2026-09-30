@@ -2773,6 +2773,12 @@ const FIGUR_TEILE = {
     ]
 };
 
+// Reihenfolge immer nach Seltenheit: gewoehnlich, dann episch, dann legendaer (innerhalb gleich wie oben)
+Object.values(FIGUR_TEILE).forEach(liste => {
+    const rang = e => (e.paket === "einzeln" ? 2 : e.quelle === "dlc" ? 1 : 0);
+    liste.sort((a, b) => rang(a) - rang(b));
+});
+
 const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut",
     accessoire: "keins", gesicht: "keins" };
 
