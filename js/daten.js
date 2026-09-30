@@ -84,10 +84,20 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.3.1";
+const SPIEL_VERSION = "Beta 0.4.0";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.4.0", punkte: [
+        t("Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand."),
+        t("Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler."),
+        t("Die Scheune ist jetzt ein Knopf: Dort kannst du den Tag früher beenden. Dazu 3 neue Scheunen-Skins."),
+        t("Neuer Stern „VIP-Karte“: Glücksspiele ohne Grenze pro Tag (nach Stammkunde, braucht Blackjack)."),
+        t("Sternenmeer und Sternengold entfernt, sie machten dasselbe wie Sternenschauer und Große Ernte, nur schwächer."),
+        t("Neue Einstellungen: „Weniger Partikel und Animationen“ und „Unnötige Texte entfernen“."),
+        t("Mythisches BETA Shirt für Beta-Tester. Blitzschuhe ganz in der Hauptfarbe, Wolkenschuhe mit größerer Animation. Skins immer nach Seltenheit sortiert."),
+        t("Popups öffnen sich immer über dem Fenster, aus dem sie kommen. Aura von Haus und Scheune liegt genau um das Gebäude.")
+    ] },
     { version: "Beta 0.3.1", punkte: [
         t("Kombo stärker: ab x2 arbeiten alle Helfer 25% schneller pro Stufe und deine Klicks geben +100% Sternensamen pro Stufe. Beides steht unter der Kombo."),
         t("Die Schildkröte ist weg, sie machte dasselbe wie der Erntehase."),

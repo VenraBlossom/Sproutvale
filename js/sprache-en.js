@@ -3196,7 +3196,15 @@ Object.assign(UEBERSETZUNG, {
     "Noch mit Grenze": "Still limited",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Appears once you have unlocked Blackjack.",
     "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP Card: unlimited play",
-    "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "\ud83d\udcac Remove unnecessary texts (harvest numbers, jackpot, chain ...)"
+    "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "\ud83d\udcac Remove unnecessary texts (harvest numbers, jackpot, chain ...)",
+    "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Shop: Gems (pink symbol) shown in the farmhouse and profile. Legendary skins can be bought one by one with gems, the Supporter Pack costs 500 gems. Gems and purchases belong to you, not to a save.",
+    "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Promo codes: new \"Code\" button in the farmhouse and profile. Each code works once per player.",
+    "Die Scheune ist jetzt ein Knopf: Dort kannst du den Tag früher beenden. Dazu 3 neue Scheunen-Skins.": "The barn is now a button: you can end the day early there. Plus 3 new barn skins.",
+    "Neuer Stern „VIP-Karte“: Glücksspiele ohne Grenze pro Tag (nach Stammkunde, braucht Blackjack).": "New star \"VIP Card\": games of chance without a daily limit (after Regular Customer, needs Blackjack).",
+    "Sternenmeer und Sternengold entfernt, sie machten dasselbe wie Sternenschauer und Große Ernte, nur schwächer.": "Sea of Stars and Star Gold removed, they did the same as Star Shower and Great Harvest, only weaker.",
+    "Neue Einstellungen: „Weniger Partikel und Animationen“ und „Unnötige Texte entfernen“.": "New settings: \"Fewer particles and animations\" and \"Remove unnecessary texts\".",
+    "Mythisches BETA Shirt für Beta-Tester. Blitzschuhe ganz in der Hauptfarbe, Wolkenschuhe mit größerer Animation. Skins immer nach Seltenheit sortiert.": "Mythic BETA Shirt for beta testers. Lightning Shoes fully in the main color, Cloud Shoes with a bigger animation. Skins always sorted by rarity.",
+    "Popups öffnen sich immer über dem Fenster, aus dem sie kommen. Aura von Haus und Scheune liegt genau um das Gebäude.": "Popups always open above the window they come from. The aura of house and barn sits exactly around the building."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
