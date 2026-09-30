@@ -65,6 +65,13 @@ function zeigePopup(optionen) {
     const o = { schliessbar: true, knoepfe: [], ...optionen };
     const huelle = document.createElement("div");
     huelle.classList.add("popup-huelle");
+    // Ein Popup liegt immer ueber allem, was schon offen ist (z.B. Profil oder andere Fenster)
+    let oben = 45;
+    document.querySelectorAll(".overlay:not(.versteckt), .popup-huelle").forEach(e => {
+        const z = parseInt(getComputedStyle(e).zIndex, 10);
+        if (!isNaN(z) && z < 1000) oben = Math.max(oben, z + 1);
+    });
+    huelle.style.zIndex = oben;
     const fenster = document.createElement("div");
     fenster.classList.add("popup");
     if (o.klasse) fenster.classList.add(o.klasse);
