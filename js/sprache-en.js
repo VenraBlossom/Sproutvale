@@ -3204,7 +3204,8 @@ Object.assign(UEBERSETZUNG, {
     "Sternenmeer und Sternengold entfernt, sie machten dasselbe wie Sternenschauer und Große Ernte, nur schwächer.": "Sea of Stars and Star Gold removed, they did the same as Star Shower and Great Harvest, only weaker.",
     "Neue Einstellungen: „Weniger Partikel und Animationen“ und „Unnötige Texte entfernen“.": "New settings: \"Fewer particles and animations\" and \"Remove unnecessary texts\".",
     "Mythisches BETA Shirt für Beta-Tester. Blitzschuhe ganz in der Hauptfarbe, Wolkenschuhe mit größerer Animation. Skins immer nach Seltenheit sortiert.": "Mythic BETA Shirt for beta testers. Lightning Shoes fully in the main color, Cloud Shoes with a bigger animation. Skins always sorted by rarity.",
-    "Popups öffnen sich immer über dem Fenster, aus dem sie kommen. Aura von Haus und Scheune liegt genau um das Gebäude.": "Popups always open above the window they come from. The aura of house and barn sits exactly around the building."
+    "Popups öffnen sich immer über dem Fenster, aus dem sie kommen. Aura von Haus und Scheune liegt genau um das Gebäude.": "Popups always open above the window they come from. The aura of house and barn sits exactly around the building.",
+    "🤖 Bot hinzufügen": "\ud83e\udd16 Add bot"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

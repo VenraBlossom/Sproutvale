@@ -310,8 +310,6 @@ const DEBUG_BEFEHLE = [
         { typ: "wahl", optionen: werte => debugKosmetikOptionen(werte[0]) }] },
     { name: "liste", text: "Skins einer Kategorie (Konsole)", felder: [{ typ: "wahl", optionen: debugKategorien }] },
     { gruppe: "Duo" },
-    { name: "bot", text: "Bot tritt Lobby bei (leer = deine Lobby)", felder: [{ typ: "text", wert: "", platzhalter: "ABC123" }] },
-    { name: "botWeg", text: "Bot entfernen" },
     { gruppe: "Gefahr" },
     { name: "resetMeta", text: "Gesamten Fortschritt löschen", gefahr: true }
 ];
@@ -436,7 +434,18 @@ function zeigeDebugFenster() {
         onSchliessen: () => { debugFensterSchliessen = null; } });
 }
 
-// Das Debug-Fenster geht NUR mit Strg+F12 in den Einstellungen im Reiter Klang auf.
+// Lobby-Debug: nur ein Knopf, der einen Test-Bot in die eigene Lobby holt
+function zeigeLobbyDebug() {
+    const knopf = el("button", "knopf knopf-gruen", t("🤖 Bot hinzufügen"));
+    debugFensterSchliessen = zeigePopup({ titel: t("🛠️ Debug (Strg+F12)"), farbe: "#44506b", breite: 360, klasse: "debug-fenster",
+        inhalt: el("div", "lobby-debug", null, [knopf]), onSchliessen: () => { debugFensterSchliessen = null; } });
+    knopf.addEventListener("click", () => {
+        debug.bot();
+        if (debugFensterSchliessen) debugFensterSchliessen();
+    });
+}
+
+// Das Debug-Fenster geht NUR mit Strg+F12 in den Einstellungen im Reiter Klang auf (in der Lobby: nur "Bot hinzufügen").
 // Die Einstellungen schliessen sich dabei, das Debug-Fenster liegt dann ganz oben.
 window.addEventListener("keydown", event => {
     if (event.key !== "F12") return;
@@ -444,6 +453,14 @@ window.addEventListener("keydown", event => {
     if (debugFensterSchliessen) {
         event.stopPropagation();
         debugFensterSchliessen();
+        return;
+    }
+    // In der eigenen Duo-Lobby: Strg+F12 oeffnet ein kleines Fenster mit "Bot hinzufügen"
+    const inLobby = typeof koop !== "undefined" && koop.code && !koop.imSpiel && !$("menue-koop").classList.contains("versteckt") &&
+        !hauptmenue.classList.contains("versteckt");
+    if (event.ctrlKey && inLobby) {
+        event.stopPropagation();
+        zeigeLobbyDebug();
         return;
     }
     const imKlangReiter = !einstellungenFenster.classList.contains("versteckt") && aktiverEinstellungsReiter === "audio";
