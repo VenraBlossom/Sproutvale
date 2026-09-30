@@ -3208,7 +3208,15 @@ Object.assign(UEBERSETZUNG, {
     "🤖 Bot hinzufügen": "\ud83e\udd16 Add bot",
     "👑 {0} ist jetzt Host.": "👑 {0} is now the host.",
     "👑 Du bist jetzt Host.": "👑 You are now the host.",
-    "👑 Zum Host machen": "👑 Make host"
+    "👑 Zum Host machen": "👑 Make host",
+    "💾 Speichern": "💾 Save",
+    "Speichern": "Save",
+    "💾 Gespeichert": "💾 Saved",
+    "💾 Hier speichern": "💾 Save here",
+    "💾 Überschreiben": "💾 Overwrite",
+    "Wähle, wo dein Spiel gespeichert wird. Ein anderer Speicherstand wird dabei überschrieben und ist ab dann der Platz dieses Spiels.": "Choose where your game is saved. Another save slot gets overwritten and becomes this game's slot from now on.",
+    "💾 Gespeichert: Speicherstand {0}": "💾 Saved: save slot {0}",
+    "💾 Speichern (gerade: Speicherstand {0})": "💾 Save (current: save slot {0})"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

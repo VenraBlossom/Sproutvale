@@ -5305,10 +5305,11 @@ function renderEinstellungen() {
     document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
         ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
-    // Endlos: von Hand speichern (gespeichert wird ausserdem automatisch)
-    const endlosAktiv = run && run.sandbox && run.phase !== "runEnde";
-    $("endlos-speichern-zeile").classList.toggle("versteckt", !endlosAktiv);
-    if (endlosAktiv) $("endlos-speichern-text").textContent = t("💾 Endlos speichern (Speicherstand ") + (run.slot || 1) + ")";
+    // Von Hand speichern (gespeichert wird ausserdem automatisch); in Endlos mit Auswahl des Speicherstands
+    const spielLaeuft = run && run.phase !== "runEnde" && hauptmenue.classList.contains("versteckt");
+    $("spiel-speichern-zeile").classList.toggle("versteckt", !spielLaeuft);
+    if (spielLaeuft) $("spiel-speichern-text").textContent = run.sandbox
+        ? tf("💾 Speichern (gerade: Speicherstand {0})", run.koop ? run.koopSlot || "–" : run.slot || 1) : t("💾 Speichern");
     if (run) renderStatistik();
     renderErfolge();
     if (aktiverEinstellungsReiter === "kodex") renderKodex($("kodex-seite"));
@@ -5427,21 +5428,90 @@ einstellungenHauptmenue.addEventListener("click", () => {
     zeigeHauptmenue();
 });
 spielstandLoeschen.addEventListener("click", frageAllesLoeschen);
-$("endlos-speichern").addEventListener("click", () => {
+$("spiel-speichern").addEventListener("click", () => {
+    if (!run || run.phase === "runEnde") return;
+    // Endlos (allein und im Duo): einen der 3 Speicherstaende waehlen. Story hat nur einen Stand.
+    if (run.sandbox) {
+        zeigeSpeicherWahl();
+        return;
+    }
     speichereRun();
     speichereMeta();
     Klang.kaufen();
-    zeigeToast(t("💾 Gespeichert: Endlos, Speicherstand ") + (run.slot || 1));
+    zeigeToast(t("💾 Gespeichert"));
 });
 
-// Desktop-App: Spielstand-Ordner "save" anzeigen und oeffnen
-if (window.sproutvaleDesktop && window.sproutvaleDesktop.speicher) {
-    $("speicher-zeile").classList.remove("versteckt");
-    const hinweis = $("speicher-hinweis");
-    hinweis.classList.remove("versteckt");
-    hinweis.textContent = t("Dein Spielstand liegt in: ") + window.sproutvaleDesktop.speicher.pfad() +
-        t(". Er bleibt bei neuen Versionen automatisch erhalten, du musst nichts kopieren.");
-    $("speicher-oeffnen").addEventListener("click", () => window.sproutvaleDesktop.speicher.oeffnen());
+// Beschreibung eines Speicherstands wie in der Auswahl im Hauptmenue
+function speicherZeilen(r, m) {
+    if (!r && !(m && ((m.lebenszeit && m.lebenszeit.tage) || m.mondblueten))) return [el("span", null, t("Leer"))];
+    const zeilen = [el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold")
+        : t("Neuer Anfang"))];
+    if (m) zeilen.push(el("span", "endlos-slot-klein", "⏱ " + spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs) +
+        " · 🌸 " + zahl(m.mondblueten || 0) + t(" Mondblüten")));
+    return zeilen;
+}
+
+// Speichern-Fenster: 3 Speicherstaende, der aktuelle ist markiert. Ein anderer Platz wird ueberschrieben
+// und ist ab dann der Platz dieses Spiels.
+function zeigeSpeicherWahl() {
+    const imDuo = Boolean(run.koop);
+    const aktuell = imDuo ? run.koopSlot || 0 : run.slot || 1;
+    const liste = el("div", "endlos-slots");
+    let schliesse = () => {};
+    for (let slot = 1; slot <= (imDuo ? KOOP_KONFIG.slots : ENDLOS_SLOTS); slot++) {
+        let r = null;
+        let m = null;
+        if (imDuo) {
+            const daten = slot === aktuell ? { run } : koopLeseEigenenRun(true, slot);
+            r = daten && daten.run;
+        } else {
+            const stand = endlosSlotStand(slot);
+            r = stand.r;
+            m = stand.m;
+        }
+        const leer = !r && !(m && ((m.lebenszeit && m.lebenszeit.tage) || m.mondblueten));
+        const zeile = el("div", "endlos-slot" + (slot === aktuell ? " aktiv" : ""), null, [
+            el("div", "endlos-slot-text", null, [el("b", null, (imDuo ? t("Koop-Speicherstand ") : t("Speicherstand ")) + slot), ...speicherZeilen(r, m)])
+        ]);
+        const knopf = el("button", "knopf " + (slot === aktuell || leer ? "knopf-gruen" : "knopf-rot"),
+            slot === aktuell ? t("💾 Speichern") : leer ? t("💾 Hier speichern") : t("💾 Überschreiben"));
+        knopf.addEventListener("click", () => {
+            schliesse();
+            speichereInSlot(slot);
+        });
+        zeile.appendChild(knopf);
+        liste.appendChild(zeile);
+    }
+    schliesse = zeigePopup({
+        titel: t("💾 Speichern"),
+        breite: 600,
+        inhalt: el("div", null, null, [
+            el("p", "endlos-slots-hinweis", t("Wähle, wo dein Spiel gespeichert wird. Ein anderer Speicherstand wird dabei überschrieben und ist ab dann der Platz dieses Spiels.")),
+            liste
+        ])
+    });
+}
+
+function speichereInSlot(slot) {
+    if (run.koop) {
+        run.koopSlot = slot;
+        if (koop.rolle === "host") koop.lobby = { ...koop.lobby, slot };
+        else koop.gastPlatz = slot;
+        koopSchreibeStand(runDaten());
+    } else {
+        // Endlos allein: Fortschritt und Hof auf den neuen Platz, ab jetzt wird dort weiter gespeichert
+        run.slot = slot;
+        meta.endlosSlot = slot;
+        metaSlot = slot;
+        speichereMeta();
+        try {
+            localStorage.setItem(runSpeicherKey(true, slot), JSON.stringify(runDaten()));
+        } catch (fehler) {
+            console.warn(t("Run konnte nicht gespeichert werden"), fehler);
+        }
+    }
+    Klang.kaufen();
+    zeigeToast(tf("💾 Gespeichert: Speicherstand {0}", slot));
 }
 
 // ---------- SPIELSTAND LADEN: Dateien auswaehlen (geht im Browser und in der Desktop-App) ----------
@@ -5457,7 +5527,7 @@ const IMPORT_DATEIEN = {
 
 // Alles in EINER Datei sichern (alle Spielstaende, Mondteich, Kaeufe, Einstellungen); "Spielstand laden" liest sie wieder ein
 const SICHERUNG_TYP = "sproutvale-sicherung";
-$("spielstand-exportieren").addEventListener("click", () => {
+$("spielstand-exportieren")?.addEventListener("click", () => {
     speichereRun();
     speichereMeta();
     const daten = {};
@@ -5478,8 +5548,8 @@ $("spielstand-exportieren").addEventListener("click", () => {
     zeigeToast(t("📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen."));
 });
 
-$("spielstand-importieren").addEventListener("click", () => $("import-dateien").click());
-$("import-dateien").addEventListener("change", async event => {
+$("spielstand-importieren")?.addEventListener("click", () => $("import-dateien").click());
+$("import-dateien")?.addEventListener("change", async event => {
     const dateien = [...event.target.files];
     event.target.value = "";
     const gefunden = [];
