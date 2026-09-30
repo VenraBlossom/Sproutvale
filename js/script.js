@@ -105,7 +105,8 @@ function leereLebenszeit() {
 function leereKosmetik() {
     return {
         haustier: "rot", landschaft: "standard", deko: ["vogelscheuche"], musik: "auto",
-        samenladen: "standard", felder: "standard", kugeln: "standard", rahmen: "standard", pflanzen: "standard", haus: "standard"
+        samenladen: "standard", felder: "standard", kugeln: "standard", rahmen: "standard", pflanzen: "standard", haus: "standard",
+        scheune: "standard"
     };
 }
 
@@ -326,7 +327,7 @@ function schalteBetaAllesFrei() {
 
 function dlcListen() {
     return { haustier: HAUSTIER_SKINS, landschaft: HOF_THEMEN, deko: DEKO_OBJEKTE, musik: MUSIK_TITEL, samenladen: SAMENLADEN_SKINS,
-        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS, haus: HAUS_SKINS };
+        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS, haus: HAUS_SKINS, scheune: SCHEUNEN_SKINS };
 }
 
 function istDlcSchluessel(schluessel) {
@@ -2592,8 +2593,13 @@ function aktualisiereTimer(dtMs) {
 // Obergrenze fuer Effekte auf dem Bildschirm (sonst ruckelt es bei Autoklickern)
 const FX_GRENZE = 350;
 
+// Einstellung "Weniger Partikel und Animationen" (fuer schwaechere Rechner)
+function ohneEffekte() {
+    return Boolean(einstellungen.wenigerEffekte);
+}
+
 function partikel(x, y, farben, anzahl, staerke) {
-    if (x === undefined) return;
+    if (x === undefined || ohneEffekte()) return;
     const frei = FX_GRENZE - fxLayer.childElementCount;
     if (frei <= 0) return;
     anzahl = Math.min(anzahl, frei);
@@ -5284,8 +5290,6 @@ function renderEinstellungen() {
     });
     document.querySelectorAll("#einstellungen-reiter .reiter-knopf").forEach((knopf, i) => {
         knopf.dataset.reiter = reiter[i].id;
-        // kleine Trennung zwischen "Fortschritt" und "Einstellungen"
-        if (reiter[i].id === "audio") knopf.classList.add("reiter-abstand");
     });
     document.querySelectorAll(".einstellungs-seite").forEach(seite => {
         seite.classList.toggle("versteckt", seite.dataset.seite !== aktiverEinstellungsReiter);
@@ -5321,6 +5325,9 @@ document.querySelectorAll("[data-option]").forEach(schalter => {
         if (schalter.dataset.option === "tipps" && !schalter.checked) versteckeTipp();
         if (schalter.dataset.option === "farbenblind") document.body.classList.toggle("farbenblind", schalter.checked);
         if (schalter.dataset.option === "crt") document.body.classList.toggle("crt", schalter.checked);
+        if (schalter.dataset.option === "wenigerEffekte") {
+            document.body.classList.toggle("ohne-effekte", schalter.checked);
+        }
         if (schalter.dataset.option === "hintergrundStumm") Klang.setzeLautstaerken();
     });
 });

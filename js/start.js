@@ -96,7 +96,15 @@ window.debug = {
     },
     // Alle Sterne im Stellarium auf die hoechste Stufe (unendliche Sterne auf die angegebene Stufe): debug.alleSterne(10)
     alleSterne(unendlich = 10) {
+        // Auch Sterne mit Bedingungen (Pflanzen, Erbsorten ...): alles wird gesetzt, Pflanzen gleich freigeschaltet
         SKILLS.forEach(st => { run.level[st.id] = Number.isFinite(st.max) ? st.max : unendlich; });
+        const bisher = Math.max(0, ...run.pflanzen.filter(p => p.freigeschaltet).map(p => p.level.ertrag));
+        SKILLS.filter(st => st.art === "pflanze").forEach(st => {
+            const pflanze = run.pflanzen.find(p => p.id === st.pflanze);
+            if (!pflanze) return;
+            pflanze.level.ertrag = Math.max(pflanze.level.ertrag, bisher);
+            pflanze.freigeschaltet = true;
+        });
         aktualisiereAlles();
         if (typeof renderSkilltree === "function") renderSkilltree();
         zeigeToast("🌟 Alle Sterne auf der höchsten Stufe.");
@@ -105,9 +113,22 @@ window.debug = {
     alleMarkt(unendlich = 10) {
         SHOP_UPGRADES.forEach(u => { run.level[u.id] = Number.isFinite(u.max) ? u.max : unendlich; });
         meta.stellariumFrei = true;
+        // Alle Felder, die noch Platz haben
+        for (let i = 0; i < 200 && run.felder.length < maxEigeneFelder(); i++) {
+            const slot = naechsterSlot(eigeneSeite());
+            if (slot < 0) break;
+            erstelleFeld(slot);
+        }
+        // Pflanzen-Upgrades (Unter-Reiter) fuer alle freigeschalteten Pflanzen, soweit ihr Stern gekauft ist
+        run.pflanzen.filter(p => p.freigeschaltet).forEach(pflanze => PFLANZEN_UPGRADES.forEach(u => {
+            if (!pflanzenUpgradeFrei(pflanze, u)) return;
+            const ziel = Number.isFinite(u.max) ? u.max : Math.max(pflanze.level[u.id] || 0, unendlich);
+            if (u.id === "ertrag") pflanze.level.ertragEigen = Math.max(pflanze.level.ertragEigen || 0, ziel);
+            pflanze.level[u.id] = ziel;
+        }));
         speichereMeta();
         aktualisiereAlles();
-        zeigeToast("🛒 Alle Markt-Upgrades auf der höchsten Stufe.");
+        zeigeToast("🛒 Alle Markt-Upgrades, Felder und Pflanzen-Upgrades auf der höchsten Stufe.");
     },
     gluehwuermchen() { spawnGluehwuermchen(); },
     segen() { zeigeSegenAuswahl(); },
@@ -268,7 +289,7 @@ const DEBUG_BEFEHLE = [
     { name: "stern", text: "Sternschnuppe" },
     { name: "promocodes", text: "Alle Promocodes anzeigen", ueberall: true },
     { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
-    { name: "alleMarkt", text: "Alle Markt-Upgrades auf Max-Stufe (unendliche auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
+    { name: "alleMarkt", text: "Markt komplett: Upgrades, Felder und Pflanzen-Upgrades auf Max (unendliche auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gluehwuermchen", text: "Glühwürmchen" },
     { name: "kraehe", text: "Krähe" },
     { name: "goldregen", text: "Goldregen" },

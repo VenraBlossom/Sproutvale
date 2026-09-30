@@ -2787,6 +2787,19 @@ const HOF_FARBEN = {
     }
 };
 
+// Kleine Pixel-Details fuer Scheunen-Skins (Koordinaten in der 20x19-Scheune: Dachspitze bei x 9-10, y 0)
+function zeichneScheuneExtra(art, pixel) {
+    if (art === "wetterhahn") {
+        // Wetterhahn auf der Dachspitze
+        [[9, -1], [9, -2], [9, -3], [10, -3], [8, -4], [9, -4], [10, -4], [11, -3], [9, -5]].forEach(([x, y]) => pixel(x, y, "#3a2a1a"));
+        pixel(8, -5, "#e0402a");
+    } else if (art === "sterne") {
+        // Sterne auf dem Dach und am Tor
+        [[5, 4], [14, 3], [9, 2], [3, 11], [16, 14]].forEach(([x, y]) => pixel(x, y, "#fff6a0"));
+        [[7, 3], [12, 4]].forEach(([x, y]) => pixel(x, y, "#8fa2f0"));
+    }
+}
+
 // Kleine Pixel-Details fuer Haus-Skins (Koordinaten im 24x18-Bauernhaus: Dach Zeilen 0-8, Wand 9-16, Fenster 4-5 und 18-19)
 function zeichneHausExtra(extra, p) {
     const punkte = (liste, farbe) => liste.forEach(([x, y]) => p(x, y, farbe));
@@ -2972,7 +2985,13 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         bild("kuerbis", hausX + 25, H - 6);
         bild("kuerbis", hausX + 33, H - 7);
     }
-    const scheune = bild("scheune", W * 0.8, H - 8);
+    // Scheune (kann einen Scheunen-Skin haben)
+    const scheunenSkin = typeof gewaehlteKosmetik === "function" && typeof SCHEUNEN_SKINS !== "undefined" ? gewaehlteKosmetik("scheune") : null;
+    const scheunenSprite = scheunenSkin && Object.keys(scheunenSkin.farben || {}).length
+        ? spriteVariante("scheune_" + scheunenSkin.id, "scheune", scheunenSkin.farben) : "scheune";
+    const scheune = bild(scheunenSprite, W * 0.8, H - 8);
+    if (scheunenSkin && scheunenSkin.extra) zeichneScheuneExtra(scheunenSkin.extra, (x, y, farbe) => pixel(scheune.x + x, scheune.y + y, farbe));
+    if (scheunenSkin && scheunenSkin.fenster) leuchten.push({ x: scheune.x + 9, y: scheune.y + 7, b: 2, h: 1, farbe: scheunenSkin.fenster });
     bild("heu", scheune.x - 10, H - 8);
     bild("heu", scheune.x - 6, H - 13);
     bild("heu", scheune.x + scheune.sprite.width + 2, H - 8);

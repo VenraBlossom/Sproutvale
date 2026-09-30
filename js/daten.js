@@ -1902,6 +1902,7 @@ const KOSMETIK_KATEGORIEN = [
     { id: "musik", name: t("Musik"), symbol: "🎵" },
     { id: "samenladen", name: t("Samenladen"), symbol: "🏪" },
     { id: "haus", name: t("Haus"), symbol: "🏠" },
+    { id: "scheune", name: t("Scheune"), symbol: "🌾" },
     { id: "felder", name: t("Felder"), symbol: "sprite:sym_beet" },
     { id: "kugeln", name: t("Münzen"), symbol: "🪙" },
     { id: "rahmen", name: t("Kuschel-Rahmen"), symbol: "🖼️" },
@@ -2073,6 +2074,18 @@ const HAUS_SKINS = [
     { id: "mondhaus", name: t("Mondhaus"), quelle: "dlc", paket: "einzeln", farben: { W: "#d8e4ff", V: "#a8b8e0", T: "#1d2a6a", U: "#2a4a9a", L: "#3a5ab0", l: "#1d2a6a", F: "#9fe0ff" }, extra: "mond", fenster: "rgba(159, 224, 255, 0.95)", funken: ["#9fe0ff", "#ffffff", "#8fa2f0"], rauch: "#c9d6ff" },
     { id: "sternwarte", name: t("Sternenhaus"), quelle: "dlc", paket: "einzeln", farben: { W: "#2a2f6e", V: "#1d2250", T: "#141840", U: "#3a3f7a", L: "#fff6a0", l: "#141840", F: "#fff6a0", D: "#1d2250" }, extra: "sterne", fenster: "rgba(255, 246, 160, 0.95)", funken: ["#fff6a0", "#ffe89a", "#ffffff"] },
     { id: "goldhaus", name: t("Goldenes Haus"), quelle: "dlc", paket: "einzeln", farben: { W: "#ffd84a", V: "#c89a10", T: "#8a5a08", U: "#e0a800", L: "#ffcf4a", l: "#8a5a08", D: "#8a5a08", F: "#fff6c0" }, extra: "glanz", fenster: "rgba(255, 240, 160, 0.95)", funken: ["#ffd93d", "#fff3b0", "#ffffff"] }
+];
+
+// Scheune (20x19): K/k Dach, L/l Wandbretter, w Balken und Tor-Rahmen, F Fenster.
+// extra = kleine Pixel-Details (zeichneScheuneExtra in sprites.js), fenster/funken = Leuchten und Funken (legendaer)
+const SCHEUNEN_SKINS = [
+    { id: "standard", name: t("Rote Scheune"), quelle: "frei", farben: {} },
+    { id: "gruen", name: t("Grüne Scheune"), quelle: "frei", farben: { L: "#4f8a3a", l: "#35652a" } },
+    { id: "lavendel", name: t("Lavendelscheune"), quelle: "dlc", paket: "unterstuetzer",
+        farben: { L: "#a58ad0", l: "#7a5fa8", K: "#5a4a8a", k: "#3a2a5a", w: "#fff4fb" }, extra: "wetterhahn" },
+    { id: "sternenscheune", name: t("Sternenscheune"), quelle: "dlc", paket: "einzeln",
+        farben: { L: "#2a2f6e", l: "#1d2250", K: "#3a3f7a", k: "#141840", w: "#fff6a0", F: "#fff6a0" }, extra: "sterne",
+        fenster: "rgba(255, 246, 160, 0.95)", funken: ["#fff6a0", "#ffffff", "#8fa2f0"] }
 ];
 
 // Felder: Farben der Erde (B hell, b Furche, c Kruemel). klasse = zusaetzlicher Look (style.css)

@@ -21,6 +21,7 @@ const KOSMETIK_LISTEN = {
     rahmen: RAHMEN_SKINS,
     pflanzen: PFLANZEN_SKINS,
     haus: HAUS_SKINS,
+    scheune: SCHEUNEN_SKINS,
     // Teile der eigenen Figur (Profil im Hauptmenue, nicht im Haus)
     figur_haut: FIGUR_TEILE.haut,
     figur_augen: FIGUR_TEILE.augen,
@@ -162,7 +163,7 @@ function wendeKosmetikAn() {
     const thema = gewaehlteKosmetik("landschaft").id;
     const gras = SPRITE_ABWANDLUNGEN["gras_" + thema] ? "gras_" + thema : "gras";
     wurzel.setProperty("--gras", "url(" + spriteUrl(gras) + ")");
-    const hofSchluessel = thema + "|" + gewaehlteKosmetik("haus").id;
+    const hofSchluessel = thema + "|" + gewaehlteKosmetik("haus").id + "|" + gewaehlteKosmetik("scheune").id;
     if (hofSchluessel !== letztesHofThema) {
         letztesHofThema = hofSchluessel;
         zeichneLandschaften();
@@ -171,6 +172,7 @@ function wendeKosmetikAn() {
     const geldIcon = moneyDisplay.querySelector("img");
     if (geldIcon) setzeSpriteBild(geldIcon, "muenze_0", 2); // Muenz-Looks gibt es nur fuer die Saat im Spiel
     document.body.classList.toggle("farbenblind", Boolean(einstellungen.farbenblind));
+    document.body.classList.toggle("ohne-effekte", Boolean(einstellungen.wenigerEffekte));
     document.body.classList.toggle("crt", Boolean(einstellungen.crt));
 
     haustier.letzteUrl = "";
@@ -377,7 +379,7 @@ function oeffneScheune() {
     }
     Klang.klick(8);
     zeigePopup({ titel: t("🌾 Scheune"), breite: 440, farbe: "#a0522d",
-        inhalt: el("p", null, t("Möchtest du den Tag jetzt schon beenden? Es passiert alles wie an einem normalen Tagesende, ohne Kosten und ohne Verluste.")),
+        inhalt: el("p", null, t("Möchtest du den Tag jetzt schon beenden?")),
         knoepfe: [{ text: t("Weiterarbeiten") }, { text: t("🌙 Tag beenden"), klasse: "knopf-gruen", aktion: beendeTagFrueh }] });
 }
 
@@ -392,7 +394,7 @@ function beendeTagFrueh() {
 // Aus dem Bauernhaus steigt leise Rauch auf (am Abend und in der Nacht etwas mehr)
 
 setInterval(() => {
-    if (!hofSzene || !hofSzene.schornstein || document.hidden) return;
+    if (!hofSzene || !hofSzene.schornstein || document.hidden || ohneEffekte()) return;
     if (Math.random() < (tageszeit > 0.6 ? 0.2 : 0.55)) return;
     const puff = el("div", "rauch");
     const hausSkin = gewaehlteKosmetik("haus");
@@ -404,23 +406,25 @@ setInterval(() => {
     setTimeout(() => puff.remove(), 3200);
 }, 700);
 
-// Legendaere Haeuser: kleine Funken steigen am Haus auf
+// Legendaere Haeuser und Scheunen: kleine Funken steigen am Gebaeude auf
 setInterval(() => {
-    if (!hofSzene || !hofSzene.haus || document.hidden) return;
-    const skin = gewaehlteKosmetik("haus");
-    if (!skin.funken || Math.random() < 0.35) return;
-    const h = hofSzene.haus;
-    const funke = el("div", "haus-funke");
-    funke.style.left = ((h.x + Math.random() * h.b) / hofSzene.breite) * 100 + "%";
-    funke.style.top = ((h.y + h.h * (0.2 + Math.random() * 0.6)) / hofSzene.hoehe) * 100 + "%";
-    funke.style.setProperty("--farbe", zufall(skin.funken));
-    hofEbene.appendChild(funke);
-    setTimeout(() => funke.remove(), 2000);
+    if (!hofSzene || document.hidden || ohneEffekte()) return;
+    ["haus", "scheune"].forEach(teil => {
+        const skin = gewaehlteKosmetik(teil);
+        const h = hofSzene[teil];
+        if (!h || !skin.funken || Math.random() < 0.35) return;
+        const funke = el("div", "haus-funke");
+        funke.style.left = ((h.x + Math.random() * h.b) / hofSzene.breite) * 100 + "%";
+        funke.style.top = ((h.y + h.h * (0.2 + Math.random() * 0.6)) / hofSzene.hoehe) * 100 + "%";
+        funke.style.setProperty("--farbe", zufall(skin.funken));
+        hofEbene.appendChild(funke);
+        setTimeout(() => funke.remove(), 2000);
+    });
 }, 450);
 
 // Deko mit Teilchen (Lagerfeuer, Feenbrunnen ...) und Landschaften mit Funkeln (Zauberwald)
 setInterval(() => {
-    if (document.hidden) return;
+    if (document.hidden || ohneEffekte()) return;
     // Bienenkorb: ab und zu fliegt eine Biene eine kleine Runde
     hofEbene.querySelectorAll(".deko-bienen").forEach(korb => {
         if (Math.random() < 0.45 || fxLayer.querySelectorAll(".deko-biene").length > 5) return;
@@ -583,7 +587,7 @@ registriereHaken("ernte", feld => {
 
 // Reife Pflanzen funkeln ab und zu (Sterne, Kristallglanz, kleine Flammen)
 setInterval(() => {
-    if (document.hidden || !run || spielPausiert()) return;
+    if (document.hidden || !run || spielPausiert() || ohneEffekte()) return;
     const look = gewaehlteKosmetik("pflanzen");
     const effekt = look.effekt && PFLANZEN_EFFEKTE[look.effekt];
     if (!effekt) return;
@@ -1331,6 +1335,23 @@ function kosmetikBild(kategorie, eintrag) {
             }
             return bild;
         }
+        case "scheune": {
+            const sprite = Object.keys(eintrag.farben || {}).length ? spriteVariante("scheune_" + eintrag.id, "scheune", eintrag.farben) : "scheune";
+            const leinwand = document.createElement("canvas");
+            leinwand.width = 20;
+            leinwand.height = 25; // oben Platz fuer Details auf dem Dach (Wetterhahn)
+            const stift = leinwand.getContext("2d");
+            stift.drawImage(spriteLeinwand(sprite), 0, 6);
+            if (eintrag.extra) zeichneScheuneExtra(eintrag.extra, (x, y, farbe) => { stift.fillStyle = farbe; stift.fillRect(x, y + 6, 1, 1); });
+            bild.src = leinwand.toDataURL();
+            bild.style.width = 20 * 4 + "px";
+            bild.style.height = 25 * 4 + "px";
+            if (eintrag.funken) {
+                bild.classList.add("vorschau-haus-leuchten");
+                bild.style.setProperty("--leuchten", eintrag.funken[0]);
+            }
+            return bild;
+        }
         default: {
             // Pflanzen-Look: Vorschau mit der Tomate
             const hatFarben = eintrag.farben && Object.keys(eintrag.farben).length > 0;
@@ -1460,7 +1481,8 @@ function renderHaus(inhalt) {
         kugeln: t("So sieht die Saat aus, die bei der Ernte fällt. Die Farbe des Edelsteins zeigt weiter die Rarität."),
         rahmen: t("Der Rahmen um deine Kuscheltiere im Mondteich."),
         pflanzen: t("Andere Blattfarben für alle deine Pflanzen."),
-        haus: t("Dein Bauernhaus oben links. Legendäre Häuser leuchten und funkeln.")
+        haus: t("Dein Bauernhaus oben links. Legendäre Häuser leuchten und funkeln."),
+        scheune: t("Deine Scheune oben rechts. Dort kannst du den Tag früher beenden.")
     };
     inhalt.appendChild(el("div", "panel-hinweis", hinweise[kategorie]));
 

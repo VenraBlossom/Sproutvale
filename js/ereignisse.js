@@ -756,7 +756,7 @@ const JAHRESZEIT_TEILCHEN = {
 };
 
 function jahreszeitTeilchenErlaubt() {
-    return run && !document.hidden && einstellungen.jahreszeitTeilchen !== false &&
+    return run && !document.hidden && einstellungen.jahreszeitTeilchen !== false && !ohneEffekte() &&
         hauptmenue.classList.contains("versteckt") && !(run.phase === "tag" && run.wetter);
 }
 

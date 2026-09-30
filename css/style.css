@@ -6637,10 +6637,6 @@ body[data-fieber="5"] #fieber-rahmen {
     max-height: none;
 }
 
-.reiter-knopf.reiter-abstand {
-    margin-left: 18px;
-}
-
 /* Rotes Ausrufezeichen: es gibt einen neuen Erfolg oder Kodex-Eintrag */
 #einstellungen-button {
     position: relative;
@@ -12604,3 +12600,15 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.55;
 }
 
+
+/* Einstellung "Weniger Partikel und Animationen": reine Deko steht still oder faellt weg */
+body.ohne-effekte .haus-funke,
+body.ohne-effekte .rauch {
+    display: none !important;
+}
+body.ohne-effekte #hof-ebene *,
+body.ohne-effekte .gebaeude-aura,
+body.ohne-effekte .haus-kachel *,
+body.ohne-effekte .figur-aura {
+    animation: none !important;
+}
