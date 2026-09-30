@@ -12593,3 +12593,22 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 .debug-promo.aus {
     opacity: 0.55;
 }
+
+/* Scheune: leichte Aura, klickbar wie das Bauernhaus */
+#scheune-klickflaeche {
+    position: absolute;
+    z-index: 4;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255, 220, 140, 0.35);
+    animation: scheune-aura 3s ease-in-out infinite;
+    transition: box-shadow 0.15s;
+}
+#scheune-klickflaeche:hover {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(255, 246, 194, 0.8), 0 0 18px rgba(255, 230, 140, 0.7);
+}
+@keyframes scheune-aura {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 220, 140, 0.25); }
+    50% { box-shadow: 0 0 14px rgba(255, 220, 140, 0.5); }
+}

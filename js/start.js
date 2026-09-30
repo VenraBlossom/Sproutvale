@@ -101,6 +101,14 @@ window.debug = {
         if (typeof renderSkilltree === "function") renderSkilltree();
         zeigeToast("🌟 Alle Sterne auf der höchsten Stufe.");
     },
+    // Alle Markt-Upgrades auf die hoechste Stufe (unendliche auf die angegebene Stufe): debug.alleMarkt(10)
+    alleMarkt(unendlich = 10) {
+        SHOP_UPGRADES.forEach(u => { run.level[u.id] = Number.isFinite(u.max) ? u.max : unendlich; });
+        meta.stellariumFrei = true;
+        speichereMeta();
+        aktualisiereAlles();
+        zeigeToast("🛒 Alle Markt-Upgrades auf der höchsten Stufe.");
+    },
     gluehwuermchen() { spawnGluehwuermchen(); },
     segen() { zeigeSegenAuswahl(); },
     // Tageszeit erzwingen (0 = Morgen, 1 = Nacht), debug.tageszeit(null) zum Ausschalten
@@ -260,6 +268,7 @@ const DEBUG_BEFEHLE = [
     { name: "stern", text: "Sternschnuppe" },
     { name: "promocodes", text: "Alle Promocodes anzeigen", ueberall: true },
     { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
+    { name: "alleMarkt", text: "Alle Markt-Upgrades auf Max-Stufe (unendliche auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gluehwuermchen", text: "Glühwürmchen" },
     { name: "kraehe", text: "Krähe" },
     { name: "goldregen", text: "Goldregen" },

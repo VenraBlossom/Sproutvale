@@ -3059,6 +3059,7 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         ],
         // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
         haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height },
+        scheune: { x: scheune.x, y: scheune.y, b: scheune.sprite.width, h: scheune.sprite.height },
         leuchten
     };
 }

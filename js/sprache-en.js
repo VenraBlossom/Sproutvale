@@ -3175,7 +3175,13 @@ Object.assign(UEBERSETZUNG, {
     "aktiv": "active",
     "🎁 Promocodes": "🎁 Promo codes",
     "Gems": "Gems",
-    "Alle Promocodes anzeigen": "Show all promo codes"
+    "Alle Promocodes anzeigen": "Show all promo codes",
+    "Scheune: Tag frühzeitig beenden": "Barn: end the day early",
+    "🌾 Den Tag beenden geht nur, während ein Tag läuft.": "🌾 You can only end the day while a day is running.",
+    "🌾 Scheune": "🌾 Barn",
+    "Möchtest du den Tag jetzt schon beenden? Es passiert alles wie an einem normalen Tagesende, ohne Kosten und ohne Verluste.": "Do you want to end the day now? Everything happens just like at a normal end of day, with no costs and no losses.",
+    "Weiterarbeiten": "Keep working",
+    "🌙 Tag beenden": "🌙 End day"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -320,6 +320,39 @@ hausFlaeche.addEventListener("pointerdown", event => {
     if (event.button === 0) oeffneHaus();
 });
 
+// Klickflaeche ueber der Scheune: dort kann man den Tag frueh beenden (wie ein ganz normales Tagesende)
+const scheuneFlaeche = $("scheune-klickflaeche");
+registriereHaken("landschaftGezeichnet", szene => {
+    if (!szene.scheune) return;
+    scheuneFlaeche.style.left = (szene.scheune.x / szene.breite) * 100 + "%";
+    scheuneFlaeche.style.top = (szene.scheune.y / szene.hoehe) * 100 + "%";
+    scheuneFlaeche.style.width = (szene.scheune.b / szene.breite) * 100 + "%";
+    scheuneFlaeche.style.height = (szene.scheune.h / szene.hoehe) * 100 + "%";
+});
+scheuneFlaeche.addEventListener("pointerdown", event => {
+    if (event.button === 0) oeffneScheune();
+});
+
+function oeffneScheune() {
+    if (spielPausiert()) return;
+    if (!run || run.phase !== "tag") {
+        Klang.fehler();
+        zeigeToast(t("🌾 Den Tag beenden geht nur, während ein Tag läuft."));
+        return;
+    }
+    Klang.klick(8);
+    zeigePopup({ titel: t("🌾 Scheune"), breite: 440, farbe: "#a0522d",
+        inhalt: el("p", null, t("Möchtest du den Tag jetzt schon beenden? Es passiert alles wie an einem normalen Tagesende, ohne Kosten und ohne Verluste.")),
+        knoepfe: [{ text: t("Weiterarbeiten") }, { text: t("🌙 Tag beenden"), klasse: "knopf-gruen", aktion: beendeTagFrueh }] });
+}
+
+function beendeTagFrueh() {
+    if (!run || run.phase !== "tag") return;
+    if (run.sandbox) naechsterSandboxTag();
+    else if (koopAktiv()) koopMeldeFertig();
+    else beendeTag();
+}
+
 // ---------- SCHORNSTEIN ----------
 // Aus dem Bauernhaus steigt leise Rauch auf (am Abend und in der Nacht etwas mehr)
 
