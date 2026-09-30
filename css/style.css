@@ -12616,3 +12616,19 @@ body.ohne-effekte .himmel-punkt,
 body.ohne-effekte #jahreszeit-ebene > * {
     display: none !important;
 }
+
+/* Duo: der Host hat eine gelbe Namensschrift (auf dem Hof und in der Lobby) */
+.figur-name.host-name {
+    color: #ffd93d !important;
+}
+/* in der Lobby (heller Hintergrund) ein dunkleres Gelb mit Schatten, damit es lesbar bleibt */
+.koop-host-name {
+    color: #e0a800;
+    text-shadow: 1px 1px 0 #4a2f15;
+}
+.mitspieler-menue {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+}

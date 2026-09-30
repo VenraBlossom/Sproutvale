@@ -107,6 +107,25 @@ function koopKicken() {
     }, 300);
 }
 
+// Host: den Mitspieler zum Host machen. Die Seiten auf dem Acker bleiben, wie sie sind.
+function koopMacheHost() {
+    if (koop.rolle !== "host" || !koop.verbunden) return;
+    const name = koop.partnerProfil && koop.partnerProfil.name ? koop.partnerProfil.name : t("Mitspieler");
+    const meineSeite = koopAktiv() ? eigeneSeite() : null;
+    koopSende("hostWechsel", { code: koop.code, lobby: koop.lobby, kosmetik: { ...koop.kosmetik }, seite: meineSeite ? partnerSeite() : null });
+    koop.rolle = "gast";
+    if (meineSeite) koop.seite = meineSeite;
+    // Den Code gibt der neue Host beim Vermittler frei (er meldet ihn gleich neu an)
+    clearInterval(koop.wsTakt);
+    if (koop.ws) {
+        const ws = koop.ws;
+        koop.ws = null;
+        ws.close();
+    }
+    zeigeToast(tf("👑 {0} ist jetzt Host.", name));
+    renderKoopLobby();
+}
+
 function zufallsCode(laenge = KOOP_KONFIG.codeLaenge) {
     let code = "";
     for (let i = 0; i < laenge; i++) code += KOOP_KONFIG.codeZeichen[Math.floor(Math.random() * KOOP_KONFIG.codeZeichen.length)];
@@ -569,6 +588,24 @@ function koopEmpfange(n) {
             break;
         case "zurLobby":
             koopZurueckZurLobby(false);
+            break;
+        case "hostWechsel":
+            // Der Host hat mich zum Host gemacht: Lobby und Code uebernehmen, die Seiten bleiben
+            if (koop.rolle !== "gast") break;
+            koop.rolle = "host";
+            if (n.lobby) koop.lobby = n.lobby;
+            if (n.kosmetik) koop.kosmetik = n.kosmetik;
+            if (n.seite) koop.seite = n.seite;
+            if (n.code) koop.code = n.code;
+            zeigeToast(t("👑 Du bist jetzt Host."));
+            Klang.geschenk();
+            // der alte Host braucht einen Moment, bis sein Code beim Vermittler frei ist
+            if (koop.code) setTimeout(() => koopMeldeCodeWiederAn(koop.code, 0), 1500);
+            if (run && koopAktiv()) {
+                if (run.koopFertig) koopPruefeFeierabend();
+                if (koop.ichBereit) koopPruefeTagStart();
+            }
+            renderKoopLobby();
             break;
         default:
             break;
@@ -1116,8 +1153,11 @@ function renderKoopLobby() {
             zeigeFigurBild(mini, figurTeileAus(teile, false), "stehen", 0, false, "vorne");
             zeile.appendChild(mini.huelle);
         }
-        zeile.appendChild(el("span", null, text));
+        zeile.appendChild(el("span", klasse.includes("ist-host") ? "koop-host-name" : null, text));
         if (kicken) {
+            const hostKnopf = el("button", "knopf koop-klein", t("👑 Zum Host machen"));
+            hostKnopf.addEventListener("click", koopMacheHost);
+            zeile.appendChild(hostKnopf);
             const knopf = el("button", "knopf knopf-rot koop-klein koop-kicken", t("🥾 Rauswerfen"));
             setzeTipp(knopf, t("Mitspieler aus der Lobby entfernen. Die Lobby bekommt einen neuen Code."));
             knopf.addEventListener("click", koopKicken);
@@ -1127,10 +1167,10 @@ function renderKoopLobby() {
     };
     const partner = koop.partnerProfil;
     inhalt.appendChild(el("div", "koop-spieler", null, [
-        spielerZeile((host ? "👑 " : "🙂 ") + profilName() + " · " + tf("Level {0}", bauernRang()) + (host ? t(" (du, Host)") : t(" (du)")), profil().teile),
+        spielerZeile((host ? "👑 " : "🙂 ") + profilName() + " · " + tf("Level {0}", bauernRang()) + (host ? t(" (du, Host)") : t(" (du)")), profil().teile, host ? " ist-host" : ""),
         koop.verbunden
             ? spielerZeile((host ? "🙂 " : "👑 ") + (partner && partner.name ? partner.name : t("Mitspieler")) + (partner ? " · " + tf("Level {0}", partner.level) : "") + (host ? "" : t(" (Host)")),
-                partner ? partner.teile : null, "", host)
+                partner ? partner.teile : null, host ? "" : " ist-host", host)
             : spielerZeile(host ? t("⏳ Warte auf einen Mitspieler …") : koop.status || t("Verbinde …"), null, " wartet")
     ]));
 

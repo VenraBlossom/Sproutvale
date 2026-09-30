@@ -1795,6 +1795,7 @@ function neueFigur(art, optionen) {
         huelle.addEventListener("contextmenu", event => {
             event.preventDefault();
             if (!f.partner) oeffneEmoteMenue(f, event);
+            else if (typeof koop !== "undefined" && koop.rolle === "host" && koop.verbunden) oeffneMitspielerMenue(event);
         });
     }
     figuren.push(f);
@@ -2009,6 +2010,8 @@ function aktualisiereFiguren(dtMs, jetzt) {
         eigene.schild.textContent = name;
         eigene.schild.classList.toggle("versteckt", !name);
     }
+    // Der Host hat ein gelbes Namensschild
+    if (eigene.schild) eigene.schild.classList.toggle("host-name", Boolean(imDuo) && koop.rolle === "host");
     // Duo: Mitspieler-Figur und sein Begleiter
     let partner = figuren.find(f => f.art === "mensch" && f.partner);
     let partnerTier = figuren.find(f => f.art === "begleiter" && f.partner);
@@ -2016,7 +2019,10 @@ function aktualisiereFiguren(dtMs, jetzt) {
         const p = koop.partnerProfil;
         if (!partner) partner = neueFigur("mensch", { partner: true, teile: p.teile || FIGUR_STANDARD, name: p.name || t("Mitspieler") });
         partner.teile = p.teile || FIGUR_STANDARD;
-        if (partner.schild) partner.schild.textContent = p.name || t("Mitspieler");
+        if (partner.schild) {
+            partner.schild.textContent = p.name || t("Mitspieler");
+            partner.schild.classList.toggle("host-name", koop.rolle !== "host");
+        }
         if (!partnerTier) partnerTier = neueFigur("begleiter", { partner: true, skin: p.begleiter, zustand: "sitzen" });
         partnerTier.skin = p.begleiter;
     } else {
@@ -2045,6 +2051,24 @@ function oeffneEmoteMenue(f, event) {
     });
     emoteMenue.style.left = Math.min(event.clientX, window.innerWidth - 200) + "px";
     emoteMenue.style.top = Math.max(10, event.clientY - 120) + "px";
+    document.body.appendChild(emoteMenue);
+    setTimeout(() => document.addEventListener("pointerdown", emoteMenueAussen), 0);
+}
+
+// Host: Rechtsklick auf die Figur des Mitspielers
+function oeffneMitspielerMenue(event) {
+    schliesseEmoteMenue();
+    emoteMenue = el("div", "emote-menue mitspieler-menue");
+    [[t("👑 Zum Host machen"), koopMacheHost, ""], [t("🥾 Rauswerfen"), koopKicken, " knopf-rot"]].forEach(([text, aktion, klasse]) => {
+        const knopf = el("button", "knopf" + klasse, text);
+        knopf.addEventListener("click", () => {
+            schliesseEmoteMenue();
+            aktion();
+        });
+        emoteMenue.appendChild(knopf);
+    });
+    emoteMenue.style.left = Math.min(event.clientX, window.innerWidth - 220) + "px";
+    emoteMenue.style.top = Math.max(10, event.clientY - 90) + "px";
     document.body.appendChild(emoteMenue);
     setTimeout(() => document.addEventListener("pointerdown", emoteMenueAussen), 0);
 }
