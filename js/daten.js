@@ -735,7 +735,7 @@ const SKILLS = [
     stern("vipkarte", "glueck", "💳", [-1400, -440], "stammkunde", t("VIP-Karte"), 15000, 1, 1,
         t("Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst."),
         () => (level("vipkarte") > 0 ? t("Unbegrenzt spielen") : t("Noch mit Grenze")),
-        { bedingung: () => level("blackjack") > 0, bedingungStern: "blackjack",
+        { vorMax: true, bedingung: () => level("blackjack") > 0, bedingungStern: "blackjack",
             bedingungText: t("Erscheint, sobald du Blackjack freigeschaltet hast.") }),
     stern("haendlerfreund", "glueck", "🧳", [-1620, -220], "huehnerrennen", t("Händlerfreund"), 2000, 2.5, 2,
         t("Der Wanderhändler kommt öfter vorbei."),
