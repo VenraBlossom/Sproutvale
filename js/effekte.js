@@ -112,9 +112,13 @@ let letzteJackpotFeier = 0;
 function jackpotFeier(x, y) {
     if (performance.now() - letzteJackpotFeier < 1500) return;
     letzteJackpotFeier = performance.now();
-    const schrift = el("div", "jackpot-schrift", t("JACKPOT!"));
-    document.body.appendChild(schrift);
-    setTimeout(() => schrift.remove(), 1600);
+    // grosse Schrift nur ohne "Unnötige Texte entfernen", Ring und Konfetti nur ohne "Weniger Partikel"
+    if (!einstellungen.ohneTexte) {
+        const schrift = el("div", "jackpot-schrift", t("JACKPOT!"));
+        document.body.appendChild(schrift);
+        setTimeout(() => schrift.remove(), 1600);
+    }
+    if (ohneEffekte()) return;
     zeigeRing(x, y, 300, "#ffd93d", 700);
     const farben = ["#ffd93d", "#ff8fb1", "#5aa9e6", "#a3dc6f", "#b06ee8", "#ffffff"];
     for (let i = 0; i < 60; i++) {
