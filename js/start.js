@@ -82,6 +82,13 @@ window.debug = {
     energie(wert) { run.energie = wert; },
     tag(nummer) { run.tag = nummer; aktualisiereAlles(); },
     stern() { spawnSternschnuppe(); },
+    // Alle Sterne im Stellarium auf die hoechste Stufe (unendliche Sterne auf die angegebene Stufe): debug.alleSterne(10)
+    alleSterne(unendlich = 10) {
+        SKILLS.forEach(st => { run.level[st.id] = Number.isFinite(st.max) ? st.max : unendlich; });
+        aktualisiereAlles();
+        if (typeof renderSkilltree === "function") renderSkilltree();
+        zeigeToast("🌟 Alle Sterne auf der höchsten Stufe.");
+    },
     gluehwuermchen() { spawnGluehwuermchen(); },
     segen() { zeigeSegenAuswahl(); },
     // Tageszeit erzwingen (0 = Morgen, 1 = Nacht), debug.tageszeit(null) zum Ausschalten
@@ -239,6 +246,7 @@ const DEBUG_BEFEHLE = [
     { gruppe: "Ereignisse" },
     { name: "wetter", text: "Wetter", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...WETTER.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol }))] }] },
     { name: "stern", text: "Sternschnuppe" },
+    { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gluehwuermchen", text: "Glühwürmchen" },
     { name: "kraehe", text: "Krähe" },
     { name: "goldregen", text: "Goldregen" },
