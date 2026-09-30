@@ -3168,7 +3168,8 @@ Object.assign(UEBERSETZUNG, {
     "💎 Gems": "💎 Gems",
     "Du hast nicht genug Gems.": "You don't have enough gems.",
     "{0} für {1} Gems kaufen?": "Buy {0} for {1} gems?",
-    "Gems geben": "Give gems"
+    "Gems geben": "Give gems",
+    "🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand.": "🛠️ Debug only works in-game: load a save first."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

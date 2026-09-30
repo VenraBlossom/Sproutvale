@@ -362,6 +362,12 @@ function zeigeDebugFenster() {
             };
         });
         const ausfuehren = (aktion, name) => {
+            // Debug-Befehle wirken nur auf den gerade geladenen Spielstand, im Hauptmenue ist keiner geladen
+            if (!hauptmenue.classList.contains("versteckt")) {
+                Klang.fehler();
+                zeigeToast(t("🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand."));
+                return;
+            }
             if (b.gefahr && !confirm(t(b.text) + "?")) return;
             try {
                 aktion(...eingaben.map(lies => lies()));
