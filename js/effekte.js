@@ -82,6 +82,7 @@ let tickerEl = null;
 let tickerTimer = null;
 
 function goldTicker(wert) {
+    if (einstellungen.ohneTexte) return; // kein Aufleuchten und keine "+..."-Zahl unter dem Gold
     moneyDisplay.classList.remove("gold-glanz");
     void moneyDisplay.offsetWidth;
     moneyDisplay.classList.add("gold-glanz");

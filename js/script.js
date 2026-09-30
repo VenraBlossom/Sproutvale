@@ -2837,6 +2837,11 @@ function sammleEin(loot) {
 
 // Die Saat fliegt zur passenden Anzeige oben
 function fliegeZuAnzeige(loot, anzeige) {
+    // "Unnötige Texte entfernen": die Saat verschwindet sofort, ohne leuchtend nach oben zu fliegen
+    if (einstellungen.ohneTexte) {
+        loot.el.remove();
+        return;
+    }
     const ziel = anzeige.getBoundingClientRect();
     loot.el.classList.add("loot-fliegt");
     loot.el.style.left = ziel.left + 16 + "px";
