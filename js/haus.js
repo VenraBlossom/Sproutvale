@@ -947,6 +947,181 @@ function beendeKosmetikVorschau() {
     aktualisiereMusik();
 }
 
+// ---------- KRISTALLE UND SHOP ----------
+
+function kristallStand() {
+    return meta.kristalle || 0;
+}
+
+function aktualisiereKristallAnzeigen() {
+    document.querySelectorAll(".kristall-zahl").forEach(e => { e.textContent = zahl(kristallStand()); });
+}
+
+// Kristall-Anzeige als Knopf (Kristalle kaufen geht noch nicht)
+function kristallKnopf() {
+    const knopf = el("button", "knopf kristall-knopf", null, [
+        pixelIcon("💎", 22), el("span", "kristall-zahl", zahl(kristallStand())), el("span", "kristall-plus", "+")
+    ]);
+    setzeTipp(knopf, t("Kristalle kaufen"));
+    knopf.addEventListener("click", () => {
+        Klang.klick(8);
+        zeigeToast(t("Kristalle kann man aktuell noch nicht kaufen."));
+    });
+    return knopf;
+}
+
+function kristallInfoKnopf() {
+    const knopf = el("button", "knopf kristall-info", "?");
+    knopf.addEventListener("click", () => {
+        Klang.klick(8);
+        zeigePopup({ titel: t("💎 Kristalle"), breite: 420, farbe: "#3a6ab0",
+            inhalt: el("p", "kristall-info-text", t("Käufe im Spiel unterstützen die Zukunft von Sproutvale. Sie haben keinerlei Einfluss auf das Spiel. ❤️")),
+            knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
+    });
+    return knopf;
+}
+
+// Unterstuetzer-Paket fuer 500 Kristalle
+const DLC_KRISTALLE = 500;
+function dlcKnopf(danach) {
+    const knopf = el("button", "knopf knopf-lila dlc-knopf", "DLC");
+    knopf.addEventListener("click", () => {
+        Klang.klick(8);
+        const paket = DLC_PAKETE.unterstuetzer;
+        const inhalt = el("div", "dlc-info", null, [
+            el("p", null, t("Mit dem Unterstützer-Paket hilfst du, dass Sproutvale weiter wachsen kann. Du bekommst:")),
+            el("ul", null, null, [
+                el("li", null, t("Alle epischen Skins: Charakter, Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, Münzen, Kuschel-Rahmen und Pflanzen-Looks")),
+                el("li", null, tf("Sofort Zugang zu Endlos (sonst für {0} Mondblüten freischaltbar)", zahl(SANDBOX_KONFIG.preis)))
+            ]),
+            el("p", "leise", t("Nur Optik und früherer Zugang, kein Pay-to-Win."))
+        ]);
+        if (meta.dlc) {
+            inhalt.appendChild(el("p", "dlc-hast", t("✓ Du hast das Unterstützer-Paket schon. Danke! ❤️")));
+            zeigePopup({ titel: "💝 " + paket.name, breite: 480, farbe: "#7c4fb3", inhalt, knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
+            return;
+        }
+        zeigePopup({ titel: "💝 " + paket.name, breite: 480, farbe: "#7c4fb3", inhalt, knoepfe: [
+            { text: t("Nein, danke!") },
+            { text: zahl(DLC_KRISTALLE) + " 💎", klasse: "knopf-gruen", aktion: () => {
+                if (kristallStand() < DLC_KRISTALLE) {
+                    Klang.fehler();
+                    zeigeToast(t("Du hast nicht genug Kristalle."));
+                    return;
+                }
+                meta.kristalle = kristallStand() - DLC_KRISTALLE;
+                meta.dlc = true;
+                speichereMeta();
+                wendeKosmetikAn();
+                aktualisiereKristallAnzeigen();
+                Klang.jackpot();
+                zeigeToast(t("💝 Unterstützer-Paket freigeschaltet. Danke! ❤️"));
+                if (danach) danach();
+            } }
+        ] });
+    });
+    return knopf;
+}
+
+// ---------- PROMOCODES ----------
+// Codes stehen nur als Pruefsumme im Code (das Repo ist oeffentlich), Gross-/Kleinschreibung egal.
+// Jeder Code geht pro Spieler nur einmal (eigene, signierte Datei, bleibt auch beim Loeschen des Spielstands).
+// Neue Codes nur auf Ansage anlegen, alte mit aktiv: false abschalten.
+const PROMO_CODES = [
+    { pruef: "20bf2gveu45", kristalle: 50, aktiv: true } // sproutvalebeta
+];
+const PROMO_KEY = "sproutvale_codes";
+
+function eingeloesteCodes() {
+    try {
+        const roh = JSON.parse(localStorage.getItem(PROMO_KEY));
+        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return [];
+        return JSON.parse(decodeURIComponent(escape(atob(roh.daten))));
+    } catch (fehler) {
+        return [];
+    }
+}
+
+function merkeCode(pruef) {
+    const daten = btoa(unescape(encodeURIComponent(JSON.stringify([...eingeloesteCodes(), pruef]))));
+    localStorage.setItem(PROMO_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+}
+
+function loeseCodeEin(text) {
+    const pruef = kaufPruefsumme("promo:" + String(text).trim().toUpperCase());
+    const code = PROMO_CODES.find(c => c.pruef === pruef && c.aktiv);
+    if (!code) {
+        Klang.fehler();
+        zeigeToast(t("Dieser Code ist ungültig oder abgelaufen."));
+        return false;
+    }
+    if (eingeloesteCodes().includes(pruef)) {
+        Klang.fehler();
+        zeigeToast(t("Diesen Code hast du schon eingelöst."));
+        return false;
+    }
+    merkeCode(pruef);
+    if (code.kristalle) meta.kristalle = kristallStand() + code.kristalle;
+    speichereMeta();
+    aktualisiereKristallAnzeigen();
+    Klang.jackpot();
+    zeigeToast(tf("🎁 Code eingelöst: +{0} 💎", zahl(code.kristalle || 0)));
+    return true;
+}
+
+function codeKnopf() {
+    const knopf = el("button", "knopf code-knopf", t("Code"));
+    knopf.addEventListener("click", () => {
+        Klang.klick(8);
+        const feld = el("input", "code-feld");
+        feld.type = "text";
+        feld.maxLength = 32;
+        feld.placeholder = t("Code eingeben");
+        let schliesse = null;
+        const einloesen = () => { if (feld.value.trim() && loeseCodeEin(feld.value) && schliesse) schliesse(); };
+        feld.addEventListener("keydown", ereignis => {
+            ereignis.stopPropagation();
+            if (ereignis.key === "Enter") einloesen();
+        });
+        schliesse = zeigePopup({ titel: t("🎁 Code einlösen"), breite: 420, farbe: "#3a6ab0",
+            inhalt: el("div", "code-inhalt", null, [el("p", null, t("Hast du einen Promocode? Gib ihn hier ein.")), feld]),
+            knoepfe: [{ text: t("Abbrechen") }, { text: t("Einlösen"), klasse: "knopf-gruen", bleibtOffen: true, aktion: einloesen }] });
+        setTimeout(() => feld.focus(), 50);
+    });
+    return knopf;
+}
+
+// Legendaere Skins einzeln fuer Kristalle kaufen
+function istEinzelKaufbar(eintrag, kategorie) {
+    return eintrag.quelle === "dlc" && eintrag.paket === "einzeln" && !istKosmetikFrei(eintrag, kategorie);
+}
+
+function kaufKnopf(kategorie, eintrag, danach) {
+    const preis = eintrag.kristalle || LEGENDAER_KRISTALLE;
+    const knopf = el("button", "knopf knopf-gruen kosmetik-kaufen", null, [el("span", null, t("Kaufen")), pixelIcon("💎", 16), el("span", null, zahl(preis))]);
+    knopf.addEventListener("click", ereignis => {
+        ereignis.stopPropagation();
+        if (kristallStand() < preis) {
+            Klang.fehler();
+            zeigeToast(t("Du hast nicht genug Kristalle."));
+            return;
+        }
+        zeigePopup({ titel: t("💎 Kaufen"), breite: 420, farbe: "#3a6ab0",
+            inhalt: tf("{0} für {1} Kristalle kaufen?", eintrag.name, zahl(preis)),
+            knoepfe: [{ text: t("Nein, danke!") }, { text: t("Kaufen"), klasse: "knopf-gruen", aktion: () => {
+                if (kristallStand() < preis || istKosmetikFrei(eintrag, kategorie)) return;
+                meta.kristalle = kristallStand() - preis;
+                meta.freigeschaltet[kategorie + ":" + eintrag.id] = true;
+                speichereMeta();
+                aktualisiereKristallAnzeigen();
+                Klang.jackpot();
+                zeigeToast(tf("✨ {0} gehört jetzt dir!", eintrag.name));
+                if (danach) danach();
+            } }] });
+    });
+    return knopf;
+}
+
 function oeffneHaus(kategorie) {
     if (spielPausiert()) return;
     if (kategorie) aktiveKosmetikKategorie = kategorie;
@@ -965,6 +1140,9 @@ function oeffneHaus(kategorie) {
     });
     Klang.banner();
     renderHaus(inhalt);
+    // Oben rechts neben dem X: Code, DLC, Kristalle, Fragezeichen
+    const fenster = inhalt.closest(".popup");
+    if (fenster) fenster.appendChild(el("div", "haus-shop-leiste", null, [codeKnopf(), dlcKnopf(() => renderHaus(inhalt)), kristallKnopf(), kristallInfoKnopf()]));
 }
 
 function kosmetikBild(kategorie, eintrag) {
@@ -1235,18 +1413,11 @@ function renderHaus(inhalt) {
             el("div", "haus-status", status)
         );
         if (knopfText && !vorschau) kachel.appendChild(el("div", "haus-testen", knopfText));
+        if (istEinzelKaufbar(eintrag, kategorie)) kachel.appendChild(kaufKnopf(kategorie, eintrag, () => renderHaus(inhalt)));
         kachel.addEventListener("click", () => waehleKosmetik(kategorie, eintrag, inhalt));
         raster.appendChild(kachel);
     });
     inhalt.appendChild(raster);
-
-    if (KOSMETIK_LISTEN[kategorie].some(e => e.quelle === "dlc" && !istKosmetikFrei(e, kategorie))) {
-        const paket = DLC_PAKETE.unterstuetzer;
-        inhalt.appendChild(el("div", "panel-hinweis leise",
-            t("💝 Alles hier ist reine Optik und unterstützt die Entwicklung von Sproutvale. ") + paket.name + ": " + paket.inhalt +
-            " (" + euro(paket.preis) + ")" + t(". Legendäre Inhalte mit Animationen gibt es einzeln für je ") + kristallText(LEGENDAER_KRISTALLE) +
-            tf(" (100 Kristalle = {0}). Nur Optik, kein Pay-to-Win. Kaufen geht, sobald Sproutvale auf Steam ist.", euro(1))));
-    }
 }
 
 // ---------- HAUSTIER ----------

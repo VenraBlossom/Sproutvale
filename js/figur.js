@@ -1163,22 +1163,30 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
             k.feinLinie(x, 23.5, x + 2, 23.5, "l");
         }
         if (schuhe.form === "blitz") {
-            // Blitzschuhe: kleine Funken springen abwechselnd links und rechts vom Schuh
-            k.feinLinie(x, 24, x + 1.5, 24, "l");
+            // Blitzschuhe: der ganze Schuh in der Hauptfarbe, die Blitze in der Zweitfarbe springen links und rechts
+            if (blick === "seite") k.rechteck(x, 24, 3, 1, "1");
+            else k.rechteck(x - (x < 9 ? 0.5 : 0), 24, 2.5, 1, "1");
             const links = (anim + (x < 9 ? 0 : 1)) % 2 === 0;
             const bx = links ? x - 1 : x + 2.5;
             const r = links ? -0.5 : 0.5;
-            g.werkzeug.feinLinie(bx, 22, bx + r, 23, "g");
-            g.werkzeug.feinLinie(bx + r, 23, bx, 23.5, "g");
-            g.werkzeug.feinLinie(bx, 23.5, bx + r, 24.5, "g");
+            g.werkzeug.feinLinie(bx, 22, bx + r, 23, "l");
+            g.werkzeug.feinLinie(bx + r, 23, bx, 23.5, "l");
+            g.werkzeug.feinLinie(bx, 23.5, bx + r, 24.5, "l");
             g.werkzeug.fein(bx, 22, "w");
         }
         if (schuhe.form === "wolke") {
-            // Wolkenschuhe: kleine Wolken, die im Takt aufpuffen
-            const puff = anim % 2 ? 0.5 : 0;
-            g.kleidung.ellipse(x + 1, 24.6, 1.8 + puff, 0.9, "1");
-            g.kleidung.fein(x, 24.2 - puff, "l");
-            g.kleidung.fein(x + 2, 24.5, "l");
+            // Wolkenschuhe: die Wolke unter dem Schuh atmet sichtbar, kleine Woelkchen steigen auf und verpuffen
+            const puff = [0, 0.5, 1, 0.5][anim % 4];
+            g.kleidung.ellipse(x + 1, 24.6, 2 + puff * 0.7, 1 + puff * 0.3, "1");
+            g.kleidung.fein(x - 0.5, 24.2 - puff * 0.5, "l");
+            g.kleidung.fein(x + 2.5, 24.6 - puff * 0.5, "l");
+            // aufsteigende Woelkchen (abwechselnd links und rechts)
+            const schritt = (anim + (x < 9 ? 0 : 2)) % 4;
+            const wx = schritt < 2 ? x - 1.5 : x + 3;
+            const wy = 25 - schritt % 2 * 1.5;
+            g.werkzeug.feinLinie(wx, wy, wx + 1, wy, "1");
+            g.werkzeug.fein(wx + 0.5, wy - 0.5, "1");
+            if (schritt % 2) g.werkzeug.fein(wx + 0.5, wy - 1.5, "l");
         }
     });
     if (rock) {
@@ -2295,6 +2303,13 @@ function renderProfil() {
         kachel.appendChild(mini.huelle);
         kachel.appendChild(el("div", "profil-kachel-name", teil.name));
         kachel.appendChild(el("div", "profil-kachel-status", frei ? (teil.fx ? "✨ " + seltenheit.name : seltenheit.name) : "🔒 " + dlcPreisText(teil)));
+        if (istEinzelKaufbar(teil, kategorie)) kachel.appendChild(kaufKnopf(kategorie, teil, () => {
+            if (!profilVorschau) return;
+            profilVorschau[profilKategorie] = teil.id;
+            profil().teile[profilKategorie] = teil.id;
+            speichereMeta();
+            renderProfil();
+        }));
         kachel.addEventListener("click", () => {
             if (!profilVorschau) return;
             profilVorschau[profilKategorie] = teil.id;
@@ -2311,7 +2326,7 @@ function renderProfil() {
         raster.appendChild(kachel);
     });
     rechts.appendChild(raster);
-    rechts.appendChild(el("div", "profil-legende", t("Gewöhnlich: frei · Episch: im Unterstützer-Paket · Legendär (mit Effekten): einzeln je ") +
-        kristallText(LEGENDAER_KRISTALLE) + t(" · Kaufen geht, sobald Sproutvale auf Steam ist. Anprobieren geht schon jetzt.")));
+    // Unten links: Fragezeichen, Kristalle, DLC, Code
+    rechts.appendChild(el("div", "profil-shop-leiste", null, [kristallInfoKnopf(), kristallKnopf(), dlcKnopf(() => renderProfil()), codeKnopf()]));
     inhalt.appendChild(rechts);
 }

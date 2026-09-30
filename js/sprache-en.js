@@ -3143,7 +3143,32 @@ Object.assign(UEBERSETZUNG, {
     "Kugeln vom Begleiter geben 20% weniger (Mindestbetrag bleibt).": "Companion orbs give 20% less (minimum stays).",
     "\"Alle abholen\" gibt es jetzt auch bei nur einem Erfolg. Die Moduswahl zählt komplett geschaffte Erfolge aus Story und dem besten Endlos-Spielstand.": "\"Claim all\" now also appears for a single achievement. The mode selection counts fully completed achievements from Story plus your best Endless save.",
     "Seltenheiten angepasst: Hasenohren legendär, Krone, Laubweste, Rote Wangen und Breites Grinsen episch, Vollbart und Schnurrbart gewöhnlich.": "Rarities changed: Bunny Ears legendary, Crown, Leaf Vest, Rosy Cheeks and Big Grin epic, Full Beard and Moustache common.",
-    "Duo: Die Lobby schließt sich, sobald du die Duo-Seite verlässt.": "Duo: The lobby closes as soon as you leave the Duo page."
+    "Duo: Die Lobby schließt sich, sobald du die Duo-Seite verlässt.": "Duo: The lobby closes as soon as you leave the Duo page.",
+    "Kristalle kaufen": "Buy crystals",
+    "Kristalle kann man aktuell noch nicht kaufen.": "Crystals can't be bought yet.",
+    "💎 Kristalle": "💎 Crystals",
+    "Käufe im Spiel unterstützen die Zukunft von Sproutvale. Sie haben keinerlei Einfluss auf das Spiel. ❤️": "In-game purchases support the future of Sproutvale. They have no impact on the game whatsoever. ❤️",
+    "Okay": "Okay",
+    "Mit dem Unterstützer-Paket hilfst du, dass Sproutvale weiter wachsen kann. Du bekommst:": "With the Supporter Pack you help Sproutvale keep growing. You get:",
+    "Alle epischen Skins: Charakter, Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, Münzen, Kuschel-Rahmen und Pflanzen-Looks": "All epic skins: character, companions, landscapes, decorations, music, seed shops, fields, coins, plushie frames and plant looks",
+    "Sofort Zugang zu Endlos (sonst für {0} Mondblüten freischaltbar)": "Instant access to Endless (otherwise unlockable for {0} Moonpetals)",
+    "Nur Optik und früherer Zugang, kein Pay-to-Win.": "Cosmetics and earlier access only, no pay-to-win.",
+    "✓ Du hast das Unterstützer-Paket schon. Danke! ❤️": "✓ You already own the Supporter Pack. Thank you! ❤️",
+    "Nein, danke!": "No, thanks!",
+    "Du hast nicht genug Kristalle.": "You don't have enough crystals.",
+    "💝 Unterstützer-Paket freigeschaltet. Danke! ❤️": "💝 Supporter Pack unlocked. Thank you! ❤️",
+    "Kaufen": "Buy",
+    "💎 Kaufen": "💎 Buy",
+    "{0} für {1} Kristalle kaufen?": "Buy {0} for {1} crystals?",
+    "✨ {0} gehört jetzt dir!": "✨ {0} is yours now!",
+    "Dieser Code ist ungültig oder abgelaufen.": "This code is invalid or expired.",
+    "Diesen Code hast du schon eingelöst.": "You have already redeemed this code.",
+    "🎁 Code eingelöst: +{0} 💎": "🎁 Code redeemed: +{0} 💎",
+    "Code eingeben": "Enter code",
+    "🎁 Code einlösen": "🎁 Redeem code",
+    "Hast du einen Promocode? Gib ihn hier ein.": "Got a promo code? Enter it here.",
+    "Einlösen": "Redeem",
+    "Kristalle geben": "Give crystals"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

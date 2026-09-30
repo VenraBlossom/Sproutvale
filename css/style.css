@@ -12470,3 +12470,103 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     vertical-align: -2px;
     margin-right: 2px;
 }
+
+/* Kristalle, Fragezeichen und DLC im Bauernhaus (oben rechts neben dem X) und im Profil (unten links) */
+.haus-shop-leiste {
+    position: absolute;
+    top: 8px;
+    right: 58px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+}
+.profil-shop-leiste {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+.kristall-knopf {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    min-width: 128px;
+    padding: 4px 10px;
+    background: #2a4a7a;
+    color: #ffffff;
+    border-color: #14284a;
+}
+.kristall-zahl {
+    flex: 1;
+    text-align: right;
+    font-weight: 800;
+}
+.kristall-plus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #3fbf3f;
+    color: #ffffff;
+    border: 2px solid #1a5a1a;
+    border-radius: 4px;
+    font-weight: 900;
+    line-height: 1;
+}
+.kristall-info {
+    width: 34px;
+    min-width: 34px;
+    padding: 4px 0;
+    font-weight: 900;
+}
+.dlc-knopf {
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+}
+.kristall-info-text {
+    line-height: 1.45;
+    text-align: center;
+}
+.dlc-info ul {
+    margin: 6px 0 6px 18px;
+    line-height: 1.45;
+}
+.dlc-hast {
+    font-weight: 800;
+    color: #3f8a32;
+}
+.kosmetik-kaufen {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 2px 8px;
+    font-size: 0.8em;
+}
+
+/* Promocode */
+.code-knopf {
+    font-weight: 900;
+    padding: 4px 12px;
+}
+.code-inhalt {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+}
+.code-feld {
+    font: inherit;
+    font-size: 1.1em;
+    padding: 6px 10px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 3px solid #4a3a2a;
+    border-radius: 6px;
+}
