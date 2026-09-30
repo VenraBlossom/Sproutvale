@@ -908,6 +908,16 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             k.linie(x0 + breite - 2, y0, x0 + 1, y0 + 3, "6");
             k.rechteck(x0, y0 + 4, breite, 2, "6");
         }
+    } else if (form === "beta") {
+        // "BE" und "TA" in zwei Zeilen, weisse Pixelschrift (3x5 feine Pixel pro Buchstabe)
+        if (blick !== "seite") {
+            const zeichen = {
+                B: ["110", "101", "110", "101", "110"], E: ["111", "100", "110", "100", "111"],
+                T: ["111", "010", "010", "010", "010"], A: ["010", "101", "111", "101", "101"]
+            };
+            [["B", "E"], ["T", "A"]].forEach((zeile, z) => zeile.forEach((b, i) => zeichen[b].forEach((reihe, ry) =>
+                [...reihe].forEach((an, rx) => { if (an === "1") k.fein(x0 + 1.5 + (i * 4 + rx) * 0.5, y0 + 0.5 + (z * 5 + ry) * 0.5, "k"); }))));
+        }
     } else if (form === "pulli") {
         k.rechteck(x0, y0 + 5, breite, 1, "8");
         for (let x = x0; x < x0 + breite; x += 1) k.fein(x + 0.5, y0 + 5.5, "o");

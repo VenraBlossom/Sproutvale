@@ -2651,6 +2651,8 @@ const FIGUR_TEILE = {
     oberteil: [
         { id: "latz", name: t("Latzhose"), quelle: "frei", form: "latz", farben: { 6: "#4a7ad0", 8: "#3a5ea8", k: "#f4ead4" } },
         { id: "shirt_weiss", name: t("T-Shirt"), quelle: "frei", farben: { 6: "#f4f4f4", 8: "#cfcfd8", k: "#cfcfd8" } },
+        // Mythisch: nur fuer Beta-Tester (wie der Begleiter "Beta Tester"), bleibt nach dem Release
+        { id: "beta_shirt", name: "BETA Shirt", quelle: "beta", seltenheit: 5, form: "beta", farben: { 6: "#1a1a1e", 8: "#0a0a0c", k: "#ffffff" } },
         { id: "pulli", name: t("Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#f0c83a", 8: "#c89a1a", k: "#c89a1a" } },
         { id: "karo", name: t("Karohemd"), quelle: "frei", form: "karo", farben: { 6: "#c8302a", 8: "#8a1a18", k: "#f4e4d0" } },
         { id: "hoodie", name: t("Hoodie"), ...EPISCH, form: "hoodie", farben: { 6: "#7a3ab0", 8: "#55287e", k: "#9a5ad0" } },
@@ -2773,9 +2775,9 @@ const FIGUR_TEILE = {
     ]
 };
 
-// Reihenfolge immer nach Seltenheit: gewoehnlich, dann episch, dann legendaer (innerhalb gleich wie oben)
+// Reihenfolge immer nach Seltenheit: gewoehnlich, dann episch, dann legendaer, dann mythisch (innerhalb gleich wie oben)
 Object.values(FIGUR_TEILE).forEach(liste => {
-    const rang = e => (e.paket === "einzeln" ? 2 : e.quelle === "dlc" ? 1 : 0);
+    const rang = e => (e.quelle === "beta" ? 3 : e.paket === "einzeln" ? 2 : e.quelle === "dlc" ? 1 : 0);
     liste.sort((a, b) => rang(a) - rang(b));
 });
 
