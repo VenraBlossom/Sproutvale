@@ -49,8 +49,8 @@ function istKosmetikFreiOhneBeta(eintrag, kategorie) {
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
     if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
-    if (meta.freigeschaltet[schluessel]) return true;
-    if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && Boolean(meta.dlc);
+    if (meta.freigeschaltet[schluessel] || hatGekauft(schluessel)) return true;
+    if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && hatDlc();
     // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)
     if (eintrag.bedingung && metaProfil !== "sandbox" && eintrag.bedingung()) {
         meta.freigeschaltet[schluessel] = true;
@@ -949,8 +949,45 @@ function beendeKosmetikVorschau() {
 
 // ---------- KRISTALLE UND SHOP ----------
 
+// Gems gehoeren dem Spieler, nicht einem Spielstand: eigene, signierte Datei (bleibt beim Loeschen eines Spielstands)
+const GEMS_KEY = "sproutvale_gems";
 function kristallStand() {
-    return meta.kristalle || 0;
+    try {
+        const roh = JSON.parse(localStorage.getItem(GEMS_KEY));
+        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return 0;
+        return Math.max(0, Number(atob(roh.daten)) || 0);
+    } catch (fehler) {
+        return 0;
+    }
+}
+
+// Mit Gems Gekauftes (Skins als "kategorie:id", das Unterstuetzer-Paket als "dlc") gehoert auch dem Spieler
+const GEKAUFT_KEY = "sproutvale_gekauft";
+function gekaufteInhalte() {
+    try {
+        const roh = JSON.parse(localStorage.getItem(GEKAUFT_KEY));
+        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return [];
+        return JSON.parse(atob(roh.daten));
+    } catch (fehler) {
+        return [];
+    }
+}
+// Unterstuetzer-Paket: auf Steam gekauft (meta.dlc) oder mit Gems
+function hatDlc() {
+    return Boolean(meta.dlc) || hatGekauft("dlc");
+}
+function hatGekauft(schluessel) {
+    return gekaufteInhalte().includes(schluessel);
+}
+function merkeGekauft(schluessel) {
+    const daten = btoa(JSON.stringify([...gekaufteInhalte(), schluessel]));
+    localStorage.setItem(GEKAUFT_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+}
+
+function setzeKristalle(menge) {
+    const daten = btoa(String(Math.max(0, Math.floor(menge))));
+    localStorage.setItem(GEMS_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+    aktualisiereKristallAnzeigen();
 }
 
 function aktualisiereKristallAnzeigen() {
@@ -996,7 +1033,7 @@ function dlcKnopf(danach) {
             ]),
             el("p", "leise", t("Nur Optik und früherer Zugang, kein Pay-to-Win."))
         ]);
-        if (meta.dlc) {
+        if (hatDlc()) {
             inhalt.appendChild(el("p", "dlc-hast", t("✓ Du hast das Unterstützer-Paket schon. Danke! ❤️")));
             zeigePopup({ titel: "💝 " + paket.name, breite: 480, farbe: "#7c4fb3", inhalt, knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
             return;
@@ -1009,8 +1046,8 @@ function dlcKnopf(danach) {
                     zeigeToast(t("Du hast nicht genug Gems."));
                     return;
                 }
-                meta.kristalle = kristallStand() - DLC_KRISTALLE;
-                meta.dlc = true;
+                setzeKristalle(kristallStand() - DLC_KRISTALLE);
+                merkeGekauft("dlc");
                 speichereMeta();
                 wendeKosmetikAn();
                 aktualisiereKristallAnzeigen();
@@ -1061,7 +1098,7 @@ function loeseCodeEin(text) {
         return false;
     }
     merkeCode(pruef);
-    if (code.kristalle) meta.kristalle = kristallStand() + code.kristalle;
+    if (code.kristalle) setzeKristalle(kristallStand() + code.kristalle);
     speichereMeta();
     aktualisiereKristallAnzeigen();
     Klang.jackpot();
@@ -1110,8 +1147,8 @@ function kaufKnopf(kategorie, eintrag, danach) {
             inhalt: tf("{0} für {1} Gems kaufen?", eintrag.name, zahl(preis)),
             knoepfe: [{ text: t("Nein, danke!") }, { text: t("Kaufen"), klasse: "knopf-gruen", aktion: () => {
                 if (kristallStand() < preis || istKosmetikFrei(eintrag, kategorie)) return;
-                meta.kristalle = kristallStand() - preis;
-                meta.freigeschaltet[kategorie + ":" + eintrag.id] = true;
+                setzeKristalle(kristallStand() - preis);
+                merkeGekauft(kategorie + ":" + eintrag.id);
                 speichereMeta();
                 aktualisiereKristallAnzeigen();
                 Klang.jackpot();

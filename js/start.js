@@ -100,7 +100,7 @@ window.debug = {
     // Unterstuetzer-Paket (4,99 €, alle epischen Inhalte + Sandbox) an/aus: debug.dlc(true)
     dlc(an = true) { meta.dlc = an; speichereMeta(); wendeKosmetikAn(); },
     // Kristalle geben (zum Testen der Kaeufe): debug.kristalle(500)
-    kristalle(menge = 500) { meta.kristalle = Math.max(0, (meta.kristalle || 0) + menge); speichereMeta(); aktualisiereKristallAnzeigen(); },
+    kristalle(menge = 500) { setzeKristalle(kristallStand() + menge); },
     // Alle legendaeren Einzel-Inhalte freischalten: debug.einzelDlc()
     einzelDlc() {
         Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => liste.filter(e => e.paket === "einzeln")
@@ -225,7 +225,7 @@ const DEBUG_BEFEHLE = [
     { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100, min: 0 }] },
     { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5, min: 0 }] },
-    { name: "kristalle", text: "Gems geben", felder: [{ typ: "zahl", wert: 500, min: 0 }] },
+    { name: "kristalle", text: "Gems geben", ueberall: true, felder: [{ typ: "zahl", wert: 500, min: 0 }] },
     { gruppe: "Level" },
     { name: "level", text: "Level setzen", felder: [{ typ: "zahl", wert: 50, min: 1 }] },
     { name: "xp", text: "Erfahrung geben", felder: [{ typ: "zahl", wert: 10000, min: 0 }] },
@@ -362,8 +362,8 @@ function zeigeDebugFenster() {
             };
         });
         const ausfuehren = (aktion, name) => {
-            // Debug-Befehle wirken nur auf den gerade geladenen Spielstand, im Hauptmenue ist keiner geladen
-            if (!hauptmenue.classList.contains("versteckt")) {
+            // Debug-Befehle, die aufs Spiel zugreifen, gehen nur mit geladenem Spielstand (ueberall: true = auch im Hauptmenue)
+            if (!b.ueberall && !hauptmenue.classList.contains("versteckt")) {
                 Klang.fehler();
                 zeigeToast(t("🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand."));
                 return;
