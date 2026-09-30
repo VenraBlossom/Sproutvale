@@ -275,7 +275,7 @@ function setzeDekoAblauf(bild, deko) {
 
 let dekoSchritt = 0;
 setInterval(() => {
-    if (document.hidden) return;
+    if (document.hidden || ohneEffekte()) return;
     dekoSchritt++;
     document.querySelectorAll("img[data-ablauf]").forEach((bild, i) => {
         const ablauf = bild.dataset.ablauf;
@@ -684,7 +684,7 @@ let ladenBildNummer = 0;
 setInterval(() => {
     const bild = marktstand.querySelector(".laden-pixelbild");
     const def = LADEN_PIXEL[marktstand.dataset.bauweise];
-    if (!bild || !def || def.bilder < 2 || document.hidden) return;
+    if (!bild || !def || def.bilder < 2 || document.hidden || ohneEffekte()) return;
     ladenBildNummer = (ladenBildNummer + 1) % def.bilder;
     bild.src = ladenPixelBild(marktstand.dataset.bauweise, ladenBildNummer);
 }, 220);

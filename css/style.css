@@ -12601,14 +12601,18 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 
-/* Einstellung "Weniger Partikel und Animationen": reine Deko steht still oder faellt weg */
-body.ohne-effekte .haus-funke,
-body.ohne-effekte .rauch {
-    display: none !important;
-}
-body.ohne-effekte #hof-ebene *,
-body.ohne-effekte .gebaeude-aura,
-body.ohne-effekte .haus-kachel *,
-body.ohne-effekte .figur-aura {
+/* Einstellung "Weniger Partikel und Animationen": alle CSS-Animationen und Uebergaenge aus,
+   reine Deko und die Helfer-Figuren verschwinden (die Helfer arbeiten weiter, man sieht sie nur nicht) */
+body.ohne-effekte *,
+body.ohne-effekte *::before,
+body.ohne-effekte *::after {
     animation: none !important;
+    transition: none !important;
+}
+body.ohne-effekte .haus-funke,
+body.ohne-effekte .rauch,
+body.ohne-effekte .helfer-figur,
+body.ohne-effekte .himmel-punkt,
+body.ohne-effekte #jahreszeit-ebene > * {
+    display: none !important;
 }
