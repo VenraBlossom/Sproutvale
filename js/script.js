@@ -749,7 +749,7 @@ function artenvielfalt() {
 
 function goldMulti() {
     const summe = 1 + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
-        0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") + 0.04 * level("sternengold") +
+        0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + level("grosseernte") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
@@ -767,7 +767,7 @@ function sternWertMulti() {
         (1 + 0.4 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
         (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
         (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + 0.08 * level("sternenmeer")) * (1 + level("sternenschauer"));
+        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + level("sternenschauer"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt

@@ -559,9 +559,6 @@ const SKILLS = [
     stern("edelstein", "ernte", "💍", [1180, 0], "gelb", t("Edelsteinschleifer"), 5000, 2.3, 5,
         t("Alle Farb-Multiplikatoren (außer Gewöhnlich) werden um 10% stärker."),
         () => multiText(1 + edelsteinBonus()) + t(" auf die Farben")),
-    stern("sternengold", "ernte", "🔆", [1620, 0], "goldschauer", t("Sternengold"), 8000, 1.4, Infinity,
-        t("+4% Gold aus allen Ernten. Unendlich oft kaufbar."),
-        () => "+" + prozentText(0.04 * level("sternengold")) + t(" Gold")),
     stern("glueck", "ernte", "🍀", [520, -220], "gruen", t("Glückskleeblatt"), 60, 1.9, 10,
         t("+5% Chance, dass eine Saat doppelt zählt."),
         () => prozentText(glueckChance()) + t(" Chance auf doppeltes Gold")),
@@ -824,11 +821,6 @@ const SKILLS = [
     stern("sternenschauer", "ernte", "💫", [740, -1100], "sternenflut", t("Sternenschauer"), 40000, 2.2, Infinity,
         t("+100% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
         () => "+" + prozentText(level("sternenschauer")) + t(" Sternensamen"), { autoPos: true }),
-    stern("sternenmeer", "ernte", "🌊", [1620, -880], "milchstrasse", t("Sternenmeer"), 9000, 1.75, Infinity,
-        t("+3% Sternensamen aus allen Ernten. Unendlich oft kaufbar."),
-        () => "+" + 8 * level("sternenmeer") + t("% Sternensamen"), { autoPos: true }),
-
-    // ----- Grundwerte (unten links, am Hof): stärken alles, was du hast -----
     stern("g_gold", "hof", "🪙", [-700, 960], "sonnenuhr", t("Grundwert: Gold"), 400, 2, 10,
         t("+5% Gold aus allen Ernten."), () => "+" + prozentText(grundwert("g_gold")) + t(" Gold")),
     stern("g_sterne", "hof", "✨", [-920, 960], "g_gold", t("Grundwert: Sternensamen"), 400, 2, 10,
@@ -963,7 +955,7 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
 // Bei neuen Sternen: Platz von Hand waehlen und mit pruefeSternbild() (Konsole) kontrollieren, dass nichts kreuzt.
 const STERN_POSITIONEN = {
     saatkette: [1180, -660], goldenestunde: [-107, 1513], morgenkombo: [-285, -183], bodenkunde: [138, 1287], feldkunde: [440, 1620], grosseernte: [1620, -540],
-    sternenschauer: [820, -1100], sternenmeer: [1620, -880], pk_weizen: [-390, -420], pe_weizen: [375, -185], pr_weizen: [-625, -557], pk_karotte: [-423, -610],
+    sternenschauer: [820, -1100], pk_weizen: [-390, -420], pe_weizen: [375, -185], pr_weizen: [-625, -557], pk_karotte: [-423, -610],
     pe_karotte: [614, -773], pr_karotte: [-573, -710], pk_kartoffel: [-459, -990], pe_kartoffel: [691, -1040], pr_kartoffel: [-609, -1090], pk_erdbeere: [-555, -1370],
     pe_erdbeere: [595, -1420], pr_erdbeere: [-705, -1470], pk_tomate: [-571, -1750], pe_tomate: [579, -1800], pr_tomate: [-721, -1850], pk_mais: [-483, -2130],
     pe_mais: [667, -2180], pr_mais: [-633, -2230], pk_kuerbis: [-420, -2510], pe_kuerbis: [730, -2560], pr_kuerbis: [-570, -2610], pk_sonnenblume: [-474, -2890],
@@ -1014,7 +1006,7 @@ const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 // ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
-    gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
+    gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
     schwereMuenzen: t("Gewöhnliche Saat mehr wert"), doppelernte: t("Doppelt so viel Saat"), fuellhorn: t("Mehr Gold"),
     goldmarie: t("Gold verdoppeln"), ernterausch: t("Jede 30. Ernte: 6 Sek. x3 Gold"), sternenstaub: t("Mehr Sternensamen"),
@@ -1043,7 +1035,7 @@ const STERN_KURZ = {
     g_gold: t("Grundwert Gold"), g_sterne: t("Grundwert Sternensamen"), g_energie: t("Grundwert Energie"),
     g_wachstum: t("Grundwert Wachstum"), g_harmonie: t("Alle Grundwerte · unendlich"),
     saatkette: t("Feld sofort neu bepflanzt"), goldenestunde: t("Kurz vor Feierabend mehr Gold"), morgenkombo: t("Tag startet mit Kombo"),
-    feldkunde: t("Schneller wachsen · unendlich"), sternenmeer: t("Mehr Sternensamen · unendlich"),
+    feldkunde: t("Schneller wachsen · unendlich"),
     bodenkunde: t("Boden wird schneller fruchtbar")
 };
 
@@ -1051,7 +1043,7 @@ const STERN_KURZ = {
 const STERN_WIRKUNG = {
     gruen: s => (s > 0 ? 12 + 3 * s : 0) + t("% grüne Saat"), blau: s => 2 * s + t("% blaue Saat"), lila: s => (s > 0 ? 2 + s : 0) + t("% lila Saat"),
     gelb: s => prozentText(s > 0 ? 0.005 + 0.005 * s : 0) + t(" legendäre Saat"), edelstein: s => "+" + 10 * s + t("% Farb-Bonus"),
-    sternengold: s => "+" + 4 * s + t("% Gold"), glueck: s => "+" + 5 * s + t("% Doppel-Saat"),
+    glueck: s => "+" + 5 * s + t("% Doppel-Saat"),
     sternensammler: s => "+" + 5 * s + t("% Doppel-Sternensaat"), sternenklick: s => "+" + zahl(s * 0.25) + t(" ✨ pro Klick"),
     schwereMuenzen: s => "+" + 20 * s + t("% Wert"), doppelernte: s => "+" + 3 * s + t("% Doppelernte"),
     fuellhorn: s => "+" + 100 * s + t("% Gold"), goldmarie: s => "x" + Math.pow(2, s) + t(" Gold"),
@@ -1078,7 +1070,7 @@ const STERN_WIRKUNG = {
     g_gold: s => "+" + 5 * s + t("% Gold"), g_sterne: s => "+" + 5 * s + t("% Sternensamen"), g_energie: s => "+" + 5 * s + t("% Energie"),
     g_wachstum: s => "+" + 5 * s + t("% Wachstum"), g_harmonie: s => "+" + 3 * s + t("% auf alles"),
     saatkette: s => "+" + 8 * s + t("% Neupflanzung"), goldenestunde: s => "+" + 50 * s + t("% Gold"), morgenkombo: s => 15 * s + t(" Kombo"),
-    feldkunde: s => "+" + 2 * s + t("% Wachstum"), sternenmeer: s => "+" + 8 * s + t("% Sternensamen"),
+    feldkunde: s => "+" + 2 * s + t("% Wachstum"),
     bodenkunde: s => (30 - 5 * s) + t(" Ernten pro Stufe")
 };
 
