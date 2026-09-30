@@ -649,15 +649,14 @@ function klicksProSamen() {
 function energieMax() {
     let energie = KONFIG.startEnergie + 20 * level("energie") + 8 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
-    // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
-    // Prozent-Boni zusammengezaehlt (Grundwert Energie nur noch +3% pro Stufe)
-    energie *= 1 + metaWert("ausdauer") + 0.6 * grundwert("g_energie") + 0.1 * segen("kraftpaket");
-    energie *= 1 + werkzeugWert("taschenuhr");
-    energie *= (1 + 0.2 * stil("fruehaufsteher")) * (1 - 0.4 * hf("kurzetage")) * (1 + 0.1 * hfGeschafft("kurzetage"));
-    // Pakte
-    energie *= Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit")) * (1 + 0.25 * segen("nachtschicht"));
+    // Alle Prozent-Boni werden zusammengezaehlt (nicht malgenommen) und geben zusammen hoechstens +100%,
+    // damit die Tage auch voll ausgebaut nicht endlos lang werden (Gluehwuermchen verlaengern den Abend weiter)
+    const prozent = metaWert("ausdauer") + 0.6 * grundwert("g_energie") + 0.1 * segen("kraftpaket") + werkzeugWert("taschenuhr") +
+        0.2 * stil("fruehaufsteher") + 0.1 * hfGeschafft("kurzetage") + 0.25 * segen("nachtschicht") + 0.03 * kuschel("faultier");
+    energie *= 1 + Math.min(1, prozent);
+    // Abzuege bleiben einzeln (Herausforderung und Pakte)
+    energie *= (1 - 0.4 * hf("kurzetage")) * Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit"));
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
-    energie *= 1 + 0.03 * kuschel("faultier");
     if (bossIst("kurzeTage")) energie *= 0.8;
     energie *= jahreszeit().energie || 1;
     if (run.mondphase >= 3) energie *= 0.9;
