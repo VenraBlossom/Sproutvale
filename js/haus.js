@@ -1061,11 +1061,11 @@ function dlcKnopf(danach) {
 }
 
 // ---------- PROMOCODES ----------
-// Codes stehen nur als Pruefsumme im Code (das Repo ist oeffentlich), Gross-/Kleinschreibung egal.
+// Codes stehen kodiert im Code (nicht auf den ersten Blick lesbar, das Repo ist oeffentlich), Gross-/Kleinschreibung egal.
 // Jeder Code geht pro Spieler nur einmal (eigene, signierte Datei, bleibt auch beim Loeschen des Spielstands).
 // Neue Codes nur auf Ansage anlegen, alte mit aktiv: false abschalten.
 const PROMO_CODES = [
-    { pruef: "20bf2gveu45", kristalle: 50, aktiv: true } // sproutvalebeta
+    { code: "U1BST1VUVkFMRUJFVEE=", kristalle: 50, aktiv: true }
 ];
 const PROMO_KEY = "sproutvale_codes";
 
@@ -1086,7 +1086,7 @@ function merkeCode(pruef) {
 
 function loeseCodeEin(text) {
     const pruef = kaufPruefsumme("promo:" + String(text).trim().toUpperCase());
-    const code = PROMO_CODES.find(c => c.pruef === pruef && c.aktiv);
+    const code = PROMO_CODES.find(c => atob(c.code) === String(text).trim().toUpperCase() && c.aktiv);
     if (!code) {
         Klang.fehler();
         zeigeToast(t("Dieser Code ist ungültig oder abgelaufen."));

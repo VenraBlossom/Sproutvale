@@ -3169,7 +3169,13 @@ Object.assign(UEBERSETZUNG, {
     "Du hast nicht genug Gems.": "You don't have enough gems.",
     "{0} für {1} Gems kaufen?": "Buy {0} for {1} gems?",
     "Gems geben": "Give gems",
-    "🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand.": "🛠️ Debug only works in-game: load a save first."
+    "🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand.": "🛠️ Debug only works in-game: load a save first.",
+    "abgeschaltet": "disabled",
+    "aktiv, von dir schon eingelöst": "active, already redeemed by you",
+    "aktiv": "active",
+    "🎁 Promocodes": "🎁 Promo codes",
+    "Gems": "Gems",
+    "Alle Promocodes anzeigen": "Show all promo codes"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

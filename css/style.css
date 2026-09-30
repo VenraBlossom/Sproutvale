@@ -12570,3 +12570,26 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     border: 3px solid #4a3a2a;
     border-radius: 6px;
 }
+
+/* Debug: Liste der Promocodes */
+.debug-promo-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.debug-promo {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 10px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid #b0407a;
+    border-radius: 6px;
+}
+.debug-promo .leise {
+    grid-column: 1 / -1;
+    font-size: 0.85em;
+}
+.debug-promo.aus {
+    opacity: 0.55;
+}

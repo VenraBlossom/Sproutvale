@@ -82,6 +82,18 @@ window.debug = {
     energie(wert) { run.energie = wert; },
     tag(nummer) { run.tag = nummer; aktualisiereAlles(); },
     stern() { spawnSternschnuppe(); },
+    // Alle Promocodes anzeigen (Fenster ueber dem Debug-Fenster): debug.promocodes()
+    promocodes() {
+        const eingeloest = eingeloesteCodes();
+        const liste = el("div", "debug-promo-liste", null, PROMO_CODES.map(c => {
+            const text = atob(c.code);
+            const status = !c.aktiv ? t("abgeschaltet") : eingeloest.includes(kaufPruefsumme("promo:" + text)) ? t("aktiv, von dir schon eingelöst") : t("aktiv");
+            return el("div", "debug-promo" + (c.aktiv ? "" : " aus"), null, [
+                el("b", null, text), el("span", null, c.kristalle ? "+" + zahl(c.kristalle) + " 💎" : ""), el("span", "leise", status)
+            ]);
+        }));
+        zeigePopup({ titel: t("🎁 Promocodes"), farbe: "#b0407a", breite: 460, inhalt: liste, knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
+    },
     // Alle Sterne im Stellarium auf die hoechste Stufe (unendliche Sterne auf die angegebene Stufe): debug.alleSterne(10)
     alleSterne(unendlich = 10) {
         SKILLS.forEach(st => { run.level[st.id] = Number.isFinite(st.max) ? st.max : unendlich; });
@@ -155,7 +167,7 @@ window.debug = {
     // Waehrung auf einen Wert setzen (statt dazugeben): debug.setze("gold", 500)
     setze(art, wert) {
         const jetzt = { gold: () => run.gold, sternensamen: () => run.skillpunkte, mondblueten: () => meta.mondblueten,
-            splitter: () => meta.sternensplitter, gutscheine: () => meta.gutscheine }[art];
+            splitter: () => meta.sternensplitter, gutscheine: () => meta.gutscheine, kristalle: () => kristallStand() }[art];
         if (!jetzt) return;
         debug[art](wert - jetzt());
     },
@@ -225,7 +237,7 @@ const DEBUG_BEFEHLE = [
     { name: "mondblueten", text: "Mondblüten", setzen: true, felder: [{ typ: "zahl", wert: 100, min: 0 }] },
     { name: "splitter", text: "Sternensplitter", setzen: true, felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gutscheine", text: "Gutscheine", setzen: true, felder: [{ typ: "zahl", wert: 5, min: 0 }] },
-    { name: "kristalle", text: "Gems geben", ueberall: true, felder: [{ typ: "zahl", wert: 500, min: 0 }] },
+    { name: "kristalle", text: "Gems", setzen: true, ueberall: true, felder: [{ typ: "zahl", wert: 500, min: 0 }] },
     { gruppe: "Level" },
     { name: "level", text: "Level setzen", felder: [{ typ: "zahl", wert: 50, min: 1 }] },
     { name: "xp", text: "Erfahrung geben", felder: [{ typ: "zahl", wert: 10000, min: 0 }] },
@@ -246,6 +258,7 @@ const DEBUG_BEFEHLE = [
     { gruppe: "Ereignisse" },
     { name: "wetter", text: "Wetter", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...WETTER.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol }))] }] },
     { name: "stern", text: "Sternschnuppe" },
+    { name: "promocodes", text: "Alle Promocodes anzeigen", ueberall: true },
     { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gluehwuermchen", text: "Glühwürmchen" },
     { name: "kraehe", text: "Krähe" },
