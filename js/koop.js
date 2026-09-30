@@ -978,8 +978,7 @@ function koopBeendeRunLokal() {
 function koopZurueckZurLobby(melden) {
     if (melden) koopSende("zurLobby");
     koopBeendeSpiel(true);
-    zeigeHauptmenue();
-    zeigeMenueSeite("koop");
+    zeigeHauptmenue(true);
 }
 
 function koopBeendeSpiel(ladeSolo) {

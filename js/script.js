@@ -5031,15 +5031,17 @@ function spielPausiert() {
         (run && run.phase === "tag" && !segenFenster.classList.contains("versteckt"));
 }
 
-function zeigeHauptmenue() {
+function zeigeHauptmenue(lobbyBehalten) {
     einstellungenFenster.classList.add("versteckt");
     hauptmenue.classList.remove("versteckt");
-    zeigeMenueSeite("start");
+    zeigeMenueSeite(lobbyBehalten ? "koop" : "start");
     $("menue-beenden").classList.toggle("versteckt", !window.sproutvaleDesktop);
     speichereRun();
 }
 
 function zeigeMenueSeite(seite) {
+    // Wer die Duo-Seite verlaesst (Zurueck, Hauptmenue), schliesst seine Lobby
+    if (seite !== "koop" && typeof koop !== "undefined" && (koop.code || koop.verbunden || koop.imSpiel)) koopVerlassen(true);
     $("menue-start").classList.toggle("versteckt", seite !== "start");
     $("menue-art").classList.toggle("versteckt", seite !== "art");
     $("menue-koop").classList.toggle("versteckt", seite !== "koop");
