@@ -3501,7 +3501,7 @@ const PIXEL_SYMBOL_DATEN = {
         "..oggggo..",
         "..oooooo.."]],
     // Kristall (Premium-Waehrung)
-    kristall: [{ o: "#1d3a6a", C: "#6ad0ff", c: "#3a9ae0", W: "#ffffff" }, [
+    kristall: [{ o: "#6a1d4a", C: "#ff9ad5", c: "#e0409a", W: "#ffffff" }, [
         "..oooooo..",
         ".oWCcCCco.",
         "oWCCcCCcco",

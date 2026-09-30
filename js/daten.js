@@ -1882,7 +1882,7 @@ const LEGENDAER_KRISTALLE = 50;
 const KRISTALLE_PRO_EURO = 100;
 
 function kristallText(menge) {
-    return "💎 " + tf("{0} Kristalle", zahl(menge));
+    return "💎 " + tf("{0} Gems", zahl(menge));
 }
 
 // Seltenheit eines Kosmetik-Eintrags (Index in KUSCHEL_RARITAETEN: 0 gewoehnlich, 1 ungewoehnlich, 3 episch, 4 legendaer)

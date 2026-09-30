@@ -962,10 +962,10 @@ function kristallKnopf() {
     const knopf = el("button", "knopf kristall-knopf", null, [
         pixelIcon("💎", 22), el("span", "kristall-zahl", zahl(kristallStand())), el("span", "kristall-plus", "+")
     ]);
-    setzeTipp(knopf, t("Kristalle kaufen"));
+    setzeTipp(knopf, t("Gems kaufen"));
     knopf.addEventListener("click", () => {
         Klang.klick(8);
-        zeigeToast(t("Kristalle kann man aktuell noch nicht kaufen."));
+        zeigeToast(t("Gems kann man aktuell noch nicht kaufen."));
     });
     return knopf;
 }
@@ -974,7 +974,7 @@ function kristallInfoKnopf() {
     const knopf = el("button", "knopf kristall-info", "?");
     knopf.addEventListener("click", () => {
         Klang.klick(8);
-        zeigePopup({ titel: t("💎 Kristalle"), breite: 420, farbe: "#3a6ab0",
+        zeigePopup({ titel: t("💎 Gems"), breite: 420, farbe: "#b0407a",
             inhalt: el("p", "kristall-info-text", t("Käufe im Spiel unterstützen die Zukunft von Sproutvale. Sie haben keinerlei Einfluss auf das Spiel. ❤️")),
             knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
     });
@@ -1006,7 +1006,7 @@ function dlcKnopf(danach) {
             { text: zahl(DLC_KRISTALLE) + " 💎", klasse: "knopf-gruen", aktion: () => {
                 if (kristallStand() < DLC_KRISTALLE) {
                     Klang.fehler();
-                    zeigeToast(t("Du hast nicht genug Kristalle."));
+                    zeigeToast(t("Du hast nicht genug Gems."));
                     return;
                 }
                 meta.kristalle = kristallStand() - DLC_KRISTALLE;
@@ -1083,7 +1083,7 @@ function codeKnopf() {
             ereignis.stopPropagation();
             if (ereignis.key === "Enter") einloesen();
         });
-        schliesse = zeigePopup({ titel: t("🎁 Code einlösen"), breite: 420, farbe: "#3a6ab0",
+        schliesse = zeigePopup({ titel: t("🎁 Code einlösen"), breite: 420, farbe: "#b0407a",
             inhalt: el("div", "code-inhalt", null, [el("p", null, t("Hast du einen Promocode? Gib ihn hier ein.")), feld]),
             knoepfe: [{ text: t("Abbrechen") }, { text: t("Einlösen"), klasse: "knopf-gruen", bleibtOffen: true, aktion: einloesen }] });
         setTimeout(() => feld.focus(), 50);
@@ -1103,11 +1103,11 @@ function kaufKnopf(kategorie, eintrag, danach) {
         ereignis.stopPropagation();
         if (kristallStand() < preis) {
             Klang.fehler();
-            zeigeToast(t("Du hast nicht genug Kristalle."));
+            zeigeToast(t("Du hast nicht genug Gems."));
             return;
         }
-        zeigePopup({ titel: t("💎 Kaufen"), breite: 420, farbe: "#3a6ab0",
-            inhalt: tf("{0} für {1} Kristalle kaufen?", eintrag.name, zahl(preis)),
+        zeigePopup({ titel: t("💎 Kaufen"), breite: 420, farbe: "#b0407a",
+            inhalt: tf("{0} für {1} Gems kaufen?", eintrag.name, zahl(preis)),
             knoepfe: [{ text: t("Nein, danke!") }, { text: t("Kaufen"), klasse: "knopf-gruen", aktion: () => {
                 if (kristallStand() < preis || istKosmetikFrei(eintrag, kategorie)) return;
                 meta.kristalle = kristallStand() - preis;

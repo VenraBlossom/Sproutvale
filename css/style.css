@@ -12494,9 +12494,9 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     gap: 6px;
     min-width: 128px;
     padding: 4px 10px;
-    background: #2a4a7a;
+    background: #8a2a62;
     color: #ffffff;
-    border-color: #14284a;
+    border-color: #4a1034;
 }
 .kristall-zahl {
     flex: 1;
