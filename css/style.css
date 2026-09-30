@@ -12632,3 +12632,11 @@ body.ohne-effekte #jahreszeit-ebene > * {
     gap: 6px;
     padding: 8px;
 }
+
+.pokal-gesamt {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.1em;
+    color: #3f8a32;
+    margin-top: 4px;
+}

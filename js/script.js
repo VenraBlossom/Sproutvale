@@ -3651,8 +3651,8 @@ function zeigeSieg(pokal) {
     const inhalt = el("div", "sieg", null, [
         bild,
         el("div", "sieg-titel", tf("Du hast den {0} gewonnen!", pokal.name)),
-        el("div", "sieg-bonus", tf("Für immer: Gold, Sternensamen, Mondblüten und Sternensplitter x{0} (alle Pokale zusammen: x{1})",
-            faktorText(pokal.faktor), faktorText(pokalFaktor()))),
+        el("div", "sieg-bonus", tf("Für immer: Gold, Sternensamen, Mondblüten und Sternensplitter {0} (alle Pokale zusammen: {1})",
+            pokalProzent(pokal.faktor), pokalProzent(pokalFaktor()))),
         pokal.id === "holz" ? null : el("div", "sieg-text", run.sandbox ? t("In Endlos geht es einfach weiter.") : t("Starte einen neuen Run oder spiel einfach weiter. Der nächste Pokal wartet schon."))
     ]);
     const knoepfe = pokal.id === "holz" ? [{ text: t("Ist das erst der Anfang?"), klasse: "knopf-gruen" }]
@@ -3678,7 +3678,7 @@ function aktualisierePokalKnopf() {
     setzeSpriteBild(bild, bester ? bester.sprite : "sym_pokal_schwarz", 2);
     pokalKnopf.classList.toggle("hat-pokal", Boolean(bester));
     if (bester) pokalKnopf.style.setProperty("--pokal", bester.farbe);
-    setzeTipp(pokalKnopf, bester ? tf("🏆 Pokale: alles x{0}", faktorText(pokalFaktor())) : t("🏆 Pokale"));
+    setzeTipp(pokalKnopf, bester ? tf("🏆 Pokale: alles {0}", pokalProzent(pokalFaktor())) : t("🏆 Pokale"));
 }
 function oeffnePokalVitrine() {
     const reihe = el("div", "pokal-vitrine");
@@ -3689,15 +3689,17 @@ function oeffnePokalVitrine() {
         setzeSpriteBild(bild, hat ? tr.sprite : "sym_pokal_schwarz", 6);
         platz.style.setProperty("--pokal", tr.farbe);
         platz.appendChild(bild);
-        // Beim Drueberfahren steht nur der Name, gewonnene zeigen darunter ihren Bonus
-        setzeTipp(platz, tr.name);
+        // Beim Drueberfahren: Name und Bonus in Prozent, gewonnene zeigen den Bonus auch darunter
+        setzeTipp(platz, tr.name + " · " + pokalProzent(tr.faktor));
         const spalte = el("div", "pokal-spalte", null, [platz]);
-        if (hat) spalte.appendChild(el("div", "pokal-bonus", tf("Alle Währungen x{0}", faktorText(tr.faktor))));
+        if (hat) spalte.appendChild(el("div", "pokal-bonus", tf("Alle Währungen {0}", pokalProzent(tr.faktor))));
         reihe.appendChild(spalte);
     });
     Klang.klick(8);
     zeigePopup({ titel: t("🏆 Pokale"), farbe: "#3a3a44", breite: 520, klasse: "pokal-fenster",
-        inhalt: el("div", null, null, [reihe, el("div", "pokal-frage", t("Bist du würdig genug?"))]) });
+        inhalt: el("div", null, null, [reihe,
+            el("div", "pokal-gesamt", tf("Gesamt: {0} auf alle Währungen", pokalProzent(pokalFaktor()))),
+            el("div", "pokal-frage", t("Bist du würdig genug?"))]) });
 }
 if (pokalKnopf) pokalKnopf.addEventListener("click", oeffnePokalVitrine);
 

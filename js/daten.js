@@ -84,10 +84,15 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.4.0";
+const SPIEL_VERSION = "Beta 0.4.1";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.4.1", punkte: [
+        t("Duo: Der Host kann per Rechtsklick auf die Figur des Mitspielers (oder in der Lobby) ihn zum Host machen oder rauswerfen. Der Host hat einen gelben Namen."),
+        t("Speichern: Im Reiter Speichern wählst du in Endlos (allein und im Duo) einen der 3 Speicherstände."),
+        t("Pokale zeigen ihren Bonus jetzt in Prozent (+50%, +100% …), die Vitrine zeigt unten den Gesamtbonus. Die Boni addieren sich in Prozent.")
+    ] },
     { version: "Beta 0.4.0", punkte: [
         t("Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand."),
         t("Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler."),
@@ -1561,9 +1566,14 @@ function faktorText(wert) {
     return wert.toLocaleString(SPRACH_LOCALE, { maximumFractionDigits: 2 });
 }
 // Bonus aller gewonnenen Pokale zusammen (ohne Pokal = x1)
+// Die Boni der Pokale addieren sich in Prozent: Holz +50%, Gold +100%, Platin +200%, Kristall +400%
 function pokalFaktor() {
-    const summe = TROPHAEEN.filter(tr => hatPokal(tr.id)).reduce((a, tr) => a + tr.faktor, 0);
-    return summe > 0 ? summe : 1;
+    return 1 + TROPHAEEN.filter(tr => hatPokal(tr.id)).reduce((a, tr) => a + (tr.faktor - 1), 0);
+}
+
+// Faktor als Prozent-Bonus, z.B. 1,5 -> "+50%"
+function pokalProzent(faktor) {
+    return "+" + zahl(Math.round((faktor - 1) * 100)) + "%";
 }
 
 // ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------

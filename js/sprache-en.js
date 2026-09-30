@@ -3218,7 +3218,14 @@ Object.assign(UEBERSETZUNG, {
     "💾 Gespeichert: Speicherstand {0}": "💾 Saved: save slot {0}",
     "💾 Speichern (gerade: Speicherstand {0})": "💾 Save (current: save slot {0})",
     "Bot hinzufügen (tritt deiner Duo-Lobby bei)": "Add bot (joins your Duo lobby)",
-    "Erst im Duo-Fenster eine Lobby erstellen.": "Create a lobby in the Duo window first."
+    "Erst im Duo-Fenster eine Lobby erstellen.": "Create a lobby in the Duo window first.",
+    "Für immer: Gold, Sternensamen, Mondblüten und Sternensplitter {0} (alle Pokale zusammen: {1})": "Forever: gold, Star Seeds, Moonpetals and Star Shards {0} (all trophies together: {1})",
+    "🏆 Pokale: alles {0}": "🏆 Trophies: everything {0}",
+    "Alle Währungen {0}": "All currencies {0}",
+    "Gesamt: {0} auf alle Währungen": "Total: {0} on all currencies",
+    "Duo: Der Host kann per Rechtsklick auf die Figur des Mitspielers (oder in der Lobby) ihn zum Host machen oder rauswerfen. Der Host hat einen gelben Namen.": "Duo: The host can right-click the other player's character (or use the lobby) to make them host or kick them. The host has a yellow name.",
+    "Speichern: Im Reiter Speichern wählst du in Endlos (allein und im Duo) einen der 3 Speicherstände.": "Save: In the Save tab you pick one of the 3 save slots in Endless (solo and Duo).",
+    "Pokale zeigen ihren Bonus jetzt in Prozent (+50%, +100% …), die Vitrine zeigt unten den Gesamtbonus. Die Boni addieren sich in Prozent.": "Trophies now show their bonus in percent (+50%, +100% …), the showcase shows the total at the bottom. The bonuses add up in percent."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
