@@ -2636,6 +2636,7 @@ function wackleBildschirm(staerke) {
 }
 
 function zeigeSchwebeText(x, y, text, farbe, gross, klasse) {
+    if (einstellungen.ohneTexte) return; // Einstellung "Unnötige Texte entfernen"
     if (!gross && fxLayer.querySelectorAll(".schwebe-text").length > 25) return;
     const el = document.createElement("div");
     el.classList.add("schwebe-text");
@@ -2651,6 +2652,7 @@ function zeigeSchwebeText(x, y, text, farbe, gross, klasse) {
 
 // Belohnung mit Pixel-Symbolen (z.B. Energie und Sternensamen vom Gluehwuermchen): schwebt nach oben und bleibt etwas laenger
 function zeigeBelohnung(x, y, teile) {
+    if (einstellungen.ohneTexte) return;
     const box = el("div", "belohnung-schild");
     teile.filter(Boolean).forEach(([sprite, text]) => {
         const bild = document.createElement("img");

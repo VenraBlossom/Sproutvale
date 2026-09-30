@@ -3195,7 +3195,8 @@ Object.assign(UEBERSETZUNG, {
     "Unbegrenzt spielen": "Unlimited play",
     "Noch mit Grenze": "Still limited",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Appears once you have unlocked Blackjack.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP Card: unlimited play"
+    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP Card: unlimited play",
+    "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "\ud83d\udcac Remove unnecessary texts (harvest numbers, jackpot, chain ...)"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

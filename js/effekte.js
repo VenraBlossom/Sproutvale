@@ -208,7 +208,7 @@ function sammelKette(x, y) {
     const jetzt = performance.now();
     kette.anzahl = jetzt < kette.bis ? kette.anzahl + 1 : 1;
     kette.bis = jetzt + KETTE_FENSTER_MS;
-    if (kette.anzahl < 3) return;
+    if (kette.anzahl < 3 || einstellungen.ohneTexte) return;
     if (!kette.el) {
         kette.el = el("div", "sammel-kette");
         document.body.appendChild(kette.el);
