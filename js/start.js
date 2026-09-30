@@ -210,8 +210,7 @@ window.debug = {
         debug.botWeg();
         const sauber = String(code || koop.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
         if (sauber.length !== KOOP_KONFIG.codeLaenge) {
-            console.warn("debug.bot: Lobby-Code fehlt (5 Zeichen). Erst im Duo-Fenster eine Lobby erstellen.");
-            return;
+            throw new Error(t("Erst im Duo-Fenster eine Lobby erstellen."));
         }
         const rahmen = el("iframe", "debug-bot-rahmen");
         rahmen.src = location.pathname + "?bot=" + sauber;
@@ -288,6 +287,7 @@ const DEBUG_BEFEHLE = [
     { name: "wetter", text: "Wetter", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...WETTER.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol }))] }] },
     { name: "stern", text: "Sternschnuppe" },
     { name: "promocodes", text: "Alle Promocodes anzeigen", ueberall: true },
+    { name: "bot", text: "Bot hinzufügen (tritt deiner Duo-Lobby bei)", ueberall: true },
     { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "alleMarkt", text: "Markt komplett: Upgrades, Felder und Pflanzen-Upgrades auf Max (unendliche auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "gluehwuermchen", text: "Glühwürmchen" },

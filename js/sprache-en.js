@@ -3216,7 +3216,9 @@ Object.assign(UEBERSETZUNG, {
     "💾 Überschreiben": "💾 Overwrite",
     "Wähle, wo dein Spiel gespeichert wird. Ein anderer Speicherstand wird dabei überschrieben und ist ab dann der Platz dieses Spiels.": "Choose where your game is saved. Another save slot gets overwritten and becomes this game's slot from now on.",
     "💾 Gespeichert: Speicherstand {0}": "💾 Saved: save slot {0}",
-    "💾 Speichern (gerade: Speicherstand {0})": "💾 Save (current: save slot {0})"
+    "💾 Speichern (gerade: Speicherstand {0})": "💾 Save (current: save slot {0})",
+    "Bot hinzufügen (tritt deiner Duo-Lobby bei)": "Add bot (joins your Duo lobby)",
+    "Erst im Duo-Fenster eine Lobby erstellen.": "Create a lobby in the Duo window first."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
