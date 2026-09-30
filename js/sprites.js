@@ -3058,8 +3058,8 @@ function zeichneHof(breite, hoehe, thema = "standard") {
             { x: scheune.x + 9, y: scheune.y + 7, b: 2, h: 1 }
         ],
         // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
-        haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height },
-        scheune: { x: scheune.x, y: scheune.y, b: scheune.sprite.width, h: scheune.sprite.height },
+        haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height, sprite: haus.sprite },
+        scheune: { x: scheune.x, y: scheune.y, b: scheune.sprite.width, h: scheune.sprite.height, sprite: scheune.sprite },
         leuchten
     };
 }

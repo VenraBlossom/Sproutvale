@@ -308,30 +308,65 @@ registriereHaken("anzeige", () => {
     if (teichEl) teichEl.classList.toggle("leuchtet", darfMondteich());
 });
 
-// Klickflaeche ueber dem Bauernhaus (die Landschaft ist ein einziges Bild)
+// Gebaeude als Knopf (die Landschaft ist ein einziges Bild): die Aura liegt als Pixel-Rand genau um das Gebaeude,
+// klickbar sind nur die Pixel des Gebaeudes selbst (nicht das Rechteck drumherum)
+const GEBAEUDE_RAND = 2;
+function macheGebaeudeKnopf(flaeche, teil, aktion) {
+    const aura = document.createElement("canvas");
+    aura.className = "gebaeude-aura";
+    flaeche.appendChild(aura);
+    let sprite = null;
+    const deckend = event => {
+        if (!sprite) return false;
+        const rect = flaeche.getBoundingClientRect();
+        const x = Math.floor((event.clientX - rect.left) / rect.width * sprite.width);
+        const y = Math.floor((event.clientY - rect.top) / rect.height * sprite.height);
+        if (x < 0 || y < 0 || x >= sprite.width || y >= sprite.height) return false;
+        return sprite.getContext("2d").getImageData(x, y, 1, 1).data[3] > 0;
+    };
+    registriereHaken("landschaftGezeichnet", szene => {
+        const g = szene[teil];
+        if (!g) return;
+        sprite = g.sprite;
+        flaeche.style.left = (g.x / szene.breite) * 100 + "%";
+        flaeche.style.top = (g.y / szene.hoehe) * 100 + "%";
+        flaeche.style.width = (g.b / szene.breite) * 100 + "%";
+        flaeche.style.height = (g.h / szene.hoehe) * 100 + "%";
+        // Aura: alle leeren Pixel bis GEBAEUDE_RAND Pixel neben dem Gebaeude, innen kraeftiger
+        const r = GEBAEUDE_RAND;
+        aura.width = g.b + 2 * r;
+        aura.height = g.h + 2 * r;
+        aura.style.left = (-r / g.b) * 100 + "%";
+        aura.style.top = (-r / g.h) * 100 + "%";
+        aura.style.width = ((g.b + 2 * r) / g.b) * 100 + "%";
+        aura.style.height = ((g.h + 2 * r) / g.h) * 100 + "%";
+        const daten = sprite.getContext("2d").getImageData(0, 0, g.b, g.h).data;
+        const voll = (x, y) => x >= 0 && y >= 0 && x < g.b && y < g.h && daten[(y * g.b + x) * 4 + 3] > 0;
+        const stift = aura.getContext("2d");
+        stift.clearRect(0, 0, aura.width, aura.height);
+        for (let y = -r; y < g.h + r; y++) for (let x = -r; x < g.b + r; x++) {
+            if (voll(x, y)) continue;
+            let abstand = Infinity;
+            for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+                if (voll(x + dx, y + dy)) abstand = Math.min(abstand, Math.max(Math.abs(dx), Math.abs(dy)));
+            }
+            if (abstand > r) continue;
+            stift.fillStyle = abstand === 1 ? "rgba(255, 236, 160, 0.55)" : "rgba(255, 236, 160, 0.25)";
+            stift.fillRect(x + r, y + r, 1, 1);
+        }
+    });
+    flaeche.addEventListener("pointermove", event => flaeche.classList.toggle("drueber", deckend(event)));
+    flaeche.addEventListener("pointerleave", () => flaeche.classList.remove("drueber"));
+    flaeche.addEventListener("pointerdown", event => {
+        if (event.button === 0 && deckend(event)) aktion();
+    });
+}
+
 const hausFlaeche = $("haus-klickflaeche");
-registriereHaken("landschaftGezeichnet", szene => {
-    hausFlaeche.style.left = (szene.haus.x / szene.breite) * 100 + "%";
-    hausFlaeche.style.top = (szene.haus.y / szene.hoehe) * 100 + "%";
-    hausFlaeche.style.width = (szene.haus.b / szene.breite) * 100 + "%";
-    hausFlaeche.style.height = (szene.haus.h / szene.hoehe) * 100 + "%";
-});
-hausFlaeche.addEventListener("pointerdown", event => {
-    if (event.button === 0) oeffneHaus();
-});
+macheGebaeudeKnopf(hausFlaeche, "haus", () => oeffneHaus());
 
 // Klickflaeche ueber der Scheune: dort kann man den Tag frueh beenden (wie ein ganz normales Tagesende)
-const scheuneFlaeche = $("scheune-klickflaeche");
-registriereHaken("landschaftGezeichnet", szene => {
-    if (!szene.scheune) return;
-    scheuneFlaeche.style.left = (szene.scheune.x / szene.breite) * 100 + "%";
-    scheuneFlaeche.style.top = (szene.scheune.y / szene.hoehe) * 100 + "%";
-    scheuneFlaeche.style.width = (szene.scheune.b / szene.breite) * 100 + "%";
-    scheuneFlaeche.style.height = (szene.scheune.h / szene.hoehe) * 100 + "%";
-});
-scheuneFlaeche.addEventListener("pointerdown", event => {
-    if (event.button === 0) oeffneScheune();
-});
+macheGebaeudeKnopf($("scheune-klickflaeche"), "scheune", () => oeffneScheune());
 
 function oeffneScheune() {
     if (spielPausiert()) return;
