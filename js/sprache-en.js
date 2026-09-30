@@ -3189,7 +3189,13 @@ Object.assign(UEBERSETZUNG, {
     "Sternenscheune": "Star Barn",
     "Deine Scheune oben rechts. Dort kannst du den Tag früher beenden.": "Your barn at the top right. You can end the day early there.",
     "Möchtest du den Tag jetzt schon beenden?": "Do you want to end the day now?",
-    "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "\ud83d\ude80 Fewer particles and animations (helps with lag)"
+    "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "\ud83d\ude80 Fewer particles and animations (helps with lag)",
+    "VIP-Karte": "VIP Card",
+    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "No more limit: you can play all games of chance as often as you like.",
+    "Unbegrenzt spielen": "Unlimited play",
+    "Noch mit Grenze": "Still limited",
+    "Erscheint, sobald du Blackjack freigeschaltet hast.": "Appears once you have unlocked Blackjack.",
+    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP Card: unlimited play"
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

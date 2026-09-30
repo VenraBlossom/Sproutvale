@@ -49,6 +49,7 @@ function hatGluecksspiel() {
 }
 
 function spieleProPause(id) {
+    if (level("vipkarte") > 0) return Infinity; // Stern "VIP-Karte": keine Grenze
     return GLUECKSSPIEL[id].proPause + level("stammkunde");
 }
 
@@ -103,6 +104,7 @@ function einsatzKnoepfe(id, onWahl, rotAb = 1) {
 }
 
 function restText(id) {
+    if (spieleProPause(id) === Infinity) return t("💳 VIP-Karte: unbegrenzt spielen");
     return t("Noch ") + restSpiele(id) + t(" von ") + spieleProPause(id) + t(" Spielen bis zum nächsten Tag");
 }
 
