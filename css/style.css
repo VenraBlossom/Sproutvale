@@ -12458,8 +12458,8 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     display: block;
     font-size: 0.75em;
     line-height: 1.25;
-    color: #fff6dc;
-    text-shadow: 1px 1px 0 #2e1a09;
+    color: #1a1a1a;
+    text-shadow: none;
 }
 .kombo-bonus:empty {
     display: none;

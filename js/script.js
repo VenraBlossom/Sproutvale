@@ -2479,7 +2479,7 @@ function aktualisiereKombo(jetzt) {
     komboAnzeige.classList.remove("versteckt");
     komboAnzeige.dataset.stufe = multi;
     komboText.textContent = t("Kombo ") + kombo.zaehler + t("  ·  x") + multi;
-    const tierText = multi >= 2 ? tf("Tier-Tempo +{0}%", Math.round(komboTierBonus() * 100)) : "";
+    const tierText = multi >= 2 ? tf("Helfer-Tempo +{0}%", Math.round(komboTierBonus() * 100)) : "";
     if (komboTiere.textContent !== tierText) komboTiere.textContent = tierText;
     const sternText = multi >= 2 ? tf("/Klick +{0}%", Math.round(komboSternBonus() * 100)) : "";
     if (komboSterne.dataset.text !== sternText) {
