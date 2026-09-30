@@ -966,11 +966,6 @@ function sternensaatPflanzenFaktor(index) {
     return Math.pow(KONFIG.sternensamenPflanzenFaktor, frueh) * Math.pow(KONFIG.sternensamenSpaetFaktor, Math.max(0, index - 4));
 }
 
-// Schildkroete (Stellarium): erntet langsam eine fertige Pflanze
-function schildkroeteSek() {
-    return level("schildkroete") > 0 ? 45 - 7 * (level("schildkroete") - 1) : Infinity;
-}
-
 function erntehaseSek() {
     return level("erntehase") > 0 ? 12 / level("erntehase") : Infinity;
 }
@@ -1116,6 +1111,17 @@ function komboStufe() {
     return bossIst("stille") ? Math.min(3, multi) : multi;
 }
 
+// Kombo-Boni (nur ab x2): Tiere arbeiten 25% pro Stufe schneller, Sternensamen pro Klick +100% pro Stufe
+function komboAktiv() {
+    return run && run.phase === "tag" && kombo.zaehler >= 2 && komboStufe() >= 2;
+}
+function komboTierBonus() {
+    return komboAktiv() ? 0.25 * komboStufe() : 0;
+}
+function komboSternBonus() {
+    return komboAktiv() ? komboStufe() : 0;
+}
+
 // So viele Klicks zaehlt ein Klick auf den Samenladen (Honigwabe: jede Stufe ueber x1 zaehlt etwas mehr)
 function komboMultiplikator() {
     return 1 + (komboStufe() - 1) * (1 + werkzeugWert("honigwabe"));
@@ -1221,6 +1227,8 @@ const plantButtonCounter = $("plant-button-counter");
 const plantButtonFortschritt = $("plant-button-fortschritt");
 
 const komboAnzeige = $("kombo-anzeige");
+const komboTiere = $("kombo-tiere");
+const komboSterne = $("kombo-sterne");
 const komboText = $("kombo-text");
 const komboFuellung = $("kombo-fuellung");
 
@@ -2311,7 +2319,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     // Jeder eigene Klick, der Fortschritt wirft, gibt Sternensamen (Helfer-Klicks nicht)
     if (!vonHelfer) {
         // Bruchteile werden gesammelt (z.B. 0,5 pro Klick = 1 Sternensamen je 2 Klicks)
-        run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick() * wertung;
+        run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick() * wertung * (vonHelfer ? 1 : 1 + komboSternBonus());
         const ganze = Math.floor(run.sternKlickRest);
         run.sternKlickRest -= ganze;
         if (ganze > 0) gibSternensamen(ganze);
@@ -2471,12 +2479,22 @@ function aktualisiereKombo(jetzt) {
     komboAnzeige.classList.remove("versteckt");
     komboAnzeige.dataset.stufe = multi;
     komboText.textContent = t("Kombo ") + kombo.zaehler + t("  ·  x") + multi;
+    const tierText = multi >= 2 ? tf("Tier-Tempo +{0}%", Math.round(komboTierBonus() * 100)) : "";
+    if (komboTiere.textContent !== tierText) komboTiere.textContent = tierText;
+    const sternText = multi >= 2 ? tf("/Klick +{0}%", Math.round(komboSternBonus() * 100)) : "";
+    if (komboSterne.dataset.text !== sternText) {
+        komboSterne.dataset.text = sternText;
+        komboSterne.innerHTML = "";
+        if (sternText) komboSterne.append(spriteIcon("sternensamen"), document.createTextNode(sternText));
+    }
     komboFuellung.style.width = Math.max(0, rest / fenster) * 100 + "%";
 }
 
 // ---------- HELFER UND TIMER ----------
 
 function aktualisiereHelfer(dtMs) {
+    // Kombo: alle Tiere arbeiten schneller (Zeit laeuft fuer sie schneller)
+    dtMs *= 1 + komboTierBonus();
     helferAkku += helferKlicksProSek() * dtMs / 1000;
     while (helferAkku >= 1) {
         helferAkku -= 1;
@@ -3058,6 +3076,13 @@ function anzahlErfolge(m = meta, sandbox = run ? run.sandbox : metaProfil === "s
     return { geschafft, gesamt };
 }
 
+// Komplett abgeschlossene Erfolge (alle Stufen einer Kette geschafft)
+function komplettErfolge(m, sandbox) {
+    const ketten = erfolgKettenFuer(sandbox);
+    const geschafft = ketten.filter(k => k.ziele.every((_, i) => m && m.erfolge && m.erfolge[erfolgStufeId(k, i)])).length;
+    return { geschafft, gesamt: ketten.length };
+}
+
 // Erreichte Stufen einer Kette, deren Gutschein noch nicht abgeholt ist
 function abholbareStufen(kette, m = meta) {
     const abgeholt = m.erfolgeAbgeholt || {};
@@ -3127,8 +3152,8 @@ function renderErfolge() {
         erfolgeContent.appendChild(leiste);
     }
     const offen = anzahlAbholbar(m, sandbox);
-    // Mehrere Gutscheine offen: alle auf einmal abholen
-    if (aktiv && offen > 1) {
+    // Gutscheine offen: oben immer "Alle abholen" (auch wenn es nur einer ist)
+    if (aktiv && offen > 0) {
         const alle = el("button", "knopf knopf-lila erfolg-alle", t("🎟️ Alle abholen (") + offen + ")");
         alle.addEventListener("click", () => {
             erfolgKettenFuer(sandbox).forEach(kette => {
@@ -5081,8 +5106,13 @@ function renderModusKarten() {
     guthaben.innerHTML = "";
     guthaben.append(
         el("span", null, null, [spriteIcon("pokal"), el("span", null, (() => {
-            const e = anzahlErfolge(erfolgsProfil(false).m, false);
-            return e.geschafft + " / " + e.gesamt + t(" Erfolge");
+            // Story + der Endlos-Spielstand mit den meisten Erfolgen, nur komplett abgeschlossene Erfolge (keine Stufen)
+            const story = komplettErfolge(erfolgsProfil(false).m, false);
+            const endlos = [1, 2, 3].map(slot => {
+                try { return komplettErfolge(endlosMeta(slot), true).geschafft; } catch (fehler) { return 0; }
+            });
+            const gesamt = story.gesamt + erfolgKettenFuer(true).length;
+            return (story.geschafft + Math.max(0, ...endlos)) + " / " + gesamt + t(" Erfolge");
         })())]),
         el("span", null, "📅 " + zahl(meta.lebenszeit.tage) + t(" Tage gespielt"))
     );
@@ -5375,7 +5405,11 @@ function wechsleVollbild() {
 $("vollbild-knopf").addEventListener("click", wechsleVollbild);
 $("einstellungen-button").addEventListener("click", () => oeffneEinstellungen(false));
 einstellungenSchliessen.addEventListener("click", () => einstellungenFenster.classList.add("versteckt"));
-einstellungenHauptmenue.addEventListener("click", zeigeHauptmenue);
+// Aus dem Spiel ins Hauptmenue: im Duo verlaesst man dabei auch die Lobby
+einstellungenHauptmenue.addEventListener("click", () => {
+    if (typeof koop !== "undefined" && (koop.verbunden || koop.code || koop.imSpiel)) koopVerlassen();
+    zeigeHauptmenue();
+});
 spielstandLoeschen.addEventListener("click", frageAllesLoeschen);
 $("endlos-speichern").addEventListener("click", () => {
     speichereRun();

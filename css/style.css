@@ -12452,3 +12452,21 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: 6px 0;
     line-height: 1.4;
 }
+
+/* Kombo-Boni unter dem Kombo-Balken */
+.kombo-bonus {
+    display: block;
+    font-size: 0.75em;
+    line-height: 1.25;
+    color: #fff6dc;
+    text-shadow: 1px 1px 0 #2e1a09;
+}
+.kombo-bonus:empty {
+    display: none;
+}
+.kombo-bonus img.icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
+    margin-right: 2px;
+}

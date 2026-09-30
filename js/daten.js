@@ -289,7 +289,7 @@ const KONFIG = {
     bonusEnergieDeckel: 0.6,          // Extra-Energie (Blitzpflanzen, Kaffee, Gluehwuermchen) hoechstens 60% der Tagesenergie, sonst endet der Tag nie
     streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Saat fallen (nur waehrend eines Tages)
     streichelSperreMs: 350,           // schneller gestreichelt zaehlt nicht (gegen Autoklicker)
-    streichelAnteile: [0.001, 0.002, 0.003, 0.004, 0.005], // Wert einer Streichel-Saat je Farbe: 0,1% bis 0,5% der Rechnung
+    streichelAnteile: [0.0008, 0.0016, 0.0024, 0.0032, 0.004], // Wert einer Streichel-Saat je Farbe: 0,08% bis 0,4% der Rechnung (20% weniger als vorher)
     streichelMindestGold: [1, 2, 3, 4, 5],                 // ... aber mindestens so viel Gold
     streichelMaxProTag: 40,           // hoechstens so viele Streichel-Saaten pro Tag: nur Streicheln reicht nie fuer eine Rechnung
     streichelHerzAb: 33333,           // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und es gibt 3-fache Saat
@@ -692,9 +692,6 @@ const SKILLS = [
     stern("eichhoernchen2", "helfer", "🐿️", [-740, 660], "eichhoernchen", t("Eichhörnchen-Kolonie"), 8000, 1.9, 10,
         t("Stufe 2 der Eichhörnchen: +2 automatische Klicks pro Sekunde."),
         () => helferKlicksProSek() + t(" Klicks pro Sekunde"), { vorMax: true, abzeichen: "Ⅱ" }),
-    stern("schildkroete", "helfer", "🐢", [-460, 90], "kombo", t("Schildkröte"), 60, 2, 5,
-        t("Eine Schildkröte kriecht gemütlich über den Acker und erntet ab und zu eine fertige Pflanze für dich. Langsam, aber zuverlässig."),
-        () => (level("schildkroete") > 0 ? t("Alle ") + sekText(schildkroeteSek()) : t("Noch keine Schildkröte"))),
     stern("erntehase", "helfer", "🐇", [-520, -440], "radius", t("Erntehase"), 600, 2.3, 5,
         t("Ein Hase hoppelt über den Acker und erntet regelmäßig eine fertige Pflanze für dich."),
         () => (level("erntehase") > 0 ? t("Alle ") + sekText(erntehaseSek()) : t("Noch kein Hase"))),
@@ -1008,7 +1005,6 @@ const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 
 // ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
-    schildkroete: t("Erntet langsam für dich"),
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
     gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"), sternengold: t("Mehr Gold · unendlich"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
@@ -2658,7 +2654,7 @@ const FIGUR_TEILE = {
         { id: "regenmantel", name: t("Regenmantel"), ...EPISCH, form: "regenmantel", farben: { 6: "#f5d547", 8: "#c8a820", k: "#3a3a44" } },
         { id: "imker", name: t("Imkeranzug"), ...EPISCH, form: "imker", farben: { 6: "#f4f0e0", 8: "#d0c8b0", k: "#1c1b24", p: "#f5c542" } },
         { id: "flicken", name: t("Flickenhemd"), ...EPISCH, form: "flicken", farben: { 6: "#8aa0c0", 8: "#6a80a0", k: "#e8434a", p: "#7ed957" } },
-        { id: "blaetterweste", name: t("Laubweste"), ...LEGENDAER, form: "blaetter", anim: true, fx: "funkeln", fxFarbe: "#ffb04a",
+        { id: "blaetterweste", name: t("Laubweste"), ...EPISCH, form: "blaetter", anim: true, fx: "funkeln", fxFarbe: "#ffb04a",
             farben: { 6: "#c8702a", 8: "#9a4a1a", k: "#ffb04a", p: "#e8d24a" } },
         { id: "umhang", name: t("Sternenumhang"), ...LEGENDAER, form: "umhang", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
             farben: { 6: "#2a3a8a", 8: "#1a2460", k: "#fff6a0" } },
@@ -2699,11 +2695,11 @@ const FIGUR_TEILE = {
     gesicht: [
         { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
         { id: "sommersprossen", name: t("Sommersprossen"), quelle: "frei", form: "sommersprossen", farben: { G: "#b0643a" } },
-        { id: "wangen", name: t("Rote Wangen"), quelle: "frei", form: "wangen", farben: { G: "#ff7a8a" } },
+        { id: "wangen", name: t("Rote Wangen"), ...EPISCH, form: "wangen", farben: { G: "#ff7a8a" } },
         { id: "muttermal", name: t("Muttermal"), quelle: "frei", form: "muttermal", farben: { G: "#5a2a1a" } },
-        { id: "grinsen", name: t("Breites Grinsen"), quelle: "frei", form: "grinsen", farben: { G: "#9a4a3a", H: "#ffffff" } },
-        { id: "schnurrbart", name: t("Schnurrbart"), ...EPISCH, form: "schnurrbart" },
-        { id: "vollbart", name: t("Vollbart"), ...EPISCH, form: "vollbart" },
+        { id: "grinsen", name: t("Breites Grinsen"), ...EPISCH, form: "grinsen", farben: { G: "#9a4a3a", H: "#ffffff" } },
+        { id: "schnurrbart", name: t("Schnurrbart"), quelle: "frei", form: "schnurrbart" },
+        { id: "vollbart", name: t("Vollbart"), quelle: "frei", form: "vollbart" },
         { id: "pflaster", name: t("Pflaster"), ...EPISCH, form: "pflaster", farben: { G: "#fff4e0", H: "#b07a4a" } },
         { id: "kriegsbemalung", name: t("Farbstreifen"), ...EPISCH, form: "streifen", farben: { G: "#2f6fb8", H: "#e8434a" } },
         { id: "sternenwangen", name: t("Sternenwangen"), ...LEGENDAER, form: "sternenwangen", anim: true, fx: "funkeln", fxFarbe: "#fff6a0",
@@ -2725,10 +2721,10 @@ const FIGUR_TEILE = {
         { id: "bandana", name: t("Bandana"), ...EPISCH, form: "bandana", farben: { a: "#d9483f", b: "#a8322a", c: "#ffffff" } },
         { id: "wikinger", name: t("Wikingerhelm"), ...EPISCH, form: "wikinger", farben: { a: "#9aa0a8", b: "#7a5230", c: "#f4ecd8" } },
         { id: "partyhut", name: t("Partyhut"), ...EPISCH, form: "partyhut", farben: { a: "#5aa9e6", b: "#ffd84a", c: "#ff5a8a" } },
-        { id: "hasenohren", name: t("Hasenohren"), ...EPISCH, form: "hasenohren", anim: true, farben: { a: "#f4f4f4", b: "#ffb0c8", c: "#e0e0e8" } },
+        { id: "hasenohren", name: t("Hasenohren"), ...LEGENDAER, form: "hasenohren", anim: true, farben: { a: "#f4f4f4", b: "#ffb0c8", c: "#e0e0e8" } },
         { id: "einhorn", name: t("Einhorn-Horn"), ...LEGENDAER, form: "einhorn", anim: true, fx: "funkeln", fxFarbe: "#ff9ad5",
             farben: { a: "#fff6c0", b: "#ffc6ea", c: "#ffffff" } },
-        { id: "krone", name: t("Krone"), ...LEGENDAER, form: "krone", anim: true, fx: "funkeln", fxFarbe: "#ffe066",
+        { id: "krone", name: t("Krone"), ...EPISCH, form: "krone", anim: true, fx: "funkeln", fxFarbe: "#ffe066",
             farben: { a: "#ffd23a", b: "#c89a10", c: "#e8434a" } },
         { id: "heiligenschein", name: t("Heiligenschein"), ...LEGENDAER, form: "schein", anim: true, fx: "glow", fxFarbe: "#fff6a0",
             farben: { a: "#fff6a0", b: "#ffe066", c: "#ffffff" } },
