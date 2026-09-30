@@ -10,3 +10,4 @@ save/
 # Test-Dateien (beginnen mit _), z.B. der Balancing-Bot
 _*.js
 _*.json
+changes_ignore.txt
