@@ -277,7 +277,7 @@ const KONFIG = {
     startKlicksProSamen: 30,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
     minKlicksProSamen: 10,            // nur erreichbar mit allem: Stellarium (13), Segen Flinke Haende (2), Mondteich Geschickte Haende (3), Tarot Kraft (2)
     klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
-    startEnergie: 180,
+    startEnergie: 160,
     energieProSek: 5,
     tageProRechnung: 5,
     rechnungBasis: 30,
@@ -305,10 +305,10 @@ const KONFIG = {
     sternschnuppeMinSek: 70,          // etwa eine Sternschnuppe pro Tag
     sternschnuppeMaxSek: 130,
     sternschnuppeBuffSek: 10,
-    gluehwuermchenAbTageszeit: 0.65,  // ab diesem Anteil des Tages (0 = Morgen, 1 = Nacht) kommen Gluehwuermchen
-    gluehwuermchenMinSek: 3,
-    gluehwuermchenMaxSek: 7,
-    gluehwuermchenEnergie: 10,        // ein gefangenes Gluehwuermchen verlaengert den Abend
+    gluehwuermchenAbTageszeit: 0.55,  // ab diesem Anteil des Tages (0 = Morgen, 1 = Nacht) kommen Gluehwuermchen
+    gluehwuermchenMinSek: 2,
+    gluehwuermchenMaxSek: 5,
+    gluehwuermchenEnergie: 15,        // ein gefangenes Gluehwuermchen verlaengert den Abend
     bonusEnergieDeckel: 0.6,          // Extra-Energie (Blitzpflanzen, Kaffee, Gluehwuermchen) hoechstens 60% der Tagesenergie, sonst endet der Tag nie
     streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Saat fallen (nur waehrend eines Tages)
     streichelSperreMs: 350,           // schneller gestreichelt zaehlt nicht (gegen Autoklicker)
@@ -463,7 +463,7 @@ const SHOP_UPGRADES = [
         beschreibung: t("Schaltet für immer das Stellarium frei. Ab dann lässt jede Ernte Sternensaat fallen, und im Stellarium gibst du sie aus: für neue Pflanzen, bunte Saaten, Helfer und vieles mehr."),
         info: () => t("Freigeschaltet") },
     { id: "energie", knoten: "s_energie", icon: "⚡", name: t("Längerer Tag"), basiskosten: 25, faktor: 2.6, max: 10,
-        beschreibung: t("+25 Energie pro Tag."),
+        beschreibung: t("+20 Energie pro Tag."),
         info: () => energieMax() + t(" Energie pro Tag") },
     { id: "kasse", knoten: "s_kasse", icon: "🛎️", name: t("Klingelnde Kasse"), basiskosten: 30, faktor: 2.2, max: 10,
         beschreibung: t("Jeder Klick auf den Samenladen gibt Gold: 0,2% des Werts deiner besten Pflanze pro Stufe."),
@@ -593,8 +593,8 @@ const SKILLS = [
         t("+100% Gold aus allen Ernten."),
         () => "+" + prozentText(level("fuellhorn")) + t(" Gold")),
     stern("goldmarie", "ernte", "🌟", [1400, -440], "fuellhorn", t("Goldmarie"), 30000, 8, 3,
-        t("Alles Gold aus Ernten wird verdoppelt (jede Stufe noch einmal)."),
-        () => multiText(Math.pow(2, level("goldmarie"))) + t(" Gold"), { abzeichen: "💰" }),
+        t("+100% Gold aus allen Ernten pro Stufe."),
+        () => "+" + prozentText(level("goldmarie")) + t(" Gold"), { abzeichen: "💰" }),
     stern("ernterausch", "ernte", "🔥", [1180, -220], "sternenklick", t("Ernterausch"), 1500, 1, 1,
         t("Jede 30. Ernte an einem Tag startet einen Ernterausch: 6 Sekunden lang dreifaches Gold."),
         () => (level("ernterausch") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
@@ -605,8 +605,8 @@ const SKILLS = [
         t("Jede Ernte gibt 2 Sternensamen mehr."),
         () => "+" + 2 * level("sternenquelle") + t(" pro Ernte")),
     stern("sternenflut", "ernte", "🌌", [740, -880], "sternenstaub", t("Sternenflut"), 20000, 6, 3,
-        t("Stufe 2 von Sternenstaub: Sternensamen aus Ernten x2 (jede Stufe noch einmal)."),
-        () => multiText(Math.pow(2, level("sternenflut"))) + t(" Sternensamen"), { vorMax: true, abzeichen: "Ⅱ" }),
+        t("Stufe 2 von Sternenstaub: +100% Sternensamen aus Ernten pro Stufe."),
+        () => "+" + prozentText(level("sternenflut")) + t(" Sternensamen"), { vorMax: true, abzeichen: "Ⅱ" }),
     stern("glueck2", "ernte", "☘️", [630, -360], "glueck", t("Vierblättriger Klee"), 3000, 2.5, 5,
         t("Stufe 2 vom Glückskleeblatt: +10% Chance, dass eine Saat doppelt zählt."),
         () => prozentText(glueckChance()) + t(" Chance auf doppeltes Gold"), { vorMax: true, abzeichen: "Ⅱ" }),
@@ -769,7 +769,7 @@ const SKILLS = [
         t("Neue Felder kosten 8% weniger."),
         () => "-" + prozentText(1 - Math.pow(0.92, level("feldvermessung"))) + t(" Feldpreis")),
     stern("sonnenuhr", "hof", "🕰️", [-440, 740], "s_energie", t("Sonnenuhr"), 150, 1.9, 10,
-        t("+10 Energie pro Tag."),
+        t("+8 Energie pro Tag."),
         () => energieMax() + t(" Energie pro Tag")),
     stern("fruehaufsteher", "hof", "🐓", [-220, 740], "s_energie", t("Frühaufsteher"), 80, 1.9, 8,
         t("Jeder Tag beginnt mit bereits gepflanzten Samen."),
@@ -847,7 +847,7 @@ const SKILLS = [
     stern("g_sterne", "hof", "✨", [-920, 960], "g_gold", t("Grundwert: Sternensamen"), 400, 2, 10,
         t("+5% Sternensamen aus allen Ernten."), () => "+" + prozentText(grundwert("g_sterne")) + t(" Sternensamen")),
     stern("g_energie", "hof", "⚡", [-700, 1180], "g_gold", t("Grundwert: Energie"), 300, 2, 10,
-        t("+5% Energie pro Tag."), () => "+" + prozentText(grundwert("g_energie")) + t(" Energie")),
+        t("+3% Energie pro Tag."), () => "+" + prozentText(0.6 * grundwert("g_energie")) + t(" Energie")),
     stern("g_wachstum", "hof", "🌱", [-920, 1180], "g_energie", t("Grundwert: Wachstum"), 500, 2, 10,
         t("Alle Pflanzen wachsen 5% schneller."), () => "+" + prozentText(grundwert("g_wachstum")) + t(" Wachstum")),
     stern("g_harmonie", "hof", "☯️", [-1140, 1070], "g_sterne", t("Harmonie"), 5000, 1.6, Infinity,
@@ -1030,8 +1030,8 @@ const STERN_KURZ = {
     gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"),
     glueck: t("Saat zählt doppelt"), sternensammler: t("Sternensaat zählt doppelt"), sternenklick: t("Sternensamen pro Klick"),
     schwereMuenzen: t("Gewöhnliche Saat mehr wert"), doppelernte: t("Doppelt so viel Saat"), fuellhorn: t("Mehr Gold"),
-    goldmarie: t("Gold verdoppeln"), ernterausch: t("Jede 30. Ernte: 6 Sek. x3 Gold"), sternenstaub: t("Mehr Sternensamen"),
-    sternenquelle: t("Sternensamen pro Ernte"), sternenflut: t("Sternensamen verdoppeln"), glueck2: t("Saat zählt doppelt"),
+    goldmarie: t("Mehr Gold"), ernterausch: t("Jede 30. Ernte: 6 Sek. x3 Gold"), sternenstaub: t("Mehr Sternensamen"),
+    sternenquelle: t("Sternensamen pro Ernte"), sternenflut: t("Mehr Sternensamen"), glueck2: t("Saat zählt doppelt"),
     midas: t("Legendäre Saat: +50 Sternensamen"), radius: t("Größerer Cursor"), vogelscheuche: t("Verscheucht die 1. Krähe"),
     kombo: t("Mehr Zeit für die Kombo"), eichhoernchen: t("Klicken den Samenladen"), haustiertraining: t("Begleiter sammelt öfter"),
     igel: t("Igel sammeln Saat ein"), saatspatz: t("Spatz pflanzt Samen"), gluehglas: t("Mehr Glühwürmchen"),
@@ -1067,9 +1067,9 @@ const STERN_WIRKUNG = {
     glueck: s => "+" + 5 * s + t("% Doppel-Saat"),
     sternensammler: s => "+" + 5 * s + t("% Doppel-Sternensaat"), sternenklick: s => "+" + zahl(s * 0.25) + t(" ✨ pro Klick"),
     schwereMuenzen: s => "+" + 20 * s + t("% Wert"), doppelernte: s => "+" + 3 * s + t("% Doppelernte"),
-    fuellhorn: s => "+" + 100 * s + t("% Gold"), goldmarie: s => "x" + Math.pow(2, s) + t(" Gold"),
+    fuellhorn: s => "+" + 100 * s + t("% Gold"), goldmarie: s => "+" + 100 * s + t("% Gold"),
     sternenstaub: s => "+" + 40 * s + "% ✨", sternenquelle: s => "+" + 2 * s + t(" ✨ pro Ernte"),
-    sternenflut: s => "x" + Math.pow(2, s) + " ✨", glueck2: s => "+" + 10 * s + t("% Doppel-Saat"),
+    sternenflut: s => "+" + 100 * s + "% ✨", glueck2: s => "+" + 10 * s + t("% Doppel-Saat"),
     radius: s => "+" + Math.round((Math.pow(KONFIG.sammelRadiusFaktor, s) - 1) * 100) + t("% Cursor"),
     kombo: s => "+" + (0.1 * s).toFixed(1).replace(".", ",") + t(" Sek. Kombo"), eichhoernchen: s => s + t(" Klicks/Sek."),
     eichhoernchen2: s => "+" + 2 * s + t(" Klicks/Sek."), haustiertraining: s => "+" + 10 * s + t("% Hilfe"),
@@ -1078,7 +1078,7 @@ const STERN_WIRKUNG = {
     biene: s => t("alle ") + sekText(12 / s), magnetfeld: s => 40 * s + t(" Pixel/Sek."), erntehase: s => t("alle ") + sekText(12 / s),
     glueckstraehne: s => "+" + 3 * s + t("% Glück"), gluecksrabatt: s => "+" + 10 * s + t("% Slot-Gewinne"), stammkunde: s => "+" + s + t(" Spiele"),
     haendlerfreund: s => "+" + 50 * s + t("% Chance"), giessen: s => s + t(" Felder 💧"),
-    feldvermessung: s => "-" + Math.round((1 - Math.pow(0.92, s)) * 100) + t("% Feldpreis"), sonnenuhr: s => "+" + 10 * s + t(" Energie"),
+    feldvermessung: s => "-" + Math.round((1 - Math.pow(0.92, s)) * 100) + t("% Feldpreis"), sonnenuhr: s => "+" + 8 * s + t(" Energie"),
     fruehaufsteher: s => s + t(" Samen"), duengen: s => s + t(" Felder 🪱"), morgentau: s => "+" + 25 * s + t("% Wachstum"),
     doppelwurf: s => "+" + 10 * s + t("% Doppelwurf"), zinsen: s => 2 * s + t("% Zinsen"), wetterfrosch: s => "+" + 30 * s + t("% Wetter"),
     abendsonne: s => "+" + 15 * s + t("% Gold"), lagerhaus: s => "+" + 25 * s + t("% Deckel"), nachtwache: s => "+" + 50 * s + t("% Energie"),

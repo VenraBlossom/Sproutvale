@@ -3225,7 +3225,12 @@ Object.assign(UEBERSETZUNG, {
     "Gesamt: {0} auf alle Währungen": "Total: {0} on all currencies",
     "Duo: Der Host kann per Rechtsklick auf die Figur des Mitspielers (oder in der Lobby) ihn zum Host machen oder rauswerfen. Der Host hat einen gelben Namen.": "Duo: The host can right-click the other player's character (or use the lobby) to make them host or kick them. The host has a yellow name.",
     "Speichern: Im Reiter Speichern wählst du in Endlos (allein und im Duo) einen der 3 Speicherstände.": "Save: In the Save tab you pick one of the 3 save slots in Endless (solo and Duo).",
-    "Pokale zeigen ihren Bonus jetzt in Prozent (+50%, +100% …), die Vitrine zeigt unten den Gesamtbonus. Die Boni addieren sich in Prozent.": "Trophies now show their bonus in percent (+50%, +100% …), the showcase shows the total at the bottom. The bonuses add up in percent."
+    "Pokale zeigen ihren Bonus jetzt in Prozent (+50%, +100% …), die Vitrine zeigt unten den Gesamtbonus. Die Boni addieren sich in Prozent.": "Trophies now show their bonus in percent (+50%, +100% …), the showcase shows the total at the bottom. The bonuses add up in percent.",
+    "Stufe 2 von Sternenstaub: +100% Sternensamen aus Ernten pro Stufe.": "Tier 2 of Stardust: +100% Star Seeds from harvests per level.",
+    "+100% Gold aus allen Ernten pro Stufe.": "+100% gold from all harvests per level.",
+    "+20 Energie pro Tag.": "+20 energy per day.",
+    "+8 Energie pro Tag.": "+8 energy per day.",
+    "+3% Energie pro Tag.": "+3% energy per day."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

@@ -647,10 +647,11 @@ function klicksProSamen() {
 
 // Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
 function energieMax() {
-    let energie = KONFIG.startEnergie + 25 * level("energie") + 10 * level("sonnenuhr") +
+    let energie = KONFIG.startEnergie + 20 * level("energie") + 8 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
     // Mondteich "Ausdauer" und Grundwert Energie wirken in Prozent (wachsen mit)
-    energie *= (1 + metaWert("ausdauer")) * (1 + grundwert("g_energie")) * (1 + 0.1 * segen("kraftpaket"));
+    // Prozent-Boni zusammengezaehlt (Grundwert Energie nur noch +3% pro Stufe)
+    energie *= 1 + metaWert("ausdauer") + 0.6 * grundwert("g_energie") + 0.1 * segen("kraftpaket");
     energie *= 1 + werkzeugWert("taschenuhr");
     energie *= (1 + 0.2 * stil("fruehaufsteher")) * (1 - 0.4 * hf("kurzetage")) * (1 + 0.1 * hfGeschafft("kurzetage"));
     // Pakte
@@ -748,27 +749,35 @@ function artenvielfalt() {
     return 0.12 * Math.max(0, freie.length - 1 + freie.filter(p => p.eigenschaft === "wurzeln").length);
 }
 
+function z_sommer() {
+    return jahreszeit().id === "sommer";
+}
+
 function goldMulti() {
     const summe = 1 + metaWert("ertrag") + (level("sternbild") > 0 ? 0.01 * Math.floor(gekaufteSterne() / 10) : 0) + tw("welt") + tw("teufel") + 0.15 * segen("goldhaende") +
         0.06 * kuschel("fuechslein") + 0.03 * level("marktschreier") +
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + level("grosseernte") + gachaBonus("gold") + artenvielfalt() +
-        (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0);
+        (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0) +
+        // alles zusammengezaehlt (nicht malgenommen), sonst schaukelt es sich im spaeten Spiel auf
+        grundwert("g_gold") + level("goldmarie") + 0.25 * kuschel("mondhase") + (z_sommer() ? 0.2 * level("sonnenernte") : 0);
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
     const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
-    return pokalFaktor() * pakte * summe * (1 + grundwert("g_gold")) * Math.pow(2, level("goldmarie")) * Math.pow(1.15, metaLevel("mondlicht")) * Math.pow(1.25, kuschel("mondhase")) *
-        (z.gold || 1) * (z.id === "sommer" ? 1 + 0.2 * level("sonnenernte") : 1) *
-        (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
+    return pokalFaktor() * pakte * summe * Math.pow(1.15, metaLevel("mondlicht")) *
+        (z.gold || 1) * (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
+// Alle Boni werden zusammengezaehlt (+40% und +100% = +140%), nur Pokale, Jahreszeit und der Pakt Sternentausch
+// wirken extra. Vorher wurde alles malgenommen, dadurch schaukelte sich das spaete Spiel ins Unendliche auf.
 function sternWertMulti() {
-    return pokalFaktor() * (1 + 0.2 * kuschel("manta")) * (1 + 0.25 * sfLevel("sternensaat")) * (1 + gachaBonus("sterne")) * (1 + werkzeugWert("wuenschelrute")) *
-        (1 + 0.4 * level("sternenstaub")) * Math.pow(2, level("sternenflut")) * (jahreszeit().sterne || 1) *
-        (jahreszeit().id === "herbst" ? 1 + 0.25 * level("erntedank") : 1) * (1 + 0.25 * segen("sternenhunger")) * (1 + 0.6 * segen("sternentausch")) * (1 + 0.5 * stil("sterndeuter")) *
-        (1 + 0.04 * level("sternenkiste")) * (run && istNachts() ? 1 + 0.25 * level("mondsichel") : 1) *
-        (1 + metaWert("startsp")) * (1 + grundwert("g_sterne")) * (1 + level("sternenschauer"));
+    const summe = 1 + 0.2 * kuschel("manta") + 0.25 * sfLevel("sternensaat") + gachaBonus("sterne") + werkzeugWert("wuenschelrute") +
+        0.4 * level("sternenstaub") + level("sternenflut") +
+        (jahreszeit().id === "herbst" ? 0.25 * level("erntedank") : 0) + 0.25 * segen("sternenhunger") + 0.5 * stil("sterndeuter") +
+        0.04 * level("sternenkiste") + (run && istNachts() ? 0.25 * level("mondsichel") : 0) +
+        metaWert("startsp") + grundwert("g_sterne") + level("sternenschauer");
+    return pokalFaktor() * summe * (jahreszeit().sterne || 1) * (1 + 0.6 * segen("sternentausch"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
