@@ -11,3 +11,5 @@ save/
 _*.js
 _*.json
 changes_ignore.txt
+_*.txt
+_*.jsonl

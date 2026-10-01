@@ -3230,7 +3230,10 @@ Object.assign(UEBERSETZUNG, {
     "+100% Gold aus allen Ernten pro Stufe.": "+100% gold from all harvests per level.",
     "+20 Energie pro Tag.": "+20 energy per day.",
     "+8 Energie pro Tag.": "+8 energy per day.",
-    "+3% Energie pro Tag.": "+3% energy per day."
+    "+3% Energie pro Tag.": "+3% energy per day.",
+    "Balancing: Gold- und Sternensamen-Boni werden jetzt zusammengezählt statt malgenommen (wie die +%-Texte es sagen). Goldmarie und Sternenflut geben +100% pro Stufe. Das späte Spiel explodiert nicht mehr.": "Balancing: Gold and Star Seed bonuses now add up instead of multiplying (as the +% texts say). Goldmarie and Star Flood give +100% per level. The late game no longer explodes.",
+    "Energie: Start 160, „Längerer Tag“ +20, Sonnenuhr +8, Grundwert Energie +3%. Alle Prozent-Boni auf Energie zusammen höchstens +100%.": "Energy: start 160, \"Longer Day\" +20, Sundial +8, Base Energy +3%. All percent energy bonuses together at most +100%.",
+    "Glühwürmchen kommen früher am Abend, öfter und geben 15 Energie.": "Fireflies come earlier in the evening, more often and give 15 energy."
 });
 
 // Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)

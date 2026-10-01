@@ -84,10 +84,15 @@ function klemme(wert, min, max) {
 // ---------- KONFIGURATION ----------
 
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
-const SPIEL_VERSION = "Beta 0.4.1";
+const SPIEL_VERSION = "Beta 0.4.2";
 
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
+    { version: "Beta 0.4.2", punkte: [
+        t("Balancing: Gold- und Sternensamen-Boni werden jetzt zusammengezählt statt malgenommen (wie die +%-Texte es sagen). Goldmarie und Sternenflut geben +100% pro Stufe. Das späte Spiel explodiert nicht mehr."),
+        t("Energie: Start 160, „Längerer Tag“ +20, Sonnenuhr +8, Grundwert Energie +3%. Alle Prozent-Boni auf Energie zusammen höchstens +100%."),
+        t("Glühwürmchen kommen früher am Abend, öfter und geben 15 Energie.")
+    ] },
     { version: "Beta 0.4.1", punkte: [
         t("Duo: Der Host kann per Rechtsklick auf die Figur des Mitspielers (oder in der Lobby) ihn zum Host machen oder rauswerfen. Der Host hat einen gelben Namen."),
         t("Speichern: Im Reiter Speichern wählst du in Endlos (allein und im Duo) einen der 3 Speicherstände."),
