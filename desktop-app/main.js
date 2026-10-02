@@ -55,7 +55,17 @@ function versionTeile(text) {
     return treffer ? treffer.slice(1).map(Number) : null;
 }
 
+// Phase einer Version: Alpha < Beta < fertige Version. Die Beta hat wieder bei 0.1 angefangen,
+// darum zaehlt zuerst die Phase und erst dann die Nummer (sonst waere "Alpha 1.0.1" neuer als "Beta 0.4.2")
+function versionPhase(text) {
+    if (/alpha/i.test(String(text))) return 0;
+    if (/beta/i.test(String(text))) return 1;
+    return 2;
+}
+
 function vergleicheVersion(a, b) {
+    const phase = versionPhase(a) - versionPhase(b);
+    if (phase !== 0) return phase;
     const x = versionTeile(a);
     const y = versionTeile(b);
     if (!x || !y) return 0;
