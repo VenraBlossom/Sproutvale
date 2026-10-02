@@ -134,6 +134,14 @@ async function suchePatch() {
     if (!istReleaseOrdner(ORDNER) && !process.env.SPROUTVALE_UPDATE_TEST) return;
     const lokal = liesVersion(ORDNER);
     const tags = await holeDaten("https://api.github.com/repos/" + UPDATE_REPO + "/tags?per_page=100", true);
+    // Geladene Updates, deren Tag es auf GitHub nicht mehr gibt (z.B. alte Alpha-Versionen), wieder loeschen
+    try {
+        const namen = new Set(tags.map(tag => String(tag.name).replace(/^v/, "")));
+        fs.readdirSync(UPDATE_ORDNER).filter(name => !name.endsWith(".laden") && !namen.has(name))
+            .forEach(name => fs.rmSync(path.join(UPDATE_ORDNER, name), { recursive: true, force: true }));
+    } catch (fehler) {
+        // noch kein Update-Ordner
+    }
     const neuester = tags.map(tag => tag.name).filter(name => /^v\d+\.\d+\.\d+/.test(name))
         .sort((a, b) => vergleicheVersion(b, a))[0];
     if (!neuester || vergleicheVersion(neuester, lokal) <= 0) return;
