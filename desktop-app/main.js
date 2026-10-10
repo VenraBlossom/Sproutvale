@@ -43,7 +43,7 @@ function spielOrdner() {
 // Ist das Repo nicht oeffentlich oder kein Internet da, passiert einfach nichts.
 const UPDATE_REPO = "VenraBlossom/Sproutvale";
 const UPDATE_ORDNER = path.join(app.getPath("userData"), "updates");
-const UPDATE_AUSLASSEN = [/^desktop-app\//, /^\.github\//, /^\.claude\//, /^\.git/, /\.md$/i, /^docs\//];
+const UPDATE_AUSLASSEN = [/^desktop-app\//, /^werkzeuge\//, /^\.github\//, /^\.claude\//, /^\.git/, /\.md$/i, /^docs\//];
 
 function istReleaseOrdner(ordner) {
     return app.isPackaged && !process.env.SPROUTVALE_ORDNER && path.resolve(ordner) === path.resolve(process.resourcesPath, "spiel");
