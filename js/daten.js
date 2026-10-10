@@ -34,7 +34,7 @@ function zahl(wert) {
         }
     }
     const exp = n.toExponential(2).replace("e+", "e");
-    return SPRACHE === "de" ? exp.replace(".", ",") : exp;
+    return SPRACHE === "en" ? exp : exp.replace(".", ",");
 }
 
 function prozentText(anteil) {

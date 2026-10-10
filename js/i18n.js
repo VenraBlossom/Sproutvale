@@ -1,21 +1,23 @@
 "use strict";
 
 // ============================================================
-// SPROUTVALE: Sprachen (Deutsch / Englisch)
+// SPROUTVALE: Sprachen (Deutsch / Englisch / Spanisch / Franzoesisch)
 // Wird direkt nach speicher.js geladen, noch vor allen Spieldaten.
-// Jeder Text im Spiel laeuft durch t("deutscher Text"). Auf Englisch steht die Uebersetzung in sprache-en.js.
-// Fehlt eine Uebersetzung, bleibt der deutsche Text stehen (nichts geht kaputt).
+// Jeder Text im Spiel laeuft durch t("deutscher Text"). Die Uebersetzungen stehen in sprache-en.js, sprache-es.js, sprache-fr.js.
+// Fehlt eine spanische oder franzoesische Uebersetzung, kommt der englische Text, sonst bleibt der deutsche stehen.
 // Beim allerersten Start ist Englisch eingestellt, bestehende Spieler behalten Deutsch.
 // Umschalten in den Einstellungen (Reiter "Anzeige"), danach laedt das Spiel neu.
 // ============================================================
 
 const SPRACHEN = [
     { id: "en", name: "English" },
-    { id: "de", name: "Deutsch" }
+    { id: "de", name: "Deutsch" },
+    { id: "es", name: "Español" },
+    { id: "fr", name: "Français" }
 ];
 // Kommen spaeter: nur als Karte sichtbar, noch nicht waehlbar und noch ohne Uebersetzung
 const SPRACHEN_BALD = [
-    { id: "es", name: "Español" }, { id: "fr", name: "Français" }, { id: "it", name: "Italiano" },
+    { id: "it", name: "Italiano" },
     { id: "pt", name: "Português" }, { id: "nl", name: "Nederlands" }, { id: "pl", name: "Polski" },
     { id: "tr", name: "Türkçe" }, { id: "ru", name: "Русский" }, { id: "uk", name: "Українська" },
     { id: "ja", name: "日本語" }, { id: "zh", name: "中文" }, { id: "ko", name: "한국어" }
@@ -24,7 +26,7 @@ const SPRACHEN_BALD = [
 const SPRACHE = (() => {
     try {
         const gespeichert = JSON.parse(localStorage.getItem("sproutvale_einstellungen"));
-        if (gespeichert && gespeichert.sprache) return gespeichert.sprache;
+        if (gespeichert && SPRACHEN.some(s => s.id === gespeichert.sprache)) return gespeichert.sprache;
         if (gespeichert) return "de"; // Spielstand von vor den Sprachen: bleibt Deutsch
     } catch (fehler) {
         console.warn("Sprache nicht lesbar", fehler);
@@ -32,10 +34,10 @@ const SPRACHE = (() => {
     return "en";
 })();
 
-const SPRACH_LOCALE = SPRACHE === "en" ? "en-US" : "de-DE";
+const SPRACH_LOCALE = { en: "en-US", de: "de-DE", es: "es-ES", fr: "fr-FR" }[SPRACHE] || "en-US";
 document.documentElement.lang = SPRACHE;
 
-// wird von sprache-en.js gefuellt
+// wird von sprache-en.js gefuellt (bei Spanisch und Franzoesisch danach von sprache-es.js / sprache-fr.js ueberschrieben)
 const UEBERSETZUNG = {};
 
 function t(text) {

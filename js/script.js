@@ -4146,9 +4146,9 @@ function renderTagesKarte() {
         const gewinnFarbe = RARITAETEN[s.hoechsterGewinnRaritaet].rand;
         html += `<div class="karte-statistik">
             <div><span>${t("Ernten")}</span><b>${zahl(s.ernten)}</b></div>
-            <div><span>Gold</span><b>+${zahl(s.gold)}</b></div>
+            <div><span>${t("Gold")}</span><b>+${zahl(s.gold)}</b></div>
             <div><span>${t("Sternensamen")}</span><b>+${zahl(s.sternensamen)}</b></div>
-            <div><span>${t("Höchster Gewinn")}</span><b style="color:${gewinnFarbe}">${zahl(s.hoechsterGewinn)} Gold</b></div>
+            <div><span>${t("Höchster Gewinn")}</span><b style="color:${gewinnFarbe}">${zahl(s.hoechsterGewinn)}${t(" Gold")}</b></div>
         </div>`;
         if (s.verfallen > 0) {
             html += `<p class="karte-verfallen">💨 ${s.verfallen} ${s.verfallen === 1 ? t("Saat verfallen") : t("Saaten verfallen")}</p>`;
@@ -4164,7 +4164,7 @@ function renderTagesKarte() {
         } else if (daten.freiwillig) {
             html += `<p>${run.sandbox ? t("Du hast in Endlos neu angefangen nach") : t("Du hast den Run beendet nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")}.</p>`;
         } else {
-            html += `<p>${t("Die Rechnung über")} <b>${zahl(daten.offenerBetrag)} Gold</b> ${t("konnte nicht bezahlt werden. Du hattest")} ${zahl(run.gold)} Gold.</p>`;
+            html += `<p>${t("Die Rechnung über")} <b>${zahl(daten.offenerBetrag)}${t(" Gold")}</b> ${t("konnte nicht bezahlt werden. Du hattest")} ${zahl(run.gold)}${t(" Gold")}.</p>`;
         }
         html += `<div class="karte-statistik">
             <div><span>${t("Tage")}</span><b>${daten.tage}</b></div>
@@ -4181,14 +4181,14 @@ function renderTagesKarte() {
 
         if (run.sandbox) {
             html += `<p class="karte-rechnung">🏁 ${t("Nächster Meilenstein")} (${run.meilensteine + 1}): <b>${zahl(run.gesamt.gold)} / ` +
-                `${zahl(meilensteinSchwelle(run.meilensteine + 1))} Gold</b> ${t("verdient. Neuanfang jetzt:")} ` +
+                `${zahl(meilensteinSchwelle(run.meilensteine + 1))}${t(" Gold")}</b> ${t("verdient. Neuanfang jetzt:")} ` +
                 `+${zahl(sandboxMondblueten())} ${t("Mondblüten.")}</p>`;
         } else {
             const rechnung = naechsteRechnung();
             const warnung = rechnung.tageBis <= 2 && run.gold < rechnung.betrag;
             html += `<p class="karte-rechnung${warnung ? " warnung" : ""}${rechnung.boss ? " boss" : ""}">` +
-                `${trophaeFuer(run.bezahlteRechnungen) && !run.gnadenRechnung ? "🏆 " + trophaeFuer(run.bezahlteRechnungen).name : rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)} Gold</b> ` +
-                `${t("in")} ${tageText(rechnung.tageBis)}. ${t("Du hast")} ${zahl(run.gold)} Gold.</p>`;
+                `${trophaeFuer(run.bezahlteRechnungen) && !run.gnadenRechnung ? "🏆 " + trophaeFuer(run.bezahlteRechnungen).name : rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)}${t(" Gold")}</b> ` +
+                `${t("in")} ${tageText(rechnung.tageBis)}. ${t("Du hast")} ${zahl(run.gold)}${t(" Gold")}.</p>`;
             if (kannFrueherBezahlen()) {
                 html += `<button class="knopf knopf-gruen karte-frueh-bezahlen">🧾 ${tf("Jetzt bezahlen ({0} früher, nächster Segen +{1}%)",
                     tageText(rechnung.tageBis), Math.round(((run.fruehBonus || 0) + FRUEH_BEZAHLT_BONUS * rechnung.tageBis) * 100))}</button>`;

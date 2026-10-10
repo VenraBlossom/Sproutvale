@@ -3236,6 +3236,4 @@ Object.assign(UEBERSETZUNG, {
     "Glühwürmchen kommen früher am Abend, öfter und geben 15 Energie.": "Fireflies come earlier in the evening, more often and give 15 energy."
 });
 
-// Feste Texte in index.html jetzt uebersetzen (die Skripte stehen am Ende der Seite, alles ist schon da)
-uebersetzeDokument(document.body);
-if (SPRACHE === "en") document.title = "Sproutvale";
+// Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)
