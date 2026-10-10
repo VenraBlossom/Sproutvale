@@ -357,8 +357,21 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
             stift.fillRect(x + r, y + r, 1, 1);
         }
     });
-    flaeche.addEventListener("pointermove", event => flaeche.classList.toggle("drueber", deckend(event)));
-    flaeche.addEventListener("pointerleave", () => flaeche.classList.remove("drueber"));
+    // Hinweis nur zeigen, wenn die Maus ueber dem Gebaeude selbst ist (nicht im leeren Rechteck drumherum)
+    const tippText = t(flaeche.dataset.tipp || "");
+    setzeTipp(flaeche, null);
+    const setzeDrueber = an => {
+        if (flaeche.classList.contains("drueber") === an) return;
+        flaeche.classList.toggle("drueber", an);
+        setzeTipp(flaeche, an ? tippText : null);
+        if (an) {
+            versteckeTipp();
+            tippZiel = flaeche;
+            tippTimer = setTimeout(() => zeigeTippFuer(flaeche), 350);
+        } else if (tippZiel === flaeche) versteckeTipp();
+    };
+    flaeche.addEventListener("pointermove", event => setzeDrueber(deckend(event)));
+    flaeche.addEventListener("pointerleave", () => setzeDrueber(false));
     flaeche.addEventListener("pointerdown", event => {
         if (event.button === 0 && deckend(event)) aktion();
     });

@@ -2606,6 +2606,16 @@ function ohneEffekte() {
     return Boolean(einstellungen.wenigerEffekte);
 }
 
+// Bei "Weniger Partikel und Animationen" springen auch JS-Animationen sofort ans Ende.
+// Nur Figuren, Begleiter und der Ball duerfen sich weiter bewegen.
+const echtesAnimate = Element.prototype.animate;
+Element.prototype.animate = function (schritte, optionen) {
+    if (ohneEffekte() && !this.closest(".haustier, .hof-figur, .hof-ball")) {
+        optionen = typeof optionen === "number" ? 0 : { ...optionen, duration: 0, delay: 0, iterations: 1 };
+    }
+    return echtesAnimate.call(this, schritte, optionen);
+};
+
 function partikel(x, y, farben, anzahl, staerke) {
     if (x === undefined || ohneEffekte()) return;
     const frei = FX_GRENZE - fxLayer.childElementCount;
