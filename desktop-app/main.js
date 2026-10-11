@@ -439,6 +439,10 @@ ipcMain.on("vollbild", () => {
 });
 ipcMain.on("steam-erfolg", (_event, id) => steam.erfolg(id));
 ipcMain.on("steam-status", (_event, text) => steam.status(text));
+ipcMain.on("steam-aktiv", event => { event.returnValue = steam.aktiv(); });
+ipcMain.on("steam-dlc", event => { event.returnValue = steam.dlcBesitz(); });
+ipcMain.on("kasse-bereit", event => { event.returnValue = steam.kassBereit(); });
+ipcMain.handle("kasse-kaufe", (_event, paketId) => steam.kaufe(String(paketId)));
 
 // Update anwenden: Spielordner neu bestimmen und das Fenster mit den neuen Dateien laden
 ipcMain.on("update-anwenden", () => {

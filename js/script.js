@@ -761,24 +761,28 @@ function goldMulti() {
         // alles zusammengezaehlt (nicht malgenommen), sonst schaukelt es sich im spaeten Spiel auf
         grundwert("g_gold") + level("goldmarie") + 0.25 * kuschel("mondhase") + (z_sommer() ? 0.2 * level("sonnenernte") : 0) +
         // Mondlicht (Mondteich) zaehlt wie alle Gold-Boni dazu (frueher x1,15 pro Stufe malgenommen: schaukelte sich ueber viele Runs auf)
-        0.25 * metaLevel("mondlicht");
+        0.25 * metaLevel("mondlicht") +
+        // Pokale: ihr Prozent-Bonus zaehlt ebenfalls dazu (Holz +50% ist +50% wie jeder andere Gold-Bonus)
+        (pokalFaktor() - 1) +
+        // Freiwillige Werbung (nur Handy): +25% Gold fuer einen Tag
+        (typeof werbeGoldBonus === "function" ? werbeGoldBonus() : 0);
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
     const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
-    return pokalFaktor() * pakte * summe *
+    return pakte * summe *
         (z.gold || 1) * (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
 // Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
-// Alle Boni werden zusammengezaehlt (+40% und +100% = +140%), nur Pokale, Jahreszeit und der Pakt Sternentausch
+// Alle Boni werden zusammengezaehlt (+40% und +100% = +140%), auch die Pokale. Nur Jahreszeit und der Pakt Sternentausch
 // wirken extra. Vorher wurde alles malgenommen, dadurch schaukelte sich das spaete Spiel ins Unendliche auf.
 function sternWertMulti() {
     const summe = 1 + 0.2 * kuschel("manta") + 0.25 * sfLevel("sternensaat") + gachaBonus("sterne") + werkzeugWert("wuenschelrute") +
         0.4 * level("sternenstaub") + level("sternenflut") +
         (jahreszeit().id === "herbst" ? 0.25 * level("erntedank") : 0) + 0.25 * segen("sternenhunger") + 0.5 * stil("sterndeuter") +
         0.04 * level("sternenkiste") + (run && istNachts() ? 0.25 * level("mondsichel") : 0) +
-        metaWert("startsp") + grundwert("g_sterne") + level("sternenschauer");
-    return pokalFaktor() * summe * (jahreszeit().sterne || 1) * (1 + 0.6 * segen("sternentausch"));
+        metaWert("startsp") + grundwert("g_sterne") + level("sternenschauer") + (pokalFaktor() - 1);
+    return summe * (jahreszeit().sterne || 1) * (1 + 0.6 * segen("sternentausch"));
 }
 
 // Chance, dass eine Sternensamen doppelt zaehlt
@@ -3080,6 +3084,17 @@ function meldeAnDesktop(art, wert) {
     else desktop.steam.status(wert);
 }
 
+// Beim Start alle schon erreichten Erfolge und Pokale an Steam melden (z.B. aus der Zeit vor Steam).
+// Steam merkt sich doppelte Meldungen nicht doppelt, darum ist das harmlos.
+function synchronisiereSteamErfolge() {
+    if (!window.sproutvaleDesktop || (run && run.sandbox)) return;
+    Object.keys(meta.erfolge || {}).forEach(id => {
+        const teile = id.match(/^(.+)_(\d+)$/);
+        if (teile && meta.erfolge[id]) meldeAnDesktop("erfolg", (teile[1] + "_" + (Number(teile[2]) + 1)).toUpperCase());
+    });
+    Object.keys(meta.trophaeen || {}).forEach(id => meldeAnDesktop("erfolg", "POKAL_" + id.toUpperCase()));
+}
+
 function pruefeErfolge() {
     let neu = false;
     erfolgKettenFuer(run.sandbox).forEach(kette => {
@@ -3660,6 +3675,7 @@ function zeigeSieg(pokal) {
     if (!meta.trophaeen) meta.trophaeen = {};
     const neu = !meta.trophaeen[pokal.id];
     if (neu) meta.trophaeen[pokal.id] = { tag: run.tag, datum: new Date().toISOString().slice(0, 10) };
+    meldeAnDesktop("erfolg", "POKAL_" + pokal.id.toUpperCase());
     aktualisierePokalKnopf();
     meta.lebenszeit.pokale = (meta.lebenszeit.pokale || 0) + 1;
     speichereMeta();
@@ -4206,6 +4222,7 @@ function renderTagesKarte() {
     tagesKarteInhalt.innerHTML = html;
     const fruehKnopf = tagesKarteInhalt.querySelector(".karte-frueh-bezahlen");
     if (fruehKnopf) fruehKnopf.addEventListener("click", () => bezahleFrueher());
+    haken("tagesKarte", tagesKarteInhalt, modus);
 
     const istRunEnde = modus === "runEnde";
     karteShop.classList.toggle("versteckt", istRunEnde);

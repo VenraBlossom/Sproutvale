@@ -12704,3 +12704,31 @@ html.touch .feld,
 html.touch .slot {
     touch-action: manipulation;
 }
+
+/* ---------- GEM-SHOP und freiwillige Werbung ---------- */
+.gem-pakete {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.gem-paket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 6px;
+    background: rgba(176, 64, 122, 0.12);
+    border: 2px solid #b0407a;
+    border-radius: 8px;
+}
+.gem-paket-menge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.3em;
+}
+.karte-werbung {
+    display: block;
+    margin: 8px auto 0;
+}

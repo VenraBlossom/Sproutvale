@@ -19,7 +19,15 @@ contextBridge.exposeInMainWorld("sproutvaleDesktop", {
     vollbild: () => ipcRenderer.send("vollbild"),
     steam: {
         erfolg: id => ipcRenderer.send("steam-erfolg", String(id)),
-        status: text => ipcRenderer.send("steam-status", String(text))
+        status: text => ipcRenderer.send("steam-status", String(text)),
+        aktiv: () => ipcRenderer.sendSync("steam-aktiv"),
+        // Pakete, die auf Steam gekauft wurden (z.B. ["unterstuetzer"])
+        dlc: () => ipcRenderer.sendSync("steam-dlc")
+    },
+    // Echte Kaeufe (Gems) ueber Steam, sobald dort eingerichtet
+    kasse: {
+        bereit: () => ipcRenderer.sendSync("kasse-bereit"),
+        kaufe: paketId => ipcRenderer.invoke("kasse-kaufe", String(paketId))
     },
     // Spielstand als Dateien im Ordner "save" im Benutzerordner (%APPDATA%/Sproutvale/save), bleibt bei neuen Versionen erhalten
     speicher: {

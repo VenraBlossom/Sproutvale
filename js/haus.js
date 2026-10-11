@@ -1079,7 +1079,7 @@ function aktualisiereKristallAnzeigen() {
     document.querySelectorAll(".kristall-zahl").forEach(e => { e.textContent = zahl(kristallStand()); });
 }
 
-// Kristall-Anzeige als Knopf (Kristalle kaufen geht noch nicht)
+// Kristall-Anzeige als Knopf: oeffnet den Gem-Shop (kasse.js)
 function kristallKnopf() {
     const knopf = el("button", "knopf kristall-knopf", null, [
         pixelIcon("💎", 22), el("span", "kristall-zahl", zahl(kristallStand())), el("span", "kristall-plus", "+")
@@ -1087,7 +1087,7 @@ function kristallKnopf() {
     setzeTipp(knopf, t("Gems kaufen"));
     knopf.addEventListener("click", () => {
         Klang.klick(8);
-        zeigeToast(t("Gems kann man aktuell noch nicht kaufen."));
+        oeffneGemShop();
     });
     return knopf;
 }

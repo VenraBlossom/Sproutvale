@@ -21,6 +21,10 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 const RUNS = Number(process.env.RUNS) || 6;
 const KPS = Number(process.env.KPS) || 4;
 const TAGE = Number(process.env.TAGE) || 45;
+// Optional: Datei mit JS, das vor der Simulation im Spiel laeuft (Balancing-Varianten testen, ohne den Code zu aendern)
+const PATCH = process.env.PATCH ? fs.readFileSync(process.env.PATCH, "utf8") : "";
+// Optional: eigene Ergebnis-Dateien, damit mehrere Simulationen gleichzeitig laufen koennen
+const NAME = process.env.NAME || "_sim-ergebnis";
 
 // Laeuft im Spiel
 async function simulation(runs, kps, tage) {
@@ -73,7 +77,7 @@ app.whenReady().then(async () => {
     let letzteMeldung = Date.now();
     const uhr = () => Math.round((Date.now() - beginn) / 60000) + "min";
     // Ergebnisse sofort mitschreiben (bleiben erhalten, auch wenn ein spaeterer Run haengt)
-    const jsonl = path.join(__dirname, "..", "_sim-ergebnis.jsonl");
+    const jsonl = path.join(__dirname, "..", NAME + ".jsonl");
     fs.writeFileSync(jsonl, "");
     // Waechter: 15 Minuten ohne jede Meldung = haengt, dann abbrechen
     setInterval(() => {
@@ -101,9 +105,10 @@ app.whenReady().then(async () => {
     await new Promise(ok => setTimeout(ok, 1500));
     const bot = fs.readFileSync(path.join(__dirname, "balancing-bot.js"), "utf8");
     await fenster.webContents.executeJavaScript(bot + "\n;true");
+    if (PATCH) await fenster.webContents.executeJavaScript(PATCH + "\n;true");
     try {
         const ergebnis = await fenster.webContents.executeJavaScript(`(${simulation.toString()})(${RUNS}, ${KPS}, ${TAGE})`);
-        fs.writeFileSync(path.join(__dirname, "..", "_sim-ergebnis.json"), JSON.stringify(ergebnis, null, 1));
+        fs.writeFileSync(path.join(__dirname, "..", NAME + ".json"), JSON.stringify(ergebnis, null, 1));
         process.stdout.write("FERTIG\n");
     } catch (fehler) {
         process.stdout.write("FEHLER " + fehler.message + "\n");

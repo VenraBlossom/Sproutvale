@@ -13,3 +13,7 @@ _*.json
 changes_ignore.txt
 _*.txt
 _*.jsonl
+handy-app/node_modules/
+handy-app/www/
+handy-app/android/
+handy-app/ios/

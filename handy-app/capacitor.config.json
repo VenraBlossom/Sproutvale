@@ -1,0 +1,15 @@
+{
+  "appId": "de.venraystudios.sproutvale",
+  "appName": "Sproutvale",
+  "webDir": "www",
+  "backgroundColor": "#86c457",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "backgroundColor": "#86c457"
+    }
+  }
+}

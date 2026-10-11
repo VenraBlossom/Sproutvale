@@ -3234,7 +3234,15 @@ Object.assign(UEBERSETZUNG, {
     "Balancing: Gold- und Sternensamen-Boni werden jetzt zusammengezählt statt malgenommen (wie die +%-Texte es sagen). Goldmarie und Sternenflut geben +100% pro Stufe. Das späte Spiel explodiert nicht mehr.": "Balancing: Gold and Star Seed bonuses now add up instead of multiplying (as the +% texts say). Goldmarie and Star Flood give +100% per level. The late game no longer explodes.",
     "Energie: Start 160, „Längerer Tag“ +20, Sonnenuhr +8, Grundwert Energie +3%. Alle Prozent-Boni auf Energie zusammen höchstens +100%.": "Energy: start 160, \"Longer Day\" +20, Sundial +8, Base Energy +3%. All percent energy bonuses together at most +100%.",
     "Glühwürmchen kommen früher am Abend, öfter und geben 15 Energie.": "Fireflies come earlier in the evening, more often and give 15 energy.",
-    "+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu.": "+25% gold from all harvests. Can be bought endlessly, adds up with the other gold bonuses."
+    "+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu.": "+25% gold from all harvests. Can be bought endlessly, adds up with the other gold bonuses.",
+    "🎁 +{0} 💎": "🎁 +{0} 💎",
+    "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "The purchase is running in the shop window. Your gems arrive as soon as it is done.",
+    "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "The purchase didn't work. You were not charged.",
+    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Gems can't be bought yet. That will work once Sproutvale is on Steam or in the app stores.",
+    "💎 Gems kaufen": "💎 Buy gems",
+    "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Watch an ad: +{0}% gold on the next day",
+    "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Thanks! +{0}% gold on the next day.",
+    "👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.": "👆 Swipe to move the tree, use two fingers to zoom. \"⭐ Affordable\" jumps to stars you can afford."
 });
 
 // Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)

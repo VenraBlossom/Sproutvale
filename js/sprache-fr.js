@@ -3274,5 +3274,14 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "▶ Duo": "▶ Duo",
     "🌍 Sprache / Language": "🌍 Langue / Language",
     "📖 Tutorial": "📖 Tutoriel",
-    "+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu.": "+25% d'or sur toutes les récoltes. Achetable à l'infini, s'additionne aux autres bonus d'or."
+    "+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu.": "+25% d'or sur toutes les récoltes. Achetable à l'infini, s'additionne aux autres bonus d'or.",
+    "🎁 +{0} 💎": "🎁 +{0} 💎",
+    "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "L'achat se déroule dans la fenêtre de la boutique. Les gemmes arrivent dès qu'il est terminé.",
+    "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "L'achat n'a pas marché. Rien n'a été débité.",
+    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Les gemmes ne s'achètent pas encore. Ce sera possible quand Sproutvale sera sur Steam ou dans les magasins d'applis.",
+    "💎 Gems kaufen": "💎 Acheter des gemmes",
+    "Schließen": "Fermer",
+    "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Regarder une pub : +{0}% d'or le jour suivant",
+    "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Merci ! +{0}% d'or le jour suivant.",
+    "👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.": "👆 Glisse pour déplacer l'arbre, deux doigts pour zoomer. « ⭐ Abordable » saute aux étoiles que tu peux t'offrir."
 });

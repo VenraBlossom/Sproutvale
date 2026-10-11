@@ -1,0 +1,21 @@
+{
+  "name": "sproutvale-handy",
+  "version": "0.4.2",
+  "private": true,
+  "description": "Sproutvale als Handy-App (Android und iOS) mit Capacitor",
+  "scripts": {
+    "kopieren": "node kopiere-spiel.js",
+    "android": "node kopiere-spiel.js && npx cap sync android && npx cap open android",
+    "ios": "node kopiere-spiel.js && npx cap sync ios && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor-community/admob": "^6.0.0",
+    "@revenuecat/purchases-capacitor": "^9.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
