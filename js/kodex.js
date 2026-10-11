@@ -21,7 +21,7 @@ function kodexEintraege(reiter) {
                         (p.eigenschaftText ? " " + p.eigenschaftText : ""),
                     zaehler: t("geerntet"),
                     extra: t("🏅 Meisterschaft ") + stufe + "/" + MEISTER_SCHWELLEN.length +
-                        (stufe > 0 ? " (+" + Math.round(MEISTER_BONUS * 100 * stufe) + t("% Wert)") : "") +
+                        (stufe > 0 ? " (+" + Math.round(meisterBonus() * 100 * stufe) + t("% Wert)") : "") +
                         (naechste ? t(" · nächste bei ") + zahl(naechste) : t(" · Maximum!"))
                 };
             });
@@ -109,7 +109,7 @@ function pruefeKodexBelohnungen() {
         const neu = stufe - meta.kodexStufe;
         meta.kodexStufe = stufe;
         meta.gutscheine += neu;
-        zeigeToast("📖 Kodex: " + summe + t(" Entdeckungen! +") + neu + t(" 🎟️ Kuschel-Gutschein"));
+        zeigeToast(t("📖 Kodex: ") + summe + t(" Entdeckungen! +") + neu + t(" 🎟️ Kuschel-Gutschein"));
         geaendert = true;
     }
     if (geaendert) speichereMeta();

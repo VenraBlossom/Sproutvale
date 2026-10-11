@@ -451,7 +451,7 @@ function wendeWareAn(id) {
     } else if (id === "gutschein") {
         meta.gutscheine += 1;
         speichereMeta();
-        zeigeToast("🎟️ +1 Kuschel-Gutschein");
+        zeigeToast(t("🎟️ +1 Kuschel-Gutschein"));
     }
 }
 

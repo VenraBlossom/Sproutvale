@@ -93,7 +93,7 @@ function wechsleTarotSlot(karte) {
         slots.push(karte.id);
         Klang.stern();
     } else {
-        zeigeToast("Alle " + KONFIG.tarotSlots + t(" Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab."));
+        zeigeToast(tf("Alle {0} Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.", KONFIG.tarotSlots));
         Klang.fehler();
         return false;
     }

@@ -686,7 +686,7 @@ function ueberflussChance(pflanze) { return 0.05 * pflanze.level.ueberfluss; }
 
 function sammelRadius() {
     let radius = KONFIG.basisSammelRadius * Math.pow(KONFIG.sammelRadiusFaktor, Math.min(level("radius"), 29)) *
-        (1 + 0.04 * kuschel("igelchen"));
+        (1 + 0.04 * kuschel("igelchen")) * (1 + 0.2 * segen("sammelwut"));
     if (wetterIst("nebel") && !hatWerkzeug("strohhut")) radius *= 0.7;
     return radius;
 }
@@ -3929,7 +3929,7 @@ function zeigeBrief() {
     const gold = Math.max(5, aufrunden(0.12 * naechsteRechnung().betrag));
     const sterne = 15 + 5 * run.tag;
     const geschenkText = {
-        gold: "+" + zahl(gold) + " Gold",
+        gold: "+" + zahl(gold) + t(" Gold"),
         sterne: "+" + zahl(sterne) + t(" Sternensamen"),
         energie: t("+40 Energie morgen"),
         duenger: t("+3 gedüngte Felder morgen")
@@ -4663,7 +4663,7 @@ function renderShop() {
                 sekText(basisStufenZeitSek(pflanze) * 3) + t(" bis zur Ernte")),
             eigenschaftText(pflanze) ? el("div", "markt-pflanze-eigenschaft", eigenschaftText(pflanze)) : null,
             meister > 0 ? el("div", "markt-pflanze-eigenschaft", t("🏅 Meisterschaft ") + meister + t(": für immer +") +
-                Math.round(MEISTER_BONUS * 100 * meister) + t("% Wert")) : null
+                Math.round(meisterBonus() * 100 * meister) + t("% Wert")) : null
         ])
     ]));
 
@@ -4900,7 +4900,7 @@ $("baum-mitte").addEventListener("click", () => springeZu(BAUM_ZIELE[0].pos[0], 
 // "?" im Stellarium: die Erklaerungen, die sonst immer im Weg standen
 $("baum-hilfe").addEventListener("click", () => {
     const punkte = [
-        t("✨ Sternensamen bekommst du bei jeder Ernte (5 pro Ernte) und für jeden Klick auf den Samenladen, der einen Samen wirft (") +
+        tf("✨ Sternensamen bekommst du bei jeder Ernte ({0} pro Ernte) und", KONFIG.sternensamenProErnte) + t(" für jeden Klick auf den Samenladen, der einen Samen wirft (") +
             sternensamenProKlick() + t(" pro Klick)."),
         TOUCH_GERAET ? t("👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.")
             : t("🖱️ Ziehen verschiebt den Baum, das Mausrad zoomt. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst."),
@@ -5226,7 +5226,8 @@ function renderModusKarten() {
     ].forEach(modus => {
         const frei = !modus.sandbox || hatSandbox();
         const stand = frei ? modusStand(modus.sandbox) : null;
-        const aktiv = run && run.sandbox === modus.sandbox && run.phase !== "runEnde";
+        // "Zuletzt gespielt" erst, wenn in diesem Modus schon gespielt wurde (nicht bei einem ganz neuen Spiel)
+        const aktiv = run && run.sandbox === modus.sandbox && run.phase !== "runEnde" && Boolean(stand && !stand.neu);
         const karte = el("button", "modus-karte" + (frei ? "" : " gesperrt") + (aktiv ? " zuletzt" : ""));
         karte.dataset.modus = modus.sandbox ? "sandbox" : "standard";
         karte.style.setProperty("--zuletzt-text", JSON.stringify(t("Zuletzt gespielt")));
@@ -5598,108 +5599,6 @@ function speichereInSlot(slot) {
     zeigeToast(tf("💾 Gespeichert: Speicherstand {0}", slot));
 }
 
-// ---------- SPIELSTAND LADEN: Dateien auswaehlen (geht im Browser und in der Desktop-App) ----------
-const IMPORT_DATEIEN = {
-    "fortschritt.json": "sproutvale_meta",
-    "sandbox-fortschritt.json": "sproutvale_meta_sandbox",
-    "run.json": "sproutvale_run",
-    "sandbox.json": "sproutvale_sandbox",
-    "einstellungen.json": "sproutvale_einstellungen",
-    "kaeufe.dat": "sproutvale_kaeufe",
-    "beta.dat": "sproutvale_beta"
-};
-
-// Alles in EINER Datei sichern (alle Spielstaende, Mondteich, Kaeufe, Einstellungen); "Spielstand laden" liest sie wieder ein
-const SICHERUNG_TYP = "sproutvale-sicherung";
-$("spielstand-exportieren")?.addEventListener("click", () => {
-    speichereRun();
-    speichereMeta();
-    const daten = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const schluessel = localStorage.key(i);
-        if (schluessel && schluessel.startsWith("sproutvale_")) daten[schluessel] = localStorage.getItem(schluessel);
-    }
-    const datei = new Blob([JSON.stringify({ typ: SICHERUNG_TYP, version: SPIEL_VERSION, datum: new Date().toISOString(), daten })],
-        { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(datei);
-    link.download = "sproutvale-spielstand-" + new Date().toISOString().slice(0, 10) + ".json";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-    Klang.kaufen();
-    zeigeToast(t("📤 Spielstand gesichert. Mit „Spielstand laden“ kannst du ihn wieder einspielen."));
-});
-
-$("spielstand-importieren")?.addEventListener("click", () => $("import-dateien").click());
-$("import-dateien")?.addEventListener("change", async event => {
-    const dateien = [...event.target.files];
-    event.target.value = "";
-    const gefunden = [];
-    for (const datei of dateien) {
-        const name = datei.name.toLowerCase();
-        // Sicherung aus "Spielstand sichern": alles in einer Datei
-        if (name.startsWith("sproutvale-spielstand")) {
-            try {
-                const inhalt = JSON.parse(await datei.text());
-                if (inhalt.typ === SICHERUNG_TYP && inhalt.daten) {
-                    Object.entries(inhalt.daten).forEach(([schluessel, text]) => {
-                        if (schluessel.startsWith("sproutvale_") && typeof text === "string") gefunden.push({ name: datei.name, schluessel, text });
-                    });
-                }
-            } catch (fehler) {
-                console.warn("Datei ist kein gueltiger Spielstand", datei.name);
-            }
-            continue;
-        }
-        const endlos = name.match(/^persistedsavefile_([1-3])\.json$/);
-        if (endlos) {
-            // Endlos-Speicherstand: Fortschritt und Hof stehen zusammen in einer Datei
-            try {
-                const inhalt = JSON.parse(await datei.text());
-                const slot = Number(endlos[1]);
-                if (inhalt.fortschritt) gefunden.push({ name: datei.name, schluessel: endlosMetaKey(slot), text: JSON.stringify(inhalt.fortschritt) });
-                if (inhalt.run) gefunden.push({ name: datei.name + " (Hof)", schluessel: runSpeicherKey(true, slot), text: JSON.stringify(inhalt.run) });
-            } catch (fehler) {
-                console.warn("Datei ist kein gueltiger Spielstand", datei.name);
-            }
-            continue;
-        }
-        const schluessel = IMPORT_DATEIEN[name];
-        if (!schluessel) continue;
-        const text = await datei.text();
-        try {
-            JSON.parse(text);
-            gefunden.push({ name: datei.name, schluessel, text });
-        } catch (fehler) {
-            console.warn("Datei ist kein gueltiger Spielstand", datei.name);
-        }
-    }
-    if (gefunden.length === 0) {
-        Klang.fehler();
-        zeigeToast(t("Keine passende Spielstand-Datei gefunden (fortschritt.json, run.json, persistedsavefile_1.json, kaeufe.dat …)."));
-        return;
-    }
-    zeigePopup({
-        titel: t("📥 Spielstand laden?"),
-        breite: 560,
-        inhalt: el("div", "warn-inhalt", null, [
-            el("p", null, t("Diese Dateien ersetzen deinen aktuellen Stand:")),
-            el("p", null, [...new Set(gefunden.map(g => g.name))].map(name => "📄 " + name).join("   ")),
-            el("p", null, t("Danach startet das Spiel neu."))
-        ]),
-        knoepfe: [
-            { text: t("Abbrechen"), klasse: "knopf" },
-            { text: t("✅ Jetzt laden"), klasse: "knopf-gruen", aktion: () => {
-                speichernGesperrt = true;
-                gefunden.forEach(g => localStorage.setItem(g.schluessel, g.text));
-                setTimeout(() => location.reload(), 300);
-            } }
-        ]
-    });
-});
-
 // Lautstaerke: Regler oder Klick aufs Symbol (stumm / wieder die vorige Lautstaerke)
 const musikStumm = $("musik-stumm");
 const sfxStumm = $("sfx-stumm");
@@ -5721,7 +5620,7 @@ function setzeLautstaerke(art, wert) {
 }
 
 function wechsleStumm(art) {
-    const vorherKey = art + t("Vorher");
+    const vorherKey = art + "Vorher";
     if (einstellungen[art] > 0) {
         einstellungen[vorherKey] = einstellungen[art];
         setzeLautstaerke(art, 0);
@@ -6346,7 +6245,7 @@ registriereHaken("tagStart", () => {
     if (level("sternenkalender") > 0) {
         const geschenk = Math.round(60 * Math.pow(1.6, bestePflanze().index));
         gibSternensamen(geschenk);
-        zeigeToast("📅 Sternenkalender: +" + zahl(geschenk) + t(" Sternensamen zum ") + z.name + "!");
+        zeigeToast(tf("📅 Sternenkalender: +{0} Sternensamen zum {1}!", zahl(geschenk), z.name));
         aktualisiereTopBar();
     }
 });

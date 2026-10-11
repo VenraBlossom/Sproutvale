@@ -318,13 +318,15 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
     aura.className = "gebaeude-aura";
     flaeche.appendChild(aura);
     let sprite = null;
+    // Deckkraft aller Pixel einmal merken (nicht bei jeder Mausbewegung neu aus der Leinwand lesen)
+    let alpha = null;
     const deckend = event => {
-        if (!sprite) return false;
+        if (!sprite || !alpha) return false;
         const rect = flaeche.getBoundingClientRect();
         const x = Math.floor((event.clientX - rect.left) / rect.width * sprite.width);
         const y = Math.floor((event.clientY - rect.top) / rect.height * sprite.height);
         if (x < 0 || y < 0 || x >= sprite.width || y >= sprite.height) return false;
-        return sprite.getContext("2d").getImageData(x, y, 1, 1).data[3] > 0;
+        return alpha[(y * sprite.width + x) * 4 + 3] > 0;
     };
     registriereHaken("landschaftGezeichnet", szene => {
         const g = szene[teil];
@@ -342,7 +344,8 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
         aura.style.top = (-r / g.h) * 100 + "%";
         aura.style.width = ((g.b + 2 * r) / g.b) * 100 + "%";
         aura.style.height = ((g.h + 2 * r) / g.h) * 100 + "%";
-        const daten = sprite.getContext("2d").getImageData(0, 0, g.b, g.h).data;
+        alpha = sprite.getContext("2d").getImageData(0, 0, sprite.width, sprite.height).data;
+        const daten = sprite.width === g.b ? alpha : sprite.getContext("2d").getImageData(0, 0, g.b, g.h).data;
         const voll = (x, y) => x >= 0 && y >= 0 && x < g.b && y < g.h && daten[(y * g.b + x) * 4 + 3] > 0;
         const stift = aura.getContext("2d");
         stift.clearRect(0, 0, aura.width, aura.height);

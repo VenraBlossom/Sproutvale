@@ -16,7 +16,7 @@ Object.assign(UEBERSETZUNG, {
     " Sek.": " sec.",
     "Weizen": "Wheat",
     "Goldene Garbe": "Golden Sheaf",
-    "Jede Weizen-Ernte gibt 5 Sternensamen extra.": "Every wheat harvest gives 5 extra Star Seeds.",
+    "Jede Weizen-Ernte gibt 10 Sternensamen extra.": "Every wheat harvest gives 10 extra Star Seeds.",
     "Karotte": "Carrot",
     "Knackige Karotten": "Crunchy Carrots",
     "Karotten wachsen 50% schneller.": "Carrots grow 50% faster.",
@@ -150,7 +150,7 @@ Object.assign(UEBERSETZUNG, {
     "Jede 30. Ernte an einem Tag startet einen Ernterausch: 6 Sekunden lang dreifaches Gold.": "Every 30th harvest of a day starts a Harvest Frenzy: triple gold for 6 seconds.",
     "Aktiv": "Active",
     "Nicht aktiv": "Not active",
-    "+20% Sternensamen aus Ernten.": "+20% Star Seeds from harvests.",
+    "+40% Sternensamen aus Ernten.": "+40% Star Seeds from harvests.",
     " Sternensamen": " Star Seeds",
     "Jede Ernte gibt 2 Sternensamen mehr.": "Every harvest gives 2 more Star Seeds.",
     " pro Ernte": " per harvest",
@@ -464,7 +464,7 @@ Object.assign(UEBERSETZUNG, {
     "Jede 2. Rechnung ist ein Kredit mit Auflage.": "Every 2nd bill is a loan with a condition.",
     "10% weniger Energie pro Tag.": "10% less energy per day.",
     "Es kommen mehr Krähen, und Segen gibt es nur noch 3 zur Auswahl.": "More crows come, and you only get 3 blessings to choose from.",
-    "Jede Rechnung steigt um x3 mehr als sonst (z.B. x28 statt x25).": "Every bill rises x3 more than usual (e.g. x28 instead of x25).",
+    "Jede Rechnung steigt um x3 mehr als sonst (z.B. x29 statt x26).": "Every bill rises x3 more than usual (e.g. x29 instead of x26).",
     "Frühling": "Spring",
     "Pflanzen wachsen 20% schneller.": "Plants grow 20% faster.",
     "Sommer": "Summer",
@@ -547,7 +547,7 @@ Object.assign(UEBERSETZUNG, {
     "Jede Ernte gibt +": "Every harvest gives +",
     " Kombo und füllt die Kombo-Zeit auf.": " combo and refills the combo time.",
     "Sternensamen-Säckchen": "Star Seed Pouch",
-    "+ Sternensamen (100 + so viele, wie du heute gesammelt hast).": "+ Star Seeds (100 + as many as you collected today).",
+    "+ Sternensamen (20 + doppelt so viele, wie du heute gesammelt hast).": "+ Star Seeds (20 + twice as many as you collected today).",
     "Goldener Samen": "Golden Seed",
     "Dein erster Samen am nächsten Tag wird golden.": "Your first seed on the next day becomes golden.",
     "Energie-Elixier": "Energy Elixir",
@@ -3242,7 +3242,16 @@ Object.assign(UEBERSETZUNG, {
     "💎 Gems kaufen": "💎 Buy gems",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Watch an ad: +{0}% gold on the next day",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Thanks! +{0}% gold on the next day.",
-    "👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.": "👆 Swipe to move the tree, use two fingers to zoom. \"⭐ Affordable\" jumps to stars you can afford."
+    "👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.": "👆 Swipe to move the tree, use two fingers to zoom. \"⭐ Affordable\" jumps to stars you can afford.",
+    "✨ Sternensamen bekommst du bei jeder Ernte ({0} pro Ernte) und": "✨ You get Star Seeds with every harvest ({0} per harvest) and",
+    " für jeden Klick auf den Samenladen, der einen Samen wirft (": " for every click on the Seed Stall that throws a seed (",
+    " (max)": " (max)",
+    "📅 Sternenkalender: +{0} Sternensamen zum {1}!": "📅 Star Calendar: +{0} Star Seeds for {1}!",
+    "% Gold aus allen Ernten und +": "% gold from all harvests and +",
+    "% Sternensamen aus Ernten und +": "% Star Seeds from harvests and +",
+    "🎟️ +1 Kuschel-Gutschein": "🎟️ +1 Plush Voucher",
+    "Alle {0} Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.": "All {0} slots are taken. Unequip an equipped card first.",
+    "📖 Kodex: ": "📖 Codex: "
 });
 
 // Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)

@@ -342,7 +342,7 @@ const KONFIG = {
 // unlockKosten in Sternensamen. "eigenschaft" = kleine Besonderheit dieser Pflanze (Wirkung in script.js).
 
 const PFLANZEN_VORLAGEN = [
-    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 1.6, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 5 Sternensamen extra.") },
+    { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 1.6, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 10 Sternensamen extra.") },
     { id: "karotte", name: t("Karotte"), emoji: "🥕", sekProStufe: 2.5, verkaufswert: 5, unlockKosten: 120, bonusName: t("Knackige Karotten"), bonusText: t("Karotten wachsen 50% schneller.") },
     { id: "kartoffel", name: t("Kartoffel"), emoji: "🥔", sekProStufe: 3, verkaufswert: 12, unlockKosten: 210, bonusName: t("Knollenfund"), bonusText: t("20% Chance, dass eine Kartoffel eine zweite Saat fallen lässt.") },
     { id: "erdbeere", name: t("Erdbeere"), emoji: "🍓", sekProStufe: 3.5, verkaufswert: 30, unlockKosten: 370, bonusName: t("Süße Beeren"), bonusText: t("Saaten von Erdbeeren sind mindestens ungewöhnlich.") },
@@ -604,7 +604,7 @@ const SKILLS = [
         t("Jede 30. Ernte an einem Tag startet einen Ernterausch: 6 Sekunden lang dreifaches Gold."),
         () => (level("ernterausch") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
     stern("sternenstaub", "ernte", "🌠", [740, -660], "schwereMuenzen", t("Sternenstaub"), 150, 2.3, 10,
-        t("+20% Sternensamen aus Ernten."),
+        t("+40% Sternensamen aus Ernten."),
         () => "+" + prozentText(0.4 * level("sternenstaub")) + t(" Sternensamen")),
     stern("sternenquelle", "ernte", "⛲", [960, -660], "sternenstaub", t("Sternenquelle"), 400, 2, 10,
         t("Jede Ernte gibt 2 Sternensamen mehr."),
@@ -1239,7 +1239,7 @@ const MONDPHASEN = [
     { symbol: "🌓", name: t("Halbmond"), text: t("Jede 2. Rechnung ist ein Kredit mit Auflage.") },
     { symbol: "🌔", name: t("Dreiviertelmond"), text: t("10% weniger Energie pro Tag.") },
     { symbol: "🌕", name: t("Vollmond"), text: t("Es kommen mehr Krähen, und Segen gibt es nur noch 3 zur Auswahl.") },
-    { symbol: "✨", name: t("Sternenmond"), text: t("Jede Rechnung steigt um x3 mehr als sonst (z.B. x28 statt x25).") },
+    { symbol: "✨", name: t("Sternenmond"), text: t("Jede Rechnung steigt um x3 mehr als sonst (z.B. x29 statt x26).") },
     { symbol: "🌟", name: t("Sternenmond II"), text: t("Jede Rechnung steigt um weitere x3.") },
     { symbol: "💫", name: t("Sternenmond III"), text: t("Jede Rechnung steigt um weitere x3.") },
     { symbol: "🌠", name: t("Sternenmond IV"), text: t("Jede Rechnung steigt um weitere x3.") },
@@ -1445,7 +1445,7 @@ const EVOLUTION_FAKTOR = 2;
 // Weitere Angebote des Haendlers (neben Werkzeugen). menge/preis werden in ereignisse.js berechnet.
 const HAENDLER_WAREN = [
     { id: "sternenbeutel", name: t("Sternensamen-Säckchen"), symbol: "👝", preis: 0.35,
-        text: t("+ Sternensamen (100 + so viele, wie du heute gesammelt hast).") },
+        text: t("+ Sternensamen (20 + doppelt so viele, wie du heute gesammelt hast).") },
     { id: "goldsamen", name: t("Goldener Samen"), symbol: "🌟", preis: 0.5, text: t("Dein erster Samen am nächsten Tag wird golden.") },
     { id: "elixier", name: t("Energie-Elixier"), symbol: "🧃", preis: 0.25, text: t("+60 Energie am nächsten Tag.") },
     { id: "gutschein", name: t("Kuschel-Gutschein"), symbol: "🎟️", preis: 3, text: t("Ein Gutschein für den Kuschel-Automaten im Mondteich (bleibt für immer).") },
@@ -2479,9 +2479,9 @@ const KUSCHELTIERE = [
         text: s => t("Legendäre Saaten sind ") + 20 * s + t("% mehr wert.") },
     // Mythisch
     { id: "mondhase", symbol: "🌙", name: t("Mondhase"), raritaet: 5,
-        text: s => multiText(Math.pow(1.25, s)) + t(" Gold aus allen Ernten und +") + 10 * s + t("% Mondblüten am Run-Ende.") },
+        text: s => "+" + 25 * s + t("% Gold aus allen Ernten und +") + 10 * s + t("% Mondblüten am Run-Ende.") },
     { id: "manta", symbol: "🐟", name: t("Mantarochen"), raritaet: 5,
-        text: s => multiText(1 + 0.2 * s) + t(" Sternensamen aus Ernten und +") + 5 * s + t("% Glück bei allen Glücksspielen.") }
+        text: s => "+" + 20 * s + t("% Sternensamen aus Ernten und +") + 5 * s + t("% Glück bei allen Glücksspielen.") }
 ];
 const KUSCHEL_NACH_ID = Object.fromEntries(KUSCHELTIERE.map(k => [k.id, k]));
 
