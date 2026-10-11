@@ -10534,6 +10534,39 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     box-shadow: 0 0 0 3px #ffd93d inset;
 }
 
+/* ---------- Markt: Kaufmenge x1 / x10 / Max ---------- */
+.markt-menge {
+    display: flex;
+    gap: 4px;
+}
+.markt-menge:empty {
+    display: none;
+}
+.markt-kopf .markt-gold {
+    margin-left: 0;
+}
+.markt-menge-knopf {
+    min-width: 0;
+    padding: 4px 10px;
+    font-size: 0.95em;
+    opacity: 0.7;
+}
+.markt-menge-knopf.aktiv {
+    opacity: 1;
+    box-shadow: 0 0 0 3px #ffd93d inset;
+}
+
+/* Stellarium: mehrere Stufen auf einmal */
+.stern-karte-max {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    margin-top: 6px;
+    font-size: 0.9em;
+}
+
 /* ---------- Roulette ---------- */
 .roulette-wetten .roulette-wette.aktiv {
     box-shadow: 0 0 0 3px #ffd93d inset;

@@ -801,10 +801,14 @@ function variantenChance(variante) {
 }
 
 function feldKosten(seite = eigeneSeite()) {
-    // Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
-    // Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
     // Im Koop hat jede Seite ihre eigene Preisleiter.
-    const felder = seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length;
+    return feldPreisBei(seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length);
+}
+
+// Preis des naechsten Feldes, wenn man schon "felder" Felder hat.
+// Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
+// Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
+function feldPreisBei(felder) {
     const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
         Math.pow(0.85, segen("sparsam")) * Math.pow(0.8, segen("feldarbeit")) * (1 + 2 * hf("teurefelder")) * (1 - 0.1 * hfGeschafft("teurefelder")) * (run.koop ? KOOP_ANFORDERUNG : 1));
@@ -1773,16 +1777,22 @@ function maxEigeneFelder() {
     return seite ? FELD_POSITIONEN.filter(pos => (seite === "links") === pos.links).length : MAX_FELDER;
 }
 
-function kaufeFeld() {
-    // Im Koop nur auf der eigenen Seite (der Platz des Mitspielers gehoert ihm)
-    const slot = naechsterSlot(eigeneSeite());
-    const kosten = feldKosten();
-    if (slot < 0 || !darfEinkaufen() || run.gold < kosten || run.felder.length >= maxEigeneFelder()) return;
-    run.gold -= kosten;
-    erstelleFeld(slot);
+// anzahl = so viele Felder auf einmal (Markt: x10 oder Max), solange das Gold reicht
+function kaufeFeld(anzahl = 1) {
+    let gekauft = 0;
+    for (let i = 0; i < anzahl; i++) {
+        // Im Koop nur auf der eigenen Seite (der Platz des Mitspielers gehoert ihm)
+        const slot = naechsterSlot(eigeneSeite());
+        const kosten = feldKosten();
+        if (slot < 0 || !darfEinkaufen() || run.gold < kosten || run.felder.length >= maxEigeneFelder()) break;
+        run.gold -= kosten;
+        erstelleFeld(slot);
+        gekauft += 1;
+        const { x, y } = feldMitte(run.felder[run.felder.length - 1]);
+        partikel(x, y, ["#8a5a2b", "#c89b6a", "#6cc24a"], 10, 50);
+    }
+    if (gekauft === 0) return;
     Klang.kaufen();
-    const { x, y } = feldMitte(run.felder[run.felder.length - 1]);
-    partikel(x, y, ["#8a5a2b", "#c89b6a", "#6cc24a"], 10, 50);
     aktualisiereAlles();
 }
 
@@ -4485,9 +4495,10 @@ function upgradeKarte(def, waehrung) {
     });
 }
 
-function kaufeUpgrade(def, waehrung) {
-    const kosten = waehrung === "skillpunkte" ? knotenKosten(def) : kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
-    if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < kosten) return;
+// anzahl = so viele Stufen auf einmal (Markt x10/Max, Stellarium Max), solange das Guthaben reicht
+function kaufeUpgrade(def, waehrung, anzahl = 1) {
+    const ersteKosten = waehrung === "skillpunkte" ? knotenKosten(def) : kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
+    if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < ersteKosten) return;
     if (waehrung === "skillpunkte" && !stellariumFrei()) return;
     if (def.erledigt && def.erledigt()) return;
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
@@ -4499,8 +4510,12 @@ function kaufeUpgrade(def, waehrung) {
         zeigeToast(t("🌾 Herausforderung „Nur Weizen“: keine neuen Pflanzen."));
         return;
     }
-    bezahle(waehrung, kosten);
-    run.level[def.id] = level(def.id) + 1;
+    for (let i = 0; i < anzahl; i++) {
+        const kosten = waehrung === "skillpunkte" ? knotenKosten(def) : kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
+        if (level(def.id) >= def.max || guthaben(waehrung) < kosten) break;
+        bezahle(waehrung, kosten);
+        run.level[def.id] = level(def.id) + 1;
+    }
     if (def.id === "stellarium") {
         meta.stellariumFrei = true;
         speichereMeta();
@@ -4516,30 +4531,63 @@ function kaufeUpgrade(def, waehrung) {
 
 // Weizen-Upgrades sind 10% billiger (der Einstieg soll flott gehen)
 // Ertrag ist auf den ersten Stufen guenstiger (Stufe 1 halber Preis, ab Stufe 10 normal): der Einstieg geht flott
-function pflanzenUpgradeKosten(pflanze, upgrade) {
-    const stufe = pflanze.level[upgrade.id];
+function pflanzenUpgradeKosten(pflanze, upgrade, stufe = pflanze.level[upgrade.id]) {
     const einstieg = upgrade.id === "ertrag" ? Math.min(1, 0.5 + 0.05 * stufe) : 1;
     return Math.max(1, Math.round(kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert * (pflanze.id === "weizen" ? 0.9 : 1), upgrade.faktor, stufe) * einstieg));
 }
 
-function kaufePflanzenUpgrade(pflanze, upgrade) {
-    const kosten = pflanzenUpgradeKosten(pflanze, upgrade);
-    if (!darfEinkaufen() || !pflanzenUpgradeFrei(pflanze, upgrade) || pflanze.level[upgrade.id] >= upgrade.max || run.gold < kosten) return;
-    run.gold -= kosten;
-    pflanze.level[upgrade.id] += 1;
-    // selbst gekaufte Ertrag-Stufen zaehlen fuer das Freischalten der naechsten Pflanze (geerbte Stufen nicht)
-    if (upgrade.id === "ertrag") pflanze.level.ertragEigen = (pflanze.level.ertragEigen || 0) + 1;
+// anzahl = so viele Stufen auf einmal (Markt: x10 oder Max), solange das Gold reicht
+function kaufePflanzenUpgrade(pflanze, upgrade, anzahl = 1) {
+    if (!darfEinkaufen() || !pflanzenUpgradeFrei(pflanze, upgrade)) return;
+    let gekauft = 0;
+    let verdoppelt = false;
+    for (let i = 0; i < anzahl; i++) {
+        const kosten = pflanzenUpgradeKosten(pflanze, upgrade);
+        if (pflanze.level[upgrade.id] >= upgrade.max || run.gold < kosten) break;
+        run.gold -= kosten;
+        pflanze.level[upgrade.id] += 1;
+        gekauft += 1;
+        // selbst gekaufte Ertrag-Stufen zaehlen fuer das Freischalten der naechsten Pflanze (geerbte Stufen nicht)
+        if (upgrade.id === "ertrag") pflanze.level.ertragEigen = (pflanze.level.ertragEigen || 0) + 1;
+        if (upgrade.id === "ertrag" && pflanze.level.ertrag % 10 === 0) verdoppelt = true;
+    }
+    if (gekauft === 0) return;
     Klang.kaufen();
-    if (upgrade.id === "ertrag" && pflanze.level.ertrag % 10 === 0) {
-        zeigeBanner(pflanze.emoji, pflanze.name + t(": Ertrag Stufe ") + pflanze.level.ertrag, t("Wert verdoppelt!"), "#e0a800", 2600);
+    if (verdoppelt) {
+        zeigeBanner(pflanze.emoji, pflanze.name + t(": Ertrag Stufe ") + Math.floor(pflanze.level.ertrag / 10) * 10, t("Wert verdoppelt!"), "#e0a800", 2600);
         Klang.jackpot();
     }
     aktualisiereAlles();
 }
 
+// ---------- KAUFMENGE (Markt: x1, x10 oder so viel wie moeglich; Umschalter oben im Markt) ----------
+// kostenBei(stufe) = Preis von Stufe "stufe" auf "stufe + 1". Ergebnis { anzahl, kosten }:
+// x1 und x10 = genau so viele Stufen (weniger nur, wenn das Maximum erreicht ist),
+// "max" = so viele, wie das Guthaben reicht (reicht es fuer keine, steht der Preis einer Stufe da).
+const KAUF_MENGEN = [1, 10, "max"];
+function kaufMenge() {
+    return KAUF_MENGEN.includes(einstellungen.kaufMenge) ? einstellungen.kaufMenge : 1;
+}
+function kaufPaket(kostenBei, stufe, max, guthabenWert, menge = kaufMenge()) {
+    const grenze = Math.min(max - stufe, menge === "max" ? 1000 : menge);
+    let anzahl = 0;
+    let kosten = 0;
+    while (anzahl < grenze) {
+        const preis = kostenBei(stufe + anzahl);
+        if (menge === "max" && anzahl > 0 && kosten + preis > guthabenWert) break;
+        kosten += preis;
+        anzahl += 1;
+        if (menge === "max" && kosten > guthabenWert) break;
+    }
+    return { anzahl: Math.max(1, anzahl), kosten };
+}
+
 // Eine Stand-Karte auf dem Markt: Symbol, Name, Stufe, Wirkung, "Du hast jetzt", Stufenpunkte, Kaufknopf
-function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten, onKauf, zusatz }) {
+// kostenBei(stufe) = Preis einer Stufe: dann gilt die Kaufmenge (x1, x10, Max). Shift + Klick kauft immer so viel wie moeglich.
+function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten, kostenBei, onKauf, zusatz }) {
     const istMax = lvl >= max;
+    const paket = kostenBei && !istMax ? kaufPaket(kostenBei, lvl, max, run.gold) : { anzahl: 1, kosten };
+    kosten = paket.kosten;
     const leistbar = !istMax && darfEinkaufen() && run.gold >= kosten;
     const bild = pixelIcon(icon, 48);
     const karte = el("div", "markt-karte" + (istMax ? " maximal" : "") + (leistbar ? " leistbar" : ""), null, [
@@ -4555,9 +4603,13 @@ function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten,
         jetzt ? el("div", "markt-karte-jetzt", null, [el("span", null, t("Du hast jetzt: ")), el("b", null, jetzt)]) : null,
         max > 1 && max <= 15 ? stufenPunkte(lvl, max) : null
     ]);
-    const knopf = el("button", "knopf markt-kaufen", istMax ? t("✔ Maximal") : "💰 " + zahl(kosten) + t(" Gold"));
+    const knopf = el("button", "knopf markt-kaufen", istMax ? t("✔ Maximal") : "💰 " + zahl(kosten) + t(" Gold") +
+        (paket.anzahl > 1 ? " · x" + paket.anzahl : ""));
     knopf.disabled = !leistbar;
-    knopf.addEventListener("click", onKauf);
+    knopf.addEventListener("click", event => {
+        const anzahl = event.shiftKey && kostenBei ? kaufPaket(kostenBei, lvl, max, run.gold, "max").anzahl : paket.anzahl;
+        onKauf(anzahl);
+    });
     karte.appendChild(knopf);
     return karte;
 }
@@ -4591,12 +4643,32 @@ function renderMarktModus() {
     });
 }
 
+// Umschalter x1 / x10 / Max oben im Markt (gilt fuer Felder und alle Upgrades, wird gemerkt)
+function renderKaufMenge() {
+    const leiste = $("markt-menge");
+    leiste.innerHTML = "";
+    if (marktModus === "glueck") return;
+    KAUF_MENGEN.forEach(menge => {
+        const knopf = el("button", "knopf markt-menge-knopf" + (kaufMenge() === menge ? " aktiv" : ""), menge === "max" ? t("Max") : "x" + menge);
+        setzeTipp(knopf, (menge === "max" ? t("So viele Stufen kaufen, wie dein Gold reicht") : tf("{0} Stufen auf einmal kaufen", menge)) +
+            (TOUCH_GERAET ? "" : "\n" + t("Tipp: Shift + Klick kauft immer so viel wie möglich.")));
+        knopf.addEventListener("click", () => {
+            einstellungen.kaufMenge = menge;
+            speichereEinstellungen();
+            Klang.klick(8);
+            renderShop();
+        });
+        leiste.appendChild(knopf);
+    });
+}
+
 function renderShop() {
     // Waehrend eine Muenze fliegt oder die Huehner rennen, wird der Glueck-Reiter nicht neu aufgebaut
     if (glueckAnimation && marktModus === "glueck" && !shopPanel.classList.contains("hidden")) return;
     if (!hatGluecksspiel()) marktModus = "markt";
     renderMarktModus();
 
+    renderKaufMenge();
     const goldAnzeige = $("markt-gold");
     goldAnzeige.innerHTML = "";
     goldAnzeige.append(spriteIcon("muenze"), " " + zahl(run.gold) + t(" Gold"));
@@ -4633,14 +4705,15 @@ function renderShop() {
             icon: "🌱", name: t("Neues Feld"), lvl: run.felder.length, max: maxEigeneFelder(),
             beschreibung: t("Erweitert deinen Acker um ein Feld. Geht auch über das + Schild auf dem Acker."),
             jetzt: run.felder.length + t(" von ") + maxEigeneFelder() + t(" Feldern"),
-            kosten: feldKosten(), onKauf: kaufeFeld
+            kosten: feldKosten(), kostenBei: feldPreisBei, onKauf: anzahl => kaufeFeld(anzahl)
         }));
         SHOP_UPGRADES.filter(shopUpgradeFrei).forEach(def => raster.appendChild(marktKarte({
             icon: def.icon, name: def.name, lvl: level(def.id), max: def.max,
             beschreibung: (/Stufe/.test(def.beschreibung) || def.max === 1 ? "" : t("Jede Stufe: ")) + def.beschreibung,
             jetzt: level(def.id) > 0 ? def.info() : null,
             kosten: kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)),
-            onKauf: () => kaufeUpgrade(def, "gold")
+            kostenBei: stufe => kostenMitFaktor(def.basiskosten, def.faktor, stufe),
+            onKauf: anzahl => kaufeUpgrade(def, "gold", anzahl)
         })));
         const gesperrt = SHOP_UPGRADES.filter(def => !shopUpgradeFrei(def) && !istSandboxAus(def.id)).length;
         if (gesperrt > 0) {
@@ -4676,12 +4749,13 @@ function renderShop() {
             zusatz: upgrade.id === "ertrag" ? t("⭐ Stufe ") + (Math.floor(lvl / 10) + 1) * 10 + t(" verdoppelt den Wert") : null,
             jetzt: upgrade.info(pflanze),
             kosten: pflanzenUpgradeKosten(pflanze, upgrade),
-            onKauf: () => kaufePflanzenUpgrade(pflanze, upgrade)
+            kostenBei: stufe => pflanzenUpgradeKosten(pflanze, upgrade, stufe),
+            onKauf: anzahl => kaufePflanzenUpgrade(pflanze, upgrade, anzahl)
         }));
     });
     const fehlend = PFLANZEN_UPGRADES.filter(u => !pflanzenUpgradeFrei(pflanze, u));
     if (fehlend.length > 0) {
-        raster.appendChild(marktGesperrt(fehlend.map(u => u.name).join(", "), t("Schaltest du im Stellarium am Ast von ") + pflanze.name + t(" frei.")));
+        raster.appendChild(marktGesperrt(fehlend.map(u => u.name).join(", "), tf("Schaltest du im Stellarium am Ast von {0} frei.", pflanze.name)));
     }
     shopContent.appendChild(raster);
 }
@@ -4731,9 +4805,9 @@ function istKnotenOffen(def) {
     return (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) && !vorigePflanzeFehlt(def) && (!def.bedingung || def.bedingung());
 }
 
-function knotenKosten(def) {
+function knotenKosten(def, stufe = level(def.id)) {
     // Mondteich "Sternenkarte": alle Sterne billiger
-    return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, level(def.id)) * (1 - 0.03 * metaLevel("sternenkarte")) * (1 - 0.1 * hfGeschafft("blind"))));
+    return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, stufe) * (1 - 0.03 * metaLevel("sternenkarte")) * (1 - 0.1 * hfGeschafft("blind"))));
 }
 
 function knotenSicht(def) {
@@ -5071,7 +5145,7 @@ function renderSternDetails(def) {
     const knopf = el("button", "knopf knopf-gruen stern-karte-kaufen", zeigtPreis ? null : knopfText,
         zeigtPreis ? [spriteIcon("sternensamen"), el("span", null, knopfText)] : null);
     knopf.disabled = !(offen && !istMax && darfEinkaufen() && run.skillpunkte >= kosten);
-    knopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte"));
+    knopf.addEventListener("click", event => kaufeUpgrade(def, "skillpunkte", event.shiftKey ? 1000 : 1));
     // Gesperrt: Klick springt zum Stern, der noch fehlt (bei Pflanzen ohne genug Ertrag ein Hinweis)
     if (!offen) {
         const fehlt = !def.vor || istVorgaengerErfuellt(def.vor, def.vorMax) ? (def.bedingungStern || null) : def.vor;
@@ -5093,6 +5167,17 @@ function renderSternDetails(def) {
         };
     }
     karte.appendChild(knopf);
+    // Sterne mit vielen Stufen: auf einmal so viele kaufen, wie die Sternensamen reichen
+    if (zeigtPreis && def.max > 1 && darfEinkaufen()) {
+        const paket = kaufPaket(stufe => knotenKosten(def, stufe), lvl, def.max, run.skillpunkte, "max");
+        if (paket.anzahl >= 2 && paket.kosten <= run.skillpunkte) {
+            const maxKnopf = el("button", "knopf stern-karte-max", null, [el("span", null, tf("⏫ {0} Stufen", paket.anzahl) + " · "),
+                spriteIcon("sternensamen"), el("span", null, zahl(paket.kosten))]);
+            setzeTipp(maxKnopf, t("So viele Stufen kaufen, wie deine Sternensamen reichen") + (TOUCH_GERAET ? "" : " " + t("(auch mit Shift + Klick)")));
+            maxKnopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte", paket.anzahl));
+            karte.appendChild(maxKnopf);
+        }
+    }
     sternbildDetails.appendChild(karte);
     // Lange Namen ("Edelsteinschleifer") etwas kleiner schreiben, statt sie abzuschneiden oder im Wort zu trennen
     const nameEl = karte.querySelector(".stern-karte-name");

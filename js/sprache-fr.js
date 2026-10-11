@@ -3292,5 +3292,14 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "% Sternensamen aus Ernten und +": "% de Graines d'étoile des récoltes et +",
     "🎟️ +1 Kuschel-Gutschein": "🎟️ +1 bon de peluche",
     "Alle {0} Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.": "Les {0} emplacements sont occupés. Déséquipe d'abord une carte équipée.",
-    "📖 Kodex: ": "📖 Codex : "
+    "📖 Kodex: ": "📖 Codex : ",
+    "Max": "Max",
+    "So viele Stufen kaufen, wie dein Gold reicht": "Acheter autant de niveaux que ton or le permet",
+    "{0} Stufen auf einmal kaufen": "Acheter {0} niveaux d'un coup",
+    "Tipp: Shift + Klick kauft immer so viel wie möglich.": "Astuce : Maj + clic achète toujours le plus possible.",
+    "⏫ {0} Stufen": "⏫ {0} niveaux",
+    "So viele Stufen kaufen, wie deine Sternensamen reichen": "Acheter autant de niveaux que tes Graines d'étoile le permettent",
+    "(auch mit Shift + Klick)": "(aussi avec Maj + clic)",
+    "Schaltest du im Stellarium am Ast von {0} frei.": "Débloque-les au Stellarium sur la branche de {0}.",
+    "👀 Du probierst gerade {0} an.": "👀 Tu essaies {0}."
 });

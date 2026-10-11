@@ -3292,5 +3292,14 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "% Sternensamen aus Ernten und +": "% de Semillas Estelares de las cosechas y +",
     "🎟️ +1 Kuschel-Gutschein": "🎟️ +1 vale de peluche",
     "Alle {0} Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.": "Las {0} ranuras están ocupadas. Primero desequipa una carta equipada.",
-    "📖 Kodex: ": "📖 Códice: "
+    "📖 Kodex: ": "📖 Códice: ",
+    "Max": "Máx.",
+    "So viele Stufen kaufen, wie dein Gold reicht": "Compra tantos niveles como te permita tu oro",
+    "{0} Stufen auf einmal kaufen": "Comprar {0} niveles de una vez",
+    "Tipp: Shift + Klick kauft immer so viel wie möglich.": "Consejo: Mayús + clic siempre compra todo lo posible.",
+    "⏫ {0} Stufen": "⏫ {0} niveles",
+    "So viele Stufen kaufen, wie deine Sternensamen reichen": "Compra tantos niveles como te permitan tus Semillas Estelares",
+    "(auch mit Shift + Klick)": "(también con Mayús + clic)",
+    "Schaltest du im Stellarium am Ast von {0} frei.": "Desbloquéalos en el Estelario en la rama de {0}.",
+    "👀 Du probierst gerade {0} an.": "👀 Te estás probando {0}."
 });

@@ -1519,7 +1519,7 @@ function renderHaus(inhalt) {
             knoepfe.unshift(ansehen);
         }
         inhalt.appendChild(el("div", "haus-vorschau-leiste", null, [
-            el("span", null, t("👀 Du probierst gerade ") + eintrag.name + t(" an. ") + woher),
+            el("span", null, tf("👀 Du probierst gerade {0} an.", eintrag.name) + " " + woher),
             el("div", "haus-vorschau-knoepfe", null, knoepfe)
         ]));
     }

@@ -3251,7 +3251,16 @@ Object.assign(UEBERSETZUNG, {
     "% Sternensamen aus Ernten und +": "% Star Seeds from harvests and +",
     "🎟️ +1 Kuschel-Gutschein": "🎟️ +1 Plush Voucher",
     "Alle {0} Plätze sind belegt. Leg zuerst eine ausgerüstete Karte ab.": "All {0} slots are taken. Unequip an equipped card first.",
-    "📖 Kodex: ": "📖 Codex: "
+    "📖 Kodex: ": "📖 Codex: ",
+    "Max": "Max",
+    "So viele Stufen kaufen, wie dein Gold reicht": "Buy as many levels as your gold allows",
+    "{0} Stufen auf einmal kaufen": "Buy {0} levels at once",
+    "Tipp: Shift + Klick kauft immer so viel wie möglich.": "Tip: Shift + click always buys as much as possible.",
+    "⏫ {0} Stufen": "⏫ {0} levels",
+    "So viele Stufen kaufen, wie deine Sternensamen reichen": "Buy as many levels as your Star Seeds allow",
+    "(auch mit Shift + Klick)": "(also with Shift + click)",
+    "Schaltest du im Stellarium am Ast von {0} frei.": "Unlock them in the Stellarium on the branch of {0}.",
+    "👀 Du probierst gerade {0} an.": "👀 You are trying on {0}."
 });
 
 // Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)
