@@ -308,6 +308,11 @@ document.addEventListener("pointerdown", event => {
     if (event.pointerType !== "touch") return;
     clearTimeout(langTippen && langTippen.timer);
     const ziel = event.target;
+    // Auf dem Samenladen heisst Gedrueckthalten "Sense" (klickt von allein): dort kein langes Antippen
+    if (ziel.closest && ziel.closest("#plant-button")) {
+        langTippen = null;
+        return;
+    }
     langTippen = { x: event.clientX, y: event.clientY, ziel, ausgeloest: false, nativ: false };
     langTippen.timer = setTimeout(() => {
         const lt = langTippen;

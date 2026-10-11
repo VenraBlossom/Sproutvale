@@ -44,12 +44,17 @@ const UEBERSETZUNG = {};
 const TOUCH_GERAET = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 document.documentElement.classList.toggle("touch", TOUCH_GERAET);
 const TOUCH_WOERTER = {
-    de: [[/Rechtsklick/g, "Lange tippen"], [/Linksklick/g, "Tippen"], [/Mausrad/g, "zwei Finger"]],
-    en: [[/Right-click/g, "Long-press"], [/right-click/g, "long-press"], [/right click/g, "long press"], [/Left-click/g, "Tap"],
+    de: [[/Fahr über die Jahreszeiten-Uhr/g, "Tippe auf die Jahreszeiten-Uhr"], [/Fahr mit der Maus über/g, "Wisch mit dem Finger über"], [/Halte die Maus auf dem Samenladen gedrückt/g, "Halte den Finger auf dem Samenladen"],
+        [/Maus auf dem Samenladen gedrückt halten/g, "Finger auf dem Samenladen halten"],
+        [/Rechtsklick/g, "Lange tippen"], [/Linksklick/g, "Tippen"], [/Mausrad/g, "zwei Finger"]],
+    en: [[/Hover over the season clock/g, "Tap the season clock"], [/Move the mouse over/g, "Swipe your finger over"], [/Hold the mouse button on the seed stall/g, "Hold your finger on the seed stall"],
+        [/hold the mouse on the seed stall/g, "hold your finger on the seed stall"], [/Right-click/g, "Long-press"], [/right-click/g, "long-press"], [/right click/g, "long press"], [/Left-click/g, "Tap"],
         [/left-click/g, "tap"], [/left click/g, "tap"], [/mouse wheel/g, "two fingers"]],
-    es: [[/Clic derecho/g, "Pulsación larga"], [/clic derecho/g, "pulsación larga"], [/Clic izquierdo/g, "Toque"], [/clic izquierdo/g, "toque"],
+    es: [[/Pasa el ratón sobre el reloj de estaciones/g, "Toca el reloj de estaciones"], [/Pasa el ratón sobre/g, "Desliza el dedo sobre"], [/Mantén pulsado el botón del ratón sobre/g, "Mantén el dedo sobre"],
+        [/mantén el ratón sobre/g, "mantén el dedo sobre"], [/Clic derecho/g, "Pulsación larga"], [/clic derecho/g, "pulsación larga"], [/Clic izquierdo/g, "Toque"], [/clic izquierdo/g, "toque"],
         [/rueda del ratón/g, "dos dedos"]],
-    fr: [[/Clic droit/g, "Appui long"], [/clic droit/g, "appui long"], [/Clic gauche/g, "Toucher"], [/clic gauche/g, "toucher"], [/molette/g, "deux doigts"]]
+    fr: [[/Survole l'horloge des saisons/g, "Touche l'horloge des saisons"], [/Passe la souris sur/g, "Glisse le doigt sur"], [/Maintiens le bouton de la souris sur/g, "Garde le doigt sur"],
+        [/maintiens la souris sur/g, "garde le doigt sur"], [/Clic droit/g, "Appui long"], [/clic droit/g, "appui long"], [/Clic gauche/g, "Toucher"], [/clic gauche/g, "toucher"], [/molette/g, "deux doigts"]]
 };
 function touchText(text) {
     if (!TOUCH_GERAET || typeof text !== "string") return text;
