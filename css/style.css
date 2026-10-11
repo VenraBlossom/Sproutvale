@@ -12732,3 +12732,8 @@ html.touch .slot {
     display: block;
     margin: 8px auto 0;
 }
+/* Auf dem Feld wischt man zum Einsammeln: der Browser soll dabei nicht scrollen oder zoomen */
+html.touch #field-grid,
+html.touch #fx-layer {
+    touch-action: none;
+}

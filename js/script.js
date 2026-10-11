@@ -3029,7 +3029,8 @@ function spawnGluehwuermchen() {
 
 // ---------- MAUS: SAMMELRADIUS ----------
 
-document.addEventListener("mousemove", event => {
+// pointermove statt mousemove: gilt fuer Maus UND Finger (auf dem Handy sammelt man durch Wischen ein)
+document.addEventListener("pointermove", event => {
     maus.x = event.clientX;
     maus.y = event.clientY;
     sammelRing.style.left = maus.x + "px";
@@ -3055,6 +3056,12 @@ document.addEventListener("pointerdown", event => {
 });
 
 document.documentElement.addEventListener("mouseleave", () => {
+    maus.x = -9999;
+    maus.y = -9999;
+});
+// Finger hebt ab: der Sammelkreis bleibt nicht unsichtbar auf dem Feld liegen
+document.addEventListener("pointerup", event => {
+    if (event.pointerType !== "touch") return;
     maus.x = -9999;
     maus.y = -9999;
 });
