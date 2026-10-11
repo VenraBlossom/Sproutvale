@@ -324,7 +324,8 @@ document.addEventListener("pointerdown", event => {
                 zeigeTippFuer(tippZielEl);
             }
         }
-        if (navigator.vibrate) navigator.vibrate(12);
+        // kurzes Vibrieren als Rueckmeldung (nur wenn der Browser es nach einer Beruehrung erlaubt)
+        if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(12);
     }, LANG_TIPPEN_MS);
 }, true);
 document.addEventListener("pointermove", event => {

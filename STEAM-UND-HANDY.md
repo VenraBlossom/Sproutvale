@@ -28,6 +28,11 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
    `STEAM_KONFIG.dlc.unterstuetzer` eintragen.
 6. Für den Steam-Status ("Rich Presence") in Steamworks den Text `#Status` mit `{#Status}` bzw. `%status%` anlegen.
 
+### Spielstände in der Steam-Cloud
+
+Die Desktop-App speichert in `%APPDATA%/Sproutvale/save`. In Steamworks unter "Steam Cloud" die **Auto-Cloud** einschalten:
+Stamm `WinAppDataRoaming`, Unterordner `Sproutvale/save`, Muster `*`. Dann wandert der Spielstand automatisch zwischen PCs mit.
+
 ### Gems auf Steam
 
 Steam kann echtes Geld nur über einen eigenen Server oder über den **Steam-Inventar-Dienst** annehmen.
