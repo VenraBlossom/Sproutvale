@@ -40,10 +40,26 @@ document.documentElement.lang = SPRACHE;
 // wird von sprache-en.js gefuellt (bei Spanisch und Franzoesisch danach von sprache-es.js / sprache-fr.js ueberschrieben)
 const UEBERSETZUNG = {};
 
+// Handy und Tablet (Finger statt Maus): Texte sagen "lange tippen" statt "Rechtsklick"
+const TOUCH_GERAET = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+document.documentElement.classList.toggle("touch", TOUCH_GERAET);
+const TOUCH_WOERTER = {
+    de: [[/Rechtsklick/g, "Lange tippen"], [/Linksklick/g, "Tippen"], [/Mausrad/g, "zwei Finger"]],
+    en: [[/Right-click/g, "Long-press"], [/right-click/g, "long-press"], [/right click/g, "long press"], [/Left-click/g, "Tap"],
+        [/left-click/g, "tap"], [/left click/g, "tap"], [/mouse wheel/g, "two fingers"]],
+    es: [[/Clic derecho/g, "Pulsación larga"], [/clic derecho/g, "pulsación larga"], [/Clic izquierdo/g, "Toque"], [/clic izquierdo/g, "toque"],
+        [/rueda del ratón/g, "dos dedos"]],
+    fr: [[/Clic droit/g, "Appui long"], [/clic droit/g, "appui long"], [/Clic gauche/g, "Toucher"], [/clic gauche/g, "toucher"], [/molette/g, "deux doigts"]]
+};
+function touchText(text) {
+    if (!TOUCH_GERAET || typeof text !== "string") return text;
+    return (TOUCH_WOERTER[SPRACHE] || []).reduce((s, [muster, ersatz]) => s.replace(muster, ersatz), text);
+}
+
 function t(text) {
-    if (SPRACHE === "de") return text;
+    if (SPRACHE === "de") return touchText(text);
     const uebersetzt = UEBERSETZUNG[text];
-    return uebersetzt !== undefined ? uebersetzt : text;
+    return touchText(uebersetzt !== undefined ? uebersetzt : text);
 }
 
 // Text mit Platzhaltern: tf("Tag {0} starten", 5) -> "Start day 5" (die Wortstellung darf sich je Sprache unterscheiden)
@@ -53,22 +69,25 @@ function tf(text, ...werte) {
 
 // Feste Texte in index.html (Knoepfe, Ueberschriften, Tooltips, Platzhalter) einmal beim Start uebersetzen
 function uebersetzeDokument(wurzel) {
-    if (SPRACHE === "de") return;
+    if (SPRACHE === "de" && !TOUCH_GERAET) return;
     const laeufer = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT);
     const knoten = [];
     while (laeufer.nextNode()) knoten.push(laeufer.currentNode);
     knoten.forEach(k => {
         const roh = k.nodeValue;
         const text = roh.split(/\s+/).join(" ").trim();
-        if (!text || UEBERSETZUNG[text] === undefined) return;
+        if (!text) return;
+        const neu = t(text);
+        if (neu === text) return;
         const vorne = roh.match(/^\s*/)[0].length ? " " : "";
         const hinten = roh.match(/\s*$/)[0].length ? " " : "";
-        k.nodeValue = vorne + UEBERSETZUNG[text] + hinten;
+        k.nodeValue = vorne + neu + hinten;
     });
     ["data-tipp", "placeholder", "title", "alt"].forEach(attribut => {
         wurzel.querySelectorAll("[" + attribut + "]").forEach(el => {
             const wert = el.getAttribute(attribut);
-            if (UEBERSETZUNG[wert] !== undefined) el.setAttribute(attribut, UEBERSETZUNG[wert]);
+            const neu = t(wert);
+            if (neu !== wert) el.setAttribute(attribut, neu);
         });
     });
 }

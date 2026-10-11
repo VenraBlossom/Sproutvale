@@ -3273,5 +3273,6 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "▶ Solo": "▶ Solo",
     "▶ Duo": "▶ Duo",
     "🌍 Sprache / Language": "🌍 Langue / Language",
-    "📖 Tutorial": "📖 Tutoriel"
+    "📖 Tutorial": "📖 Tutoriel",
+    "+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu.": "+25% d'or sur toutes les récoltes. Achetable à l'infini, s'additionne aux autres bonus d'or."
 });

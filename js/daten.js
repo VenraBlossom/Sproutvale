@@ -2316,8 +2316,8 @@ const META_UPGRADES = [
     { id: "geschickt", name: t("Geschickte Hände"), basiskosten: 40, faktor: 3, max: 3,
         beschreibung: t("-1 Klick pro Samen in jedem Run."), info: lvl => "-" + lvl + t(" Klicks pro Samen") },
     { id: "mondlicht", name: t("Mondlicht"), basiskosten: 8, faktor: 1.4, max: Infinity,
-        beschreibung: t("x1,15 Gold aus allen Ernten. Unendlich oft kaufbar, jede Stufe multipliziert sich."),
-        info: lvl => multiText(Math.pow(1.15, lvl)) + t(" Gold") }
+        beschreibung: t("+25% Gold aus allen Ernten. Unendlich oft kaufbar, zählt zu den anderen Gold-Boni dazu."),
+        info: lvl => "+" + prozentText(0.25 * lvl) + t(" Gold") }
 ];
 
 // ---------- MONDTEICH: TAROTKARTEN ----------

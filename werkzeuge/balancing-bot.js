@@ -76,6 +76,9 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
             const ertrag = PFLANZEN_UPGRADES.find(u => u.id === "ertrag");
             const wachstum = PFLANZEN_UPGRADES.find(u => u.id === "wachstum");
             if (beste && pflanzenUpgradeFrei(beste, ertrag)) angebote.push({ id: "ertrag", prio: 0, kosten: pflanzenUpgradeKosten(beste, ertrag), kauf: () => kaufePflanzenUpgrade(beste, ertrag) });
+            // Wie ein Spieler: 3x Ertrag fuer jede neue Pflanze, sonst bleibt die naechste Pflanze im Stellarium gesperrt
+            run.pflanzen.filter(pf => pf.freigeschaltet && pf !== beste && (pf.level.ertragEigen || 0) < PFLANZE_ERTRAG_VOR && pflanzenUpgradeFrei(pf, ertrag))
+                .forEach(pf => angebote.push({ id: "ertrag_" + pf.id, prio: 0, kosten: pflanzenUpgradeKosten(pf, ertrag), kauf: () => kaufePflanzenUpgrade(pf, ertrag) }));
             if (run.felder.length < Math.min(6, maxEigeneFelder())) angebote.push({ id: "feld", prio: 1, kosten: feldKosten(), kauf: kaufeFeld });
             if (beste && pflanzenUpgradeFrei(beste, wachstum) && beste.level.wachstum < wachstum.max) {
                 angebote.push({ id: "wachstum", prio: 2, kosten: pflanzenUpgradeKosten(beste, wachstum), kauf: () => kaufePflanzenUpgrade(beste, wachstum) });

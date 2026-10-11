@@ -266,7 +266,8 @@ function versteckeTipp() {
 }
 
 document.addEventListener("pointerover", event => {
-    if (tippFest) return;
+    // Finger: Hinweise kommen nur per langem Antippen (sonst springt bei jedem Tippen ein Hinweis auf)
+    if (tippFest || event.pointerType === "touch") return;
     const ziel = event.target.closest ? event.target.closest("[data-tipp]") : null;
     if (ziel === tippZiel) return;
     versteckeTipp();
@@ -297,6 +298,70 @@ setInterval(() => {
         versteckeTipp();
     }
 }, 500);
+
+// ---------- TOUCH: langes Antippen ----------
+// Auf Handy und Tablet gibt es keinen Rechtsklick und kein Drueberfahren. Langes Antippen (0,5 Sek.) wirkt wie ein
+// Rechtsklick (Begleiter, Figur, Werkzeuge ...). Hat die Stelle kein eigenes Menue, zeigt es stattdessen den Hinweis.
+const LANG_TIPPEN_MS = 500;
+let langTippen = null;
+document.addEventListener("pointerdown", event => {
+    if (event.pointerType !== "touch") return;
+    clearTimeout(langTippen && langTippen.timer);
+    const ziel = event.target;
+    langTippen = { x: event.clientX, y: event.clientY, ziel, ausgeloest: false, nativ: false };
+    langTippen.timer = setTimeout(() => {
+        const lt = langTippen;
+        if (!lt || lt.nativ) return;
+        lt.ausgeloest = true;
+        const rechtsklick = new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: lt.x, clientY: lt.y, button: 2 });
+        const behandelt = !lt.ziel.dispatchEvent(rechtsklick);
+        if (!behandelt) {
+            const tippZielEl = lt.ziel.closest ? lt.ziel.closest("[data-tipp]") : null;
+            if (tippZielEl) {
+                tippFest = null;
+                versteckeTipp();
+                tippFest = tippZielEl;
+                zeigeTippFuer(tippZielEl);
+            }
+        }
+        if (navigator.vibrate) navigator.vibrate(12);
+    }, LANG_TIPPEN_MS);
+}, true);
+document.addEventListener("pointermove", event => {
+    if (!langTippen || event.pointerType !== "touch") return;
+    if (Math.hypot(event.clientX - langTippen.x, event.clientY - langTippen.y) > 12) clearTimeout(langTippen.timer);
+}, true);
+["pointerup", "pointercancel"].forEach(art => document.addEventListener(art, event => {
+    if (!langTippen || event.pointerType !== "touch") return;
+    clearTimeout(langTippen.timer);
+    // Nach einem langen Antippen keinen normalen Klick hinterher ausloesen
+    if (langTippen.ausgeloest) {
+        const schlucke = e => { e.stopPropagation(); e.preventDefault(); };
+        document.addEventListener("click", schlucke, { capture: true, once: true });
+        setTimeout(() => document.removeEventListener("click", schlucke, { capture: true }), 400);
+    }
+    langTippen = null;
+}, true));
+// Manche Browser (Android) melden langes Antippen selbst als Rechtsklick: dann nicht noch einmal
+document.addEventListener("contextmenu", event => {
+    if (langTippen && event.isTrusted) {
+        langTippen.nativ = true;
+        langTippen.ausgeloest = true;
+        clearTimeout(langTippen.timer);
+    }
+}, true);
+
+// Hat niemand den (echten) Rechtsklick vom langen Antippen gebraucht: Hinweis zeigen statt Browser-Menue
+document.addEventListener("contextmenu", event => {
+    if (!event.isTrusted || !langTippen || !langTippen.nativ || event.defaultPrevented) return;
+    event.preventDefault();
+    const tippZielEl = event.target.closest ? event.target.closest("[data-tipp]") : null;
+    if (!tippZielEl) return;
+    tippFest = null;
+    versteckeTipp();
+    tippFest = tippZielEl;
+    zeigeTippFuer(tippZielEl);
+});
 
 // ---------- ZAHLEN HOCHZAEHLEN ----------
 // Die Anzeige laeuft in ca. 0,35 Sekunden vom alten zum neuen Wert.

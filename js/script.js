@@ -759,11 +759,13 @@ function goldMulti() {
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + level("grosseernte") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0) +
         // alles zusammengezaehlt (nicht malgenommen), sonst schaukelt es sich im spaeten Spiel auf
-        grundwert("g_gold") + level("goldmarie") + 0.25 * kuschel("mondhase") + (z_sommer() ? 0.2 * level("sonnenernte") : 0);
+        grundwert("g_gold") + level("goldmarie") + 0.25 * kuschel("mondhase") + (z_sommer() ? 0.2 * level("sonnenernte") : 0) +
+        // Mondlicht (Mondteich) zaehlt wie alle Gold-Boni dazu (frueher x1,15 pro Stufe malgenommen: schaukelte sich ueber viele Runs auf)
+        0.25 * metaLevel("mondlicht");
     const z = jahreszeit();
     // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
     const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
-    return pokalFaktor() * pakte * summe * Math.pow(1.15, metaLevel("mondlicht")) *
+    return pokalFaktor() * pakte * summe *
         (z.gold || 1) * (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
@@ -4791,14 +4793,37 @@ function zoomeBaum(faktor, cx, cy) {
     setzeBaumAnsicht(false);
 }
 
+// Zwei Finger (Handy, Tablet): auseinanderziehen zoomt wie das Mausrad
+const baumFinger = new Map();
+let baumPinch = null;
+function baumFingerAbstand() {
+    const [a, b] = [...baumFinger.values()];
+    return { abstand: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+}
 baumHimmel.addEventListener("pointerdown", event => {
     if (event.button !== 0) return;
+    if (event.pointerType === "touch") {
+        baumFinger.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (baumFinger.size === 2) {
+            baumPinch = baumFingerAbstand();
+            baumZug = null;
+            baumHimmel.setPointerCapture(event.pointerId);
+            return;
+        }
+    }
     baumZug = { x: event.clientX, y: event.clientY, gezogen: false };
     baumHimmel.setPointerCapture(event.pointerId);
 });
 let baumBildGeplant = false;
 
 baumHimmel.addEventListener("pointermove", event => {
+    if (baumFinger.has(event.pointerId)) baumFinger.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (baumPinch && baumFinger.size === 2) {
+        const jetzt = baumFingerAbstand();
+        if (baumPinch.abstand > 0 && jetzt.abstand > 0) zoomeBaum(jetzt.abstand / baumPinch.abstand, jetzt.x, jetzt.y);
+        baumPinch = jetzt;
+        return;
+    }
     if (!baumZug) return;
     const dx = event.clientX - baumZug.x;
     const dy = event.clientY - baumZug.y;
@@ -4817,7 +4842,21 @@ baumHimmel.addEventListener("pointermove", event => {
         setzeBaumAnsicht(false);
     });
 });
+function baumFingerWeg(event) {
+    baumFinger.delete(event.pointerId);
+    if (baumFinger.size < 2 && baumPinch) {
+        baumPinch = null;
+        baumZug = null; // nach dem Zoomen nicht aus Versehen einen Stern auswaehlen
+        baumHimmel.classList.remove("zieht");
+    }
+}
+baumHimmel.addEventListener("pointercancel", event => {
+    baumFingerWeg(event);
+    baumZug = null;
+    baumHimmel.classList.remove("zieht");
+});
 baumHimmel.addEventListener("pointerup", event => {
+    baumFingerWeg(event);
     if (!baumZug) return;
     const warGezogen = baumZug.gezogen;
     baumZug = null;
@@ -4839,7 +4878,8 @@ $("baum-hilfe").addEventListener("click", () => {
     const punkte = [
         t("✨ Sternensamen bekommst du bei jeder Ernte (5 pro Ernte) und für jeden Klick auf den Samenladen, der einen Samen wirft (") +
             sternensamenProKlick() + t(" pro Klick)."),
-        t("🖱️ Ziehen verschiebt den Baum, das Mausrad zoomt. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst."),
+        TOUCH_GERAET ? t("👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.")
+            : t("🖱️ Ziehen verschiebt den Baum, das Mausrad zoomt. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst."),
         t("Ⅱ Sterne mit Ⅱ kommen erst, wenn der Stern davor ganz ausgebaut ist: viel teurer, viel stärker."),
         t("🟢 Grüne Sterne sind schon erledigt, weil eine Tarotkarte oder der Mondteich dasselbe dauerhaft macht."),
         t("💡 Kaufen geht nur zwischen den Tagen (in Endlos jederzeit).")

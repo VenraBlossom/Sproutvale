@@ -12640,3 +12640,67 @@ body.ohne-effekte #jahreszeit-ebene > * {
     color: #3f8a32;
     margin-top: 4px;
 }
+
+/* ---------- KLEINE BILDSCHIRME (Handy quer, kleine Fenster) ----------
+   Die Kopfleiste wird kompakter, damit alles in eine Zeile passt und nichts rechts herausragt. */
+@media (max-width: 1100px), (max-height: 560px) {
+    #top-leiste {
+        height: 42px;
+        gap: 4px;
+        padding: 0 6px;
+        font-size: 12px;
+    }
+    #top-leiste .stat {
+        padding: 2px 5px;
+        gap: 3px;
+    }
+    #top-leiste img.icon,
+    #money-display .icon,
+    #skillpoint-display .icon {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    #money-display,
+    #skillpoint-display {
+        font-size: 1.35em;
+        padding: 2px 6px;
+    }
+    #rechnung-display {
+        font-size: 1.05em;
+    }
+    #top-leiste .top-knopf {
+        padding: 2px 6px;
+        font-size: 1em;
+    }
+    #energie-box {
+        gap: 4px;
+    }
+    #energie-balken {
+        width: clamp(40px, 7vw, 90px);
+        height: 12px;
+        border-width: 2px;
+    }
+    #energie-text {
+        min-width: 26px;
+        font-size: 1em;
+    }
+    #jahreszeit-uhr span,
+    #kalender-display .icon {
+        display: none;
+    }
+}
+
+/* Finger-Bedienung: kein Text markieren, kein Lupen-Menue beim langen Antippen, kein Doppeltipp-Zoom */
+html.touch,
+html.touch body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+html.touch button,
+html.touch .knopf,
+html.touch .feld,
+html.touch .slot {
+    touch-action: manipulation;
+}
