@@ -75,6 +75,14 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - Markt: Kaufmenge x1 / x10 / Max, Stellarium: mehrere Stufen auf einmal.
 - Gem-Shop bleibt, bis die Steamworks-Sachen da sind. Details in `STEAM-UND-HANDY.md`.
 
+## Für die nächsten Neuigkeiten (erst bei "publish" in `NEUIGKEITEN` in `js/daten.js` eintragen)
+
+- 10 neue Sprachen, Systemsprache beim ersten Start.
+- Markt: Kaufmenge x1 / x10 / Max, Stellarium: mehrere Stufen auf einmal.
+- Käufe und Gems sicher im Tresor, Promocode BETAVALE.
+- VIP-Karte: +5 Spiele pro Pause statt unbegrenzt.
+- Fehler behoben: Segen Sammelwut wirkte nicht, falsche Texte.
+
 ## Offen
 
 - Steamworks: App-ID, Erfolge (`werkzeuge/steam-erfolge.csv`), DLC, Gem-Pakete eintragen, dann Gem-Shop fertig machen.
