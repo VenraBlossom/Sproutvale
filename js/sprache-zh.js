@@ -2685,7 +2685,7 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "之后你的无尽游戏会从第 1 天重新开始；在此之前可以在月之池购物。",
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 语言 / Language",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "切换语言时游戏会短暂重新加载。/ The game reloads briefly when you switch.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "切换语言时游戏会短暂重新加载。",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "所有博彩游戏每次休息 +5 局。",
     "Noch mehr Spiele pro Pause": "每次休息可玩更多局"

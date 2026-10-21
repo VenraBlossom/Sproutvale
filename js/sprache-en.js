@@ -2684,7 +2684,9 @@ Object.assign(UEBERSETZUNG, {
     "Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.": "In Duo you both start over, then the host starts the next game in the lobby.",
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Your Endless game then starts again at day 1; before that you can shop in the Moon Pond.",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 games per break in all games of chance.",
-    "Noch mehr Spiele pro Pause": "Even more games per break"
+    "Noch mehr Spiele pro Pause": "Even more games per break",
+    "🌍 Sprache / Language": "🌍 Language",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "The game reloads briefly when you switch the language."
 });
 
 // Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)

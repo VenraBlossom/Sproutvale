@@ -2685,7 +2685,7 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Je Eindeloos-spel begint daarna weer bij dag 1; daarvoor kun je bij de Maanvijver winkelen.",
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Taal / Language",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Het spel laadt kort opnieuw als je van taal wisselt. / The game reloads briefly when you switch.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Het spel laadt even opnieuw als je van taal wisselt.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 spellen per pauze bij alle kansspelen.",
     "Noch mehr Spiele pro Pause": "Nog meer spellen per pauze"

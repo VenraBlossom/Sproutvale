@@ -2685,7 +2685,7 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "그다음 무한 게임은 1일차부터 다시 시작해요. 그 전에 달빛 연못에서 쇼핑할 수 있어요.",
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 언어 / Language",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "언어를 바꾸면 게임이 잠깐 다시 로드됩니다. / The game reloads briefly when you switch.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "언어를 바꾸면 게임이 잠깐 다시 불러와져요.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "모든 도박 게임에서 휴식마다 +5판.",
     "Noch mehr Spiele pro Pause": "휴식마다 더 많은 판"

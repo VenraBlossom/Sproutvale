@@ -2685,7 +2685,7 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Потім твоя гра в Нескінченному знову почнеться з 1-го дня; перед цим можна зробити покупки в Місячному ставку.",
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Мова / Language",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Після зміни мови гра ненадовго перезавантажиться. / The game reloads briefly when you switch.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Під час зміни мови гра ненадовго перезавантажиться.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 ігор за перерву в усіх азартних іграх.",
     "Noch mehr Spiele pro Pause": "Ще більше ігор за перерву"

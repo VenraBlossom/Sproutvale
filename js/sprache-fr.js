@@ -2110,7 +2110,7 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "🍿 Popcorn!": "🍿 Pop-corn !",
     "🎡 Roulette": "🎡 Roulette",
     "Stellarium (B)": "Stellarium (B)",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Le jeu redémarre brièvement quand tu changes de langue.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Le jeu se recharge brièvement quand tu changes de langue.",
     "Solo": "Solo",
     "▶ Solo": "▶ Solo",
     "▶ Duo": "▶ Duo",

@@ -2685,7 +2685,7 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Sonsuz oyunun ardından yine 1. günden başlar; öncesinde Ay göletinde alışveriş yapabilirsin.",
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Dil / Language",
-    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Dili değiştirince oyun kısa süreliğine yeniden yüklenir. / The game reloads briefly when you switch.",
+    "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Dili değiştirdiğinde oyun kısa bir süre yeniden yüklenir.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "Tüm şans oyunlarında mola başına +5 oyun.",
     "Noch mehr Spiele pro Pause": "Mola başına daha da çok oyun"
