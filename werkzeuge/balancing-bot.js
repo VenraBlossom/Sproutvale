@@ -9,7 +9,9 @@
 // Gibt pro Tag Gold, Rechnungen und Einkommen zurueck.
 // ============================================================
 
-window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 6, tickMs = 100, meldung = true, mondphase = 0, sparTage = 2, abgeben = true } = {}) {
+// frueh = Rechnungen frueher bezahlen wie ein Spieler, sobald das Gold deutlich reicht (Knopf "Jetzt bezahlen" auf der Tageskarte).
+//         Zahl = so viel mal die Rechnung muss man haben (z.B. 1.5), 0 = nie frueher bezahlen
+window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 6, tickMs = 100, meldung = true, mondphase = 0, sparTage = 2, abgeben = true, frueh = 0 } = {}) {
     speichernGesperrt = true;
     meta.mondphase = mondphase;
     // schneller: keine Partikel, keine Schwebe-Texte, keine Tageszeit-Deko
@@ -110,6 +112,15 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
             waehleSegen(run.segenAuswahl[0], document.body);
         }
         document.querySelectorAll(".popup-huelle").forEach(h => { if (!h.querySelector(".rechnung-frage")) h.remove(); });
+        // Wie ein Spieler: Rechnung frueher bezahlen, wenn das Gold deutlich reicht, danach den Segen waehlen
+        if (frueh > 0 && kannFrueherBezahlen() && run.gold >= frueh * naechsteRechnung().betrag) {
+            bezahleFrueher();
+            if (run.segenAuswahl) {
+                segenSperreBis = 0;
+                waehleSegen(run.segenAuswahl[0], document.body);
+            }
+            document.querySelectorAll(".popup-huelle").forEach(h => { if (!h.querySelector(".rechnung-frage")) h.remove(); });
+        }
         kaufeEin();
         goldAmTagesStart = run.gold;
         starteTag();

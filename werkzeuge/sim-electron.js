@@ -25,9 +25,11 @@ const TAGE = Number(process.env.TAGE) || 45;
 const PATCH = process.env.PATCH ? fs.readFileSync(process.env.PATCH, "utf8") : "";
 // Optional: eigene Ergebnis-Dateien, damit mehrere Simulationen gleichzeitig laufen koennen
 const NAME = process.env.NAME || "_sim-ergebnis";
+// Optional: Rechnungen frueher bezahlen, sobald man FRUEH-mal so viel Gold hat (z.B. FRUEH=1.5), Standard: nie
+const FRUEH = Number(process.env.FRUEH) || 0;
 
 // Laeuft im Spiel
-async function simulation(runs, kps, tage) {
+async function simulation(runs, kps, tage, frueh) {
     const intro = document.getElementById("intro");
     if (intro) intro.remove();
     meta.tutorial = "fertig";
@@ -35,7 +37,7 @@ async function simulation(runs, kps, tage) {
     for (let r = 0; r < runs; r++) {
         const start = Date.now();
         console.log("START " + (r + 1));
-        const protokoll = await sproutvaleBot({ tage, klicksProSek: kps, tickMs: 250, meldung: false, abgeben: true });
+        const protokoll = await sproutvaleBot({ tage, klicksProSek: kps, tickMs: 250, meldung: false, abgeben: true, frueh });
         const eintrag = {
             run: r + 1, tag: run.tag, rechnungen: run.bezahlteRechnungen, gold: Math.round(run.gold),
             goldTag: [5, 10, 15, 20, 25, 30, 35, 40].map(t => (protokoll.find(p => p.tag === t + 1) || {}).gold ?? null),
@@ -86,8 +88,13 @@ app.whenReady().then(async () => {
             app.exit(2);
         }
     }, 30000);
-    fenster.webContents.on("console-message", (e, level, text, zeile, quelle) => {
-        text = String(text);
+    fenster.webContents.on("console-message", (e, ...alt) => {
+        // Neue Electron-Versionen: alles steckt im Ereignis, aeltere geben es als einzelne Werte
+        const stufen = { verbose: 0, info: 1, warning: 2, error: 3 };
+        const level = e.level !== undefined ? (stufen[e.level] ?? e.level) : alt[0];
+        const text = String(e.message !== undefined ? e.message : alt[1]);
+        const zeile = e.lineNumber !== undefined ? e.lineNumber : alt[2];
+        const quelle = e.sourceId !== undefined ? e.sourceId : alt[3];
         if (/^(RUN|TAG|START) /.test(text)) letzteMeldung = Date.now();
         if (text.startsWith("RUN ")) {
             process.stdout.write(uhr() + " " + text + "\n");
@@ -107,7 +114,7 @@ app.whenReady().then(async () => {
     await fenster.webContents.executeJavaScript(bot + "\n;true");
     if (PATCH) await fenster.webContents.executeJavaScript(PATCH + "\n;true");
     try {
-        const ergebnis = await fenster.webContents.executeJavaScript(`(${simulation.toString()})(${RUNS}, ${KPS}, ${TAGE})`);
+        const ergebnis = await fenster.webContents.executeJavaScript(`(${simulation.toString()})(${RUNS}, ${KPS}, ${TAGE}, ${FRUEH})`);
         fs.writeFileSync(path.join(__dirname, "..", NAME + ".json"), JSON.stringify(ergebnis, null, 1));
         process.stdout.write("FERTIG\n");
     } catch (fehler) {

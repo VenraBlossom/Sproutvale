@@ -17,3 +17,8 @@ handy-app/node_modules/
 handy-app/www/
 handy-app/android/
 handy-app/ios/
+
+# Quelldateien von Bildern (nicht ins Spiel)
+*.psd
+*.kra
+*.aseprite

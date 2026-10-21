@@ -634,10 +634,10 @@ aktualisiereProfilKnopf();
     });
     // Weitere Sprachen: schon zu sehen, aber noch gesperrt
     SPRACHEN_BALD.forEach(s => {
+        // Name und "Bald" untereinander, damit lange Namen (Português, Українська) nicht abgeschnitten werden
         const karte = el("button", "knopf sprach-karte bald", null, [
             el("span", "sprach-flagge flagge-" + s.id),
-            el("span", "sprach-name", s.name),
-            el("span", "sprach-bald", t("Bald"))
+            el("span", "sprach-text", null, [el("span", "sprach-name", s.name), el("span", "sprach-bald", t("Bald"))])
         ]);
         karte.disabled = true;
         setzeTipp(karte, t("Diese Sprache kommt bald."));

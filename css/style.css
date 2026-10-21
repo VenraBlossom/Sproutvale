@@ -11352,8 +11352,12 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 #mondphase-display { cursor: pointer; }
 .karte-frueh-bezahlen {
     display: block;
+    max-width: 100%;
     margin: 6px auto 0;
     font-size: 15px;
+    /* lange Texte (Franzoesisch, Spanisch) brechen um, statt die Tageskarte seitlich scrollen zu lassen */
+    white-space: normal;
+    line-height: 1.25;
 }
 .prestige-fuss { gap: 10px; }
 .debug-wahl {
@@ -11470,15 +11474,24 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .flagge-ja { background: radial-gradient(circle, #bc002d 0 28%, #fff 29%); }
 .flagge-zh { background: radial-gradient(circle at 25% 32%, #ffde00 0 14%, transparent 15%), #de2910; }
 .flagge-ko { background: radial-gradient(circle, #cd2e3a 0 14%, #0047a0 15% 27%, #fff 28%); }
-.sprach-karte.bald .sprach-name {
+.sprach-text {
+    flex: 1;
     min-width: 0;
-    font-size: 0.85em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+.sprach-karte.bald .sprach-name {
+    max-width: 100%;
+    font-size: 0.9em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 .sprach-karte.bald .sprach-bald {
-    flex-shrink: 0;
+    font-size: 0.6em;
+    padding: 1px 8px;
 }
 
 /* Profil: eigene Farben und Titel */
