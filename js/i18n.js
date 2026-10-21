@@ -1,27 +1,32 @@
 "use strict";
 
 // ============================================================
-// SPROUTVALE: Sprachen (Deutsch / Englisch / Spanisch / Franzoesisch)
+// SPROUTVALE: Sprachen
 // Wird direkt nach speicher.js geladen, noch vor allen Spieldaten.
-// Jeder Text im Spiel laeuft durch t("deutscher Text"). Die Uebersetzungen stehen in sprache-en.js, sprache-es.js, sprache-fr.js.
-// Fehlt eine spanische oder franzoesische Uebersetzung, kommt der englische Text, sonst bleibt der deutsche stehen.
-// Beim allerersten Start ist Englisch eingestellt, bestehende Spieler behalten Deutsch.
-// Umschalten in den Einstellungen (Reiter "Anzeige"), danach laedt das Spiel neu.
+// Jeder Text im Spiel laeuft durch t("deutscher Text"). Die Uebersetzungen stehen in sprache-xx.js (eine Datei pro Sprache).
+// Fehlt eine Uebersetzung, kommt der englische Text, sonst bleibt der deutsche stehen.
+// Beim allerersten Start wird die Sprache des Systems genommen (sonst Englisch), bestehende Spieler behalten ihre Sprache.
+// Umschalten in den Einstellungen (Reiter "Sprache"), danach laedt das Spiel neu.
 // ============================================================
 
 const SPRACHEN = [
     { id: "en", name: "English" },
     { id: "de", name: "Deutsch" },
     { id: "es", name: "Español" },
-    { id: "fr", name: "Français" }
-];
-// Kommen spaeter: nur als Karte sichtbar, noch nicht waehlbar und noch ohne Uebersetzung
-const SPRACHEN_BALD = [
+    { id: "fr", name: "Français" },
     { id: "it", name: "Italiano" },
-    { id: "pt", name: "Português" }, { id: "nl", name: "Nederlands" }, { id: "pl", name: "Polski" },
-    { id: "tr", name: "Türkçe" }, { id: "ru", name: "Русский" }, { id: "uk", name: "Українська" },
-    { id: "ja", name: "日本語" }, { id: "zh", name: "中文" }, { id: "ko", name: "한국어" }
+    { id: "pt", name: "Português (Brasil)" },
+    { id: "nl", name: "Nederlands" },
+    { id: "pl", name: "Polski" },
+    { id: "tr", name: "Türkçe" },
+    { id: "ru", name: "Русский" },
+    { id: "uk", name: "Українська" },
+    { id: "ja", name: "日本語" },
+    { id: "zh", name: "简体中文" },
+    { id: "ko", name: "한국어" }
 ];
+// Kommen spaeter: nur als Karte sichtbar, noch nicht waehlbar (gerade keine)
+const SPRACHEN_BALD = [];
 
 const SPRACHE = (() => {
     try {
@@ -31,13 +36,16 @@ const SPRACHE = (() => {
     } catch (fehler) {
         console.warn("Sprache nicht lesbar", fehler);
     }
-    return "en";
+    // Allererster Start: Sprache des Systems, wenn es sie gibt
+    const system = (navigator.languages || [navigator.language || ""]).map(l => String(l).toLowerCase().slice(0, 2));
+    return system.find(id => SPRACHEN.some(s => s.id === id)) || "en";
 })();
 
-const SPRACH_LOCALE = { en: "en-US", de: "de-DE", es: "es-ES", fr: "fr-FR" }[SPRACHE] || "en-US";
+const SPRACH_LOCALE = { en: "en-US", de: "de-DE", es: "es-ES", fr: "fr-FR", it: "it-IT", pt: "pt-BR", nl: "nl-NL", pl: "pl-PL",
+    tr: "tr-TR", ru: "ru-RU", uk: "uk-UA", ja: "ja-JP", zh: "zh-CN", ko: "ko-KR" }[SPRACHE] || "en-US";
 document.documentElement.lang = SPRACHE;
 
-// wird von sprache-en.js gefuellt (bei Spanisch und Franzoesisch danach von sprache-es.js / sprache-fr.js ueberschrieben)
+// wird von sprache-en.js gefuellt (bei anderen Sprachen danach von ihrer sprache-xx.js ueberschrieben)
 const UEBERSETZUNG = {};
 
 // Handy und Tablet (Finger statt Maus): Texte sagen "lange tippen" statt "Rechtsklick"
@@ -54,7 +62,26 @@ const TOUCH_WOERTER = {
         [/mantén el ratón sobre/g, "mantén el dedo sobre"], [/Clic derecho/g, "Pulsación larga"], [/clic derecho/g, "pulsación larga"], [/Clic izquierdo/g, "Toque"], [/clic izquierdo/g, "toque"],
         [/rueda del ratón/g, "dos dedos"]],
     fr: [[/Survole l'horloge des saisons/g, "Touche l'horloge des saisons"], [/Passe la souris sur/g, "Glisse le doigt sur"], [/Maintiens le bouton de la souris sur/g, "Garde le doigt sur"],
-        [/maintiens la souris sur/g, "garde le doigt sur"], [/Clic droit/g, "Appui long"], [/clic droit/g, "appui long"], [/Clic gauche/g, "Toucher"], [/clic gauche/g, "toucher"], [/molette/g, "deux doigts"]]
+        [/maintiens la souris sur/g, "garde le doigt sur"], [/Clic droit/g, "Appui long"], [/clic droit/g, "appui long"], [/Clic gauche/g, "Toucher"], [/clic gauche/g, "toucher"], [/molette/g, "deux doigts"]],
+    it: [[/Passa sopra l'orologio delle stagioni/g, "Tocca l'orologio delle stagioni"], [/Passa il mouse sulle/g, "Scorri il dito sulle"], [/Tieni premuto il mouse sulla/g, "Tieni il dito sulla"],
+        [/tieni premuto il mouse sulla/g, "tieni il dito sulla"], [/Clic destro/g, "Pressione lunga"], [/clic destro/g, "pressione lunga"], [/clic sinistro/g, "tocco"], [/la rotella/g, "due dita"]],
+    pt: [[/Passe o mouse sobre o relógio das estações/g, "Toque no relógio das estações"], [/Passe o mouse sobre/g, "Deslize o dedo sobre"], [/Segure o mouse na/g, "Segure o dedo na"],
+        [/segure o mouse na/g, "segure o dedo na"], [/Clique direito/g, "Toque longo"], [/clique direito/g, "toque longo"], [/clique esquerdo/g, "toque"], [/a roda do mouse/g, "dois dedos"]],
+    nl: [[/Ga over de seizoensklok/g, "Tik op de seizoensklok"], [/Ga met de muis over/g, "Veeg met je vinger over"], [/Houd de muis ingedrukt op/g, "Houd je vinger op"],
+        [/houd de muis ingedrukt op/g, "houd je vinger op"], [/Rechtsklik/g, "Lang tikken"], [/rechtsklik/g, "lang tikken"], [/linksklik/g, "tikken"], [/het muiswiel/g, "twee vingers"]],
+    pl: [[/Najedź na zegar pór roku/g, "Dotknij zegara pór roku"], [/Najedź myszą na/g, "Przesuń palcem po"], [/Przytrzymaj mysz na/g, "Przytrzymaj palec na"],
+        [/przytrzymaj mysz na/g, "przytrzymaj palec na"], [/Prawy klik/g, "Długie dotknięcie"], [/prawy klik/g, "długie dotknięcie"], [/lewy klik/g, "dotknięcie"], [/kółko myszy/g, "dwa palce"]],
+    tr: [[/fareyi damlaların ve yıldız damlalarının üzerinden geçir/g, "parmağını damlaların ve yıldız damlalarının üzerinden kaydır"], [/Fareyi tohum tezgâhında basılı tut/g, "Parmağını tohum tezgâhında basılı tut"],
+        [/fareyi tohum tezgâhında basılı tut/g, "parmağını tohum tezgâhında basılı tut"], [/Sağ tık/g, "Uzun dokunuş"], [/sağ tık/g, "uzun dokunuş"], [/sol tık/g, "dokunuş"], [/fare tekerleği/g, "iki parmak"]],
+    ru: [[/Наведи на часы сезонов/g, "Нажми на часы сезонов"], [/Проведи мышью над/g, "Проведи пальцем над"], [/Зажми мышь на/g, "Зажми палец на"],
+        [/зажми мышь на/g, "зажми палец на"], [/Правый клик/g, "Долгое нажатие"], [/правый клик/g, "долгое нажатие"], [/левый клик/g, "касание"], [/колесо мыши/g, "два пальца"]],
+    uk: [[/Наведи на годинник сезонів/g, "Натисни на годинник сезонів"], [/Проведи мишею над/g, "Проведи пальцем над"], [/Затисни мишу на/g, "Затисни палець на"],
+        [/затисни мишу на/g, "затисни палець на"], [/Правий клац/g, "Довге натискання"], [/правий клац/g, "довге натискання"], [/лівий клац/g, "дотик"], [/колесо миші/g, "два пальці"]],
+    ja: [[/カーソルを合わせると/g, "タップすると"], [/の上にマウスを動かして/g, "の上を指でなぞって"], [/でマウスを押したままにすると/g, "を指で押したままにすると"],
+        [/でマウスを押し続けると/g, "を指で押し続けると"], [/右クリック/g, "長押し"], [/左クリック/g, "タップ"], [/マウスホイール/g, "2本指"]],
+    zh: [[/将鼠标悬停在/g, "点按"], [/将鼠标移到/g, "用手指划过"], [/按住鼠标/g, "按住手指"], [/右键/g, "长按"], [/左键/g, "点按"], [/鼠标滚轮/g, "双指"]],
+    ko: [[/에 마우스를 올리면/g, "을 누르면"], [/위로 마우스를 움직여서/g, "위로 손가락을 쓸어서"], [/에서 마우스를 누르고 있으면/g, "을 손가락으로 누르고 있으면"],
+        [/우클릭/g, "길게 누르기"], [/좌클릭/g, "탭"], [/마우스 휠/g, "두 손가락"]]
 };
 function touchText(text) {
     if (!TOUCH_GERAET || typeof text !== "string") return text;

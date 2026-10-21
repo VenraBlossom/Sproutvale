@@ -2848,7 +2848,7 @@ function spawnSternschnuppe() {
             aktualisiereTopBar();
         }
         partikel(x, y, ["#ffe89a", "#ffffff", "#ffd93d"], 24, 110);
-        zeigeBanner("🌠", t("Sternschnuppe gefangen!"), tf("{0} Sekunden doppeltes Gold{1}", sek, (liegend.length > 0 ? tf(", dazu {0}{1} x2", liegend.length, (liegend.length === 1 ? t(" liegende Saat") : t(" liegende Saaten"))) : "")),
+        zeigeBanner("🌠", t("Sternschnuppe gefangen!"), tf("{0} Sekunden doppeltes Gold{1}", sek, (liegend.length > 0 ? (liegend.length === 1 ? t(", dazu 1 liegende Saat x2") : tf(", dazu {0} liegende Saaten x2", liegend.length)) : "")),
             "#e0a800", 2600);
         Klang.stern();
     });
@@ -3130,7 +3130,7 @@ function renderErfolge() {
             item.appendChild(el("span", "erfolg-ausruf", "!"));
             if (aktiv) {
                 item.addEventListener("pointerdown", () => holeErfolgAb(kette, item));
-                setzeTipp(item, tf("Klicken: {0}{1}", abholbar, (abholbar === 1 ? t(" Gutschein abholen") : t(" Gutscheine abholen"))));
+                setzeTipp(item, (abholbar === 1 ? t("Klicken: 1 Gutschein abholen") : tf("Klicken: {0} Gutscheine abholen", abholbar)));
             }
         }
 
@@ -5683,7 +5683,8 @@ karteAufgeben.addEventListener("click", () => {
         breite: 500,
         inhalt: el("div", "warn-inhalt", null, [
             el("p", null, t("Dein Run endet sofort. Das kannst du nicht rückgängig machen.")),
-            el("p", "warn-belohnung", tf("Du bekommst +{0} Mondblüten für {1}{2}", zahl(mondbluetenJetzt()), run.bezahlteRechnungen, (run.bezahlteRechnungen === 1 ? t(" bezahlte Rechnung.") : t(" bezahlte Rechnungen."))))
+            el("p", "warn-belohnung", (run.bezahlteRechnungen === 1 ? tf("Du bekommst +{0} Mondblüten für 1 bezahlte Rechnung.", zahl(mondbluetenJetzt()))
+                : tf("Du bekommst +{0} Mondblüten für {1} bezahlte Rechnungen.", zahl(mondbluetenJetzt()), run.bezahlteRechnungen)))
         ]),
         knoepfe: [
             { text: t("Weiterspielen"), klasse: "knopf-gruen" },
@@ -5709,8 +5710,9 @@ function frageNeuanfang() {
             el("div", "neuanfang-belohnung", null, [spriteIcon("mondbluete", true), el("b", null, tf("+{0} Mondblüten", zahl(mondblueten)))]),
             el("p", "neuanfang-klein", run.meilensteine === 0
                 ? t("Du hast noch keinen Meilenstein erreicht und bekommst darum noch nichts.")
-                : tf("Für {0}{1}{2}", run.meilensteine, (run.meilensteine === 1 ? t(" Meilenstein") : t(" Meilensteine")), (run.koop ? t(". Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.")
-                      : t(". Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen."))))
+                : (run.meilensteine === 1 ? t("Für 1 Meilenstein.") : tf("Für {0} Meilensteine.", run.meilensteine)) + " " +
+                    (run.koop ? t("Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.")
+                        : t("Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.")))
         ]),
         breite: 480,
         knoepfe: [
