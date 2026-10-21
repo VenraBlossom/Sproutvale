@@ -2566,7 +2566,7 @@ Object.assign(UEBERSETZUNG, {
     "Erreiche {0} Meilensteine in Endlos": "Reach {0} milestones in Endless",
     "Zahle {0} Kredit ab": "Pay off {0} loan",
     "Zahle {0} Kredite ab": "Pay off {0} loans",
-    "Erreiche eine {0}er-Kombo": "Reach a {0} combo",
+    "Erreiche eine {0}er-Kombo": "Reach a combo of {0}",
     "Sammle {0} legendäre Saat ein": "Collect {0} Legendary Drop",
     "Sammle {0} legendäre Saaten ein": "Collect {0} Legendary Drops",
     "Ernte {0} Spezialpflanze": "Harvest {0} special plant",
