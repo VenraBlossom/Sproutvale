@@ -15,8 +15,12 @@ Gearbeitet wird im Branch **Beta**.
 ## Regeln im Code
 
 - Die Datei `changes_ignore.txt` nie lesen und nie hochladen.
-- Neue Texte immer über `t("...")` bzw. `tf("... {0}", wert)`. Übersetzungen in `js/sprache-en.js`, `js/sprache-es.js`, `js/sprache-fr.js`
-  eintragen. Fehlt Spanisch oder Französisch, erscheint Englisch.
+- Neue Texte immer über `t("...")` bzw. `tf("... {0}", wert)`, und zwar als **ganzer Satz mit Platzhaltern**, nie aus Stücken
+  zusammengesetzt (`t("Noch ") + n + t(" Tage")` geht in Japanisch, Türkisch usw. nicht). Übersetzungen in **alle 14** Dateien
+  `js/sprache-xx.js` eintragen (en, es, fr, it, pt, nl, pl, tr, ru, uk, ja, zh, ko). Fehlt eine, erscheint Englisch.
+- Prüfen mit `node werkzeuge/pruefe-uebersetzung.js` (`--sprache=ja` nur eine Sprache, `--aufraeumen` löscht veraltete Einträge).
+- `desktop-app/geheim.txt` (Schlüssel für den Tresor mit Käufen und Gems) nie hochladen, nie ändern, nie löschen.
+- Debug-Menü nur zum Testen: `DEBUG_ERLAUBT = true` in `js/daten.js`, vor dem Commit wieder `false`.
 - Sterne im Stellarium haben feste Positionen (`STERN_POSITIONEN`). Nach Änderungen `pruefeSternbild()` prüfen
   (keine Linie durch andere Sterne). Unendliche Sterne stehen am Ende ihres Asts.
 - **Gold- und Sternensamen-Boni werden zusammengezählt, nicht malgenommen** (`goldMulti`, `sternWertMulti` in `js/script.js`).
@@ -57,22 +61,29 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - Run 1 endet meist an der 5. Rechnung (1,87 Mio.).
 - **Nächster Schritt:** Läufe bis Platin und Kristall fertig laufen lassen, dann die Pokal-Plätze bzw. Werte festlegen.
 
-## Was zuletzt gemacht wurde (Oktober 2026)
+## Was zuletzt gemacht wurde (Oktober 2026, Vorbereitung Steam-Release)
 
-- Spanisch und Französisch komplett übersetzt.
-- Touch-Bedienung:
-  - Langes Antippen wirkt wie ein Rechtsklick.
-  - Zoomen mit zwei Fingern im Stellarium.
-  - Einsammeln durch Wischen (`pointermove`). Das ist auf einem echten Gerät noch ungetestet.
-  - Auf Touch-Geräten sagen die Texte "Finger" statt Maus.
-- Kompakte Kopfleiste für kleine Bildschirme.
-- "Weniger Partikel und Animationen" stoppt auch JS-Animationen, Figur und Begleiter bewegen sich weiter.
-- Hinweise bei Haus und Scheune erscheinen nur über dem Gebäude selbst.
-- Steam und Handy vorbereitet: Steam-Erfolge, Gem-Shop (`js/kasse.js`), Handy-Brücke (`js/handy.js`),
-  freiwillige Werbung. Details stehen in `STEAM-UND-HANDY.md`.
+- **14 Sprachen**: neu Italienisch, Portugiesisch (Brasilien), Niederländisch, Polnisch, Türkisch, Russisch, Ukrainisch,
+  Japanisch, Chinesisch (vereinfacht), Koreanisch. Beim ersten Start wird die Systemsprache genommen.
+  Schriften für Kyrillisch und Asiatisch kommen als Systemschrift-Ersatz (`html[lang=..]` in `css/style.css`).
+  Rund 500 zusammengesetzte Texte wurden zu ganzen Sätzen mit `tf()` umgebaut (Erfolge, Tarot, Kuscheltiere, Tageskarte usw.).
+- **Tresor für Käufe** (`desktop-app/tresor.js`, `js/tresor.js`): Gems, gekaufte Skins, Unterstützer-Paket und Codes liegen
+  verschlüsselt in `save/tresor.dat` (+ `tresor.bak`), nicht im Spielstand. Steam-DLC wird bei jedem Start geprüft.
+- Promocode **BETAVALE**: Beta-Tester-Begleiter, BETA-Shirt und Endlos. Alter Code und BETA-Knopf sind weg.
+- Debug-Menü aus (`DEBUG_ERLAUBT`), Entwickler-Werkzeuge im Release aus.
+- `npm run steam` (in `desktop-app`) baut die Steam-Version nach `dist-steam/Sproutvale` (Spiel als asar, kein Updater).
+- Markt: Kaufmenge x1 / x10 / Max, Stellarium: mehrere Stufen auf einmal.
+- Gem-Shop bleibt, bis die Steamworks-Sachen da sind. Details in `STEAM-UND-HANDY.md`.
+
+## Offen
+
+- Steamworks: App-ID, Erfolge (`werkzeuge/steam-erfolge.csv`), DLC, Gem-Pakete eintragen, dann Gem-Shop fertig machen.
+- Beta-Sachen (BETAVALE, Beta-Hinweise) später vor dem richtigen Release herausnehmen.
+- Balancing (siehe oben), Glücksspiel prüfen: VIP-Karte (unbegrenzt) plus Münzwurf mit 70% Glück ist sehr stark.
+- Übersetzungen von Muttersprachlern gegenlesen lassen (vor allem Japanisch, Chinesisch, Koreanisch, Türkisch).
 
 ## Ideen für danach
 
-- Weitere Sprachen: Italienisch, Portugiesisch und andere. Gleich aufbauen wie `js/sprache-es.js`.
+- Weitere Sprachen (z.B. Spanisch für Lateinamerika, Vietnamesisch, Thai): gleich aufbauen wie `js/sprache-it.js`, in `js/i18n.js` bei `SPRACHEN` eintragen.
 - Handy-App bauen und auf einem echten Gerät testen.
 - Allgemein: Quality-of-Life verbessern und neue Inhalte, ohne die erspielbare Kosmetik zu ändern.
