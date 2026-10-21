@@ -3,10 +3,12 @@
 // ============================================================
 // SPROUTVALE: Prueft die Uebersetzungen (Test-Werkzeug, wird nicht mitgeliefert)
 // Sucht alle Texte im Code (t("...") und tf("...")) und in index.html und meldet,
-// welche in sprache-en.js, sprache-es.js oder sprache-fr.js fehlen.
+// welche in den Sprachdateien (sprache-en.js, sprache-es.js, ...) fehlen.
 // Ausserdem: Eintraege, die im Code gar nicht mehr vorkommen (veraltet), und Platzhalter {0}, die nicht passen.
 // Start (im Projektordner):  node werkzeuge/pruefe-uebersetzung.js
 // Mit "--alle" werden auch alle veralteten Eintraege einzeln aufgelistet.
+// Mit "--aufraeumen" werden veraltete Eintraege aus den Sprachdateien geloescht.
+// Mit "--sprache=ja" wird nur eine Sprache geprueft.
 // ============================================================
 
 const fs = require("fs");
@@ -16,12 +18,17 @@ const vm = require("vm");
 const ORDNER = path.join(__dirname, "..");
 const JS = path.join(ORDNER, "js");
 const ALLE = process.argv.includes("--alle");
+const AUFRAEUMEN = process.argv.includes("--aufraeumen");
+const NUR = (process.argv.find(a => a.startsWith("--sprache=")) || "").slice(10);
+const SPRACHEN = fs.readdirSync(JS).map(n => (n.match(/^sprache-([a-z]{2})\.js$/) || [])[1]).filter(Boolean)
+    .sort((a, b) => (a === "en" ? -1 : b === "en" ? 1 : a.localeCompare(b)))
+    .filter(s => !NUR || s === NUR);
 
-// Uebersetzungen einer Sprache laden (die Dateien fuellen UEBERSETZUNG, Spanisch und Franzoesisch nur bei passender SPRACHE)
+// Uebersetzungen einer Sprache laden (die Dateien fuellen UEBERSETZUNG, alle ausser Englisch nur bei passender SPRACHE)
 function ladeSprache(sprache) {
     const kontext = { SPRACHE: sprache, UEBERSETZUNG: {} };
     vm.createContext(kontext);
-    const datei = { en: "sprache-en.js", es: "sprache-es.js", fr: "sprache-fr.js" }[sprache];
+    const datei = "sprache-" + sprache + ".js";
     const code = fs.readFileSync(path.join(JS, datei), "utf8").replace(/^"use strict";/, "");
     vm.runInContext(code.replace(/\bconst UEBERSETZUNG\b/, "var _x"), kontext);
     return kontext.UEBERSETZUNG;
@@ -80,7 +87,24 @@ const alle = new Map([...html, ...code]);
 const GLEICH_OK = /^[\s\d.,:;!?+\-x×%/()·…|#=<>*★☆✔✕✓❓🔒]*$|^Sproutvale$|^VenraBlossom$|^BETA$/u;
 
 let fehler = 0;
-["en", "es", "fr"].forEach(sprache => {
+// Veraltete Eintraege (eine Zeile pro Eintrag) aus einer Sprachdatei loeschen
+function raeumeAuf(sprache, veraltet) {
+    const datei = path.join(JS, "sprache-" + sprache + ".js");
+    const weg = new Set(veraltet);
+    const zeilen = fs.readFileSync(datei, "utf8").split("\n");
+    const neu = zeilen.filter(zeile => {
+        const m = zeile.match(/^\s*("(?:[^"\\]|\\.)*"):\s/);
+        return !(m && weg.has(JSON.parse(m[1])));
+    });
+    // Komma vor dem schliessenden "});" entfernen
+    for (let i = neu.length - 1; i > 0; i--) {
+        if (/^\}\);/.test(neu[i].trim())) { neu[i - 1] = neu[i - 1].replace(/,(\s*)$/, "$1"); break; }
+    }
+    fs.writeFileSync(datei, neu.join("\n"));
+    console.log("  " + (zeilen.length - neu.length) + " veraltete Eintraege geloescht");
+}
+
+SPRACHEN.forEach(sprache => {
     const tabelle = ladeSprache(sprache);
     const fehlt = [];
     const englisch = [];
@@ -100,6 +124,7 @@ let fehler = 0;
     falscheZeichen.forEach(([text, wert]) => console.log("  PLATZHALTER  " + JSON.stringify(text) + " -> " + JSON.stringify(wert)));
     englisch.forEach(([text, ort]) => console.log("  ENGLISCH  " + ort + "  " + JSON.stringify(text)));
     if (ALLE) veraltet.forEach(text => console.log("  VERALTET  " + JSON.stringify(text)));
+    if (AUFRAEUMEN && veraltet.length) raeumeAuf(sprache, veraltet);
     fehler += fehlt.length + falscheZeichen.length;
 });
 console.log("\n" + alle.size + " Texte im Code und in index.html geprueft.");

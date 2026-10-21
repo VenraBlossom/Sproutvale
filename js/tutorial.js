@@ -79,7 +79,7 @@ function zeigeTutorial() {
         tutorialBlase.classList.add("versteckt");
         return;
     }
-    tutorialKopf.textContent = t("📖 Tipp ") + (meta.tutorial + 1) + " / " + TUTORIAL_SCHRITTE.length;
+    tutorialKopf.textContent = tf("📖 Tipp {0} / {1}", (meta.tutorial + 1), TUTORIAL_SCHRITTE.length);
     tutorialText.textContent = schritt.text;
     tutorialKnoepfe.innerHTML = "";
     if (schritt.knopf) {

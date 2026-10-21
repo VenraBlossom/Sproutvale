@@ -253,7 +253,7 @@ function debugKategorien() {
     return Object.keys(KOSMETIK_LISTEN).map(k => {
         const haus = KOSMETIK_KATEGORIEN.find(x => x.id === k);
         const figur = k.startsWith("figur_") && FIGUR_KATEGORIEN.find(x => x.id === k.slice(6));
-        return { wert: k, name: haus ? haus.name : figur ? t("Figur: ") + figur.name : k, symbol: haus ? haus.symbol : null };
+        return { wert: k, name: haus ? haus.name : figur ? tf("Figur: {0}", figur.name) : k, symbol: haus ? haus.symbol : null };
     });
 }
 

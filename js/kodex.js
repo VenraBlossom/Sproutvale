@@ -17,12 +17,9 @@ function kodexEintraege(reiter) {
                 const naechste = MEISTER_SCHWELLEN[stufe];
                 return {
                     bild: { sprite: p.id }, name: p.name, anzahl: k.pflanzen[p.id] || 0,
-                    text: t("Grundwert ") + zahl(p.verkaufswert) + t(" Gold, ") + sekText(p.sekProStufe * 3) + t(" bis zur Ernte.") +
-                        (p.eigenschaftText ? " " + p.eigenschaftText : ""),
+                    text: tf("Grundwert {0} Gold, {1} bis zur Ernte.{2}", zahl(p.verkaufswert), sekText(p.sekProStufe * 3), (p.eigenschaftText ? " " + p.eigenschaftText : "")),
                     zaehler: t("geerntet"),
-                    extra: t("🏅 Meisterschaft ") + stufe + "/" + MEISTER_SCHWELLEN.length +
-                        (stufe > 0 ? " (+" + Math.round(meisterBonus() * 100 * stufe) + t("% Wert)") : "") +
-                        (naechste ? t(" · nächste bei ") + zahl(naechste) : t(" · Maximum!"))
+                    extra: tf("🏅 Meisterschaft {0}/{1}{2}{3}", stufe, MEISTER_SCHWELLEN.length, (stufe > 0 ? tf(" (+{0}% Wert)", Math.round(meisterBonus() * 100 * stufe)) : ""), (naechste ? tf(" · nächste bei {0}", zahl(naechste)) : t(" · Maximum!")))
                 };
             });
         case "varianten":
@@ -32,8 +29,7 @@ function kodexEintraege(reiter) {
         case "werkzeuge":
             return WERKZEUGE.map(w => ({ bild: { emoji: w.symbol }, name: w.name, anzahl: k.werkzeuge[w.id] || 0,
                 text: w.text(w.wert), zaehler: t("gekauft"),
-                detail: t("Stufe 1: ") + w.kurz(w.wert) + " · " + (w.kurz(1).trim().startsWith("-") ? "-" : "+") +
-                    prozentText(w.wert * WERKZEUG_STUFEN_BONUS) + t(" pro weitere Stufe") }));
+                detail: tf("Stufe 1: {0} · {1}{2} pro weitere Stufe", w.kurz(w.wert), (w.kurz(1).trim().startsWith("-") ? "-" : "+"), prozentText(w.wert * WERKZEUG_STUFEN_BONUS)) }));
         case "jahreszeiten":
             return JAHRESZEITEN.map(z => ({ bild: { emoji: z.symbol }, name: z.name, anzahl: (k.jahreszeiten || {})[z.id] || 0,
                 text: z.text, ohneZaehler: true }));
@@ -95,8 +91,8 @@ function pruefeKodexBelohnungen() {
         if (entdeckt >= gesamt && gesamt > 0 && !meta.kodexBelohnt[r.id]) {
             meta.kodexBelohnt[r.id] = true;
             meta.gutscheine += KODEX_BELOHNUNG.gutscheineBereich;
-            zeigeBanner("📖", t("Kodex vollständig: ") + r.text.replace(/^\S+ /, ""),
-                "+" + KODEX_BELOHNUNG.gutscheineBereich + t(" 🎟️ und für immer +3% Gold"), "#6b4220", 3600);
+            zeigeBanner("📖", tf("Kodex vollständig: {0}", r.text.replace(/^\S+ /, "")),
+                tf("+{0} 🎟️ und für immer +3% Gold", KODEX_BELOHNUNG.gutscheineBereich), "#6b4220", 3600);
             Klang.jackpot();
             geaendert = true;
         }
@@ -109,7 +105,7 @@ function pruefeKodexBelohnungen() {
         const neu = stufe - meta.kodexStufe;
         meta.kodexStufe = stufe;
         meta.gutscheine += neu;
-        zeigeToast(t("📖 Kodex: ") + summe + t(" Entdeckungen! +") + neu + t(" 🎟️ Kuschel-Gutschein"));
+        zeigeToast(tf("📖 Kodex: {0} Entdeckungen! +{1} 🎟️ Kuschel-Gutschein", summe, neu));
         geaendert = true;
     }
     if (geaendert) speichereMeta();
@@ -127,15 +123,13 @@ function renderKodex(inhalt) {
     balken.firstChild.style.width = (aktuell.entdeckt / Math.max(1, aktuell.gesamt)) * 100 + "%";
     inhalt.appendChild(el("div", "kodex-belohnung", null, [
         el("div", "kodex-belohnung-zeile", null, [
-            el("b", null, "📖 " + alle + t(" Entdeckungen")),
-            el("span", null, t("Nächster 🎟️ Gutschein bei ") + naechste),
-            el("span", null, t("Bereiche vollständig: ") + kodexBereicheFertig() + " / " + KODEX_REITER.length +
-                " (+" + Math.round(kodexBereicheFertig() * KODEX_BELOHNUNG.goldBereich * 100) + t("% Gold)"))
+            el("b", null, tf("📖 {0} Entdeckungen", alle)),
+            el("span", null, tf("Nächster 🎟️ Gutschein bei {0}", naechste)),
+            el("span", null, tf("Bereiche vollständig: {0} / {1} (+{2}% Gold)", kodexBereicheFertig(), KODEX_REITER.length, Math.round(kodexBereicheFertig() * KODEX_BELOHNUNG.goldBereich * 100)))
         ]),
         balken,
         el("div", "kodex-belohnung-text", fertig ? t("✔ Dieser Bereich ist vollständig: Belohnung erhalten.")
-            : t("Vervollständige diesen Bereich (") + aktuell.entdeckt + " / " + aktuell.gesamt + t(") für +") +
-            KODEX_BELOHNUNG.gutscheineBereich + t(" 🎟️ und für immer +3% Gold."))
+            : tf("Vervollständige diesen Bereich ({0} / {1}) für +{2} 🎟️ und für immer +3% Gold.", aktuell.entdeckt, aktuell.gesamt, KODEX_BELOHNUNG.gutscheineBereich))
     ]));
     const leiste = el("div", "haus-reiter");
     KODEX_REITER.forEach(r => {
@@ -168,7 +162,7 @@ function renderKodex(inhalt) {
             el("div", "kodex-bildrahmen", null, [bild]),
             el("div", "kodex-name", entdeckt ? e.name : "???"),
             el("div", "kodex-text", entdeckt ? e.text : t("Noch nicht entdeckt.")),
-            el("div", "kodex-zahl", entdeckt && !e.ohneZaehler ? zahl(e.anzahl) + t("x ") + e.zaehler : ""),
+            el("div", "kodex-zahl", entdeckt && !e.ohneZaehler ? tf("{0}x {1}", zahl(e.anzahl), e.zaehler) : ""),
             entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null,
             entdeckt && e.detail ? el("div", "kodex-detail versteckt", e.detail) : null
         ]);

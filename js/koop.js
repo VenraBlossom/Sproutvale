@@ -771,7 +771,7 @@ function koopFragePlatzUeberschreiben() {
     for (let slot = 1; slot <= KOOP_KONFIG.slots; slot++) {
         const r = (koopLeseEigenenRun(true, slot) || {}).run;
         knoepfe.push({
-            text: t("💾 Platz ") + slot + (r ? " (" + t("Tag ") + r.tag + ")" : ""),
+            text: tf("💾 Platz {0}{1}", slot, (r ? tf(" (Tag {0})", r.tag) : "")),
             klasse: "knopf-rot",
             aktion: () => {
                 koop.gastPlatz = slot;
@@ -1201,8 +1201,8 @@ function renderKoopLobby() {
             const r = daten && daten.run;
             const zeile = el("div", "endlos-slot" + (koop.lobby.slot === slot ? " aktiv" : ""), null, [
                 el("div", "endlos-slot-text", null, [
-                    el("b", null, t("Koop-Speicherstand ") + slot),
-                    el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold") : t("Leer"))
+                    el("b", null, tf("Koop-Speicherstand {0}", slot)),
+                    el("span", null, r ? tf("📅 Tag {0} · 🏁 {1} Meilensteine · 🪙 {2} Gold", r.tag, (r.meilensteine || 0), zahl(r.gold || 0)) : t("Leer"))
                 ])
             ]);
             if (host) {
@@ -1260,9 +1260,7 @@ function aktualisiereKoopKnopf() {
     const span = knopf.querySelector("span");
     if (span.textContent !== text) span.textContent = text;
     knopf.classList.toggle("wartet", !koop.verbunden);
-    setzeTipp(knopf, "## " + t("👥 Duo") + "\n= " + (koop.rolle === "host" ? t("Du bist Host") : t("Du bist Gast")) +
-        "\n- " + (koop.verbunden ? t("Mitspieler verbunden") : t("Mitspieler nicht da: mit dem Code kann er wieder beitreten")) +
-        "\n" + t("Klick: Code anzeigen, kopieren oder neu machen"));
+    setzeTipp(knopf, tf("## 👥 Duo\n= {0}\n- {1}\nKlick: Code anzeigen, kopieren oder neu machen", (koop.rolle === "host" ? t("Du bist Host") : t("Du bist Gast")), (koop.verbunden ? t("Mitspieler verbunden") : t("Mitspieler nicht da: mit dem Code kann er wieder beitreten"))));
 }
 
 function zeigeKoopFenster() {

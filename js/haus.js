@@ -105,7 +105,7 @@ function pruefeNeueKosmetik() {
         liste.filter(e => e.quelle === "erspielt" && !meta.freigeschaltet[kategorie + ":" + e.id]).forEach(e => {
             if (!istKosmetikFrei(e, kategorie)) return;
             neu = true;
-            zeigeBanner("🏡", t("Neu im Haus: ") + e.name, t("Klick aufs Bauernhaus, um es auszuwählen"), "#2e9e2e", 3600);
+            zeigeBanner("🏡", tf("Neu im Haus: {0}", e.name), t("Klick aufs Bauernhaus, um es auszuwählen"), "#2e9e2e", 3600);
             Klang.geschenk();
         });
     });
@@ -1345,7 +1345,7 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
             liste.splice(index, 1);
         } else if (liste.length >= DEKO_MAX) {
             Klang.fehler();
-            zeigeToast(t("Es passen höchstens ") + DEKO_MAX + t(" Deko-Objekte in den Hof. Nimm zuerst eins weg."));
+            zeigeToast(tf("Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.", DEKO_MAX));
             return;
         } else {
             liste.push(eintrag.id);
@@ -1437,7 +1437,7 @@ function renderHaus(inhalt) {
     const hinweise = {
         haustier: t("Dein Begleiter auf dem Hof. Rechtsklick auf ihn öffnet seine Aktionen."),
         landschaft: t("Das Aussehen deines Hofs und der Wiese."),
-        deko: t("Bis zu ") + DEKO_MAX + t(" Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen."),
+        deko: tf("Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.", DEKO_MAX),
         musik: t("\"Automatisch\" wechselt mit der Tageszeit zwischen deinen Liedern. Klick auf ein fremdes Lied zum Probehören."),
         samenladen: t("Der Look deines Samenladens, manche mit Effekten."),
         felder: t("So sieht die Erde auf deinen Feldern aus."),
@@ -1452,8 +1452,8 @@ function renderHaus(inhalt) {
     // Vorschau-Leiste: was gerade anprobiert wird und was es kostet
     if (kosmetikVorschau && kosmetikVorschau.kategorie === kategorie) {
         const eintrag = KOSMETIK_LISTEN[kategorie].find(e => e.id === kosmetikVorschau.id);
-        const woher = eintrag.quelle === "dlc" ? t("Bald im Steam-Shop: ") + dlcPreisText(eintrag)
-            : t("Freispielen: ") + eintrag.bedingungText;
+        const woher = eintrag.quelle === "dlc" ? tf("Bald im Steam-Shop: {0}", dlcPreisText(eintrag))
+            : tf("Freispielen: {0}", eintrag.bedingungText);
         const ende = el("button", "knopf", t("Vorschau beenden"));
         ende.addEventListener("click", () => {
             beendeKosmetikVorschau();

@@ -2159,10 +2159,7 @@ function aktualisiereProfilKnopf() {
         el("span", "profil-rang", tf("Level {0}", rang)),
         xpLeiste((xp - von) / (bis - von))
     ]));
-    setzeTipp(knopf, "## " + tf("⭐ Level {0}", rang) + "\n" +
-        tf("Erfahrung: {0} / {1}", zahl(xp - von), zahl(bis - von)) + "\n- " +
-        t("Erfahrung gibt es für fast alles: Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere und Erfolge.") + "\n- " +
-        t("Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar)."));
+    setzeTipp(knopf, tf("## {0}\n{1}\n- Erfahrung gibt es für fast alles: Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere und Erfolge.\n- Das Level gibt keine Vorteile im Spiel. Alle 5 Level gibt es eine neue Aura (im Profil wählbar).", tf("⭐ Level {0}", rang), tf("Erfahrung: {0} / {1}", zahl(xp - von), zahl(bis - von))));
 }
 
 function xpLeiste(anteil) {
@@ -2263,8 +2260,7 @@ function renderProfil() {
     // Hinweis, wenn etwas nur anprobiert ist
     const nichtBesessen = FIGUR_KATEGORIEN.filter(k => !istKosmetikFrei(figurTeil(k.id, profilVorschau[k.id]), "figur_" + k.id));
     if (nichtBesessen.length > 0) {
-        links.appendChild(el("div", "profil-anprobe", t("👀 Nur anprobiert: ") + nichtBesessen.map(k => figurTeil(k.id, profilVorschau[k.id]).name).join(", ") +
-            t(". Im Spiel trägst du dafür dein bisheriges Teil.")));
+        links.appendChild(el("div", "profil-anprobe", tf("👀 Nur anprobiert: {0}. Im Spiel trägst du dafür dein bisheriges Teil.", nichtBesessen.map(k => figurTeil(k.id, profilVorschau[k.id]).name).join(", "))));
     }
     inhalt.appendChild(links);
 

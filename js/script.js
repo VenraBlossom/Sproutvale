@@ -757,7 +757,7 @@ function istBossRechnung(index) {
 }
 
 function tageText(anzahl) {
-    return anzahl === 1 ? t("1 Tag") : anzahl + t(" Tagen");
+    return anzahl === 1 ? t("1 Tag") : tf("{0} Tagen", anzahl);
 }
 
 // ---------- SANDBOX: MEILENSTEINE ----------
@@ -1613,7 +1613,7 @@ function ernteMitCursor(x, y) {
         .forEach(schubsWachstum);
     if (geerntet >= 2) {
         const farbe = geerntet >= 9 ? "#d9452c" : geerntet >= 4 ? "#e08a00" : "#2e9e2e";
-        zeigeSchwebeText(x, y - 24, geerntet + t("x Ernte!"), farbe, geerntet >= 3);
+        zeigeSchwebeText(x, y - 24, tf("{0}x Ernte!", geerntet), farbe, geerntet >= 3);
         if (geerntet >= 4) partikel(x, y, ["#ffd93d", "#ffffff", "#a3dc6f"], Math.min(40, 10 + geerntet * 2), 90);
         if (geerntet >= 3) grosseErnteWelle(x, y, geerntet);
     }
@@ -1645,7 +1645,7 @@ function klickFeld(feld) {
 
     if (feld.ernteKlicksRest > 1) {
         feld.ernteKlicksRest -= 1;
-        feld.el.nameEl.textContent = t("Noch ") + feld.ernteKlicksRest + "x";
+        feld.el.nameEl.textContent = tf("Noch {0}x", feld.ernteKlicksRest);
         const { x, y } = feldMitte(feld);
         partikel(x, y, ["#9fe8ff", "#ffffff", "#5aa9e6"], 6, 45);
         Klang.klick(40);
@@ -1702,7 +1702,7 @@ function aktualisiereKaufKachel() {
         }
         const eigene = !koopAktiv() || seite === eigeneSeite();
         const kosten = feldKosten(seite);
-        el.querySelector(".kauf-preis").textContent = zahl(kosten) + t(" Gold");
+        el.querySelector(".kauf-preis").textContent = tf("{0} Gold", zahl(kosten));
         el.classList.toggle("fremd", !eigene);
         el.classList.toggle("gesperrt", !eigene || !darfEinkaufen() || run.gold < kosten);
         el.classList.toggle("leistbar", eigene && darfEinkaufen() && run.gold >= kosten);
@@ -1795,7 +1795,7 @@ function zaehleBodenErnte(feld, x, y, direkt) {
 
 function feldTipp(feld) {
     const p = feld.pflanze;
-    let text = p.emoji + " " + p.name + " · " + zahl(verkaufswert(p)) + t(" Gold Grundwert");
+    let text = tf("{0} {1} · {2} Gold Grundwert", p.emoji, p.name, zahl(verkaufswert(p)));
     if (feld.variante) text += "\n" + feld.variante.badge + " " + feld.variante.titel + ": " + feld.variante.beschreibung;
     if (eigenschaftText(p)) text += "\n" + eigenschaftText(p);
     if (feld.bewaessert) text += t("\n💧 Bewässert: wächst schneller");
@@ -1858,7 +1858,7 @@ function wachseEineStufe(feld) {
         feld.fortschrittMs = 0;
         feld.el.feldDiv.classList.add("feld-fertig");
         feld.el.balkenInnen.style.width = "100%";
-        if (feld.ernteKlicksRest > 0) feld.el.nameEl.textContent = t("Noch ") + feld.ernteKlicksRest + "x";
+        if (feld.ernteKlicksRest > 0) feld.el.nameEl.textContent = tf("Noch {0}x", feld.ernteKlicksRest);
     }
     zeigeFeldSprite(feld);
 }
@@ -1978,8 +1978,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende") + Math.floor(segen("meisterlich"));
     if (meisterStufe(pflanze.id) > stufeVorher) {
         const stufe = meisterStufe(pflanze.id);
-        zeigeBanner(pflanze.emoji, pflanze.name + t(": Meisterschaft ") + stufe + "!",
-            t("Für immer +") + Math.round(meisterBonus() * 100 * stufe) + t("% Wert für ") + pflanze.name, "#d49a00", 3500);
+        zeigeBanner(pflanze.emoji, tf("{0}: Meisterschaft {1}!", pflanze.name, stufe),
+            tf("Für immer +{0}% Wert für {1}", Math.round(meisterBonus() * 100 * stufe), pflanze.name), "#d49a00", 3500);
         Klang.jackpot();
     }
     if (variante) {
@@ -2105,7 +2105,7 @@ function wendeErnteEffekteAn(feld, variante, x, y) {
         kombo.letzterKlick = performance.now();
         run.gesamt.maxKombo = Math.max(run.gesamt.maxKombo, kombo.zaehler);
         pruefeKomboStufe();
-        zeigeSchwebeText(x, y - 30, "🍯 +" + variante.kombo + t(" Kombo"), "#d49a00", false);
+        zeigeSchwebeText(x, y - 30, tf("🍯 +{0} Kombo", variante.kombo), "#d49a00", false);
     }
 }
 
@@ -2318,7 +2318,7 @@ function pruefeKomboStufe() {
     if (multi > kombo.letzteStufe) {
         const rect = plantButton.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
-        zeigeSchwebeText(x, rect.top - 10, t("KOMBO x") + multi + "!", KOMBO_FARBEN[multi] || "#d9452c", true);
+        zeigeSchwebeText(x, rect.top - 10, tf("KOMBO x{0}!", multi), KOMBO_FARBEN[multi] || "#d9452c", true);
         partikel(x, rect.top + rect.height / 2, ["#ffd93d", "#ffffff", "#ff8fb1"], 16 + multi * 4, 110);
         Klang.erfolg();
     }
@@ -2390,7 +2390,7 @@ function aktualisiereKombo(jetzt) {
     const multi = komboStufe();
     komboAnzeige.classList.remove("versteckt");
     komboAnzeige.dataset.stufe = multi;
-    komboText.textContent = t("Kombo ") + kombo.zaehler + t("  ·  x") + multi;
+    komboText.textContent = tf("Kombo {0}  ·  x{1}", kombo.zaehler, multi);
     const tierText = multi >= 2 ? tf("Helfer-Tempo +{0}%", Math.round(komboTierBonus() * 100)) : "";
     if (komboTiere.textContent !== tierText) komboTiere.textContent = tierText;
     const sternText = multi >= 2 ? tf("/Klick +{0}%", Math.round(komboSternBonus() * 100)) : "";
@@ -2487,11 +2487,11 @@ function aktualisiereTimer(dtMs) {
     const tipp = [];
     if (run.goldBuffMs > 0) {
         buffs.push("🌠 " + Math.ceil(run.goldBuffMs / 1000) + "s");
-        tipp.push("## " + t("🌠 Sternschnuppe"), "= " + t("x2 Gold"), "- " + t("noch ") + Math.ceil(run.goldBuffMs / 1000) + t(" Sekunden"));
+        tipp.push("## " + t("🌠 Sternschnuppe"), "= " + t("x2 Gold"), tf("- noch {0} Sekunden", Math.ceil(run.goldBuffMs / 1000)));
     }
     if (run.rauschMs > 0) {
         buffs.push("🔥 " + Math.ceil(run.rauschMs / 1000) + "s");
-        tipp.push("## " + t("🔥 Goldrausch"), "= " + t("x3 Gold"), "- " + t("noch ") + Math.ceil(run.rauschMs / 1000) + t(" Sekunden"));
+        tipp.push("## " + t("🔥 Goldrausch"), "= " + t("x3 Gold"), tf("- noch {0} Sekunden", Math.ceil(run.rauschMs / 1000)));
     }
     buffAnzeige.classList.toggle("versteckt", buffs.length === 0);
     if (buffs.length > 0 && buffAnzeige.textContent !== buffs.join("  ")) buffAnzeige.textContent = buffs.join("  ");
@@ -2848,8 +2848,7 @@ function spawnSternschnuppe() {
             aktualisiereTopBar();
         }
         partikel(x, y, ["#ffe89a", "#ffffff", "#ffd93d"], 24, 110);
-        zeigeBanner("🌠", t("Sternschnuppe gefangen!"), sek + t(" Sekunden doppeltes Gold") +
-            (liegend.length > 0 ? t(", dazu ") + liegend.length + (liegend.length === 1 ? t(" liegende Saat") : t(" liegende Saaten")) + t(" x2") : ""),
+        zeigeBanner("🌠", t("Sternschnuppe gefangen!"), tf("{0} Sekunden doppeltes Gold{1}", sek, (liegend.length > 0 ? tf(", dazu {0}{1} x2", liegend.length, (liegend.length === 1 ? t(" liegende Saat") : t(" liegende Saaten"))) : "")),
             "#e0a800", 2600);
         Klang.stern();
     });
@@ -3009,7 +3008,7 @@ function pruefeErfolge() {
             meta.erfolge[id] = true;
             neu = true;
             // Die Belohnung holt man bei den Erfolgen ab (dort leuchtet der Erfolg)
-            zeigeBanner(kette.icon, t("Erfolg: ") + kette.text(ziel), "", "#7c4fb3", 3600);
+            zeigeBanner(kette.icon, tf("Erfolg: {0}", kette.text(ziel)), "", "#7c4fb3", 3600);
             if (!run.sandbox) meldeAnDesktop("erfolg", steamErfolgId(kette, index));
             Klang.erfolg();
         });
@@ -3106,7 +3105,7 @@ function renderErfolge() {
     const offen = anzahlAbholbar(m, sandbox);
     // Gutscheine offen: oben immer "Alle abholen" (auch wenn es nur einer ist)
     if (aktiv && offen > 0) {
-        const alle = el("button", "knopf knopf-lila erfolg-alle", t("🎟️ Alle abholen (") + offen + ")");
+        const alle = el("button", "knopf knopf-lila erfolg-alle", tf("🎟️ Alle abholen ({0})", offen));
         alle.addEventListener("click", () => {
             erfolgKettenFuer(sandbox).forEach(kette => {
                 if (abholbareStufen(kette).length > 0) holeErfolgAb(kette, null);
@@ -3117,9 +3116,7 @@ function renderErfolge() {
         erfolgeContent.appendChild(alle);
     }
     erfolgeContent.appendChild(erstelleHinweis(
-        "🏆 " + fertig + t(" von ") + alle + t(" Stufen geschafft") + (sandbox ? t(" (Endlos)") : t(" (Story)")) +
-        t(". Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.") +
-        (offen > 0 && !aktiv ? t(" Abholen kannst du sie, wenn du in diesem Modus spielst.") : "")));
+        tf("🏆 {0} von {1} Stufen geschafft{2}. Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.{3}", fertig, alle, (sandbox ? t(" (Endlos)") : t(" (Story)")), (offen > 0 && !aktiv ? t(" Abholen kannst du sie, wenn du in diesem Modus spielst.") : ""))));
 
     erfolgKettenFuer(sandbox).forEach(kette => {
         const offenIndex = kette.ziele.findIndex((_, i) => !m.erfolge[erfolgStufeId(kette, i)]);
@@ -3133,19 +3130,19 @@ function renderErfolge() {
             item.appendChild(el("span", "erfolg-ausruf", "!"));
             if (aktiv) {
                 item.addEventListener("pointerdown", () => holeErfolgAb(kette, item));
-                setzeTipp(item, t("Klicken: ") + abholbar + (abholbar === 1 ? t(" Gutschein abholen") : t(" Gutscheine abholen")));
+                setzeTipp(item, tf("Klicken: {0}{1}", abholbar, (abholbar === 1 ? t(" Gutschein abholen") : t(" Gutscheine abholen"))));
             }
         }
 
         if (offenIndex === -1) {
             item.classList.add("geschafft");
             text.textContent = kette.text(kette.ziele[kette.ziele.length - 1]);
-            stufeText.textContent = t("✅ Alle ") + kette.ziele.length + t(" Stufen");
+            stufeText.textContent = tf("✅ Alle {0} Stufen", kette.ziele.length);
         } else {
             const ziel = kette.ziele[offenIndex];
             const wert = Math.min(Number(kette.wert(m, r)) || 0, ziel);
             text.textContent = kette.text(ziel);
-            stufeText.textContent = t("Stufe ") + (offenIndex + 1) + "/" + kette.ziele.length;
+            stufeText.textContent = tf("Stufe {0}/{1}", (offenIndex + 1), kette.ziele.length);
 
             const balken = el("div", "erfolg-balken");
             const fuellung = el("div");
@@ -3267,12 +3264,11 @@ segenKnopf.prepend(pixelIcon("🙏", 28, "icon"));
 
 function segenText() {
     const liste = Object.entries(run.segen).filter(([, stufe]) => stufe > 0);
-    if (liste.length === 0) return t("## 🙏 Deine Segen") + "\n" + t("Noch keine. Segen bekommst du nach jeder bezahlten Rechnung") +
-        (run.sandbox ? t(" (Endlos: für jeden Meilenstein).") : ".");
-    return t("## 🙏 Deine Segen") + "\n" + liste.map(([id, stufe]) => {
+    if (liste.length === 0) return tf("## 🙏 Deine Segen\nNoch keine. Segen bekommst du nach jeder bezahlten Rechnung{0}", (run.sandbox ? t(" (Endlos: für jeden Meilenstein).") : "."));
+    return tf("## 🙏 Deine Segen\n{0}", liste.map(([id, stufe]) => {
         const s = SEGEN_NACH_ID[id];
-        return s ? s.badge + " " + s.name + (stufe > 1 ? t(" x") + stufe : "") + ": " + s.text : "";
-    }).join("\n");
+        return s ? s.badge + " " + s.name + (stufe > 1 ? tf(" x{0}", stufe) : "") + ": " + s.text : "";
+    }).join("\n"));
 }
 
 registriereHaken("anzeige", () => {
@@ -3290,8 +3286,8 @@ segenKnopf.addEventListener("click", () => {
         if (!s) return;
         inhalt.appendChild(el("div", "segen-listen-eintrag", null, [
             pixelIcon(s.badge, 48),
-            el("div", null, null, [el("b", null, s.name + (stufe > 1 ? t(" x") + stufe : "") +
-                (run.segenExtra && run.segenExtra[id] ? " (+" + Math.round(run.segenExtra[id] * 100) + t("% stärker") + ")" : "")), el("div", null, s.text)])
+            el("div", null, null, [el("b", null, s.name + (stufe > 1 ? tf(" x{0}", stufe) : "") +
+                (run.segenExtra && run.segenExtra[id] ? tf(" (+{0}% stärker)", Math.round(run.segenExtra[id] * 100)) : "")), el("div", null, s.text)])
         ]));
     });
     zeigePopup({ titel: t("🙏 Deine Segen in diesem Run"), inhalt, breite: 620 });
@@ -3351,8 +3347,8 @@ function zeigeSegenAuswahl(auswahl) {
                 .map(e => el("div", "segen-evo-schild", "🧬 " + tf("Entwickelt {0}", e.name)))),
             el("div", "segen-name", s.name),
             el("div", "segen-text", s.text),
-            el("div", "segen-stufe", (stufe > 0 ? t("Du hast ihn schon ") + stufe + t("x, stapelt sich") : t("Neu")) +
-                (run.fruehBonus ? " · +" + Math.round(run.fruehBonus * 100) + t("% stärker") : ""))
+            el("div", "segen-stufe", (stufe > 0 ? tf("Du hast ihn schon {0}x, stapelt sich", stufe) : t("Neu")) +
+                (run.fruehBonus ? tf(" · +{0}% stärker", Math.round(run.fruehBonus * 100)) : ""))
         );
         karte.addEventListener("click", () => waehleSegen(id, karte));
         segenKarten.appendChild(karte);
@@ -3367,7 +3363,7 @@ function waehleSegen(id, karte) {
     if (id === "vorschuss" && !run.sandbox) {
         const vorschuss = aufrunden(0.5 * rechnungsBetrag(run.bezahlteRechnungen) / (run.koop ? KOOP_ANFORDERUNG : 1));
         run.gold += vorschuss;
-        zeigeToast("💰 +" + zahl(vorschuss) + t(" Gold Vorschuss"));
+        zeigeToast(tf("💰 +{0} Gold Vorschuss", zahl(vorschuss)));
     }
     // Frueh bezahlte Rechnung: dieser Segen wirkt staerker
     if (run.fruehBonus) {
@@ -3477,7 +3473,7 @@ function starteTag(fortsetzen = false) {
     kartenHalter.classList.add("versteckt");
     if (!fortsetzen) Klang.tagStart();
     haken("tagStart", fortsetzen);
-    meldeAnDesktop("status", (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag + " · " + run.bezahlteRechnungen + t(" Rechnungen bezahlt"));
+    meldeAnDesktop("status", tf("{0}Tag {1} · {2} Rechnungen bezahlt", (run.sandbox ? t("Endlos · ") : ""), run.tag, run.bezahlteRechnungen));
     aktualisiereAlles();
 }
 
@@ -3493,8 +3489,7 @@ function pruefeMeilensteine() {
         if (hierophant > 0) gibSternensamen(hierophant);
     }
     run.meilensteineGemeldet = run.meilensteine;
-    zeigeBanner("🏁", t("Meilenstein ") + run.meilensteine + t(" erreicht!"), zahl(meilensteinSchwelle(run.meilensteine)) +
-        t(" Gold verdient. Wähle einen Segen!"), "#2e9e2e", 3200);
+    zeigeBanner("🏁", tf("Meilenstein {0} erreicht!", run.meilensteine), tf("{0} Gold verdient. Wähle einen Segen!", zahl(meilensteinSchwelle(run.meilensteine))), "#2e9e2e", 3200);
     Klang.rechnung();
     // Ein Segen pro Meilenstein, mehrere nacheinander
     if (run.segenAuswahl) {
@@ -3528,7 +3523,7 @@ function naechsterSandboxTag() {
     haken("tagVorbereiten"); // neues Wetter
     verteileFeldEffekte();
     haken("tagStart");
-    if (!imHauptmenue()) zeigeBanner("☀️", t("Tag ") + run.tag, t("Ein neuer Tag beginnt"), "#e0a800", 2600);
+    if (!imHauptmenue()) zeigeBanner("☀️", tf("Tag {0}", run.tag), t("Ein neuer Tag beginnt"), "#e0a800", 2600);
     Klang.tagStart();
     speichereRun();
     speichereMeta();
@@ -3542,9 +3537,8 @@ function pruefeMondphaseFrei() {
     if (run.bezahlteRechnungen < MONDPHASE_FREI_AB_RECHNUNGEN) return;
     meta.mondphaseFrei = frei + 1;
     const neu = MONDPHASEN[frei + 1];
-    run.nachrichten.push(neu.symbol + t(" Neue Mondphase freigeschaltet: ") + neu.name + t(" (im Mondteich wählbar, +") +
-        Math.round(MONDPHASE_BONUS * 100 * (frei + 1)) + t("% Mondblüten)"));
-    zeigeBanner(neu.symbol, t("Neue Mondphase: ") + neu.name, t("Wählbar im Mondteich, mehr Mondblüten"), "#7c4fb3", 4500);
+    run.nachrichten.push(tf("{0} Neue Mondphase freigeschaltet: {1} (im Mondteich wählbar, +{2}% Mondblüten)", neu.symbol, neu.name, Math.round(MONDPHASE_BONUS * 100 * (frei + 1))));
+    zeigeBanner(neu.symbol, tf("Neue Mondphase: {0}", neu.name), t("Wählbar im Mondteich, mehr Mondblüten"), "#7c4fb3", 4500);
     speichereMeta();
 }
 
@@ -3565,7 +3559,7 @@ function bezahleRechnungen() {
     if (!run.gnadenRechnung && run.gnadenGenutzt < aufrunden(tw("gerechtigkeit"))) {
         run.gnadenGenutzt += 1;
         run.gnadenRechnung = aufrunden(faellig * 1.25);
-        run.nachrichten.push(t("⚖️ Gnadenfrist! Zahle ") + zahl(run.gnadenRechnung) + t(" Gold nach dem nächsten Tag."));
+        run.nachrichten.push(tf("⚖️ Gnadenfrist! Zahle {0} Gold nach dem nächsten Tag.", zahl(run.gnadenRechnung)));
         return true;
     }
 
@@ -3655,24 +3649,24 @@ function zahleRechnung(faellig) {
     run.gnadenRechnung = 0;
     run.rechnungsRabatt = 0;
     run.segenAusstehend = true;
-    run.nachrichten.push(t("🧾 Rechnung über ") + zahl(faellig) + t(" Gold bezahlt!"));
+    run.nachrichten.push(tf("🧾 Rechnung über {0} Gold bezahlt!", zahl(faellig)));
     const hierophant = aufrunden(tw("hierophant"));
     if (hierophant > 0) {
         gibSternensamen(hierophant);
-        run.nachrichten.push(t("🔑 Der Hierophant: +") + hierophant + t(" Sternensamen"));
+        run.nachrichten.push(tf("🔑 Der Hierophant: +{0} Sternensamen", hierophant));
     }
     if (warBoss) {
         meta.lebenszeit.bossRechnungen += 1;
         const bonus = BOSS_KONFIG.bonusSternensamenProRechnung * run.bezahlteRechnungen;
         gibSternensamen(bonus);
         run.segenBoss = true;
-        run.nachrichten.push(t("🏦 Kredit abbezahlt! +") + zahl(bonus) + t(" Sternensamen und ein zusätzlicher Segen zur Auswahl"));
+        run.nachrichten.push(tf("🏦 Kredit abbezahlt! +{0} Sternensamen und ein zusätzlicher Segen zur Auswahl", zahl(bonus)));
     }
     // Mondteich "Startkapital": nach jeder Rechnung ein Geschenk, das mit dem Run mitwaechst
     const startkapital = aufrunden(metaWert("startgold") * naechsteRechnung().betrag);
     if (startkapital > 0) {
         run.gold += startkapital;
-        run.nachrichten.push(t("💰 Startkapital: +") + zahl(startkapital) + t(" Gold"));
+        run.nachrichten.push(tf("💰 Startkapital: +{0} Gold", zahl(startkapital)));
     }
     Klang.rechnung();
     pruefeMondphaseFrei();
@@ -3783,14 +3777,14 @@ function beendeTag() {
     const zinsen = Math.min(aufrunden(run.gold * zinsSatz()), aufrunden(zinsDeckel));
     if (zinsen > 0) {
         run.gold += zinsen;
-        run.nachrichten.push(t("🐷 Zinsen: +") + zahl(zinsen) + t(" Gold"));
+        run.nachrichten.push(tf("🐷 Zinsen: +{0} Gold", zahl(zinsen)));
     }
 
     // Kredit-Auflage "Steuerpruefung": 10% des Tagesgewinns sind weg
     if (bossIst("steuer") && run.statistik.gold > 0) {
         const steuer = Math.min(run.gold, aufrunden(run.statistik.gold * 0.1));
         run.gold -= steuer;
-        run.nachrichten.push(t("📜 Steuerprüfung: -") + zahl(steuer) + t(" Gold"));
+        run.nachrichten.push(tf("📜 Steuerprüfung: -{0} Gold", zahl(steuer)));
     }
 
     aktualisiereLebenszeitMaxima();
@@ -3826,8 +3820,8 @@ function zeigeBrief() {
     const gold = Math.max(5, aufrunden(0.12 * naechsteRechnung().betrag));
     const sterne = 15 + 5 * run.tag;
     const geschenkText = {
-        gold: "+" + zahl(gold) + t(" Gold"),
-        sterne: "+" + zahl(sterne) + t(" Sternensamen"),
+        gold: tf("+{0} Gold", zahl(gold)),
+        sterne: tf("+{0} Sternensamen", zahl(sterne)),
         energie: t("+40 Energie morgen"),
         duenger: t("+3 gedüngte Felder morgen")
     }[brief.geschenk];
@@ -3883,11 +3877,11 @@ function zeigeRechnungsFrage() {
         schliessbar: false,
         klasse: "rechnung-frage",
         inhalt: el("div", null, null, [
-            el("p", "rechnung-betrag", zahl(faellig) + t(" Gold")),
+            el("p", "rechnung-betrag", tf("{0} Gold", zahl(faellig))),
             el("p", null, run.koop
-                ? t("Ihr habt zusammen ") + zahl(koopGesamtGold()) + t(" Gold (du: ") + zahl(run.gold) + t("). Jeder zahlt seinen Anteil, dann wählt jeder seinen Segen.")
-                : t("Du hast ") + zahl(run.gold) + t(" Gold. Bezahlst du, geht es mit der Segen-Auswahl weiter.")),
-            el("p", "rechnung-klein", t("Oder du beendest den Run jetzt und bekommst +") + zahl(mondbluetenJetzt()) + t(" Mondblüten."))
+                ? tf("Ihr habt zusammen {0} Gold (du: {1}). Jeder zahlt seinen Anteil, dann wählt jeder seinen Segen.", zahl(koopGesamtGold()), zahl(run.gold))
+                : tf("Du hast {0} Gold. Bezahlst du, geht es mit der Segen-Auswahl weiter.", zahl(run.gold))),
+            el("p", "rechnung-klein", tf("Oder du beendest den Run jetzt und bekommst +{0} Mondblüten.", zahl(mondbluetenJetzt())))
         ]),
         knoepfe: [
             { text: t("🏳️ Run beenden"), klasse: "knopf-rot", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
@@ -4021,12 +4015,12 @@ function zeigeStilAuswahl() {
 function beschreibeNaechstenTag() {
     const boni = run.naechsterTag;
     const teile = [];
-    if (boni.energie > 0) teile.push("+" + boni.energie + t(" Energie"));
+    if (boni.energie > 0) teile.push(tf("+{0} Energie", boni.energie));
     if (boni.samenregen) teile.push(t("Samenregen"));
     if (boni.mindestGruen) teile.push(t("alle Saaten mindestens ungewöhnlich"));
-    if (boni.goldeneSamen > 0) teile.push(boni.goldeneSamen + t("x goldene Saat"));
-    if (boni.goldBuffSek > 0) teile.push(boni.goldBuffSek + t(" Sek. doppeltes Gold"));
-    if (boni.extraDuenger > 0) teile.push(boni.extraDuenger + t(" zusätzliche gedüngte Felder"));
+    if (boni.goldeneSamen > 0) teile.push(tf("{0}x goldene Saat", boni.goldeneSamen));
+    if (boni.goldBuffSek > 0) teile.push(tf("{0} Sek. doppeltes Gold", boni.goldBuffSek));
+    if (boni.extraDuenger > 0) teile.push(tf("{0} zusätzliche gedüngte Felder", boni.extraDuenger));
     return teile.join(", ");
 }
 
@@ -4056,37 +4050,38 @@ function renderTagesKarte() {
             html += `<p class="karte-meta">${t("Endlos: keine Rechnungen, keine Energie, unendliche Entwicklung. Statt Rechnungen gibt es Meilensteine für verdientes Gold: Jeder bringt einen Segen. Mit einem Neuanfang fängst du neu an und bekommst Mondblüten für deine Meilensteine. Es gibt eigene Erfolge und 3 Speicherstände.")}</p>`;
         } else if (run.mondphase > 0) {
             const phase = MONDPHASEN[run.mondphase];
-            html += `<p class="karte-meta">${phase.symbol} ${t("Mondphase")} ${phase.name}: +${Math.round(MONDPHASE_BONUS * 100 * run.mondphase)}% ` +
-                `${t("Mondblüten. Regeln:")} ${MONDPHASEN.slice(1, run.mondphase + 1).map(p => p.text).join(" ")}</p>`;
+            html += `<p class="karte-meta">${phase.symbol} ${tf("Mondphase {0}: +{1}% Mondblüten. Regeln:", phase.name, Math.round(MONDPHASE_BONUS * 100 * run.mondphase))} ` +
+                `${MONDPHASEN.slice(1, run.mondphase + 1).map(p => p.text).join(" ")}</p>`;
         } else if (meta.mondblueten > 0 || meta.tarot.length > 0) {
-            html += `<p class="karte-meta">${t("Mondblüten:")} ${zahl(meta.mondblueten)}  ·  ` +
-                `${t("Tarotkarten:")} ${meta.tarot.length}/${TAROT.length} (${meta.tarotSlots.length} ${t("ausgerüstet")})</p>`;
+            html += `<p class="karte-meta">${tf("Mondblüten: {0}", zahl(meta.mondblueten))}  ·  ` +
+                `${tf("Tarotkarten: {0}/{1} ({2} ausgerüstet)", meta.tarot.length, TAROT.length, meta.tarotSlots.length)}</p>`;
         }
     } else if (modus === "feierabend") {
-        tagesKarteTitel.textContent = t("Feierabend! Tag ") + (run.tag - 1) + t(" geschafft");
+        tagesKarteTitel.textContent = tf("Feierabend! Tag {0} geschafft", (run.tag - 1));
         html += `<p class="karte-zeitung">📰 <b>${t("Dorfzeitung:")}</b> ${zufall(DORFZEITUNG.map(f => f(meta, run)).filter(Boolean))}</p>`;
         const gewinnFarbe = RARITAETEN[s.hoechsterGewinnRaritaet].rand;
         html += `<div class="karte-statistik">
             <div><span>${t("Ernten")}</span><b>${zahl(s.ernten)}</b></div>
             <div><span>${t("Gold")}</span><b>+${zahl(s.gold)}</b></div>
             <div><span>${t("Sternensamen")}</span><b>+${zahl(s.sternensamen)}</b></div>
-            <div><span>${t("Höchster Gewinn")}</span><b style="color:${gewinnFarbe}">${zahl(s.hoechsterGewinn)}${t(" Gold")}</b></div>
+            <div><span>${t("Höchster Gewinn")}</span><b style="color:${gewinnFarbe}">${tf("{0} Gold", zahl(s.hoechsterGewinn))}</b></div>
         </div>`;
         if (s.verfallen > 0) {
-            html += `<p class="karte-verfallen">💨 ${s.verfallen} ${s.verfallen === 1 ? t("Saat verfallen") : t("Saaten verfallen")}</p>`;
+            html += `<p class="karte-verfallen">💨 ${s.verfallen === 1 ? t("1 Saat verfallen") : tf("{0} Saaten verfallen", s.verfallen)}</p>`;
         }
         if (s.gestohlen > 0) {
-            html += `<p class="karte-verfallen">🐦 ${t("Krähen haben")} ${s.gestohlen} ${s.gestohlen === 1 ? t("Pflanze gestohlen") : t("Pflanzen gestohlen")}</p>`;
+            html += `<p class="karte-verfallen">🐦 ${s.gestohlen === 1 ? t("Krähen haben 1 Pflanze gestohlen") : tf("Krähen haben {0} Pflanzen gestohlen", s.gestohlen)}</p>`;
         }
         run.nachrichten.forEach(text => { html += `<p class="karte-nachricht">${text}</p>`; });
     } else {
         tagesKarteTitel.textContent = run.sandbox ? t("🌙 Neuanfang") : daten.neuerRekord ? t("Run vorbei, neuer Rekord!") : t("Run vorbei");
         if (run.sandbox) {
-            html += `<p>${t("Du fängst nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")} ${t("neu an und hast")} ${zahl(run.gesamt.gold)} ${t("Gold verdient.")}</p>`;
+            html += `<p>${tf("Du fängst nach {0} neu an und hast {1} Gold verdient.", daten.tage === 1 ? t("1 Tag") : tf("{0} Tagen", daten.tage), zahl(run.gesamt.gold))}</p>`;
         } else if (daten.freiwillig) {
-            html += `<p>${run.sandbox ? t("Du hast in Endlos neu angefangen nach") : t("Du hast den Run beendet nach")} ${daten.tage === 1 ? t("1 Tag") : daten.tage + t(" Tagen")}.</p>`;
+            const dauer = daten.tage === 1 ? t("1 Tag") : tf("{0} Tagen", daten.tage);
+            html += `<p>${run.sandbox ? tf("Du hast in Endlos neu angefangen nach {0}.", dauer) : tf("Du hast den Run beendet nach {0}.", dauer)}</p>`;
         } else {
-            html += `<p>${t("Die Rechnung über")} <b>${zahl(daten.offenerBetrag)}${t(" Gold")}</b> ${t("konnte nicht bezahlt werden. Du hattest")} ${zahl(run.gold)}${t(" Gold")}.</p>`;
+            html += `<p>${tf("Die Rechnung über <b>{0} Gold</b> konnte nicht bezahlt werden. Du hattest {1} Gold.", zahl(daten.offenerBetrag), zahl(run.gold))}</p>`;
         }
         html += `<div class="karte-statistik">
             <div><span>${t("Tage")}</span><b>${daten.tage}</b></div>
@@ -4102,15 +4097,14 @@ function renderTagesKarte() {
         html += karteZusatzHtml();
 
         if (run.sandbox) {
-            html += `<p class="karte-rechnung">🏁 ${t("Nächster Meilenstein")} (${run.meilensteine + 1}): <b>${zahl(run.gesamt.gold)} / ` +
-                `${zahl(meilensteinSchwelle(run.meilensteine + 1))}${t(" Gold")}</b> ${t("verdient. Neuanfang jetzt:")} ` +
-                `+${zahl(sandboxMondblueten())} ${t("Mondblüten.")}</p>`;
+            html += `<p class="karte-rechnung">🏁 ${tf("Nächster Meilenstein ({0}): <b>{1} / {2} Gold</b> verdient. Neuanfang jetzt: +{3} Mondblüten.",
+                run.meilensteine + 1, zahl(run.gesamt.gold), zahl(meilensteinSchwelle(run.meilensteine + 1)), zahl(sandboxMondblueten()))}</p>`;
         } else {
             const rechnung = naechsteRechnung();
             const warnung = rechnung.tageBis <= 2 && run.gold < rechnung.betrag;
             html += `<p class="karte-rechnung${warnung ? " warnung" : ""}${rechnung.boss ? " boss" : ""}">` +
-                `${trophaeFuer(run.bezahlteRechnungen) && !run.gnadenRechnung ? "🏆 " + trophaeFuer(run.bezahlteRechnungen).name : rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: <b>${zahl(rechnung.betrag)}${t(" Gold")}</b> ` +
-                `${t("in")} ${tageText(rechnung.tageBis)}. ${t("Du hast")} ${zahl(run.gold)}${t(" Gold")}.</p>`;
+                `${trophaeFuer(run.bezahlteRechnungen) && !run.gnadenRechnung ? "🏆 " + trophaeFuer(run.bezahlteRechnungen).name : rechnung.boss ? t("🏦 Kredit abbezahlen") : t("🧾 Rechnung")}: ` +
+                `${tf("<b>{0} Gold</b> in {1}. Du hast {2} Gold.", zahl(rechnung.betrag), tageText(rechnung.tageBis), zahl(run.gold))}</p>`;
             if (kannFrueherBezahlen()) {
                 html += `<button class="knopf knopf-gruen karte-frueh-bezahlen">🧾 ${tf("Jetzt bezahlen ({0} früher, nächster Segen +{1}%)",
                     tageText(rechnung.tageBis), Math.round(((run.fruehBonus || 0) + FRUEH_BEZAHLT_BONUS * rechnung.tageBis) * 100))}</button>`;
@@ -4119,7 +4113,7 @@ function renderTagesKarte() {
     }
 
     const aktHf = HERAUSFORDERUNGEN.find(x => x.id === run.herausforderung);
-    if (aktHf && !run.sandbox) html += `<p class="karte-stil">${aktHf.symbol} <b>${t("Herausforderung")} ${aktHf.name}:</b> ${aktHf.regel} ` +
+    if (aktHf && !run.sandbox) html += `<p class="karte-stil">${aktHf.symbol} <b>${tf("Herausforderung {0}:", aktHf.name)}</b> ${aktHf.regel} ` +
         `(${hfGeschafft(aktHf.id) ? t("schon geschafft") : tf("Ziel: {0} Rechnungen", aktHf.ziel)})</p>`;
     const hofStil = HOF_STILE.find(s => s.id === run.stil);
     if (hofStil && !run.sandbox) html += `<p class="karte-stil">${hofStil.symbol} <b>${hofStil.name}:</b> ${hofStil.text}</p>`;
@@ -4160,36 +4154,33 @@ function karteZusatzHtml() {
 // Hover ueber dem Kalender: alles, was im Moment wirkt (Tageszeit, Wetter, Boss-Regel, Mondphase, Segen, Werkzeuge)
 function aktivTipp() {
     const z = jahreszeit();
-    const zeilen = ["## " + (run.sandbox ? t("Endlos · ") : "") + t("Tag ") + run.tag + " · " + z.symbol + " " + z.name];
+    const zeilen = [tf("## {0}Tag {1} · {2} {3}", (run.sandbox ? t("Endlos · ") : ""), run.tag, z.symbol, z.name)];
     if (!run.sandbox && run.phase !== "runEnde") {
         const r = naechsteRechnung();
         const fehlt = Math.max(0, r.betrag - run.gold);
         if (r.tageBis <= 1) {
-            zeilen.push("> ⚠️ " + (run.phase === "tag" ? t("Heute") : t("Nach dem nächsten Tag")) + t(" ist Zahltag: ") + zahl(r.betrag) + t(" Gold") +
-                (fehlt > 0 ? t(" (es fehlen noch ") + zahl(fehlt) + ")" : t(" (hast du schon)")));
+            zeilen.push(tf("> ⚠️ {0} ist Zahltag: {1} Gold{2}", (run.phase === "tag" ? t("Heute") : t("Nach dem nächsten Tag")), zahl(r.betrag), (fehlt > 0 ? tf(" (es fehlen noch {0})", zahl(fehlt)) : t(" (hast du schon)"))));
         } else {
-            zeilen.push("🧾 " + (r.boss ? t("Kredit") : t("Rechnung")) + ": " + zahl(r.betrag) + t(" Gold am Ende von Tag ") + r.tag +
-                t(" (noch ") + r.tageBis + (r.tageBis === 1 ? t(" Tag)") : t(" Tage)")));
+            zeilen.push(tf("🧾 {0}: {1} Gold am Ende von Tag {2} (noch {3}{4}", (r.boss ? t("Kredit") : t("Rechnung")), zahl(r.betrag), r.tag, r.tageBis, (r.tageBis === 1 ? t(" Tag)") : t(" Tage)"))));
         }
     }
     if (run.phase === "tag") {
         const anteil = tagesAnteil();
         const zeit = anteil < 0.2 || anteil > 1.2 ? t("🌅 Morgen") : anteil < 0.66 ? t("☀️ Tag") : anteil < 0.85 ? t("🌇 Abend") : t("🌙 Nacht");
-        zeilen.push(zeit + (run.sandbox ? " (" + Math.round(tagesFortschritt() * 100) + t("% des Tages vorbei)") : ""));
+        zeilen.push(zeit + (run.sandbox ? tf(" ({0}% des Tages vorbei)", Math.round(tagesFortschritt() * 100)) : ""));
     }
     zeilen.push("", t("## Gerade aktiv"), z.symbol + " " + z.name + ": " + jahreszeitEffekte(z));
     if (run.phase === "tag" && run.wetter) zeilen.push(WETTER_NACH_ID[run.wetter].symbol + " " + WETTER_NACH_ID[run.wetter].name + ": " +
         wetterText(WETTER_NACH_ID[run.wetter]));
-    if (run.bossRegel) zeilen.push(t("🏦 Kredit-Auflage ") + BOSS_NACH_ID[run.bossRegel].name + ": " + BOSS_NACH_ID[run.bossRegel].text);
-    if (run.mondphase > 0) zeilen.push(MONDPHASEN[run.mondphase].symbol + t(" Mondphase ") + MONDPHASEN[run.mondphase].name + ": +" +
-        Math.round(MONDPHASE_BONUS * 100 * run.mondphase) + t("% Mondblüten"));
-    if (run.goldBuffMs > 0) zeilen.push(t("🌠 Sternschnuppe: doppeltes Gold für ") + Math.ceil(run.goldBuffMs / 1000) + t(" Sek."));
+    if (run.bossRegel) zeilen.push(tf("🏦 Kredit-Auflage {0}: {1}", BOSS_NACH_ID[run.bossRegel].name, BOSS_NACH_ID[run.bossRegel].text));
+    if (run.mondphase > 0) zeilen.push(tf("{0} Mondphase {1}: +{2}% Mondblüten", MONDPHASEN[run.mondphase].symbol, MONDPHASEN[run.mondphase].name, Math.round(MONDPHASE_BONUS * 100 * run.mondphase)));
+    if (run.goldBuffMs > 0) zeilen.push(tf("🌠 Sternschnuppe: doppeltes Gold für {0} Sek.", Math.ceil(run.goldBuffMs / 1000)));
     const segenListe = Object.entries(run.segen).filter(([, stufe]) => stufe > 0);
     if (segenListe.length > 0) {
         zeilen.push("", t("## Segen"));
         segenListe.forEach(([id, stufe]) => {
             const s = SEGEN_NACH_ID[id];
-            if (s) zeilen.push(s.badge + " " + s.name + (stufe > 1 ? t(" x") + stufe : "") + ": " + s.text);
+            if (s) zeilen.push(s.badge + " " + s.name + (stufe > 1 ? tf(" x{0}", stufe) : "") + ": " + s.text);
         });
     }
     if (run.werkzeuge.length > 0) {
@@ -4208,14 +4199,10 @@ function aktualisiereTopBar() {
     zaehleHoch(moneyDisplay.querySelector("span"), run.gold);
     zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     skillpointDisplay.classList.toggle("versteckt", !stellariumFrei());
-    kalenderDisplay.querySelector("span").textContent = t("Tag ") + run.tag;
+    kalenderDisplay.querySelector("span").textContent = tf("Tag {0}", run.tag);
     const gesamtSterne = run.gesamt.sternensamen || 0;
-    setzeTipp(moneyDisplay, "## " + t("🪙 Gold") + "\n= " + zahl(run.gold) + "\n" + t("Für den Markt, neue Felder und die Rechnungen.") +
-        (run.sandbox ? "" : "\n- " + t("Nächste Rechnung: ") + zahl(naechsteRechnung().betrag) + t(" Gold")) +
-        "\n- " + t("In diesem Run verdient: ") + zahl(run.gesamt.gold) + t(" Gold"));
-    setzeTipp(skillpointDisplay, "## " + t("✨ Sternensamen") + "\n= " + zahl(run.skillpunkte) + "\n" + t("Für das Stellarium.") +
-        "\n- " + t("Jede Ernte lässt Sternensaat fallen") + "\n- " + t("Jeder Klick auf den Samenladen: +") + sternensamenProKlick() +
-        "\n- " + t("In diesem Run gesammelt: ") + zahl(gesamtSterne));
+    setzeTipp(moneyDisplay, tf("## 🪙 Gold\n= {0}\nFür den Markt, neue Felder und die Rechnungen.{1}\n- In diesem Run verdient: {2} Gold", zahl(run.gold), (run.sandbox ? "" : tf("\n- Nächste Rechnung: {0} Gold", zahl(naechsteRechnung().betrag))), zahl(run.gesamt.gold)));
+    setzeTipp(skillpointDisplay, tf("## ✨ Sternensamen\n= {0}\nFür das Stellarium.\n- Jede Ernte lässt Sternensaat fallen\n- Jeder Klick auf den Samenladen: +{1}\n- In diesem Run gesammelt: {2}", zahl(run.skillpunkte), sternensamenProKlick(), zahl(gesamtSterne)));
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
     // Aktuelle Mondphase (Schwierigkeit), nur in Story
@@ -4227,49 +4214,31 @@ function aktualisiereTopBar() {
         const phase = MONDPHASEN[stufe];
         mondphaseDisplay.querySelector("span").textContent = phase.symbol;
         mondphaseDisplay.classList.toggle("hat-neues", neueMondphase());
-        setzeTipp(mondphaseDisplay, "## " + t("🌙 Mondphase: ") + phase.name + "\n" +
-            t("In Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.") +
-            "\n> +" + Math.round(MONDPHASE_BONUS * 100 * stufe) + t("% Mondblüten am Ende des Runs") +
-            "\n- " + t("Klick: zur Auswahl im Mondteich"));
+        setzeTipp(mondphaseDisplay, tf("## 🌙 Mondphase: {0}\nIn Endlos gibt es keine Mondphasen. Das ist die Phase für deine nächsten Story-Runs.\n> +{1}% Mondblüten am Ende des Runs\n- Klick: zur Auswahl im Mondteich", phase.name, Math.round(MONDPHASE_BONUS * 100 * stufe)));
     } else {
         const stufe = run.mondphase || 0;
         const phase = MONDPHASEN[stufe];
         mondphaseDisplay.querySelector("span").textContent = phase.symbol;
         mondphaseDisplay.classList.toggle("hat-neues", neueMondphase());
         const regeln = MONDPHASEN.slice(1, stufe + 1).map(p => "\n- " + p.symbol + " " + p.text).join("");
-        setzeTipp(mondphaseDisplay, "## " + t("🌙 Mondphase: ") + phase.name + "\n= " + phase.symbol + " " + phase.name +
-            (stufe === 0 ? "\n" + t("Die normalen Regeln.") : "\n" + t("Es gelten zusammen:") + regeln) +
-            "\n> +" + Math.round(MONDPHASE_BONUS * 100 * stufe) + t("% Mondblüten am Ende des Runs") +
-            (neueMondphase() ? "\n> " + t("❗ Neue Mondphase frei: wählbar im Mondteich unter Spielmodi") : "") +
-            "\n" + t("Die Mondphase wählst du im Mondteich (Spielmodi). Sie gilt ab dem nächsten Run.") +
-            "\n- " + t("Klick: zur Auswahl im Mondteich"));
+        setzeTipp(mondphaseDisplay, tf("## 🌙 Mondphase: {0}\n= {1} {2}{3}\n> +{4}% Mondblüten am Ende des Runs{5}\nDie Mondphase wählst du im Mondteich (Spielmodi). Sie gilt ab dem nächsten Run.\n- Klick: zur Auswahl im Mondteich", phase.name, phase.symbol, phase.name, (stufe === 0 ? "\n" + t("Die normalen Regeln.") : tf("\nEs gelten zusammen:{0}", regeln)), Math.round(MONDPHASE_BONUS * 100 * stufe), (neueMondphase() ? "\n> " + t("❗ Neue Mondphase frei: wählbar im Mondteich unter Spielmodi") : "")));
     }
     aktualisiereMondphaseHinweis();
     if (run.sandbox) {
         // Meilensteine erreicht man einfach (nichts wird abgezogen): angezeigt wird nur das naechste Ziel
         const ziel = meilensteinSchwelle(run.meilensteine + 1);
-        rechnungDisplay.querySelector("span").textContent = "🏁 " + zahl(ziel) + t(" Gold");
+        rechnungDisplay.querySelector("span").textContent = tf("🏁 {0} Gold", zahl(ziel));
         zeigeRechnungsSymbol(trophaeFuer(run.meilensteine));
-        setzeTipp(rechnungDisplay, "## " + t("🏁 Nächster Meilenstein") + "\n= " + zahl(ziel) + t(" Gold") + "\n" +
-            t("Erreichst du, sobald du in diesem Spielstand insgesamt so viel Gold verdient hast. Es wird nichts abgezogen.") +
-            "\n- " + t("Schon verdient: ") + zahl(run.gesamt.gold) + t(" Gold") +
-            "\n- " + t("Erreicht: ") + run.meilensteine + t(" Meilensteine") +
-            "\n" + t("Jeder Meilenstein bringt einen Segen und beim Neuanfang Mondblüten."));
+        setzeTipp(rechnungDisplay, tf("## 🏁 Nächster Meilenstein\n= {0} Gold\nErreichst du, sobald du in diesem Spielstand insgesamt so viel Gold verdient hast. Es wird nichts abgezogen.\n- Schon verdient: {1} Gold\n- Erreicht: {2} Meilensteine\nJeder Meilenstein bringt einen Segen und beim Neuanfang Mondblüten.", zahl(ziel), zahl(run.gesamt.gold), run.meilensteine));
         rechnungDisplay.classList.remove("boss");
     } else {
         const rechnung = naechsteRechnung();
-        rechnungDisplay.querySelector("span").textContent = zahl(rechnung.betrag) + t(" Gold in ") + tageText(rechnung.tageBis);
+        rechnungDisplay.querySelector("span").textContent = tf("{0} Gold in {1}", zahl(rechnung.betrag), tageText(rechnung.tageBis));
         rechnungDisplay.classList.toggle("boss", rechnung.boss);
         const pokal = run.gnadenRechnung ? null : trophaeFuer(run.bezahlteRechnungen);
         zeigeRechnungsSymbol(pokal);
         const fehlt = Math.max(0, rechnung.betrag - run.gold);
-        setzeTipp(rechnungDisplay, "## " + (pokal ? "🏆 " + pokal.name : run.gnadenRechnung ? t("⚖️ Gnadenfrist") : rechnung.boss ? t("🏦 Nächster Kredit") : t("🧾 Nächste Rechnung")) +
-            (pokal ? "\n" + t("Bezahlst du ihn wie eine Rechnung, hast du gewonnen!") : "") +
-            "\n= " + zahl(rechnung.betrag) + t(" Gold") +
-            "\n- " + t("Fällig am Ende von Tag ") + rechnung.tag + " (" + tageText(rechnung.tageBis) + ")" +
-            "\n" + (fehlt > 0 ? "- " + t("Es fehlen noch ") + zahl(fehlt) + t(" Gold") : "> " + t("✔ Du hast genug Gold")) +
-            (rechnung.boss && run.bossRegel ? "\n- " + t("Kredit-Auflage: ") + BOSS_NACH_ID[run.bossRegel].name + ": " + BOSS_NACH_ID[run.bossRegel].text : "") +
-            "\n" + t("Jede 3. Rechnung ist ein Kredit: Bis dahin gilt eine Kredit-Auflage, dafür gibt es Sternensamen und einen Segen mehr zur Auswahl."));
+        setzeTipp(rechnungDisplay, tf("## {0}{1}\n= {2} Gold\n- Fällig am Ende von Tag {3} ({4})\n{5}{6}\nJede 3. Rechnung ist ein Kredit: Bis dahin gilt eine Kredit-Auflage, dafür gibt es Sternensamen und einen Segen mehr zur Auswahl.", (pokal ? "🏆 " + pokal.name : run.gnadenRechnung ? t("⚖️ Gnadenfrist") : rechnung.boss ? t("🏦 Nächster Kredit") : t("🧾 Nächste Rechnung")), (pokal ? "\n" + t("Bezahlst du ihn wie eine Rechnung, hast du gewonnen!") : ""), zahl(rechnung.betrag), rechnung.tag, tageText(rechnung.tageBis), (fehlt > 0 ? tf("- Es fehlen noch {0} Gold", zahl(fehlt)) : "> " + t("✔ Du hast genug Gold")), (rechnung.boss && run.bossRegel ? tf("\n- Kredit-Auflage: {0}: {1}", BOSS_NACH_ID[run.bossRegel].name, BOSS_NACH_ID[run.bossRegel].text) : "")));
     }
     aktualisiereEnergieAnzeige();
 }
@@ -4280,17 +4249,14 @@ function aktualisiereEnergieAnzeige() {
     energieBox.classList.toggle("sandbox-box", run.sandbox);
     neuanfangKnopf.classList.toggle("versteckt", !run.sandbox || run.phase === "runEnde");
     if (run.sandbox) {
-        neuanfangKnopf.textContent = t("🌙 Neuanfang · +") + zahl(mondbluetenJetzt());
+        neuanfangKnopf.textContent = tf("🌙 Neuanfang · +{0}", zahl(mondbluetenJetzt()));
         setzeTipp(energieBox, null);
-        setzeTipp(neuanfangKnopf, t("Neuanfang: Fang von vorn an und bekomm Mondblüten für deine ") + run.meilensteine +
-            t(" Meilensteine (die Hälfte von dem, was so viele Rechnungen bringen würden)."));
+        setzeTipp(neuanfangKnopf, tf("Neuanfang: Fang von vorn an und bekomm Mondblüten für deine {0} Meilensteine (die Hälfte von dem, was so viele Rechnungen bringen würden).", run.meilensteine));
         return;
     }
     const max = run.phase === "tag" ? run.tagesMaxEnergie : energieMax() + run.naechsterTag.energie;
     const wert = run.phase === "tag" ? run.energie : max;
-    setzeTipp(energieBox, "## " + t("⚡ Energie") + "\n= " + Math.ceil(wert) + " / " + Math.round(max) + "\n" +
-        t("Energie ist die Tageszeit. Ist sie leer, ist Feierabend.") + "\n- " + t("Glühwürmchen am Abend geben Energie zurück") +
-        "\n- " + t("Mehr Energie: Markt, Stellarium, Segen und Mondteich"));
+    setzeTipp(energieBox, tf("## ⚡ Energie\n= {0} / {1}\nEnergie ist die Tageszeit. Ist sie leer, ist Feierabend.\n- Glühwürmchen am Abend geben Energie zurück\n- Mehr Energie: Markt, Stellarium, Segen und Mondteich", Math.ceil(wert), Math.round(max)));
     energieFuellung.style.width = Math.min(100, (wert / max) * 100) + "%";
     energieFuellung.classList.toggle("energie-knapp", run.phase === "tag" && wert <= 50);
     energieText.textContent = Math.ceil(wert);
@@ -4363,7 +4329,7 @@ function renderReiter(container, liste, aktiveId, onWahl) {
 }
 
 function stufenText(stufe, max) {
-    return max === Infinity ? t("Stufe ") + stufe : t("Stufe ") + stufe + "/" + max;
+    return max === Infinity ? tf("Stufe {0}", stufe) : tf("Stufe {0}/{1}", stufe, max);
 }
 
 function upgradeKarte(def, waehrung) {
@@ -4375,7 +4341,7 @@ function upgradeKarte(def, waehrung) {
     return erstelleKarte({
         titel: def.name + " (" + stufenText(lvl, def.max) + ")",
         beschreibung: def.beschreibung,
-        info: erledigt ? t("✔ Abgeschlossen: Du hast schon ") + erledigt + "." : t("Aktuell: ") + def.info(),
+        info: erledigt ? tf("✔ Abgeschlossen: Du hast schon {0}.", erledigt) : tf("Aktuell: {0}", def.info()),
         knopfText: erledigt ? t("✔ Abgeschlossen") : istMax ? t("Maximal") : preisText(kosten, waehrung),
         aktiv: !istMax && darfEinkaufen() && guthaben(waehrung) >= kosten,
         onKauf: () => kaufeUpgrade(def, waehrung)
@@ -4441,7 +4407,7 @@ function kaufePflanzenUpgrade(pflanze, upgrade, anzahl = 1) {
     if (gekauft === 0) return;
     Klang.kaufen();
     if (verdoppelt) {
-        zeigeBanner(pflanze.emoji, pflanze.name + t(": Ertrag Stufe ") + Math.floor(pflanze.level.ertrag / 10) * 10, t("Wert verdoppelt!"), "#e0a800", 2600);
+        zeigeBanner(pflanze.emoji, tf("{0}: Ertrag Stufe {1}", pflanze.name, Math.floor(pflanze.level.ertrag / 10) * 10), t("Wert verdoppelt!"), "#e0a800", 2600);
         Klang.jackpot();
     }
     aktualisiereAlles();
@@ -4482,7 +4448,7 @@ function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten,
             el("div", "markt-bildrahmen", null, [bild]),
             el("div", "markt-karte-titel", null, [
                 el("div", "markt-karte-name", name),
-                el("div", "markt-karte-stufe", max === Infinity ? t("Stufe ") + lvl : max === 1 ? (lvl ? t("Gekauft") : t("Einmalig")) : t("Stufe ") + lvl + " / " + max)
+                el("div", "markt-karte-stufe", max === Infinity ? tf("Stufe {0}", lvl) : max === 1 ? (lvl ? t("Gekauft") : t("Einmalig")) : tf("Stufe {0} / {1}", lvl, max))
             ])
         ]),
         el("div", "markt-karte-text", beschreibung),
@@ -4490,8 +4456,7 @@ function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten,
         jetzt ? el("div", "markt-karte-jetzt", null, [el("span", null, t("Du hast jetzt: ")), el("b", null, jetzt)]) : null,
         max > 1 && max <= 15 ? stufenPunkte(lvl, max) : null
     ]);
-    const knopf = el("button", "knopf markt-kaufen", istMax ? t("✔ Maximal") : "💰 " + zahl(kosten) + t(" Gold") +
-        (paket.anzahl > 1 ? " · x" + paket.anzahl : ""));
+    const knopf = el("button", "knopf markt-kaufen", istMax ? t("✔ Maximal") : tf("💰 {0} Gold{1}", zahl(kosten), (paket.anzahl > 1 ? " · x" + paket.anzahl : "")));
     knopf.disabled = !leistbar;
     knopf.addEventListener("click", event => {
         const anzahl = event.shiftKey && kostenBei ? kaufPaket(kostenBei, lvl, max, run.gold, "max").anzahl : paket.anzahl;
@@ -4558,7 +4523,7 @@ function renderShop() {
     renderKaufMenge();
     const goldAnzeige = $("markt-gold");
     goldAnzeige.innerHTML = "";
-    goldAnzeige.append(spriteIcon("muenze"), " " + zahl(run.gold) + t(" Gold"));
+    goldAnzeige.append(spriteIcon("muenze"), tf(" {0} Gold", zahl(run.gold)));
 
     // Gluecksspiel: eigene Reiter, ein Spiel pro Reiter
     if (marktModus === "glueck") {
@@ -4591,7 +4556,7 @@ function renderShop() {
         raster.appendChild(marktKarte({
             icon: "🌱", name: t("Neues Feld"), lvl: run.felder.length, max: maxEigeneFelder(),
             beschreibung: t("Erweitert deinen Acker um ein Feld. Geht auch über das + Schild auf dem Acker."),
-            jetzt: run.felder.length + t(" von ") + maxEigeneFelder() + t(" Feldern"),
+            jetzt: tf("{0} von {1} Feldern", run.felder.length, maxEigeneFelder()),
             kosten: feldKosten(), kostenBei: feldPreisBei, onKauf: anzahl => kaufeFeld(anzahl)
         }));
         SHOP_UPGRADES.filter(shopUpgradeFrei).forEach(def => raster.appendChild(marktKarte({
@@ -4604,7 +4569,7 @@ function renderShop() {
         })));
         const gesperrt = SHOP_UPGRADES.filter(def => !shopUpgradeFrei(def) && !istSandboxAus(def.id)).length;
         if (gesperrt > 0) {
-            raster.appendChild(marktGesperrt(gesperrt + t(" weitere Stände"), t("Schaltest du im Stellarium frei (Äste Hof und Helfer).")));
+            raster.appendChild(marktGesperrt(tf("{0} weitere Stände", gesperrt), t("Schaltest du im Stellarium frei (Äste Hof und Helfer).")));
         }
         shopContent.appendChild(raster);
         return;
@@ -4619,11 +4584,9 @@ function renderShop() {
         kopfBild,
         el("div", null, null, [
             el("div", "markt-pflanze-name", pflanze.name),
-            el("div", "markt-pflanze-werte", "💰 " + zahl(verkaufswert(pflanze)) + t(" Gold Grundwert · ⏱️ ") +
-                sekText(basisStufenZeitSek(pflanze) * 3) + t(" bis zur Ernte")),
+            el("div", "markt-pflanze-werte", tf("💰 {0} Gold Grundwert · ⏱️ {1} bis zur Ernte", zahl(verkaufswert(pflanze)), sekText(basisStufenZeitSek(pflanze) * 3))),
             eigenschaftText(pflanze) ? el("div", "markt-pflanze-eigenschaft", eigenschaftText(pflanze)) : null,
-            meister > 0 ? el("div", "markt-pflanze-eigenschaft", t("🏅 Meisterschaft ") + meister + t(": für immer +") +
-                Math.round(meisterBonus() * 100 * meister) + t("% Wert")) : null
+            meister > 0 ? el("div", "markt-pflanze-eigenschaft", tf("🏅 Meisterschaft {0}: für immer +{1}% Wert", meister, Math.round(meisterBonus() * 100 * meister))) : null
         ])
     ]));
 
@@ -4632,8 +4595,8 @@ function renderShop() {
         const lvl = pflanze.level[upgrade.id];
         raster.appendChild(marktKarte({
             icon: PFLANZEN_UPGRADE_ICONS[upgrade.id] || pflanze.emoji, name: upgrade.name, lvl, max: upgrade.max,
-            beschreibung: t("Jede Stufe: ") + upgrade.beschreibung,
-            zusatz: upgrade.id === "ertrag" ? t("⭐ Stufe ") + (Math.floor(lvl / 10) + 1) * 10 + t(" verdoppelt den Wert") : null,
+            beschreibung: tf("Jede Stufe: {0}", upgrade.beschreibung),
+            zusatz: upgrade.id === "ertrag" ? tf("⭐ Stufe {0} verdoppelt den Wert", (Math.floor(lvl / 10) + 1) * 10) : null,
             jetzt: upgrade.info(pflanze),
             kosten: pflanzenUpgradeKosten(pflanze, upgrade),
             kostenBei: stufe => pflanzenUpgradeKosten(pflanze, upgrade, stufe),
@@ -4726,11 +4689,11 @@ function schalteSternFrei(def) {
         const bisher = Math.max(0, ...run.pflanzen.filter(p => p.freigeschaltet).map(p => p.level.ertrag));
         pflanze.level.ertrag = Math.max(pflanze.level.ertrag, bisher);
         pflanze.freigeschaltet = true;
-        zeigeBanner(pflanze.emoji, pflanze.name + t(" freigeschaltet!"), t("Wächst ab jetzt auf deinen Feldern"), "#2e9e2e", 2400);
+        zeigeBanner(pflanze.emoji, tf("{0} freigeschaltet!", pflanze.name), t("Wächst ab jetzt auf deinen Feldern"), "#2e9e2e", 2400);
         neuePflanzeFeier(pflanze);
         Klang.segen();
     } else if (def.art === "shop" || def.art === "pflanzenShop") {
-        zeigeBanner(def.icon, t("Neu auf dem Markt: ") + def.name, null, "#b8862b", 2200);
+        zeigeBanner(def.icon, tf("Neu auf dem Markt: {0}", def.name), null, "#b8862b", 2200);
     }
 }
 
@@ -4861,8 +4824,7 @@ $("baum-mitte").addEventListener("click", () => springeZu(BAUM_ZIELE[0].pos[0], 
 // "?" im Stellarium: die Erklaerungen, die sonst immer im Weg standen
 $("baum-hilfe").addEventListener("click", () => {
     const punkte = [
-        tf("✨ Sternensamen bekommst du bei jeder Ernte ({0} pro Ernte) und", KONFIG.sternensamenProErnte) + t(" für jeden Klick auf den Samenladen, der einen Samen wirft (") +
-            sternensamenProKlick() + t(" pro Klick)."),
+        tf("{0} für jeden Klick auf den Samenladen, der einen Samen wirft ({1} pro Klick).", tf("✨ Sternensamen bekommst du bei jeder Ernte ({0} pro Ernte) und", KONFIG.sternensamenProErnte), sternensamenProKlick()),
         TOUCH_GERAET ? t("👆 Wischen verschiebt den Baum, zwei Finger zoomen. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst.")
             : t("🖱️ Ziehen verschiebt den Baum, das Mausrad zoomt. „⭐ Kaufbar“ springt zu Sternen, die du dir leisten kannst."),
         t("Ⅱ Sterne mit Ⅱ kommen erst, wenn der Stern davor ganz ausgebaut ist: viel teurer, viel stärker."),
@@ -4892,10 +4854,10 @@ baumHimmel.addEventListener("wheel", event => {
 function renderSkilltree() {
     sternbildTitel.textContent = t("✨ Stellarium");
     const anzahlKaufbar = SKILLS.filter(knotenLeistbar).length;
-    baumNaechster.textContent = t("⭐ Kaufbar: ") + anzahlKaufbar;
+    baumNaechster.textContent = tf("⭐ Kaufbar: {0}", anzahlKaufbar);
     baumNaechster.disabled = anzahlKaufbar === 0;
     sternbildSp.innerHTML = "";
-    sternbildSp.append(spriteIcon("sternensamen"), " " + zahl(run.skillpunkte) + t(" Sternensamen"));
+    sternbildSp.append(spriteIcon("sternensamen"), tf(" {0} Sternensamen", zahl(run.skillpunkte)));
 
     if (!SKILL_NACH_ID[aktiverStern]) aktiverStern = "p_weizen";
 
@@ -4960,9 +4922,9 @@ const AST_NAMEN = {
 
 // Stufen als kleine Punkte (bis 10 Stufen), sonst als Zahl
 function stufenPunkte(lvl, max) {
-    if (max === Infinity) return el("div", "stern-stufen-text", t("Stufe ") + lvl + t(" · unendlich"));
+    if (max === Infinity) return el("div", "stern-stufen-text", tf("Stufe {0} · unendlich", lvl));
     if (max === 1) return el("div", "stern-stufen-text", lvl > 0 ? t("✔ Freigeschaltet") : t("Noch nicht gekauft"));
-    if (max > 10) return el("div", "stern-stufen-text", t("Stufe ") + lvl + " / " + max);
+    if (max > 10) return el("div", "stern-stufen-text", tf("Stufe {0} / {1}", lvl, max));
     const leiste = el("div", "stern-punkte");
     for (let i = 0; i < max; i++) leiste.appendChild(el("span", i < lvl ? "voll" : null));
     return leiste;
@@ -4975,11 +4937,10 @@ function sternErklaerung(def) {
     if (def.markt) {
         // Stern schaltet etwas auf dem Markt frei: Name und Wirkung des Upgrades zeigen
         box.appendChild(el("div", "stern-markt", null, [
-            el("div", "stern-markt-titel", t("🛒 Neu auf dem Markt") + (def.marktReiter ? t(" (Reiter ") + def.marktReiter + ")" : "")),
+            el("div", "stern-markt-titel", tf("🛒 Neu auf dem Markt{0}", (def.marktReiter ? tf(" (Reiter {0})", def.marktReiter) : ""))),
             el("b", null, (def.markt.icon ? def.markt.icon + " " : "") + def.markt.name),
             el("div", null, (/Stufe/.test(def.markt.beschreibung) ? "" : t("Jede Stufe: ")) + def.markt.beschreibung),
-            el("div", "stern-markt-hinweis", t("Dort kaufst du es danach mit Gold, ") +
-                (def.markt.max === Infinity ? t("beliebig oft.") : t("bis Stufe ") + def.markt.max + "."))
+            el("div", "stern-markt-hinweis", tf("Dort kaufst du es danach mit Gold, {0}", (def.markt.max === Infinity ? t("beliebig oft.") : tf("bis Stufe {0}.", def.markt.max))))
         ]));
         return box;
     }
@@ -5060,7 +5021,7 @@ function renderSternDetails(def) {
         if (paket.anzahl >= 2 && paket.kosten <= run.skillpunkte) {
             const maxKnopf = el("button", "knopf stern-karte-max", null, [el("span", null, tf("⏫ {0} Stufen", paket.anzahl) + " · "),
                 spriteIcon("sternensamen"), el("span", null, zahl(paket.kosten))]);
-            setzeTipp(maxKnopf, t("So viele Stufen kaufen, wie deine Sternensamen reichen") + (TOUCH_GERAET ? "" : " " + t("(auch mit Shift + Klick)")));
+            setzeTipp(maxKnopf, tf("So viele Stufen kaufen, wie deine Sternensamen reichen{0}", (TOUCH_GERAET ? "" : " " + t("(auch mit Shift + Klick)"))));
             maxKnopf.addEventListener("click", () => kaufeUpgrade(def, "skillpunkte", paket.anzahl));
             karte.appendChild(maxKnopf);
         }
@@ -5074,14 +5035,14 @@ function renderSternDetails(def) {
         nameEl.style.fontSize = groesse.toFixed(2) + "em";
     }
 
-    if (erledigt) sternbildDetails.appendChild(erstelleHinweis(t("✔ Schon erledigt durch ") + erledigt + "."));
+    if (erledigt) sternbildDetails.appendChild(erstelleHinweis(tf("✔ Schon erledigt durch {0}.", erledigt)));
     const fehlt = vorigePflanzeFehlt(def);
     if (fehlt) {
         sternbildDetails.appendChild(erstelleHinweis(tf("🔒 Erst {0}x Ertrag für {1} kaufen ({2}/{0})", PFLANZE_ERTRAG_VOR, fehlt.pflanze.name, fehlt.eigen)));
     } else if (!offen) {
         const vor = SKILL_NACH_ID[def.vor];
         const vorName = knotenSicht(vor) === "schatten" ? t("einen unbekannten Stern") : vor.name;
-        sternbildDetails.appendChild(erstelleHinweis(def.vorMax ? t("🔒 Erst ganz ausbauen: ") + vorName : t("🔒 Erst kaufen: ") + vorName));
+        sternbildDetails.appendChild(erstelleHinweis(def.vorMax ? tf("🔒 Erst ganz ausbauen: {0}", vorName) : tf("🔒 Erst kaufen: {0}", vorName)));
     } else if (!darfEinkaufen() && !istMax) {
         sternbildDetails.appendChild(erstelleHinweis(t("Kaufen geht nur zwischen den Tagen.")));
     }
@@ -5157,18 +5118,18 @@ function modusInfoText(sandbox, stand) {
     const r = stand.r;
     const z = JAHRESZEITEN[jahreszeitIndex(r.tag)];
     const zeilen = [
-        t("📅 Tag ") + r.tag + " · " + z.symbol + " " + z.name,
-        sandbox ? "🏁 " + (r.meilensteine || 0) + t(" Meilensteine erreicht") : "🧾 " + r.bezahlteRechnungen + t(" Rechnungen bezahlt"),
-        "🪙 " + zahl(r.gold) + t(" Gold · ✨ ") + zahl(r.skillpunkte) + t(" Sternensamen"),
-        "🌱 " + stand.pflanzen + (stand.pflanzen === 1 ? t(" Pflanze") : t(" Pflanzen")) + " · 🟫 " + stand.felder + t(" Felder"),
-        "🙏 " + stand.segen + t(" Segen · 🧰 ") + (r.werkzeuge || []).length + t(" Werkzeuge"),
-        t("💰 Insgesamt ") + zahl(r.gesamt ? r.gesamt.gold : 0) + t(" Gold verdient")
+        tf("📅 Tag {0} · {1} {2}", r.tag, z.symbol, z.name),
+        sandbox ? tf("🏁 {0} Meilensteine erreicht", (r.meilensteine || 0)) : tf("🧾 {0} Rechnungen bezahlt", r.bezahlteRechnungen),
+        tf("🪙 {0} Gold · ✨ {1} Sternensamen", zahl(r.gold), zahl(r.skillpunkte)),
+        tf("🌱 {0}{1} · 🟫 {2} Felder", stand.pflanzen, (stand.pflanzen === 1 ? t(" Pflanze") : t(" Pflanzen")), stand.felder),
+        tf("🙏 {0} Segen · 🧰 {1} Werkzeuge", stand.segen, (r.werkzeuge || []).length),
+        tf("💰 Insgesamt {0} Gold verdient", zahl(r.gesamt ? r.gesamt.gold : 0))
     ];
-    if (!sandbox && r.mondphase > 0) zeilen.push(MONDPHASEN[r.mondphase].symbol + t(" Mondphase ") + MONDPHASEN[r.mondphase].name);
+    if (!sandbox && r.mondphase > 0) zeilen.push(tf("{0} Mondphase {1}", MONDPHASEN[r.mondphase].symbol, MONDPHASEN[r.mondphase].name));
     const mondblueten = sandbox
         ? aufrunden(mondbluetenFuerRechnungen(r.meilensteine || 0, 0) * SANDBOX_KONFIG.mondbluetenAnteil)
         : mondbluetenFuerRechnungen(r.bezahlteRechnungen, r.mondphase || 0);
-    zeilen.push("🌸 " + (sandbox ? t("Neuanfang") : t("Run beenden")) + t(" jetzt: +") + zahl(mondblueten) + t(" Mondblüten"));
+    zeilen.push(tf("🌸 {0} jetzt: +{1} Mondblüten", (sandbox ? t("Neuanfang") : t("Run beenden")), zahl(mondblueten)));
     return zeilen.join("\n");
 }
 
@@ -5183,9 +5144,9 @@ function renderModusKarten() {
                 try { return komplettErfolge(endlosMeta(slot), true).geschafft; } catch (fehler) { return 0; }
             });
             const gesamt = story.gesamt + erfolgKettenFuer(true).length;
-            return (story.geschafft + Math.max(0, ...endlos)) + " / " + gesamt + t(" Erfolge");
+            return tf("{0} / {1} Erfolge", (story.geschafft + Math.max(0, ...endlos)), gesamt);
         })())]),
-        el("span", null, "📅 " + zahl(meta.lebenszeit.tage) + t(" Tage gespielt"))
+        el("span", null, tf("📅 {0} Tage gespielt", zahl(meta.lebenszeit.tage)))
     );
 
     const reihe = $("modus-reihe");
@@ -5206,15 +5167,15 @@ function renderModusKarten() {
         const info = el("span", "modus-info", "i");
         setzeTipp(info, modusInfoText(modus.sandbox, stand));
         let statusText;
-        if (!frei) statusText = t("🔒 Im Mondteich für ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten oder mit dem Unterstützer-Paket");
-        else if (modus.sandbox) statusText = t("Speicherstand ") + endlosSlot() + " · " + (stand && !stand.neu ? t("Tag ") + stand.r.tag : t("Neuer Anfang"));
+        if (!frei) statusText = tf("🔒 Im Mondteich für {0} Mondblüten oder mit dem Unterstützer-Paket", zahl(SANDBOX_KONFIG.preis));
+        else if (modus.sandbox) statusText = tf("Speicherstand {0} · {1}", endlosSlot(), (stand && !stand.neu ? tf("Tag {0}", stand.r.tag) : t("Neuer Anfang")));
         else if (!stand || stand.neu) statusText = t("Neuer Anfang");
-        else statusText = t("Tag ") + stand.r.tag + " · " + (modus.sandbox ? (stand.r.meilensteine || 0) + t(" Meilensteine")
-            : stand.r.bezahlteRechnungen + (stand.r.bezahlteRechnungen === 1 ? t(" Rechnung") : t(" Rechnungen")));
+        else statusText = tf("Tag {0} · {1}", stand.r.tag, (modus.sandbox ? tf("{0} Meilensteine", (stand.r.meilensteine || 0))
+            : stand.r.bezahlteRechnungen + (stand.r.bezahlteRechnungen === 1 ? t(" Rechnung") : t(" Rechnungen"))));
         const mondblueten = frei ? profilMondblueten(modus.sandbox) : 0;
         const spielzeit = frei ? (modus.sandbox ? endlosMeta(endlosSlot()) : storyMeta()).lebenszeit.spielzeitMs : 0;
         const stats = frei && stand && !stand.neu
-            ? el("div", "modus-stats", "🪙 " + zahl(stand.r.gold || 0) + t(" Gold") + " · ⏱ " + spielzeitText(spielzeit))
+            ? el("div", "modus-stats", tf("🪙 {0} Gold · ⏱ {1}", zahl(stand.r.gold || 0), spielzeitText(spielzeit)))
             : frei && spielzeit > 60000 ? el("div", "modus-stats", "⏱ " + spielzeitText(spielzeit)) : null;
         karte.append(...[
             frei ? info : null,
@@ -5223,7 +5184,7 @@ function renderModusKarten() {
             el("div", "modus-text", modus.text),
             el("div", "modus-status", statusText),
             stats,
-            frei ? el("div", "modus-mondblueten", null, [spriteIcon("mondbluete"), el("span", null, zahl(mondblueten) + t(" Mondblüten"))]) : null,
+            frei ? el("div", "modus-mondblueten", null, [spriteIcon("mondbluete"), el("span", null, tf("{0} Mondblüten", zahl(mondblueten)))]) : null,
             el("div", "modus-los", !frei ? t("Gesperrt") : !stand || stand.neu ? t("▶ Starten") : t("▶ Weiterspielen"))
         ].filter(Boolean));
         karte.addEventListener("click", event => {
@@ -5247,7 +5208,7 @@ function spieleModus(sandbox) {
     if (typeof koop !== "undefined" && koop.imSpiel) koopVerlassen(false);
     if (sandbox && !hatSandbox()) {
         Klang.fehler();
-        zeigeToast(t("🔒 Endlos kaufst du im Mondteich (Reiter Spielmodi) für ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten."));
+        zeigeToast(tf("🔒 Endlos kaufst du im Mondteich (Reiter Spielmodi) für {0} Mondblüten.", zahl(SANDBOX_KONFIG.preis)));
         return;
     }
     wechsleZuModus(sandbox);
@@ -5263,12 +5224,10 @@ function frageModusReset(sandbox) {
     zeigePopup({
         titel: sandbox ? t("🏖️ Sandbox zurücksetzen?") : t("🌾 Story komplett löschen?"),
         farbe: "#b8232a",
-        inhalt: t("Willst du ") + name + t(" wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine ") +
-            t("(dafür ") + (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")) + t(" nutzen). ") +
-            (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). ") +
+        inhalt: tf("Willst du {0} wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine (dafür {1} nutzen). {2}", name, (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")), (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). ") +
                 t("Story, Erfolge und Kosmetik bleiben.")
                 : t("ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. ") +
-                t("Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos.")),
+                t("Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos."))),
         breite: 560,
         knoepfe: [
             { text: t("Abbrechen") },
@@ -5500,10 +5459,9 @@ $("spiel-speichern").addEventListener("click", () => {
 // Beschreibung eines Speicherstands wie in der Auswahl im Hauptmenue
 function speicherZeilen(r, m) {
     if (!r && !(m && ((m.lebenszeit && m.lebenszeit.tage) || m.mondblueten))) return [el("span", null, t("Leer"))];
-    const zeilen = [el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold")
+    const zeilen = [el("span", null, r ? tf("📅 Tag {0} · 🏁 {1} Meilensteine · 🪙 {2} Gold", r.tag, (r.meilensteine || 0), zahl(r.gold || 0))
         : t("Neuer Anfang"))];
-    if (m) zeilen.push(el("span", "endlos-slot-klein", "⏱ " + spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs) +
-        " · 🌸 " + zahl(m.mondblueten || 0) + t(" Mondblüten")));
+    if (m) zeilen.push(el("span", "endlos-slot-klein", tf("⏱ {0} · 🌸 {1} Mondblüten", spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs), zahl(m.mondblueten || 0))));
     return zeilen;
 }
 
@@ -5725,8 +5683,7 @@ karteAufgeben.addEventListener("click", () => {
         breite: 500,
         inhalt: el("div", "warn-inhalt", null, [
             el("p", null, t("Dein Run endet sofort. Das kannst du nicht rückgängig machen.")),
-            el("p", "warn-belohnung", t("Du bekommst +") + zahl(mondbluetenJetzt()) + t(" Mondblüten für ") + run.bezahlteRechnungen +
-                (run.bezahlteRechnungen === 1 ? t(" bezahlte Rechnung.") : t(" bezahlte Rechnungen.")))
+            el("p", "warn-belohnung", tf("Du bekommst +{0} Mondblüten für {1}{2}", zahl(mondbluetenJetzt()), run.bezahlteRechnungen, (run.bezahlteRechnungen === 1 ? t(" bezahlte Rechnung.") : t(" bezahlte Rechnungen."))))
         ]),
         knoepfe: [
             { text: t("Weiterspielen"), klasse: "knopf-gruen" },
@@ -5749,12 +5706,11 @@ function frageNeuanfang() {
         titel: t("🌙 Neuanfang?"),
         inhalt: el("div", "neuanfang-inhalt", null, [
             el("p", null, t("Möchtest du einen Neuanfang wagen?")),
-            el("div", "neuanfang-belohnung", null, [spriteIcon("mondbluete", true), el("b", null, "+" + zahl(mondblueten) + t(" Mondblüten"))]),
+            el("div", "neuanfang-belohnung", null, [spriteIcon("mondbluete", true), el("b", null, tf("+{0} Mondblüten", zahl(mondblueten)))]),
             el("p", "neuanfang-klein", run.meilensteine === 0
                 ? t("Du hast noch keinen Meilenstein erreicht und bekommst darum noch nichts.")
-                : t("Für ") + run.meilensteine + (run.meilensteine === 1 ? t(" Meilenstein") : t(" Meilensteine")) +
-                  (run.koop ? t(". Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.")
-                      : t(". Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.")))
+                : tf("Für {0}{1}{2}", run.meilensteine, (run.meilensteine === 1 ? t(" Meilenstein") : t(" Meilensteine")), (run.koop ? t(". Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.")
+                      : t(". Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen."))))
         ]),
         breite: 480,
         knoepfe: [
@@ -5845,7 +5801,7 @@ function stelleFeldWiederHer(feld, stand) {
     feld.el.feldDiv.classList.toggle("feld-fertig", feld.fertig);
     setzeVariantenKlasse(feld, variante);
     setzeTipp(feld.el.feldDiv, feldTipp(feld));
-    feld.el.nameEl.textContent = feld.fertig && feld.ernteKlicksRest > 0 ? t("Noch ") + feld.ernteKlicksRest + "x" : pflanze.name;
+    feld.el.nameEl.textContent = feld.fertig && feld.ernteKlicksRest > 0 ? tf("Noch {0}x", feld.ernteKlicksRest) : pflanze.name;
     feld.el.balkenInnen.style.width = feld.fertig ? "100%" : (feld.stufe / 3) * 100 + "%";
     zeigeFeldSprite(feld);
 }
@@ -6068,13 +6024,12 @@ function zeigeEndlosSlots() {
     for (let slot = 1; slot <= ENDLOS_SLOTS; slot++) {
         const { r, m, leer } = endlosSlotStand(slot);
         const zeilen = leer ? [el("span", null, t("Leer"))] : [
-            el("span", null, r ? "📅 " + t("Tag ") + r.tag + " · 🏁 " + (r.meilensteine || 0) + t(" Meilensteine") + " · 🪙 " + zahl(r.gold || 0) + t(" Gold")
+            el("span", null, r ? tf("📅 Tag {0} · 🏁 {1} Meilensteine · 🪙 {2} Gold", r.tag, (r.meilensteine || 0), zahl(r.gold || 0))
                 : t("Neuer Anfang")),
-            el("span", "endlos-slot-klein", "⏱ " + spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs) +
-                " · 🌸 " + zahl(m.mondblueten || 0) + t(" Mondblüten"))
+            el("span", "endlos-slot-klein", tf("⏱ {0} · 🌸 {1} Mondblüten", spielzeitText(m.lebenszeit && m.lebenszeit.spielzeitMs), zahl(m.mondblueten || 0)))
         ];
         const zeile = el("div", "endlos-slot" + (slot === endlosSlot() ? " aktiv" : ""), null, [
-            el("div", "endlos-slot-text", null, [el("b", null, t("Speicherstand ") + slot), ...zeilen])
+            el("div", "endlos-slot-text", null, [el("b", null, tf("Speicherstand {0}", slot)), ...zeilen])
         ]);
         const los = el("button", "knopf knopf-gruen", leer ? t("+ Neues Spiel") : t("▶ Weiterspielen"));
         los.addEventListener("click", () => {
@@ -6105,7 +6060,7 @@ function zeigeEndlosSlots() {
 
 function frageSlotLoeschen(slot) {
     zeigePopup({
-        titel: t("🗑️ Speicherstand ") + slot + t(" löschen?"),
+        titel: tf("🗑️ Speicherstand {0} löschen?", slot),
         farbe: "#b8232a",
         breite: 520,
         inhalt: t("Der ganze Speicherstand wird gelöscht: Hof, Mondblüten, Upgrades, Kuscheltiere und Erfolge dieses Speicherstands. ") +
@@ -6116,7 +6071,7 @@ function frageSlotLoeschen(slot) {
                 setzeModusZurueck(true, slot);
                 Klang.reset();
                 renderModusKarten();
-                zeigeToast(t("♾️ Speicherstand ") + slot + t(" gelöscht"));
+                zeigeToast(tf("♾️ Speicherstand {0} gelöscht", slot));
                 zeigeEndlosSlots();
             } }
         ]

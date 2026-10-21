@@ -34,7 +34,7 @@ function renderMetaUpgrades() {
     prestigeInfo.textContent = (run.sandbox
         ? t("♾️ Mondteich von Endlos: eigener Fortschritt, getrennt von Story. Mondblüten gibt es beim Neuanfang für Meilensteine")
         : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 2, 2. = 8, 3. = 18 …)")) +
-        (meta.sternenfaelle > 0 ? t(", durch deine Sternenfälle x") + zahl(sternenfallFaktor()) + "." : ".");
+        (meta.sternenfaelle > 0 ? tf(", durch deine Sternenfälle x{0}.", zahl(sternenfallFaktor())) : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
         // Noch nicht entdeckt: nur ein Geheimnis mit Hinweis
         if (def.sichtbar && !def.sichtbar(meta)) {
@@ -48,8 +48,8 @@ function renderMetaUpgrades() {
         const karte = erstelleKarte({
             titel: def.name + " (" + stufenText(lvl, def.max) + ")",
             beschreibung: def.beschreibung,
-            info: t("Aktuell: ") + def.info(lvl),
-            knopfText: istMax ? t("Maximal") : zahl(kosten) + t(" Mondblüten"),
+            info: tf("Aktuell: {0}", def.info(lvl)),
+            knopfText: istMax ? t("Maximal") : tf("{0} Mondblüten", zahl(kosten)),
             aktiv: !istMax && meta.mondblueten >= kosten,
             onKauf: () => kaufeMetaUpgrade(def)
         });
@@ -106,13 +106,11 @@ function tarotStatus(karte) {
     if (istVerstaerkt(karte.id)) return { text: t("⭐ Ausgerüstet"), klasse: "ausgeruestet" };
     if (istVerbessert(karte.id)) return { text: t("✨ Verbessert"), klasse: "verbessert" };
     if (hatTarot(karte.id)) return { text: t("Im Besitz"), klasse: "besessen" };
-    return { text: zahl(tarotKaufPreis()) + t(" Mondblüten"), klasse: "kaufbar" };
+    return { text: tf("{0} Mondblüten", zahl(tarotKaufPreis())), klasse: "kaufbar" };
 }
 
 function renderTarot() {
-    prestigeInfo.textContent = t("⭐ Ausgerüstet: ") + meta.tarotSlots.length + "/" + KONFIG.tarotSlots +
-        t("  ·  Nächste Karte: ") + zahl(tarotKaufPreis()) + t(" Mondblüten (jede Karte macht die nächste 20% teurer)") +
-        t("  ·  Verbessern: ") + KONFIG.tarotVerbessernPreis + t(" Mondblüten. Klick auf eine Karte für alle Details.");
+    prestigeInfo.textContent = tf("⭐ Ausgerüstet: {0}/{1}  ·  Nächste Karte: {2} Mondblüten (jede Karte macht die nächste 20% teurer)  ·  Verbessern: {3} Mondblüten. Klick auf eine Karte für alle Details.", meta.tarotSlots.length, KONFIG.tarotSlots, zahl(tarotKaufPreis()), KONFIG.tarotVerbessernPreis);
 
     const raster = el("div", "tarot-raster");
     TAROT.filter(karte => !(run.sandbox && SANDBOX_AUS_TAROT.includes(karte.id))).forEach(karte => {
@@ -143,7 +141,7 @@ function zeigeTarotDetails(karte) {
             el("div", "tarot-detail-zeile", null, [el("b", null, t("Normal: ")), el("span", null, karte.text(1))]),
             el("div", "tarot-detail-zeile" + (ausgeruestet ? " aktiv" : ""), null, [
                 el("b", null, t("Verbessert und ausgerüstet: ")),
-                el("span", null, karte.text(f) + (karte.extra ? t(" Zusätzlich: ") + karte.extra : ""))
+                el("span", null, karte.text(f) + (karte.extra ? tf(" Zusätzlich: {0}", karte.extra) : ""))
             ]),
             el("div", "tarot-detail-status", besessen
                 ? (ausgeruestet ? t("⭐ Diese Karte ist ausgerüstet und wirkt verstärkt.")
@@ -156,14 +154,14 @@ function zeigeTarotDetails(karte) {
     const knoepfe = [];
     if (!besessen) {
         const preis = tarotKaufPreis();
-        knoepfe.push({ text: t("Kaufen · ") + zahl(preis) + t(" Mondblüten"), klasse: "knopf-lila", deaktiviert: meta.mondblueten < preis,
+        knoepfe.push({ text: tf("Kaufen · {0} Mondblüten", zahl(preis)), klasse: "knopf-lila", deaktiviert: meta.mondblueten < preis,
             aktion: () => { if (kaufeTarot(karte)) zeigeTarotDetails(karte); } });
     } else if (!verbessert) {
-        knoepfe.push({ text: t("Verbessern · ") + KONFIG.tarotVerbessernPreis + t(" Mondblüten"), klasse: "knopf-lila",
+        knoepfe.push({ text: tf("Verbessern · {0} Mondblüten", KONFIG.tarotVerbessernPreis), klasse: "knopf-lila",
             deaktiviert: meta.mondblueten < KONFIG.tarotVerbessernPreis,
             aktion: () => { if (verbessereTarot(karte)) zeigeTarotDetails(karte); } });
     } else {
-        knoepfe.push({ text: ausgeruestet ? t("Ablegen") : t("Ausrüsten (") + meta.tarotSlots.length + "/" + KONFIG.tarotSlots + ")",
+        knoepfe.push({ text: ausgeruestet ? t("Ablegen") : tf("Ausrüsten ({0}/{1})", meta.tarotSlots.length, KONFIG.tarotSlots),
             klasse: ausgeruestet ? null : "knopf-gruen",
             aktion: () => { if (wechsleTarotSlot(karte)) zeigeTarotDetails(karte); } });
     }
@@ -262,14 +260,14 @@ function zeigeKapsel(ergebnis) {
             pixelIcon(tier.symbol, 96, "kapsel-tier"),
             el("div", "kapsel-name", tier.name),
             el("div", "kapsel-raritaet", r.name),
-            el("div", "kapsel-status", ergebnis.neu ? t("NEU!") : ergebnis.aufgestiegen ? t("Stufe ") + ergebnis.stufe + "!" : t("+1 Stück")),
+            el("div", "kapsel-status", ergebnis.neu ? t("NEU!") : ergebnis.aufgestiegen ? tf("Stufe {0}!", ergebnis.stufe) : t("+1 Stück")),
             el("div", "kapsel-text", tier.text(ergebnis.stufe))
         );
         preis.querySelector(".kapsel-raritaet").style.color = r.rand;
 
         const nochmal = meta.gutscheine > 0
-            ? el("button", "knopf knopf-lila", t("Nochmal mit Gutschein 🎟️ (") + meta.gutscheine + ")")
-            : el("button", "knopf knopf-lila", t("Nochmal · ") + zahl(kuschelPreis()) + t(" Mondblüten"));
+            ? el("button", "knopf knopf-lila", tf("Nochmal mit Gutschein 🎟️ ({0})", meta.gutscheine))
+            : el("button", "knopf knopf-lila", tf("Nochmal · {0} Mondblüten", zahl(kuschelPreis())));
         nochmal.disabled = meta.gutscheine <= 0 && meta.mondblueten < kuschelPreis();
         // Letzter Gutschein verbraucht: kurz warten und deutlich sagen, dass jetzt Mondblueten kosten
         const rest = kuschelSperreBis - performance.now();
@@ -297,9 +295,7 @@ function zeigeKapsel(ergebnis) {
 
 function renderKuscheltiere() {
     const k = KUSCHEL_KONFIG;
-    prestigeInfo.textContent = t("Kuscheltiere bleiben für immer und geben dir in jedem Run einen Bonus. ") +
-        t("Doppelte verbessern ein Kuscheltier automatisch (Stufe 1 bis ") + k.maxStufe + t(": 1, 2, 4, 8, 16 Stück). ") +
-        t("Gutscheine bekommst du für jede Erfolg-Stufe (bei den Erfolgen abholen).");
+    prestigeInfo.textContent = tf("Kuscheltiere bleiben für immer und geben dir in jedem Run einen Bonus. Doppelte verbessern ein Kuscheltier automatisch (Stufe 1 bis {0}: 1, 2, 4, 8, 16 Stück). Gutscheine bekommst du für jede Erfolg-Stufe (bei den Erfolgen abholen).", k.maxStufe);
 
     const preis = kuschelPreis();
     const chancen = el("div", "kuschel-chancen");
@@ -311,12 +307,11 @@ function renderKuscheltiere() {
     const automat = el("div", "kuschel-automat", null, [
         el("div", "kuschel-automat-kopf", null, [pixelIcon("🎪", 48), el("b", null, t("Kuschel-Automat")), chancen]),
         el("div", "spiel-knoepfe", null, [
-            kleinerKnopf(t("🎟️ Mit Gutschein ziehen (") + meta.gutscheine + ")", meta.gutscheine > 0, () => zieheKuschel(true), "knopf-gruen"),
-            kleinerKnopf(t("Ziehen · ") + zahl(preis) + t(" Mondblüten"), meta.mondblueten >= preis && performance.now() >= kuschelSperreBis,
+            kleinerKnopf(tf("🎟️ Mit Gutschein ziehen ({0})", meta.gutscheine), meta.gutscheine > 0, () => zieheKuschel(true), "knopf-gruen"),
+            kleinerKnopf(tf("Ziehen · {0} Mondblüten", zahl(preis)), meta.mondblueten >= preis && performance.now() >= kuschelSperreBis,
                 () => zieheKuschel(false), "knopf-lila")
         ]),
-        el("div", "kuschel-hinweis", (metaLevel("kuschelrabatt") > 0 ? t("Jeder 2. Zug") : t("Jeder Zug")) +
-            t(" mit Mondblüten macht den nächsten um 1 teurer. Gutschein-Züge sind immer kostenlos."))
+        el("div", "kuschel-hinweis", tf("{0} mit Mondblüten macht den nächsten um 1 teurer. Gutschein-Züge sind immer kostenlos.", (metaLevel("kuschelrabatt") > 0 ? t("Jeder 2. Zug") : t("Jeder Zug"))))
     ]);
     prestigeInhalt.appendChild(automat);
 
@@ -341,8 +336,8 @@ function renderKuscheltiere() {
                 el("div", "kuschel-sterne", "★".repeat(stufe) + "☆".repeat(k.maxStufe - stufe)),
                 el("div", "kuschel-text", tier.text(stufe)),
                 el("div", "kuschel-fortschritt", stufe >= k.maxStufe
-                    ? t("Maximal (") + anzahl + t(" Stück)")
-                    : anzahl + " / " + kuschelNaechsteStufeBei(stufe) + t(" bis Stufe ") + (stufe + 1))
+                    ? tf("Maximal ({0} Stück)", anzahl)
+                    : tf("{0} / {1} bis Stufe {2}", anzahl, kuschelNaechsteStufeBei(stufe), (stufe + 1)))
             );
         } else {
             karte.appendChild(el("div", "kuschel-text", t("Noch nicht gefunden.")));
@@ -376,8 +371,7 @@ function loeseSternenfallAus() {
     speichereMeta();
     Klang.goldregen();
     bildschirmBlitz("#c9b0f5", 0.6, 600);
-    zeigeBanner("☄️", t("Sternenfall!"), "+" + splitter + t(" Sternensplitter · alle Mondblüten ab jetzt x") +
-        zahl(sternenfallFaktor()) + (geschenk ? " · +" + geschenk + t(" Gutscheine") : ""), "#7c4fb3", 4500);
+    zeigeBanner("☄️", t("Sternenfall!"), tf("+{0} Sternensplitter · alle Mondblüten ab jetzt x{1}{2}", splitter, zahl(sternenfallFaktor()), (geschenk ? tf(" · +{0} Gutscheine", geschenk) : "")), "#7c4fb3", 4500);
     // Ein vorbereiteter Tag 1 wird mit den neuen Werten neu aufgebaut
     if (run.phase === "vorTag" && run.tag === 1 && !run.koop) starteNeuenRun(false);
     oeffnePrestigeShop();
@@ -392,8 +386,7 @@ function frageSternenfall() {
         inhalt: el("div", "sternenfall-frage", null, [
             el("p", null, t("Du verlierst: alle Mondblüten und alle dauerhaften Upgrades im Mondteich.")),
             el("p", null, t("Du behältst: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik und Endlos.")),
-            el("p", null, t("Du bekommst: ") + splitter + t(" Sternensplitter und alle zukünftigen Mondblüten zählen dreifach (x") +
-                zahl(Math.pow(STERNENFALL_KONFIG.mondbluetenFaktor, meta.sternenfaelle + 1)) + ").")
+            el("p", null, tf("Du bekommst: {0} Sternensplitter und alle zukünftigen Mondblüten zählen dreifach (x{1}).", splitter, zahl(Math.pow(STERNENFALL_KONFIG.mondbluetenFaktor, meta.sternenfaelle + 1))))
         ]),
         knoepfe: [
             { text: t("Abbrechen") },
@@ -423,16 +416,15 @@ function renderSternenfall() {
     fuellung.style.width = fortschritt * 100 + "%";
     balken.appendChild(fuellung);
     const knopf = el("button", "knopf knopf-lila haupt-knopf", kannSternenfall()
-        ? t("☄️ Sternenfall auslösen (+") + sternenfallSplitter() + t(" Splitter)")
-        : t("🔒 Noch ") + zahl(STERNENFALL_KONFIG.mindestMondblueten - meta.mondbluetenSeitSternenfall) + t(" Mondblüten"));
+        ? tf("☄️ Sternenfall auslösen (+{0} Splitter)", sternenfallSplitter())
+        : tf("🔒 Noch {0} Mondblüten", zahl(STERNENFALL_KONFIG.mindestMondblueten - meta.mondbluetenSeitSternenfall)));
     knopf.disabled = !kannSternenfall();
     knopf.addEventListener("click", frageSternenfall);
     prestigeInhalt.appendChild(el("div", "sternenfall-kasten", null, [
         pixelIcon("☄️", 64),
         el("div", "sternenfall-text", null, [
-            el("b", null, t("Sternenfälle bisher: ") + meta.sternenfaelle + t(" · Mondblüten x") + zahl(sternenfallFaktor())),
-            el("span", null, t("Verdient seit dem letzten Sternenfall: ") + zahl(meta.mondbluetenSeitSternenfall) + " / " +
-                zahl(STERNENFALL_KONFIG.mindestMondblueten) + t(" Mondblüten")),
+            el("b", null, tf("Sternenfälle bisher: {0} · Mondblüten x{1}", meta.sternenfaelle, zahl(sternenfallFaktor()))),
+            el("span", null, tf("Verdient seit dem letzten Sternenfall: {0} / {1} Mondblüten", zahl(meta.mondbluetenSeitSternenfall), zahl(STERNENFALL_KONFIG.mindestMondblueten))),
             balken
         ]),
         knopf
@@ -446,8 +438,8 @@ function renderSternenfall() {
             icon: def.symbol,
             titel: def.name + " (" + stufenText(lvl, def.max) + ")",
             beschreibung: def.beschreibung,
-            info: t("Aktuell: ") + def.info(lvl),
-            knopfText: istMax ? t("Maximal") : zahl(kosten) + t(" Sternensplitter"),
+            info: tf("Aktuell: {0}", def.info(lvl)),
+            knopfText: istMax ? t("Maximal") : tf("{0} Sternensplitter", zahl(kosten)),
             aktiv: !istMax && meta.sternensplitter >= kosten,
             onKauf: () => kaufeSternenfallUpgrade(def)
         });
@@ -495,9 +487,7 @@ function renderMondphasen() {
     const kasten = el("div", "mondphasen-kasten");
     kasten.appendChild(el("div", "mondphasen-titel", t("🌙 Mondphasen: Schwierigkeit für normale Runs")));
     if (run.sandbox) kasten.appendChild(el("div", "mondphasen-hinweis", t("♾️ In Endlos gibt es keine Mondphasen. Deine Auswahl gilt für deine Story-Runs.")));
-    kasten.appendChild(el("div", "mondphasen-hinweis", t("Jede Phase ist schwerer als die vorige, ihre Regeln gelten zusammen. ") +
-        t("Dafür gibt es +") + Math.round(MONDPHASE_BONUS * 100) + t("% Mondblüten pro Phase. Die nächste Phase wird frei, wenn du in der ") +
-        t("höchsten freien Phase ") + MONDPHASE_FREI_AB_RECHNUNGEN + t(" Rechnungen in einem Run bezahlst.")));
+    kasten.appendChild(el("div", "mondphasen-hinweis", tf("Jede Phase ist schwerer als die vorige, ihre Regeln gelten zusammen. Dafür gibt es +{0}% Mondblüten pro Phase. Die nächste Phase wird frei, wenn du in der höchsten freien Phase {1} Rechnungen in einem Run bezahlst.", Math.round(MONDPHASE_BONUS * 100), MONDPHASE_FREI_AB_RECHNUNGEN)));
     const reihe = el("div", "mondphasen-reihe");
     MONDPHASEN.forEach((phase, index) => {
         const frei = index <= (m.mondphaseFrei || 0);
@@ -507,8 +497,8 @@ function renderMondphasen() {
             neu ? el("div", "mondphase-neu", t("NEU")) : null,
             el("div", "mondphase-symbol", phase.symbol),
             el("div", "mondphase-name", phase.name),
-            el("div", "mondphase-text", frei ? phase.text : "🔒 " + MONDPHASE_FREI_AB_RECHNUNGEN + t(" Rechnungen in der Phase davor")),
-            el("div", "mondphase-bonus", "+" + Math.round(MONDPHASE_BONUS * 100 * index) + t("% Mondblüten"))
+            el("div", "mondphase-text", frei ? phase.text : tf("🔒 {0} Rechnungen in der Phase davor", MONDPHASE_FREI_AB_RECHNUNGEN)),
+            el("div", "mondphase-bonus", tf("+{0}% Mondblüten", Math.round(MONDPHASE_BONUS * 100 * index)))
         ]);
         knopf.addEventListener("click", () => {
             if (!frei) {
@@ -597,8 +587,8 @@ function renderSpielmodi() {
             t("Meilensteine für verdientes Gold (je 1 Segen). Mit dem Neuanfang fängst du von vorn an und bekommst die Hälfte der ") +
             t("Mondblüten, die die Meilensteine als Rechnungen bringen würden. Keine Erfolge. Eigener Spielstand, wählbar im Hauptmenü. ") +
             t("Mit dem Unterstützer-Paket ist sie später sofort frei."),
-        info: frei ? t("Freigeschaltet") : t("Einmalig ") + zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten"),
-        knopfText: frei ? (run.sandbox ? t("Endlos neu starten") : t("Zu Endlos")) : zahl(SANDBOX_KONFIG.preis) + t(" Mondblüten"),
+        info: frei ? t("Freigeschaltet") : tf("Einmalig {0} Mondblüten", zahl(SANDBOX_KONFIG.preis)),
+        knopfText: frei ? (run.sandbox ? t("Endlos neu starten") : t("Zu Endlos")) : tf("{0} Mondblüten", zahl(SANDBOX_KONFIG.preis)),
         aktiv: frei || meta.mondblueten >= SANDBOX_KONFIG.preis,
         onKauf: () => (!frei ? kaufeSandbox() : run.sandbox ? starteNeuenRun(true) : wechsleZuModus(true))
     }));
@@ -620,21 +610,20 @@ function aktualisiereMondphaseHinweis() {
 function renderPrestigeShop() {
     prestigeGuthaben.innerHTML = "";
     prestigeGuthaben.append(
-        el("span", "guthaben-teil", null, [spriteIcon("mondbluete", true), el("span", null, zahl(meta.mondblueten) + t(" Mondblüten"))]),
-        el("span", "guthaben-teil", null, [pixelIcon("🎟️", 32), el("span", null, meta.gutscheine + t(" Gutscheine"))])
+        el("span", "guthaben-teil", null, [spriteIcon("mondbluete", true), el("span", null, tf("{0} Mondblüten", zahl(meta.mondblueten)))]),
+        el("span", "guthaben-teil", null, [pixelIcon("🎟️", 32), el("span", null, tf("{0} Gutscheine", meta.gutscheine))])
     );
     if (meta.sternenfaelle > 0 || meta.sternensplitter > 0) {
-        prestigeGuthaben.appendChild(el("span", "guthaben-teil", null, [pixelIcon("💠", 32), el("span", null, zahl(meta.sternensplitter) + t(" Sternensplitter"))]));
+        prestigeGuthaben.appendChild(el("span", "guthaben-teil", null, [pixelIcon("💠", 32), el("span", null, tf("{0} Sternensplitter", zahl(meta.sternensplitter)))]));
     }
     prestigeWeiter.textContent = run.phase !== "runEnde" ? t("Übernehmen") : run.sandbox ? t("Endlos neu starten") : t("Neuen Run starten");
 
     renderReiter(prestigeReiter, [
         { id: "upgrades", text: t("🏆 Upgrades") },
-        { id: "tarot", text: t("🔮 Tarot (") + meta.tarot.length + "/" + TAROT.length + ")" },
-        { id: "kuschel", text: t("🧸 Kuscheltiere (") + Object.keys(meta.kuscheltiere).length + "/" + KUSCHELTIERE.length + ")" +
-            (meta.gutscheine > 0 ? " 🎟️" + meta.gutscheine : "") },
-        { id: "sternenfall", text: t("☄️ Sternenfall") + (kannSternenfall() ? " !" : "") },
-        { id: "modi", text: t("🎮 Spielmodi") + (neueMondphase() ? " !" : "") }
+        { id: "tarot", text: tf("🔮 Tarot ({0}/{1})", meta.tarot.length, TAROT.length) },
+        { id: "kuschel", text: tf("🧸 Kuscheltiere ({0}/{1}){2}", Object.keys(meta.kuscheltiere).length, KUSCHELTIERE.length, (meta.gutscheine > 0 ? " 🎟️" + meta.gutscheine : "")) },
+        { id: "sternenfall", text: tf("☄️ Sternenfall{0}", (kannSternenfall() ? " !" : "")) },
+        { id: "modi", text: tf("🎮 Spielmodi{0}", (neueMondphase() ? " !" : "")) }
     ], aktiverPrestigeReiter, id => {
         aktiverPrestigeReiter = id;
         renderPrestigeShop();

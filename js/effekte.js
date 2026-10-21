@@ -146,7 +146,7 @@ function zeigeTitel(text, klasse) {
 registriereHaken("tagStart", () => {
     if (imHauptmenue()) return; // Spielstart: der Tag laeuft hinter dem Hauptmenue an, kein grosser Titel
     const z = jahreszeit();
-    zeigeTitel(t("☀️ Tag ") + run.tag, "titel-tag");
+    zeigeTitel(tf("☀️ Tag {0}", run.tag), "titel-tag");
     setTimeout(() => {
         if (run.phase === "tag") partikel(window.innerWidth / 2, window.innerHeight * 0.35, ["#ffe89a", "#ffffff", z.farbe], 30, 160);
     }, 150);
@@ -218,7 +218,7 @@ function sammelKette(x, y) {
         kette.el = el("div", "sammel-kette");
         document.body.appendChild(kette.el);
     }
-    kette.el.textContent = t("Kette x") + kette.anzahl;
+    kette.el.textContent = tf("Kette x{0}", kette.anzahl);
     kette.el.style.left = x + "px";
     kette.el.style.top = y - 50 + "px";
     kette.el.style.setProperty("--kette", Math.min(1, kette.anzahl / 50));
@@ -256,7 +256,7 @@ function sternGekauft(def) {
     zeigeRing(x, y, rect.width * 2.4, "#ffe89a", 550);
     partikel(x, y, ["#ffe89a", "#ffffff", "#8fa2f0"], 22, 90);
     const stufe = level(def.id);
-    const text = el("div", "stern-aufstieg", def.max > 1 ? t("Stufe ") + stufe + "!" : t("✔ Freigeschaltet!"));
+    const text = el("div", "stern-aufstieg", def.max > 1 ? tf("Stufe {0}!", stufe) : t("✔ Freigeschaltet!"));
     text.style.left = x + "px";
     text.style.top = rect.top - 10 + "px";
     document.body.appendChild(text);
@@ -288,7 +288,7 @@ function neuePflanzeFeier(pflanze) {
     const bild = document.createElement("img");
     bild.alt = "";
     setzeSpriteBild(bild, pflanze.id, 10);
-    buehne.append(el("div", "neue-pflanze-strahlen"), bild, el("div", "neue-pflanze-text", t("Neu: ") + pflanze.name + "!"));
+    buehne.append(el("div", "neue-pflanze-strahlen"), bild, el("div", "neue-pflanze-text", tf("Neu: {0}!", pflanze.name)));
     document.body.appendChild(buehne);
     setTimeout(() => buehne.remove(), 2400);
 }
