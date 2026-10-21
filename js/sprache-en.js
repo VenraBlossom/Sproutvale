@@ -2039,11 +2039,7 @@ Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Do you want to end the day now?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "\ud83d\ude80 Fewer particles and animations (helps with lag)",
     "VIP-Karte": "VIP Card",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "No more limit: you can play all games of chance as often as you like.",
-    "Unbegrenzt spielen": "Unlimited play",
-    "Noch mit Grenze": "Still limited",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Appears once you have unlocked Blackjack.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP Card: unlimited play",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "\ud83d\udcac Remove unnecessary texts (harvest numbers, jackpot, chain ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Shop: Gems (pink symbol) shown in the farmhouse and profile. Legendary skins can be bought one by one with gems, the Supporter Pack costs 500 gems. Gems and purchases belong to you, not to a save.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Promo codes: new \"Code\" button in the farmhouse and profile. Each code works once per player.",
@@ -2686,7 +2682,9 @@ Object.assign(UEBERSETZUNG, {
     "Für 1 Meilenstein.": "For 1 milestone.",
     "Für {0} Meilensteine.": "For {0} milestones.",
     "Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.": "In Duo you both start over, then the host starts the next game in the lobby.",
-    "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Your Endless game then starts again at day 1; before that you can shop in the Moon Pond."
+    "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Your Endless game then starts again at day 1; before that you can shop in the Moon Pond.",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 games per break in all games of chance.",
+    "Noch mehr Spiele pro Pause": "Even more games per break"
 });
 
 // Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)

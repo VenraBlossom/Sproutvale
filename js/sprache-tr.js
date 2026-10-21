@@ -2039,11 +2039,7 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Günü şimdi bitirmek istiyor musun?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Daha az parçacık ve animasyon (takılmalara karşı)",
     "VIP-Karte": "VIP Kart",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Sınır yok: tüm şans oyunlarını istediğin kadar oynayabilirsin.",
-    "Unbegrenzt spielen": "Sınırsız oyun",
-    "Noch mit Grenze": "Hâlâ sınırlı",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Blackjack'i açtığında görünür.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP kart: sınırsız oyun",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Gereksiz yazıları kaldır (hasat sayıları, jackpot, zincir ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Mağaza: Mücevherler (pembe simge) çiftlik evinde ve profilde görünür. Efsanevi kostümler tek tek mücevherle alınabilir, Destekçi Paketi 500 mücevher. Mücevherler ve satın alımlar sana aittir, bir kayda değil.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Promosyon kodları: çiftlik evinde ve profilde yeni „Kod“ düğmesi. Her kod oyuncu başına bir kez çalışır.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Dil / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Dili değiştirince oyun kısa süreliğine yeniden yüklenir. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "Tüm şans oyunlarında mola başına +5 oyun.",
+    "Noch mehr Spiele pro Pause": "Mola başına daha da çok oyun"
 });

@@ -2039,11 +2039,7 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "现在就结束这一天吗？",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 减少粒子和动画（缓解卡顿）",
     "VIP-Karte": "VIP 卡",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "不再有限制：所有博彩游戏想玩多少次都行。",
-    "Unbegrenzt spielen": "无限畅玩",
-    "Noch mit Grenze": "仍有限制",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "解锁二十一点后出现。",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP 卡：无限畅玩",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 移除多余文字（收获数字、大奖、连锁……）",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "商店：宝石（粉色图标）显示在农舍和个人资料中。传说外观可用宝石单独购买，支持者礼包售价 500 宝石。宝石和购买内容属于你，而不是某个存档。",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "兑换码：农舍和个人资料中新增“兑换码”按钮。每个兑换码每位玩家只能用一次。",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 语言 / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "切换语言时游戏会短暂重新加载。/ The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "所有博彩游戏每次休息 +5 局。",
+    "Noch mehr Spiele pro Pause": "每次休息可玩更多局"
 });

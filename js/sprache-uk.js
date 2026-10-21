@@ -2039,11 +2039,7 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Хочеш завершити день уже зараз?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Менше частинок і анімацій (допомагає при лагах)",
     "VIP-Karte": "VIP-картка",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Жодних обмежень: можеш грати в усі азартні ігри скільки завгодно.",
-    "Unbegrenzt spielen": "Без обмежень",
-    "Noch mit Grenze": "Поки з лімітом",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "З'явиться, коли відкриєш блекджек.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP-картка: гра без обмежень",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Прибрати зайві написи (числа врожаю, джекпот, ланцюжок ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Крамниця: самоцвіти (рожевий значок) видно в будинку та профілі. Легендарні вигляди можна купувати поштучно за самоцвіти, Набір підтримки коштує 500 самоцвітів. Самоцвіти й покупки належать тобі, а не збереженню.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Промокоди: нова кнопка „Код“ у будинку та профілі. Кожен код працює один раз на гравця.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Мова / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Після зміни мови гра ненадовго перезавантажиться. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 ігор за перерву в усіх азартних іграх.",
+    "Noch mehr Spiele pro Pause": "Ще більше ігор за перерву"
 });

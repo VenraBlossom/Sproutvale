@@ -2039,11 +2039,7 @@ if (SPRACHE === "it") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Vuoi finire la giornata adesso?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Meno particelle e animazioni (aiuta se scatta)",
     "VIP-Karte": "Carta VIP",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Niente più limiti: puoi giocare a tutti i giochi d'azzardo quanto vuoi.",
-    "Unbegrenzt spielen": "Gioco illimitato",
-    "Noch mit Grenze": "Ancora con limite",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Appare quando hai sbloccato il blackjack.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 Carta VIP: gioco illimitato",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Rimuovi testi superflui (numeri del raccolto, jackpot, catena ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Negozio: Gemme (simbolo rosa) visibili nella fattoria e nel profilo. Le skin leggendarie si possono comprare singolarmente con le gemme, il Pacchetto sostenitore costa 500 gemme. Gemme e acquisti appartengono a te, non a un salvataggio.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Codici promozionali: nuovo pulsante „Codice“ nella fattoria e nel profilo. Ogni codice funziona una volta per giocatore.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "it") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Lingua / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Il gioco si ricarica brevemente quando cambi lingua. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 partite per pausa in tutti i giochi d'azzardo.",
+    "Noch mehr Spiele pro Pause": "Ancora più partite per pausa"
 });

@@ -2039,11 +2039,7 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "今日をもう終わりにする？",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 パーティクルとアニメを減らす（カクつき対策）",
     "VIP-Karte": "VIPカード",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "制限なし：すべてのギャンブルを好きなだけ遊べる。",
-    "Unbegrenzt spielen": "無制限",
-    "Noch mit Grenze": "まだ制限あり",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "ブラックジャックを解放すると現れる。",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIPカード：無制限にプレイ",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 不要な文字を消す（収穫の数字、ジャックポット、チェーン…）",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "ショップ：ジェム（ピンクのアイコン）を家とプロフィールに表示。レジェンダリースキンはジェムで1つずつ購入でき、サポーターパックは500ジェム。ジェムと購入品はセーブではなくあなたのものです。",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "プロモコード：家とプロフィールに新しい「コード」ボタン。各コードは1人1回まで。",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 言語 / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "言語を切り替えるとゲームが少しだけ再読み込みされます。 / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "全ギャンブルで休憩ごとのプレイ回数+5。",
+    "Noch mehr Spiele pro Pause": "休憩ごとのプレイ回数がさらに増える"
 });

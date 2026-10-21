@@ -48,9 +48,11 @@ function hatGluecksspiel() {
     return freieGluecksspiele().length > 0;
 }
 
+// Stern "VIP-Karte": so viele Spiele pro Pause mehr
+const VIP_SPIELE = 5;
+
 function spieleProPause(id) {
-    if (level("vipkarte") > 0) return Infinity; // Stern "VIP-Karte": keine Grenze
-    return GLUECKSSPIEL[id].proPause + level("stammkunde");
+    return GLUECKSSPIEL[id].proPause + level("stammkunde") + (level("vipkarte") > 0 ? VIP_SPIELE : 0);
 }
 
 function restSpiele(id) {
@@ -103,7 +105,6 @@ function einsatzKnoepfe(id, onWahl, rotAb = 1) {
 }
 
 function restText(id) {
-    if (spieleProPause(id) === Infinity) return t("💳 VIP-Karte: unbegrenzt spielen");
     return tf("Noch {0} von {1} Spielen bis zum nächsten Tag", restSpiele(id), spieleProPause(id));
 }
 

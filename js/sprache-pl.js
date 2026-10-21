@@ -2039,11 +2039,7 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Chcesz już zakończyć dzień?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Mniej cząsteczek i animacji (pomaga przy przycięciach)",
     "VIP-Karte": "Karta VIP",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Koniec limitu: możesz grać we wszystkie gry losowe, ile chcesz.",
-    "Unbegrenzt spielen": "Gra bez limitu",
-    "Noch mit Grenze": "Nadal z limitem",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Pojawi się, gdy odblokujesz blackjacka.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 Karta VIP: gra bez limitu",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Usuń zbędne napisy (liczby zbiorów, jackpot, łańcuch ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Sklep: Klejnoty (różowy symbol) widoczne w domu i profilu. Legendarne skórki można kupić pojedynczo za klejnoty, Pakiet wspierającego kosztuje 500 klejnotów. Klejnoty i zakupy należą do ciebie, nie do zapisu.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Kody promocyjne: nowy przycisk „Kod“ w domu i profilu. Każdy kod działa raz na gracza.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Język / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Gra na chwilę się przeładuje po zmianie języka. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 gier na przerwę we wszystkich grach losowych.",
+    "Noch mehr Spiele pro Pause": "Jeszcze więcej gier na przerwę"
 });

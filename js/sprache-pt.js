@@ -2039,11 +2039,7 @@ if (SPRACHE === "pt") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Quer encerrar o dia agora?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Menos partículas e animações (ajuda com travamentos)",
     "VIP-Karte": "Cartão VIP",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Sem limite: você pode jogar todos os jogos de azar quantas vezes quiser.",
-    "Unbegrenzt spielen": "Jogo ilimitado",
-    "Noch mit Grenze": "Ainda com limite",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Aparece quando você liberar o blackjack.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 Cartão VIP: jogo ilimitado",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Remover textos desnecessários (números de colheita, jackpot, sequência ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Loja: Gemas (símbolo rosa) aparecem na casa da fazenda e no perfil. Skins lendárias podem ser compradas uma a uma com gemas, o Pacote de apoiador custa 500 gemas. Gemas e compras são suas, não de um save.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Códigos promocionais: novo botão „Código“ na casa da fazenda e no perfil. Cada código funciona uma vez por jogador.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "pt") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Idioma / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "O jogo recarrega rapidamente ao trocar o idioma. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 jogos por pausa em todos os jogos de azar.",
+    "Noch mehr Spiele pro Pause": "Ainda mais jogos por pausa"
 });

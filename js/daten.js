@@ -756,10 +756,10 @@ const SKILLS = [
     stern("stammkunde", "glueck", "🎫", [-1400, -220], "rubbellos", t("Stammkunde"), 1500, 2.5, 3,
         t("+1 Spiel pro Pause bei allen Glücksspielen."),
         () => tf("+{0} Spiele pro Pause", level("stammkunde"))),
-    // Nach dem Stammkunden, braucht Blackjack: keine Grenze mehr, wie oft man pro Tag spielen darf
+    // Nach dem Stammkunden, braucht Blackjack: noch mehr Spiele pro Pause (frueher unbegrenzt, das machte Gold beliebig vermehrbar)
     stern("vipkarte", "glueck", "💳", [-1400, -440], "stammkunde", t("VIP-Karte"), 15000, 1, 1,
-        t("Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst."),
-        () => (level("vipkarte") > 0 ? t("Unbegrenzt spielen") : t("Noch mit Grenze")),
+        t("+5 Spiele pro Pause bei allen Glücksspielen."),
+        () => (level("vipkarte") > 0 ? tf("+{0} Spiele pro Pause", VIP_SPIELE) : t("Noch nicht gekauft")),
         { vorMax: true, bedingung: () => level("blackjack") > 0, bedingungStern: "blackjack",
             bedingungText: t("Erscheint, sobald du Blackjack freigeschaltet hast.") }),
     stern("haendlerfreund", "glueck", "🧳", [-1620, -220], "huehnerrennen", t("Händlerfreund"), 2000, 2.5, 2,
@@ -1046,7 +1046,7 @@ const STERN_KURZ = {
     igel: t("Igel sammeln Saat ein"), saatspatz: t("Spatz pflanzt Samen"), gluehglas: t("Mehr Glühwürmchen"),
     biene: t("Bienen lassen Pflanzen wachsen"), magnetfeld: t("Saat rollt zum Cursor"), eichhoernchen2: t("Mehr Eichhörnchen-Klicks"),
     erntehase: t("Hase erntet für dich"), sternhoernchen: t("Eichhörnchen geben Sternensamen"), helferlohn: t("Eichhörnchen-Klicks x2"),
-    glueckstraehne: t("Mehr Glück beim Spielen"), gluecksrabatt: t("Höhere Slot-Gewinne"), stammkunde: t("Mehr Spiele pro Pause"), vipkarte: t("Unbegrenzt spielen"),
+    glueckstraehne: t("Mehr Glück beim Spielen"), gluecksrabatt: t("Höhere Slot-Gewinne"), stammkunde: t("Mehr Spiele pro Pause"), vipkarte: t("Noch mehr Spiele pro Pause"),
     haendlerfreund: t("Händler kommt öfter"), giessen: t("Felder bewässern (x2 Tempo)"), feldvermessung: t("Felder billiger"),
     sonnenuhr: t("Mehr Energie"), fruehaufsteher: t("Samen zum Tagesstart"), duengen: t("Felder düngen (x2 Gold)"),
     morgentau: t("Morgens schneller wachsen"), doppelwurf: t("Zweiter Samen"), zinsen: t("Zinsen bei Feierabend"),

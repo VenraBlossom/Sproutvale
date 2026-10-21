@@ -2039,11 +2039,7 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "¿Quieres terminar el día ahora?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Menos partículas y animaciones (ayuda con los tirones)",
     "VIP-Karte": "Tarjeta VIP",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Sin límite: puedes jugar a todos los juegos de azar tanto como quieras.",
-    "Unbegrenzt spielen": "Juego ilimitado",
-    "Noch mit Grenze": "Aún limitado",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Aparece cuando hayas desbloqueado el Blackjack.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 Tarjeta VIP: juego ilimitado",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Quitar textos innecesarios (números de cosecha, premio gordo, cadena ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Tienda: las gemas (símbolo rosa) se muestran en la casa de la granja y en el perfil. Los skins legendarios se pueden comprar uno a uno con gemas; el Pack de apoyo cuesta 500 gemas. Las gemas y las compras son tuyas, no de una partida.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Códigos promocionales: nuevo botón \"Código\" en la casa de la granja y en el perfil. Cada código funciona una vez por jugador.",
@@ -2689,5 +2685,7 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Für 1 Meilenstein.": "Por 1 hito.",
     "Für {0} Meilensteine.": "Por {0} hitos.",
     "Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.": "En Duo ambos empezáis de nuevo y luego el anfitrión inicia el siguiente juego en la sala.",
-    "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Tu partida Infinita vuelve a empezar en el día 1; antes puedes comprar en el Estanque lunar."
+    "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Tu partida Infinita vuelve a empezar en el día 1; antes puedes comprar en el Estanque lunar.",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 partidas por pausa en todos los juegos de azar.",
+    "Noch mehr Spiele pro Pause": "Aún más partidas por pausa"
 });

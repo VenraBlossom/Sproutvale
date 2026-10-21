@@ -2039,11 +2039,7 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Wil je de dag nu al beëindigen?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Minder deeltjes en animaties (helpt bij haperen)",
     "VIP-Karte": "VIP-kaart",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Geen limiet meer: je mag alle kansspelen zo vaak spelen als je wilt.",
-    "Unbegrenzt spielen": "Onbeperkt spelen",
-    "Noch mit Grenze": "Nog met limiet",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Verschijnt zodra je blackjack hebt vrijgespeeld.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP-kaart: onbeperkt spelen",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Onnodige teksten weghalen (oogstgetallen, jackpot, ketting ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Winkel: Gems (roze symbool) zichtbaar in de boerderij en het profiel. Legendarische skins kun je los kopen met gems, het Supporterpakket kost 500 gems. Gems en aankopen zijn van jou, niet van één opslag.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Promocodes: nieuwe knop „Code“ in de boerderij en het profiel. Elke code werkt één keer per speler.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Taal / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Het spel laadt kort opnieuw als je van taal wisselt. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 spellen per pauze bij alle kansspelen.",
+    "Noch mehr Spiele pro Pause": "Nog meer spellen per pauze"
 });

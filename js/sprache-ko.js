@@ -2039,11 +2039,7 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "지금 하루를 끝낼까요?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 파티클과 애니메이션 줄이기 (렉 완화)",
     "VIP-Karte": "VIP 카드",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "제한 없음: 모든 도박 게임을 원하는 만큼 할 수 있어요.",
-    "Unbegrenzt spielen": "무제한",
-    "Noch mit Grenze": "아직 제한 있음",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "블랙잭을 해금하면 나타나요.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP 카드: 무제한 플레이",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 불필요한 글자 숨기기 (수확 숫자, 잭팟, 연쇄 ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "상점: 젬(분홍 아이콘)이 농가와 프로필에 표시돼요. 전설 스킨은 젬으로 하나씩 살 수 있고, 후원자 팩은 500 젬이에요. 젬과 구매품은 저장 파일이 아니라 당신의 것이에요.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "프로모 코드: 농가와 프로필에 새 „코드“ 버튼. 코드는 플레이어당 한 번만 쓸 수 있어요.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 언어 / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "언어를 바꾸면 게임이 잠깐 다시 로드됩니다. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "모든 도박 게임에서 휴식마다 +5판.",
+    "Noch mehr Spiele pro Pause": "휴식마다 더 많은 판"
 });

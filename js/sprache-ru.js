@@ -2039,11 +2039,7 @@ if (SPRACHE === "ru") Object.assign(UEBERSETZUNG, {
     "Möchtest du den Tag jetzt schon beenden?": "Хочешь закончить день уже сейчас?",
     "🚀 Weniger Partikel und Animationen (hilft bei Rucklern)": "🚀 Меньше частиц и анимаций (помогает при лагах)",
     "VIP-Karte": "VIP-карта",
-    "Keine Grenze mehr: Du darfst alle Glücksspiele so oft spielen, wie du willst.": "Никаких ограничений: можешь играть во все азартные игры сколько угодно.",
-    "Unbegrenzt spielen": "Без ограничений",
-    "Noch mit Grenze": "Пока с лимитом",
     "Erscheint, sobald du Blackjack freigeschaltet hast.": "Появится, когда откроешь блэкджек.",
-    "💳 VIP-Karte: unbegrenzt spielen": "💳 VIP-карта: игра без ограничений",
     "💬 Unnötige Texte entfernen (Ernte-Zahlen, Jackpot, Kette ...)": "💬 Убрать лишние надписи (числа урожая, джекпот, цепочка ...)",
     "Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand.": "Магазин: самоцветы (розовый значок) видны в доме и профиле. Легендарные облики можно покупать по одному за самоцветы, Набор поддержки стоит 500 самоцветов. Самоцветы и покупки принадлежат тебе, а не сохранению.",
     "Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler.": "Промокоды: новая кнопка „Код“ в доме и профиле. Каждый код работает один раз на игрока.",
@@ -2690,5 +2686,7 @@ if (SPRACHE === "ru") Object.assign(UEBERSETZUNG, {
     "Sproutvale": "Sproutvale",
     "🌍 Sprache / Language": "🌍 Язык / Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "При смене языка игра ненадолго перезагрузится. / The game reloads briefly when you switch.",
-    "VenraBlossom": "VenraBlossom"
+    "VenraBlossom": "VenraBlossom",
+    "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 игр за перерыв во всех азартных играх.",
+    "Noch mehr Spiele pro Pause": "Ещё больше игр за перерыв"
 });
