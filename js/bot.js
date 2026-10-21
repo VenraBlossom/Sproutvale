@@ -20,7 +20,7 @@ const BOT = {
 };
 
 (function starteBot() {
-    if (typeof BOT_CODE !== "string" || !BOT_CODE) return;
+    if (typeof BOT_CODE !== "string" || !BOT_CODE || !DEBUG_ERLAUBT) return;
 
     // Der Bot hat einen eigenen Namen im Duo
     profil().name = "Bot";

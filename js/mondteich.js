@@ -459,7 +459,8 @@ function renderSternenfall() {
 // ---------- SPIELMODI ----------
 
 function hatSandbox() {
-    return meta.sandbox || hatDlc() || (typeof betaAllesFrei === "function" && betaAllesFrei());
+    // Endlos: im Mondteich gekauft, mit dem Unterstuetzer-Paket oder mit dem Code BETAVALE
+    return meta.sandbox || hatDlc() || Boolean(Tresor.stand().endlos);
 }
 
 function kaufeSandbox() {

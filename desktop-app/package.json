@@ -9,7 +9,8 @@
   "scripts": {
     "start": "electron .",
     "exe": "node baue-exe.js",
-    "release": "node baue-exe.js --release"
+    "release": "node baue-exe.js --release",
+    "steam": "node baue-exe.js --steam"
   },
   "devDependencies": {
     "@electron/packager": "^20.3.0",

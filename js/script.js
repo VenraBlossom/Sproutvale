@@ -204,7 +204,6 @@ function geteiltVon(stand) {
 function speichereMeta() {
     if (speichernGesperrt) return;
     try {
-        speichereKaeufe(meta);
         if (metaProfil === "sandbox") {
             localStorage.setItem(endlosMetaKey(metaSlot || 1), JSON.stringify(fortschrittVon(meta)));
             localStorage.setItem(META_SPEICHER_KEY, JSON.stringify({ ...metaRuhend, ...geteiltVon(meta) }));
@@ -245,136 +244,24 @@ function profilMondblueten(sandbox) {
 }
 
 // ---------- GEKAUFTE INHALTE (DLC) ----------
-// Stehen in einer eigenen Datei (kaeufe.dat) mit Pruefsumme. Wer den Spielstand von Hand aendert ("dlc": true),
-// bekommt dadurch nichts: beim Laden zaehlt nur, was in der Kauf-Datei steht und zur Pruefsumme passt.
-// Spaeter wird das zusaetzlich mit Steam abgeglichen.
-const KAEUFE_KEY = "sproutvale_kaeufe";
-
-function kaufPruefsumme(text) {
-    // cyrb53 mit festem Salz (kein echter Schutz, aber einfaches Umschreiben reicht nicht mehr)
-    const salz = "sv-" + text.length + "-bl00m";
-    let h1 = 0xdeadbeef ^ 0x5eed;
-    let h2 = 0x41c6ce57 ^ 0x5eed;
-    const eingabe = salz + text + salz;
-    for (let i = 0; i < eingabe.length; i++) {
-        const c = eingabe.charCodeAt(i);
-        h1 = Math.imul(h1 ^ c, 2654435761);
-        h2 = Math.imul(h2 ^ c, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+// Gekauftes steht NICHT im Spielstand, sondern im Tresor (js/tresor.js, Desktop: verschluesselt im Hauptprozess).
+// Wer den Spielstand von Hand aendert ("dlc": true oder Skins in "freigeschaltet"), bekommt dadurch nichts.
+// Hier werden nur alte Eintraege aus dem Spielstand entfernt.
+function uebernehmeKaeufe(stand) {
+    delete stand.dlc;
+    return stand;
 }
 
 // ---------- BETA-TESTER ----------
-// Wer vor dem richtigen Release spielt (Alpha oder Beta), bekommt eine eigene Datei (beta.dat, mit Pruefsumme).
-// Sie bleibt auch nach dem Release erhalten und schaltet den mythischen Begleiter "Beta Tester" frei.
-const BETA_KEY = "sproutvale_beta";
-
-// Inhalt der Beta-Datei lesen (kodiert, mit Pruefsumme; aeltere Dateien waren noch nicht kodiert)
-function leseBetaDaten() {
-    try {
-        const roh = JSON.parse(localStorage.getItem(BETA_KEY));
-        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return null;
-        const text = roh.daten.startsWith("{") ? roh.daten : decodeURIComponent(escape(atob(roh.daten)));
-        return JSON.parse(text);
-    } catch (fehler) {
-        return null;
-    }
-}
-
-function schreibeBetaDaten(inhalt) {
-    const daten = btoa(unescape(encodeURIComponent(JSON.stringify(inhalt))));
-    localStorage.setItem(BETA_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
-}
-
+// Den Beta-Tester-Begleiter und das BETA Shirt gibt es mit dem Code BETAVALE (oder wer bis Beta 0.4.x
+// auf itch.io gespielt hat: das wurde in den Tresor uebernommen). Es gibt keine Automatik mehr.
 function istBetaTester() {
-    const daten = leseBetaDaten();
-    return Boolean(daten && daten.beta);
+    return Boolean(Tresor.stand().beta);
 }
 
 // Laeuft gerade eine Alpha- oder Beta-Version?
 function istBetaVersion() {
     return /^(Alpha|Beta)\b/.test(SPIEL_VERSION);
-}
-
-function merkeBetaTester() {
-    if (!istBetaVersion()) return;
-    const daten = leseBetaDaten();
-    if (daten && daten.beta) {
-        // alte, noch nicht kodierte Datei einmal neu schreiben
-        const roh = JSON.parse(localStorage.getItem(BETA_KEY));
-        if (roh.daten.startsWith("{")) schreibeBetaDaten(daten);
-        return;
-    }
-    schreibeBetaDaten({ beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) });
-}
-
-// Waehrend der Beta: nach dem Klick auf "Okay!" im BETA-Fenster ist alles frei. Nach dem Release zaehlt das nicht mehr
-// (nur der Beta-Tester-Begleiter bleibt).
-function betaAllesFrei() {
-    if (!istBetaVersion()) return false;
-    const daten = leseBetaDaten();
-    return Boolean(daten && daten.alles);
-}
-
-function schalteBetaAllesFrei() {
-    const daten = leseBetaDaten() || { beta: true, version: SPIEL_VERSION, seit: new Date().toISOString().slice(0, 10) };
-    daten.beta = true;
-    daten.alles = true;
-    schreibeBetaDaten(daten);
-}
-
-function dlcListen() {
-    return { haustier: HAUSTIER_SKINS, landschaft: HOF_THEMEN, deko: DEKO_OBJEKTE, musik: MUSIK_TITEL, samenladen: SAMENLADEN_SKINS,
-        felder: FELD_SKINS, kugeln: KUGEL_SKINS, rahmen: RAHMEN_SKINS, pflanzen: PFLANZEN_SKINS, haus: HAUS_SKINS, scheune: SCHEUNEN_SKINS };
-}
-
-function istDlcSchluessel(schluessel) {
-    const [kategorie, id] = schluessel.split(":");
-    const liste = dlcListen()[kategorie];
-    const eintrag = liste && liste.find(e => e.id === id);
-    return Boolean(eintrag && eintrag.quelle === "dlc");
-}
-
-function ladeKaeufe() {
-    try {
-        const roh = JSON.parse(localStorage.getItem(KAEUFE_KEY));
-        if (roh && typeof roh.daten === "string" && kaufPruefsumme(roh.daten) === roh.sig) {
-            const daten = JSON.parse(roh.daten);
-            return { dlc: Boolean(daten.dlc), einzeln: Array.isArray(daten.einzeln) ? daten.einzeln : [] };
-        }
-    } catch (fehler) {
-        console.warn(t("Kauf-Datei ungueltig"), fehler);
-    }
-    return { dlc: false, einzeln: [] };
-}
-
-function speichereKaeufe(stand) {
-    const daten = JSON.stringify({ dlc: Boolean(stand.dlc), einzeln: Object.keys(stand.freigeschaltet).filter(istDlcSchluessel).sort() });
-    if (localStorage.getItem(KAEUFE_KEY) && ladeKaeufeText() === daten) return;
-    localStorage.setItem(KAEUFE_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
-}
-
-function ladeKaeufeText() {
-    try { return JSON.parse(localStorage.getItem(KAEUFE_KEY)).daten; } catch (fehler) { return null; }
-}
-
-// Nur was in der Kauf-Datei steht, gilt als gekauft
-function uebernehmeKaeufe(stand) {
-    const kaeufe = ladeKaeufe();
-    // Umzug: gab es noch keine Kauf-Datei, werden die bisherigen Kaeufe einmal uebernommen
-    if (localStorage.getItem(KAEUFE_KEY) === null && !stand.kaeufeUmzug) {
-        stand.kaeufeUmzug = true;
-        speichereKaeufe(stand);
-        return stand;
-    }
-    stand.dlc = kaeufe.dlc;
-    Object.keys(stand.freigeschaltet).filter(istDlcSchluessel).forEach(schluessel => {
-        if (!kaeufe.einzeln.includes(schluessel)) delete stand.freigeschaltet[schluessel];
-    });
-    kaeufe.einzeln.forEach(schluessel => { stand.freigeschaltet[schluessel] = true; });
-    return stand;
 }
 
 const meta = uebernehmeKaeufe(ladeMeta());
@@ -5535,7 +5422,6 @@ function loescheSpielstand() {
     Klang.reset();
     const neuerStand = {
         ...leererMetaStand(),
-        dlc: meta.dlc,
         freigeschaltet: { ...meta.freigeschaltet },
         kosmetik: { ...meta.kosmetik },
         kaeufeUmzug: true

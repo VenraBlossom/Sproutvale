@@ -9,7 +9,14 @@
 //
 // "npm run release"  Version zum Weitergeben (dist-release). Alle Spieldateien stecken in resources/spiel.
 //                    Dazu entsteht dist-release/Sproutvale.rar zum Hochladen (ZIP, falls WinRAR fehlt).
-//                    Darin: Ordner "Sproutvale" mit Sproutvale.exe. F12 (Debug-Fenster) geht auch dort, Strg+Umschalt+F12 = Entwickler-Werkzeuge.
+//                    Darin: Ordner "Sproutvale" mit Sproutvale.exe. Laedt Updates ueber GitHub (Tags).
+//
+// "npm run steam"    Version fuer Steam (dist-steam/Sproutvale). Die Spieldateien stecken gepackt in resources/spiel.asar,
+//                    kein eigener Updater (Steam aktualisiert), keine Entwickler-Werkzeuge. Den Ordner dist-steam/Sproutvale
+//                    laedst du mit SteamPipe (Steamworks) hoch. steam_appid.txt gehoert NICHT dazu (Steam startet das Spiel selbst).
+//
+// Alle fertigen Versionen brauchen desktop-app/geheim.txt (Schluessel fuer den Tresor mit den Kaeufen). Die Datei
+// entsteht beim ersten Start und darf sich nie aendern: gut sichern, nicht ins Repo!
 // ============================================================
 
 const path = require("path");
@@ -20,12 +27,13 @@ const { packager } = require("@electron/packager");
 const HIER = __dirname;
 const PROJEKT = path.resolve(HIER, "..");
 const BUILD = path.join(HIER, "build");
-const RELEASE = process.argv.includes("--release");
+const STEAM = process.argv.includes("--steam");
+const RELEASE = process.argv.includes("--release") || STEAM;
 
 // Diese Dateien und Ordner gehoeren zum Spiel (Test-Dateien mit "_" am Anfang bleiben draussen)
 function istSpielDatei(name) {
     if (name.startsWith("_") || name.startsWith(".")) return false;
-    if (["js", "css", "assets"].includes(name)) return true;
+    if (["js", "css", "assets", "fonts"].includes(name)) return true;
     return /\.(html|js|css|png|jpg|ogg|mp3|wav|woff2?)$/i.test(name);
 }
 
@@ -34,8 +42,10 @@ function kopiereSpiel() {
     const ziel = path.join(BUILD, "spiel");
     fs.rmSync(ziel, { recursive: true, force: true });
     fs.mkdirSync(ziel, { recursive: true });
+    // Quelldateien von Bildern (Photoshop, Krita, Aseprite) gehoeren nicht ins Spiel
+    const ohneQuellen = quelle => !/\.(psd|kra|aseprite|ase|xcf)$/i.test(quelle);
     fs.readdirSync(PROJEKT).filter(istSpielDatei).forEach(name => {
-        fs.cpSync(path.join(PROJEKT, name), path.join(ziel, name), { recursive: true });
+        fs.cpSync(path.join(PROJEKT, name), path.join(ziel, name), { recursive: true, filter: ohneQuellen });
     });
     if (!fs.existsSync(path.join(ziel, "index.html"))) throw new Error("index.html fehlt im Projektordner");
     return ziel;
@@ -124,17 +134,33 @@ function erstelleVerknuepfung(exe) {
     return lnk;
 }
 
+// Steam: die Spieldateien als ein gepacktes Archiv (spiel.asar), dazu vertrieb.txt ("steam" = kein eigener Updater)
+async function packeSpielFuerSteam(ordner) {
+    const asar = require("@electron/asar");
+    const archiv = path.join(BUILD, "spiel.asar");
+    fs.rmSync(archiv, { force: true });
+    await asar.createPackage(ordner, archiv);
+    const vertrieb = path.join(BUILD, "vertrieb.txt");
+    fs.writeFileSync(vertrieb, "steam", "utf8");
+    return [archiv, vertrieb];
+}
+
 async function baue() {
     fs.mkdirSync(BUILD, { recursive: true });
+    if (RELEASE && !fs.existsSync(path.join(HIER, "geheim.txt"))) {
+        throw new Error("desktop-app/geheim.txt fehlt (Schluessel fuer die Kaeufe). Einmal die Entwickler-Version starten oder die gesicherte Datei zurueckkopieren.");
+    }
     const icon = erstelleIcon();
     let extra;
-    if (RELEASE) {
+    if (STEAM) {
+        extra = await packeSpielFuerSteam(kopiereSpiel());
+    } else if (RELEASE) {
         extra = [kopiereSpiel()];
     } else {
         fs.writeFileSync(path.join(BUILD, "spielordner.txt"), PROJEKT, "utf8");
         extra = [path.join(BUILD, "spielordner.txt")];
     }
-    const ausgabe = path.join(HIER, RELEASE ? "dist-release" : "dist");
+    const ausgabe = path.join(HIER, STEAM ? "dist-steam" : RELEASE ? "dist-release" : "dist");
 
     const ordner = await packager({
         dir: HIER,
@@ -147,7 +173,8 @@ async function baue() {
         overwrite: true,
         asar: true,
         prune: true,
-        ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/],
+        ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/dist-steam($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/,
+            /^\/steam_appid\.txt$/],
         extraResource: extra,
         appCopyright: "Venray Studios",
         win32metadata: {
@@ -157,6 +184,13 @@ async function baue() {
         }
     });
 
+    if (STEAM) {
+        const schoen = path.join(ausgabe, "Sproutvale");
+        fs.rmSync(schoen, { recursive: true, force: true });
+        fs.renameSync(ordner[0], schoen);
+        console.log("\nFertig! Fuer SteamPipe (Steamworks) hochladen:\n  " + schoen);
+        return;
+    }
     if (RELEASE) {
         const windowsArchiv = path.join(ausgabe, WINRAR ? "Sproutvale.rar" : "Sproutvale.zip");
         // Ordner schoen benennen, damit beim Entpacken "Sproutvale" entsteht

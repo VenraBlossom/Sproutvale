@@ -15,6 +15,20 @@ const fs = require("fs");
 const https = require("https");
 const crypto = require("crypto");
 const steam = require("./steam");
+const tresor = require("./tresor");
+
+// Entwickler-Version (aus dem Projektordner oder "npm run exe"): Entwickler-Werkzeuge und Test-Befehle erlaubt.
+// Fertige Versionen (itch.io und Steam): beides aus.
+const ENTWICKLER = !app.isPackaged || fs.existsSync(path.join(process.resourcesPath || "", "spielordner.txt"));
+// Wo wird das Spiel verteilt? "steam" (Steam aktualisiert selbst, kein eigener Updater) oder "itch" (Updater ueber GitHub).
+// Steht in resources/vertrieb.txt (legt "npm run steam" an).
+const VERTRIEB = (() => {
+    try {
+        return fs.readFileSync(path.join(process.resourcesPath || "", "vertrieb.txt"), "utf8").trim() || "itch";
+    } catch (fehler) {
+        return "itch";
+    }
+})();
 
 // Wo liegt das Spiel? 1) Umgebungsvariable, 2) spielordner.txt neben der .exe (Entwickler-Version),
 // 3) mitgelieferter Ordner resources/spiel (Release-Version zum Weitergeben), 4) Ordner ueber desktop-app
@@ -24,6 +38,7 @@ function spielOrdner() {
     if (app.isPackaged) {
         const datei = path.join(process.resourcesPath, "spielordner.txt");
         if (fs.existsSync(datei)) kandidaten.push(fs.readFileSync(datei, "utf8").trim());
+        kandidaten.push(path.join(process.resourcesPath, "spiel.asar"));
         kandidaten.push(path.join(process.resourcesPath, "spiel"));
     }
     kandidaten.push(path.resolve(__dirname, ".."));
@@ -46,6 +61,8 @@ const UPDATE_ORDNER = path.join(app.getPath("userData"), "updates");
 const UPDATE_AUSLASSEN = [/^desktop-app\//, /^werkzeuge\//, /^\.github\//, /^\.claude\//, /^\.git/, /\.md$/i, /^docs\//];
 
 function istReleaseOrdner(ordner) {
+    // Steam-Version: Steam kuemmert sich um Updates, der GitHub-Updater bleibt aus
+    if (VERTRIEB === "steam") return false;
     return app.isPackaged && !process.env.SPROUTVALE_ORDNER && path.resolve(ordner) === path.resolve(process.resourcesPath, "spiel");
 }
 
@@ -284,7 +301,7 @@ try {
         "persistedsavefile_3.json  = Endlos, Speicherstand 3\r\n" +
         "koop_1.json bis _3.json   = Endlos im Duo (gemeinsame Speicherstaende)\r\n" +
         "einstellungen.json        = Klang, Anzeige ...\r\n" +
-        "kaeufe.dat                = gekaufte Inhalte\r\n", "utf8");
+        "tresor.dat                = gekaufte Inhalte, Gems und Codes (verschluesselt, bitte nicht aendern)\r\n", "utf8");
 } catch (fehler) {
     console.warn("LIESMICH konnte nicht geschrieben werden:", fehler.message);
 }
@@ -358,6 +375,17 @@ ipcMain.on("speicher-loeschen", (_event, schluessel) => {
 });
 
 ipcMain.on("speicher-pfad", event => { event.returnValue = SPEICHER_ORDNER; });
+
+// ---------- TRESOR (Kaeufe, Gems, Codes) ----------
+tresor.starte(SPEICHER_ORDNER);
+ipcMain.on("tresor-lesen", event => { event.returnValue = tresor.lesen(); });
+ipcMain.on("tresor-kaufe", (event, was) => { event.returnValue = tresor.kaufe(String(was)); });
+ipcMain.on("tresor-code", (event, text) => { event.returnValue = tresor.code(String(text)); });
+ipcMain.on("tresor-alt", (event, daten) => { event.returnValue = tresor.uebernimmAlt(daten); });
+ipcMain.on("tresor-entwickler", (event, art, wert) => {
+    event.returnValue = ENTWICKLER ? tresor.entwickler(String(art), wert) : tresor.lesen();
+});
+ipcMain.on("entwickler", event => { event.returnValue = ENTWICKLER; });
 ipcMain.on("speicher-oeffnen", () => shell.openPath(SPEICHER_ORDNER));
 
 function erstelleFenster() {
@@ -377,6 +405,8 @@ function erstelleFenster() {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
             nodeIntegration: false,
+            // Fertige Versionen: keine Entwickler-Werkzeuge (sonst koennte man dort alles umschreiben)
+            devTools: ENTWICKLER,
             backgroundThrottling: false
         }
     });
@@ -399,7 +429,7 @@ function erstelleFenster() {
         if (eingabe.key === "F11") {
             fenster.setFullScreen(!fenster.isFullScreen());
             event.preventDefault();
-        } else if (eingabe.key === "F12" && eingabe.control && eingabe.shift) {
+        } else if (eingabe.key === "F12" && eingabe.control && eingabe.shift && ENTWICKLER) {
             // Nur fuer die Entwicklung versteckt: Strg+Umschalt+F12 = Entwickler-Werkzeuge. Strg+F12 im Klang-Reiter der Einstellungen oeffnet das Debug-Fenster.
             fenster.webContents.toggleDevTools();
             event.preventDefault();
@@ -455,6 +485,8 @@ ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
 
 app.whenReady().then(() => {
     steam.starte();
+    // Unterstuetzer-Paket auf Steam gekauft? Das zaehlt bei jedem Start neu (nicht aus einer Datei)
+    tresor.setzeSteamDlc(steam.dlcBesitz().includes("unterstuetzer"));
     erstelleFenster();
     beobachteSpielordner();
     // Nach dem Start in Ruhe nach einem Update schauen (Fehler sind egal, dann eben beim naechsten Mal)

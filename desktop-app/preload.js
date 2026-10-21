@@ -29,6 +29,16 @@ contextBridge.exposeInMainWorld("sproutvaleDesktop", {
         bereit: () => ipcRenderer.sendSync("kasse-bereit"),
         kaufe: paketId => ipcRenderer.invoke("kasse-kaufe", String(paketId))
     },
+    // Tresor: Gekauftes, Gems und Codes liegen verschluesselt im Hauptprozess. Das Spiel kann nur lesen,
+    // mit Gems kaufen und Codes einloesen (die Preise und Codes kennt nur der Hauptprozess).
+    tresor: {
+        lesen: () => ipcRenderer.sendSync("tresor-lesen"),
+        kaufe: was => ipcRenderer.sendSync("tresor-kaufe", String(was)),
+        code: text => ipcRenderer.sendSync("tresor-code", String(text)),
+        uebernimmAlt: daten => ipcRenderer.sendSync("tresor-alt", daten),
+        entwickler: (art, wert) => ipcRenderer.sendSync("tresor-entwickler", String(art), wert)
+    },
+    entwickler: () => ipcRenderer.sendSync("entwickler"),
     // Spielstand als Dateien im Ordner "save" im Benutzerordner (%APPDATA%/Sproutvale/save), bleibt bei neuen Versionen erhalten
     speicher: {
         lesen: () => ipcRenderer.sendSync("speicher-lesen"),

@@ -86,6 +86,10 @@ function klemme(wert, min, max) {
 // Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
 const SPIEL_VERSION = "Beta 0.4.2";
 
+// Debug-Fenster (Einstellungen > Klang, Strg+F12) und die Konsolen-Befehle debug.xyz.
+// Im fertigen Spiel AUS. Zum Testen voruebergehend auf true setzen (und vor dem Veroeffentlichen wieder auf false).
+const DEBUG_ERLAUBT = false;
+
 // Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Beta 0.4.2", punkte: [

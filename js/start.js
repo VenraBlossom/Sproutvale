@@ -73,7 +73,13 @@ registriereTaste("escape", t("Fenster schließen / Einstellungen"), () => {
 
 // ---------- TEST-BEFEHLE (Browser-Konsole, F12) ----------
 
-window.debug = {
+// Debug: Bezahltes kommt in den Tresor (geht nur in der Entwickler-Version), Erspielbares in den Spielstand
+function debugFreischalten(kategorie, eintrag) {
+    if (eintrag.quelle === "dlc") Tresor.entwickler("gekauft", kategorie + ":" + eintrag.id);
+    else meta.freigeschaltet[kategorie + ":" + eintrag.id] = true;
+}
+
+const debug = {
     gold(menge) { run.gold += menge; aktualisiereAlles(); },
     sternensamen(menge) { run.skillpunkte += menge; aktualisiereAlles(); },
     mondblueten(menge) { meta.mondblueten += menge; meta.mondbluetenSeitSternenfall += menge; speichereMeta(); if (!prestigeShop.classList.contains("versteckt")) renderPrestigeShop(); },
@@ -82,18 +88,6 @@ window.debug = {
     energie(wert) { run.energie = wert; },
     tag(nummer) { run.tag = nummer; aktualisiereAlles(); },
     stern() { spawnSternschnuppe(); },
-    // Alle Promocodes anzeigen (Fenster ueber dem Debug-Fenster): debug.promocodes()
-    promocodes() {
-        const eingeloest = eingeloesteCodes();
-        const liste = el("div", "debug-promo-liste", null, PROMO_CODES.map(c => {
-            const text = atob(c.code);
-            const status = !c.aktiv ? t("abgeschaltet") : eingeloest.includes(kaufPruefsumme("promo:" + text)) ? t("aktiv, von dir schon eingelöst") : t("aktiv");
-            return el("div", "debug-promo" + (c.aktiv ? "" : " aus"), null, [
-                el("b", null, text), el("span", null, c.kristalle ? "+" + zahl(c.kristalle) + " 💎" : ""), el("span", "leise", status)
-            ]);
-        }));
-        zeigePopup({ titel: t("🎁 Promocodes"), farbe: "#b0407a", breite: 460, inhalt: liste, knoepfe: [{ text: t("Okay"), klasse: "knopf-gruen" }] });
-    },
     // Alle Sterne im Stellarium auf die hoechste Stufe (unendliche Sterne auf die angegebene Stufe): debug.alleSterne(10)
     alleSterne(unendlich = 10) {
         // Auch Sterne mit Bedingungen (Pflanzen, Erbsorten ...): alles wird gesetzt, Pflanzen gleich freigeschaltet
@@ -139,22 +133,24 @@ window.debug = {
     // z.B. debug.variante("kristall"), alle neuen Pflanzen werden diese Variante. debug.variante(null) zum Ausschalten
     variante(id) { debugVariante = id; },
     // Unterstuetzer-Paket (4,99 €, alle epischen Inhalte + Sandbox) an/aus: debug.dlc(true)
-    dlc(an = true) { meta.dlc = an; speichereMeta(); wendeKosmetikAn(); },
+    dlc(an = true) { Tresor.entwickler("dlc", an); wendeKosmetikAn(); },
     // Kristalle geben (zum Testen der Kaeufe): debug.kristalle(500)
-    kristalle(menge = 500) { setzeKristalle(kristallStand() + menge); },
+    kristalle(menge = 500) { Tresor.entwickler("gems", kristallStand() + menge); aktualisiereKristallAnzeigen(); },
+    // Beta-Tester (Code BETAVALE) und Endless im Tresor an/aus: debug.beta(true)
+    beta(an = true) { Tresor.entwickler("beta", an); Tresor.entwickler("endlos", an); wendeKosmetikAn(); },
     // Alle legendaeren Einzel-Inhalte freischalten: debug.einzelDlc()
     einzelDlc() {
         Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => liste.filter(e => e.paket === "einzeln")
-            .forEach(e => { meta.freigeschaltet[kategorie + ":" + e.id] = true; }));
+            .forEach(e => debugFreischalten(kategorie, e)));
         speichereMeta();
         wendeKosmetikAn();
     },
     // ALLES freischalten: Unterstuetzer-Paket, alle legendaeren und alle erspielbaren Skins, Sandbox
     alles() {
-        meta.dlc = true;
+        Tresor.entwickler("dlc", true);
         meta.sandbox = true;
         Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => liste.forEach(e => {
-            if (e.quelle !== "frei") meta.freigeschaltet[kategorie + ":" + e.id] = true;
+            if (e.quelle !== "frei") debugFreischalten(kategorie, e);
         }));
         speichereMeta();
         wendeKosmetikAn();
@@ -162,7 +158,7 @@ window.debug = {
     },
     // Alle Skins wieder sperren (zum Testen des Anprobierens)
     allesWeg() {
-        meta.dlc = false;
+        Tresor.entwickler("dlc", false);
         Object.keys(meta.freigeschaltet).forEach(schluessel => { delete meta.freigeschaltet[schluessel]; });
         meta.kosmetik = leereKosmetik();
         speichereMeta();
@@ -170,7 +166,8 @@ window.debug = {
     },
     // Einen Skin freischalten und direkt auswaehlen: debug.kosmetik("samenladen", "feuerwerk")
     kosmetik(kategorie, id) {
-        meta.freigeschaltet[kategorie + ":" + id] = true;
+        const eintrag = (KOSMETIK_LISTEN[kategorie] || []).find(e => e.id === id);
+        if (eintrag) debugFreischalten(kategorie, eintrag);
         if (kategorie === "deko") {
             if (!meta.kosmetik.deko.includes(id)) meta.kosmetik.deko.push(id);
             meta.kosmetik.deko = meta.kosmetik.deko.slice(-DEKO_MAX);
@@ -237,6 +234,8 @@ window.debug = {
     sandbox() { meta.sandbox = true; speichereMeta(); },
     resetMeta() { Object.assign(meta, leererMetaStand()); speichereMeta(); loescheRunSpeicher(); }
 };
+// Nur mit DEBUG_ERLAUBT (daten.js) sind die Befehle in der Konsole erreichbar
+if (DEBUG_ERLAUBT) window.debug = debug;
 
 // Debug-Fenster (Einstellungen > Klang, Strg+F12): jeder Befehl mit Eingaben und einem Knopf zum Ausfuehren.
 // Feldtypen: zahl (min/max, die Grenzen stehen grau im Feld), wahl (oeffnet ein "Inventar" mit allen Moeglichkeiten
@@ -286,7 +285,6 @@ const DEBUG_BEFEHLE = [
     { gruppe: "Ereignisse" },
     { name: "wetter", text: "Wetter", felder: [{ typ: "wahl", optionen: () => [DEBUG_AUS, ...WETTER.map(w => ({ wert: w.id, name: w.name, symbol: w.symbol }))] }] },
     { name: "stern", text: "Sternschnuppe" },
-    { name: "promocodes", text: "Alle Promocodes anzeigen", ueberall: true },
     { name: "bot", text: "Bot hinzufügen (tritt deiner Duo-Lobby bei)", ueberall: true },
     { name: "alleSterne", text: "Alle Sterne auf Max-Stufe (unendliche Sterne auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
     { name: "alleMarkt", text: "Markt komplett: Upgrades, Felder und Pflanzen-Upgrades auf Max (unendliche auf diese Stufe)", felder: [{ typ: "zahl", wert: 10, min: 0 }] },
@@ -448,7 +446,7 @@ function zeigeLobbyDebug() {
 // Das Debug-Fenster geht NUR mit Strg+F12 in den Einstellungen im Reiter Klang auf (in der Lobby: nur "Bot hinzufügen").
 // Die Einstellungen schliessen sich dabei, das Debug-Fenster liegt dann ganz oben.
 window.addEventListener("keydown", event => {
-    if (event.key !== "F12") return;
+    if (event.key !== "F12" || !DEBUG_ERLAUBT) return;
     event.preventDefault();
     if (debugFensterSchliessen) {
         event.stopPropagation();
@@ -987,32 +985,9 @@ aktualisiereProfilKnopf();
 })();
 
 // Wer jetzt (vor dem Release) spielt, wird als Beta-Tester gemerkt (eigene Datei, bleibt fuer immer)
-merkeBetaTester();
 
 // Hauptmenue-Knoepfe: handgezeichnete Pixel-Symbole statt Emojis
 document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, 28));
 });
 
-// ---------- BETA-KNOPF (nur waehrend der Beta) ----------
-(function betaKnopf() {
-    const knopf = document.getElementById("menue-beta");
-    if (!knopf || !istBetaVersion()) return;
-    knopf.classList.remove("versteckt");
-    knopf.addEventListener("click", () => {
-        Klang.geschenk();
-        const inhalt = el("div", "beta-dank", null, [
-            el("p", null, t("Danke, dass du Sproutvale testest! 💚")),
-            el("p", null, t("Das Spiel ist noch in der Beta. Schreib uns gerne dein Feedback: in den Einstellungen unter Feedback oder als Review.")),
-            el("p", null, t("Als Dankeschön kannst du während der Beta alle Skins und Endlos benutzen. Den Beta-Tester-Begleiter behältst du für immer, auch nach dem Release."))
-        ]);
-        zeigePopup({ titel: t("🧪 Beta"), farbe: "#7c4fb3", breite: 480, inhalt, knoepfe: [{ text: t("Okay! ❤️"), klasse: "knopf-gruen", aktion: () => {
-            schalteBetaAllesFrei();
-            if (typeof wendeKosmetikAn === "function") wendeKosmetikAn();
-            if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
-            zeigeToast(t("💚 Alles freigeschaltet. Viel Spaß beim Testen!"));
-            knopf.classList.add("gesehen");
-        } }] });
-    });
-    if (betaAllesFrei()) knopf.classList.add("gesehen");
-})();

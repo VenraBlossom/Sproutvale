@@ -22,3 +22,6 @@ handy-app/ios/
 *.psd
 *.kra
 *.aseprite
+
+# Schluessel fuer den Tresor (Kaeufe). NIE ins Repo, aber gut sichern!
+desktop-app/geheim.txt

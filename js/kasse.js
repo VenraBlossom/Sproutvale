@@ -39,15 +39,19 @@ const Kasse = {
         if (!anbieter) return { ok: false };
         const kanal = anbieter === "steam" ? window.sproutvaleDesktop.kasse : window.sproutvaleHandy.kasse;
         const antwort = (await kanal.kaufe(paket.id)) || {};
-        if (antwort.ok && !antwort.offen) gibGems(paket.kristalle);
+        // Steam: die Gems schreibt der Hauptprozess gut, sobald Steam den Kauf bestaetigt (nie das Spiel selbst)
+        if (anbieter === "steam") {
+            Tresor.neuLaden();
+            aktualisiereKristallAnzeigen();
+        } else if (antwort.ok && !antwort.offen) {
+            gibGems(paket.kristalle);
+        }
         return antwort;
     },
     // Beim Start: auf Steam (oder im Handy-Shop) Gekauftes uebernehmen
     abgleichen() {
         try {
-            const d = window.sproutvaleDesktop;
-            const pakete = d && d.steam && d.steam.dlc ? d.steam.dlc() : [];
-            if (pakete.includes("unterstuetzer") && !hatDlc()) merkeGekauft("dlc");
+            // Steam: das Unterstuetzer-Paket prueft der Hauptprozess bei jedem Start selbst (desktop-app/tresor.js)
             // Handy: noch nicht gutgeschriebene Kaeufe (z.B. App wurde waehrend des Kaufs geschlossen)
             const h = window.sproutvaleHandy;
             if (h && h.kasse && h.kasse.offeneKaeufe) {
@@ -64,8 +68,10 @@ const Kasse = {
     }
 };
 
+// Nur Handy (spaeter): bestaetigte Kaeufe aus dem App-Store. Auf Steam macht das der Hauptprozess.
 function gibGems(menge) {
-    setzeKristalle(kristallStand() + menge);
+    Tresor.gutschreibenBrowser(menge);
+    aktualisiereKristallAnzeigen();
     Klang.jackpot();
     zeigeToast(tf("🎁 +{0} 💎", zahl(menge)));
 }

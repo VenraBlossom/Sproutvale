@@ -36,22 +36,16 @@ const KOSMETIK_LISTEN = {
 };
 
 // frei = immer, erspielt = Bedingung einmal erfuellt (bleibt dann fuer immer),
-// dlc = Unterstuetzer-Paket (meta.dlc) oder einzeln gekauft (meta.freigeschaltet)
-// Frei durch Spielen/Kaufen, oder waehrend der Beta durch "alles frei"
+// dlc = Unterstuetzer-Paket oder einzeln mit Gems gekauft (steht nur im Tresor, nie im Spielstand),
+// beta = Beta-Tester (Code BETAVALE)
 function istKosmetikFrei(eintrag, kategorie) {
-    if (!eintrag) return false;
-    if (istKosmetikFreiOhneBeta(eintrag, kategorie)) return true;
-    return eintrag.quelle !== "beta" && typeof betaAllesFrei === "function" && betaAllesFrei();
-}
-
-// Wirklich erspielt oder gekauft (zaehlt auch nach der Beta)
-function istKosmetikFreiOhneBeta(eintrag, kategorie) {
     if (!eintrag) return false;
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
     if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
-    if (meta.freigeschaltet[schluessel] || hatGekauft(schluessel)) return true;
-    if (eintrag.quelle === "dlc") return eintrag.paket === "unterstuetzer" && hatDlc();
+    // Bezahlte Inhalte: nur was im Tresor steht (ein Eintrag in "freigeschaltet" im Spielstand zaehlt hier nicht)
+    if (eintrag.quelle === "dlc") return hatGekauft(schluessel) || (eintrag.paket === "unterstuetzer" && hatDlc());
+    if (meta.freigeschaltet[schluessel]) return true;
     // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)
     if (eintrag.bedingung && metaProfil !== "sandbox" && eintrag.bedingung()) {
         meta.freigeschaltet[schluessel] = true;
@@ -109,7 +103,7 @@ function pruefeNeueKosmetik() {
     let neu = false;
     Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => {
         liste.filter(e => e.quelle === "erspielt" && !meta.freigeschaltet[kategorie + ":" + e.id]).forEach(e => {
-            if (!istKosmetikFreiOhneBeta(e, kategorie)) return;
+            if (!istKosmetikFrei(e, kategorie)) return;
             neu = true;
             zeigeBanner("🏡", t("Neu im Haus: ") + e.name, t("Klick aufs Bauernhaus, um es auszuwählen"), "#2e9e2e", 3600);
             Klang.geschenk();
@@ -1036,46 +1030,28 @@ function beendeKosmetikVorschau() {
 }
 
 // ---------- KRISTALLE UND SHOP ----------
-
-// Gems gehoeren dem Spieler, nicht einem Spielstand: eigene, signierte Datei (bleibt beim Loeschen eines Spielstands)
-const GEMS_KEY = "sproutvale_gems";
+// Gems und Gekauftes gehoeren dem Spieler, nicht einem Spielstand: sie stehen im Tresor (js/tresor.js).
 function kristallStand() {
-    try {
-        const roh = JSON.parse(localStorage.getItem(GEMS_KEY));
-        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return 0;
-        return Math.max(0, Number(atob(roh.daten)) || 0);
-    } catch (fehler) {
-        return 0;
-    }
+    return Tresor.stand().gems;
 }
 
-// Mit Gems Gekauftes (Skins als "kategorie:id", das Unterstuetzer-Paket als "dlc") gehoert auch dem Spieler
-const GEKAUFT_KEY = "sproutvale_gekauft";
-function gekaufteInhalte() {
-    try {
-        const roh = JSON.parse(localStorage.getItem(GEKAUFT_KEY));
-        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return [];
-        return JSON.parse(atob(roh.daten));
-    } catch (fehler) {
-        return [];
-    }
-}
-// Unterstuetzer-Paket: auf Steam gekauft (meta.dlc) oder mit Gems
+// Unterstuetzer-Paket: auf Steam gekauft oder mit Gems
 function hatDlc() {
-    return Boolean(meta.dlc) || hatGekauft("dlc");
+    return Boolean(Tresor.stand().dlc);
 }
 function hatGekauft(schluessel) {
-    return gekaufteInhalte().includes(schluessel);
-}
-function merkeGekauft(schluessel) {
-    const daten = btoa(JSON.stringify([...gekaufteInhalte(), schluessel]));
-    localStorage.setItem(GEKAUFT_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+    return Tresor.stand().gekauft.includes(schluessel);
 }
 
-function setzeKristalle(menge) {
-    const daten = btoa(String(Math.max(0, Math.floor(menge))));
-    localStorage.setItem(GEMS_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
+// Mit Gems kaufen ("dlc" oder "kategorie:id"). Den Preis kennt der Tresor selbst. Gibt true zurueck, wenn es geklappt hat.
+function kaufeMitGems(was) {
+    const antwort = Tresor.kaufe(was);
+    if (!antwort.ok) {
+        Klang.fehler();
+        zeigeToast(antwort.grund === "gems" ? t("Du hast nicht genug Gems.") : t("Der Kauf hat nicht geklappt. Es wurde nichts abgebucht."));
+    }
     aktualisiereKristallAnzeigen();
+    return Boolean(antwort.ok);
 }
 
 function aktualisiereKristallAnzeigen() {
@@ -1129,13 +1105,7 @@ function dlcKnopf(danach) {
         zeigePopup({ titel: "💝 " + paket.name, breite: 480, farbe: "#7c4fb3", inhalt, knoepfe: [
             { text: t("Nein, danke!") },
             { text: zahl(DLC_KRISTALLE) + " 💎", klasse: "knopf-gruen", aktion: () => {
-                if (kristallStand() < DLC_KRISTALLE) {
-                    Klang.fehler();
-                    zeigeToast(t("Du hast nicht genug Gems."));
-                    return;
-                }
-                setzeKristalle(kristallStand() - DLC_KRISTALLE);
-                merkeGekauft("dlc");
+                if (!kaufeMitGems("dlc")) return;
                 speichereMeta();
                 wendeKosmetikAn();
                 aktualisiereKristallAnzeigen();
@@ -1149,48 +1119,27 @@ function dlcKnopf(danach) {
 }
 
 // ---------- PROMOCODES ----------
-// Codes stehen kodiert im Code (nicht auf den ersten Blick lesbar, das Repo ist oeffentlich), Gross-/Kleinschreibung egal.
-// Jeder Code geht pro Spieler nur einmal (eigene, signierte Datei, bleibt auch beim Loeschen des Spielstands).
-// Neue Codes nur auf Ansage anlegen, alte mit aktiv: false abschalten.
-const PROMO_CODES = [
-    { code: "U1BST1VUVkFMRUJFVEE=", kristalle: 50, aktiv: true }
-];
-const PROMO_KEY = "sproutvale_codes";
-
-function eingeloesteCodes() {
-    try {
-        const roh = JSON.parse(localStorage.getItem(PROMO_KEY));
-        if (!roh || typeof roh.daten !== "string" || kaufPruefsumme(roh.daten) !== roh.sig) return [];
-        return JSON.parse(decodeURIComponent(escape(atob(roh.daten))));
-    } catch (fehler) {
-        return [];
-    }
-}
-
-function merkeCode(pruef) {
-    const daten = btoa(unescape(encodeURIComponent(JSON.stringify([...eingeloesteCodes(), pruef]))));
-    localStorage.setItem(PROMO_KEY, JSON.stringify({ daten, sig: kaufPruefsumme(daten) }));
-}
-
+// Die Codes stehen nur als Pruefsumme im Tresor (Desktop: desktop-app/tresor.js), Gross-/Kleinschreibung egal.
+// Jeder Code geht pro Spieler nur einmal. Neue Codes nur auf Ansage anlegen.
+// BETAVALE: Beta-Tester-Begleiter, BETA Shirt und Endless (keine anderen Skins).
 function loeseCodeEin(text) {
-    const pruef = kaufPruefsumme("promo:" + String(text).trim().toUpperCase());
-    const code = PROMO_CODES.find(c => atob(c.code) === String(text).trim().toUpperCase() && c.aktiv);
-    if (!code) {
+    const antwort = Tresor.code(text);
+    if (!antwort.ok) {
         Klang.fehler();
-        zeigeToast(t("Dieser Code ist ungültig oder abgelaufen."));
+        zeigeToast(antwort.grund === "schon" ? t("Diesen Code hast du schon eingelöst.") : t("Dieser Code ist ungültig oder abgelaufen."));
         return false;
     }
-    if (eingeloesteCodes().includes(pruef)) {
-        Klang.fehler();
-        zeigeToast(t("Diesen Code hast du schon eingelöst."));
-        return false;
-    }
-    merkeCode(pruef);
-    if (code.kristalle) setzeKristalle(kristallStand() + code.kristalle);
+    const b = antwort.belohnung || {};
+    const teile = [];
+    if (b.gems) teile.push("+" + zahl(b.gems) + " 💎");
+    if (b.beta) teile.push(t("Beta-Tester-Begleiter und BETA Shirt"));
+    if (b.endlos) teile.push(t("Endlos"));
     speichereMeta();
     aktualisiereKristallAnzeigen();
+    wendeKosmetikAn();
+    if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
     Klang.jackpot();
-    zeigeToast(tf("🎁 Code eingelöst: +{0} 💎", zahl(code.kristalle || 0)));
+    zeigeToast(tf("🎁 Code eingelöst: {0}", teile.join(", ")));
     return true;
 }
 
@@ -1234,9 +1183,7 @@ function kaufKnopf(kategorie, eintrag, danach) {
         zeigePopup({ titel: t("💎 Kaufen"), breite: 420, farbe: "#b0407a",
             inhalt: tf("{0} für {1} Gems kaufen?", eintrag.name, zahl(preis)),
             knoepfe: [{ text: t("Nein, danke!") }, { text: t("Kaufen"), klasse: "knopf-gruen", aktion: () => {
-                if (kristallStand() < preis || istKosmetikFrei(eintrag, kategorie)) return;
-                setzeKristalle(kristallStand() - preis);
-                merkeGekauft(kategorie + ":" + eintrag.id);
+                if (istKosmetikFrei(eintrag, kategorie) || !kaufeMitGems(kategorie + ":" + eintrag.id)) return;
                 speichereMeta();
                 aktualisiereKristallAnzeigen();
                 Klang.jackpot();
