@@ -392,8 +392,10 @@ function erstelleFenster() {
         fenster.loadFile(startseite);
     } else {
         const text = "<body style='font-family:sans-serif;background:#86c457;color:#2e1a09;padding:40px'>" +
+            "<h2>Sproutvale: game files not found</h2><p>Searched in: " + ORDNER + "</p>" +
+            "<p>Please reinstall the game or verify the game files in Steam.</p><hr>" +
             "<h2>Sproutvale: Spieldateien nicht gefunden</h2><p>Gesucht in: " + ORDNER + "</p>" +
-            "<p>Bitte die Release-Version benutzen (npm run release) und den ganzen Ordner weitergeben.</p></body>";
+            "<p>Bitte das Spiel neu installieren oder in Steam die Spieldateien prüfen.</p></body>";
         fenster.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(text));
     }
     fenster.once("ready-to-show", () => fenster.show());
