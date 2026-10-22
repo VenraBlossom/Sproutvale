@@ -4689,10 +4689,28 @@ function zeigeMenueSeite(seite) {
     $("menue-modi").classList.toggle("versteckt", seite !== "modi");
     if (seite === "modi") renderModusKarten();
     if (seite === "koop") renderKoopLobby();
+    if (seite === "art") zeichneArtFiguren();
 }
 
 $("art-solo-bild").appendChild(pixelIcon("👤", 96));
 $("art-duo-bild").appendChild(pixelIcon("👥", 96));
+
+function zeichneArtFiguren() {
+    if (typeof erstelleFigurBild !== "function") return;
+    const figur = (teile, klasse) => {
+        const bild = erstelleFigurBild(4);
+        bild.huelle.classList.add("art-figur", klasse);
+        zeigeFigurBild(bild, figurTeileAus(teile), "stehen", 0, false, "vorne");
+        return bild.huelle;
+    };
+    const eigene = profil().teile || FIGUR_STANDARD;
+    const freund = { ...FIGUR_STANDARD, frisur: "dutt", haarfarbe: "blond", oberteil: "karo", hose: "rock", kopf: "schleife" };
+    Object.keys(freund).forEach(k => {
+        if (!FIGUR_TEILE[k] || !FIGUR_TEILE[k].some(teil => teil.id === freund[k] && teil.quelle === "frei")) freund[k] = FIGUR_STANDARD[k];
+    });
+    $("art-solo-bild").replaceChildren(figur(eigene, "art-figur-solo"));
+    $("art-duo-bild").replaceChildren(figur(eigene, "art-figur-links"), figur(freund, "art-figur-rechts"));
+}
 $("art-solo").addEventListener("click", () => {
     Klang.klick(10);
     zeigeMenueSeite("modi");
