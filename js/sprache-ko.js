@@ -2664,5 +2664,6 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1종 식물 · 🟫 밭 {0}개",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 {0}종 식물 · 🟫 밭 {1}개",
     "1 Rechnung": "청구서 1장",
-    "{0} Rechnungen": "청구서 {0}장"
+    "{0} Rechnungen": "청구서 {0}장",
+    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ 픽셀 스타일 마우스 커서"
 });

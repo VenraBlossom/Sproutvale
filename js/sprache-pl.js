@@ -2664,5 +2664,6 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1 roślina · 🟫 pola: {0}",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 Rośliny: {0} · 🟫 pola: {1}",
     "1 Rechnung": "1 rachunek",
-    "{0} Rechnungen": "Rachunki: {0}"
+    "{0} Rechnungen": "Rachunki: {0}",
+    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ Kursor myszy w stylu pikselowym"
 });

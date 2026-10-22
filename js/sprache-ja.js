@@ -2664,5 +2664,6 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1種の植物・🟫 畑{0}面",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 {0}種の植物・🟫 畑{1}面",
     "1 Rechnung": "請求書1枚",
-    "{0} Rechnungen": "請求書{0}枚"
+    "{0} Rechnungen": "請求書{0}枚",
+    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ ドット絵風のマウスカーソル"
 });

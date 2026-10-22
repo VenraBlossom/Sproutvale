@@ -150,7 +150,7 @@ img.icon {
     border-radius: 5px;
     box-shadow: inset 0 2px 0 #e8b06a, inset 0 -3px 0 #7d4a1c, 0 3px 0 #2e1a09;
     text-shadow: 1px 1px 0 var(--holz-dunkel);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     white-space: nowrap;
     transition: filter 0.1s;
     display: inline-flex;
@@ -203,7 +203,7 @@ img.icon {
     border: none;
     background: none;
     color: var(--text-leise);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     font-size: 0.9em;
     padding: 2px 4px;
 }
@@ -358,7 +358,7 @@ img.icon {
 
 .teich {
     pointer-events: auto;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     bottom: calc(var(--hof-px) * 7);
     transition: filter 0.3s;
 }
@@ -374,7 +374,7 @@ img.icon {
 
 .haustier {
     pointer-events: auto;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     z-index: 1;
     bottom: calc(var(--hof-px) * 7);
 }
@@ -546,7 +546,7 @@ img.icon {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     padding: 6%;
     position: relative;
     font-size: calc(var(--zelle) * 0.13);
@@ -771,7 +771,7 @@ img.icon {
     color: #fff6dc;
     font-size: calc(var(--zelle) * 0.17);
     font-weight: 700;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     box-shadow: inset 0 0 0 3px var(--holz-glanz), 0 6px 0 #2e1a09, 0 10px 18px rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
@@ -846,7 +846,7 @@ img.icon {
 
 #plant-button[data-zustand="geschlossen"] {
     filter: grayscale(0.55) brightness(0.8);
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 
 
@@ -928,7 +928,7 @@ img.icon {
     border: 3px solid var(--holz-dunkel);
     border-radius: 50%;
     box-shadow: inset 0 2px 0 #e8b06a, 0 3px 0 #2e1a09;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 #karte-pfeil:hover {
@@ -1321,7 +1321,7 @@ img.icon {
     border: 4px solid var(--holz);
     border-radius: 8px;
     box-shadow: 0 5px 0 var(--holz-dunkel);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     transition: transform 0.15s;
 }
 
@@ -1382,7 +1382,7 @@ img.icon {
     background-color: #fbf1d6;
     border: 2px solid var(--holz);
     border-radius: 5px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     vertical-align: middle;
 }
 
@@ -1569,7 +1569,7 @@ img.icon {
     border: 3px solid rgba(180, 200, 255, 0.6);
     background: radial-gradient(circle, #3a4a9a 0%, #1d2560 70%);
     color: white;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1889,7 +1889,7 @@ img.icon {
     height: 44px;
     transform: translate(-100%, -50%) rotate(var(--winkel));
     transform-origin: 100% 50%;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     pointer-events: auto;
 }
 
@@ -1943,7 +1943,7 @@ img.icon {
     height: 30px;
     margin: -15px 0 0 -15px;
     pointer-events: auto;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     animation: glueh-auftauchen 7s ease-in-out forwards;
 }
 
@@ -2064,7 +2064,7 @@ img.icon {
     background: repeating-linear-gradient(45deg, #c9ccd6 0 6px, #b5b8c4 6px 12px);
     border: 3px solid #6e6e7a;
     border-radius: 6px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .rubbel-feld:hover:not(.offen) {
@@ -2074,7 +2074,7 @@ img.icon {
 .rubbel-feld.offen {
     background: #fffaf0;
     border-color: var(--pergament-rand);
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
     animation: auftauchen 0.2s ease-out;
 }
 
@@ -2315,7 +2315,7 @@ img.icon {
     background: rgba(0, 0, 0, 0.25);
     border: 2px solid rgba(0, 0, 0, 0.35);
     border-radius: 6px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .popup-x:hover {
@@ -2471,7 +2471,7 @@ img.icon {
 }
 #haus-klickflaeche.drueber,
 #scheune-klickflaeche.drueber {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 .gebaeude-aura {
     position: absolute;
@@ -2518,7 +2518,7 @@ img.icon {
     background-color: #fbf1d6;
     border: 3px solid var(--pergament-rand);
     border-radius: 6px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .haustier-aktion:hover {
@@ -2594,7 +2594,7 @@ img.icon {
     background-color: #fbf1d6;
     border: 3px solid var(--pergament-rand);
     border-radius: 8px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     transition: transform 0.12s;
 }
 
@@ -2726,7 +2726,7 @@ img.icon {
 .werkzeug-platz.leer {
     background-color: rgba(246, 231, 193, 0.35);
     border-style: dashed;
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 
 
@@ -2901,7 +2901,7 @@ body.wetter-hitze #wetter-schleier {
     position: absolute;
     transform: translate(-50%, -50%);
     pointer-events: auto;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     z-index: 2;
     filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3));
 }
@@ -3018,7 +3018,7 @@ body.wetter-hitze #wetter-schleier {
     text-align: center;
     gap: 6px;
     opacity: 0.7;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     box-shadow: inset 0 0 0 2px rgba(201, 164, 74, 0.25);
     transition: transform 0.15s;
 }
@@ -3305,14 +3305,14 @@ body.wetter-hitze #wetter-schleier {
 }
 
 .schalter-zeile {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .schalter-zeile input[type="checkbox"] {
     width: 24px;
     height: 24px;
     accent-color: var(--gruen);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .einstellung-hinweis {
@@ -3585,7 +3585,7 @@ body.muenzen-mond .loot-kugel.raritaet-0 {
 }
 
 .haus-kachel.gesperrt {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .haus-kachel.gesperrt:hover .haus-bild {
@@ -3961,7 +3961,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     background: rgba(255, 255, 255, 0.08);
     border: 3px solid rgba(201, 176, 245, 0.4);
     border-radius: 8px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     text-align: center;
 }
 
@@ -4209,7 +4209,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border: 5px solid var(--holz);
     border-radius: 12px;
     box-shadow: 0 0 0 3px var(--holz-dunkel), 0 10px 0 #2e1a09, 0 18px 30px rgba(0, 0, 0, 0.35);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     transition: transform 0.15s, box-shadow 0.15s;
     animation: auftauchen 0.3s ease-out backwards;
 }
@@ -7273,7 +7273,7 @@ h1, h2, h3,
     color: #fff6dc;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
     opacity: 0.85;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 #menue-version:hover {
     opacity: 1;
@@ -9238,7 +9238,7 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
 }
 
 .erfolg.abholbar {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     border-color: #b06ee8 !important;
     animation: erfolg-leuchten 1.3s ease-in-out infinite;
 }
@@ -9291,7 +9291,7 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
 }
 
 .kodex-karte.klickbar {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 .kodex-detail {
@@ -9638,7 +9638,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 .info-knopf {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     transition: transform 0.08s, filter 0.08s;
 }
 
@@ -9826,7 +9826,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 10px;
     text-align: left;
     font: inherit;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     background: rgba(255, 255, 255, 0.6);
     border: 3px solid #b8905a;
     border-radius: 8px;
@@ -9839,7 +9839,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 .koop-modus:disabled {
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 
 .koop-modus.gesperrt {
@@ -9878,7 +9878,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .kauf-kachel.fremd {
     opacity: 0.55;
     filter: grayscale(0.5);
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 
 .feld.koop-kraehe::before {
@@ -9891,7 +9891,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 .feld.partner-feld {
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
     filter: saturate(0.85);
 }
 
@@ -10316,7 +10316,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 
 .hof-figur {
     pointer-events: auto;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 .figur-mensch {
     z-index: 0;
@@ -10538,7 +10538,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-radius: 10px;
     border: 3px solid var(--seltenheit, #8a8a8a);
     background: #fffdf5;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     font: inherit;
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -10614,7 +10614,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 #koop-knopf {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     font: inherit;
     color: inherit;
 }
@@ -10733,7 +10733,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .figur-bild.figur-aura {
     filter: drop-shadow(0 0 3px var(--aura, #fff3c4));
 }
-#mondphase-display { cursor: pointer; }
+#mondphase-display { cursor: var(--zeiger-hand); }
 .karte-frueh-bezahlen {
     display: block;
     max-width: 100%;
@@ -10767,7 +10767,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     background: #f6ecd2;
     border: 2px solid #b89a6a;
     border-radius: 6px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 .debug-kachel:hover {
     background: #fff6dc;
@@ -10831,7 +10831,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 
 .sprach-karte.bald {
     opacity: 0.6;
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
     filter: saturate(0.7);
 }
 .sprach-bald {
@@ -10896,7 +10896,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     height: 24px;
     border: 2px solid #4a2f15;
     border-radius: 5px;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     padding: 0;
     font-size: 12px;
     line-height: 1;
@@ -10991,13 +10991,13 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border: 2px solid #4a2f15;
     background: var(--aura);
     box-shadow: 0 0 6px var(--aura);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     padding: 0;
     font-size: 10px;
 }
 .profil-aura.gesperrt {
     opacity: 0.35;
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
     box-shadow: none;
 }
 .profil-aura.gewaehlt {
@@ -11068,7 +11068,7 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     z-index: 9999;
     background: #120a22;
     overflow: hidden;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     transition: opacity 0.6s ease;
 }
 #intro.weg {
@@ -11209,7 +11209,7 @@ body.crt #crt-filter::after {
     border: 3px solid #8a5a2c;
     border-radius: 10px;
     background: linear-gradient(#fff8e4, #f4e2b8);
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     font: inherit;
     transition: transform 0.12s ease;
 }
@@ -11303,7 +11303,7 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-radius: 12px;
     background: linear-gradient(#fff8e4, #f0dfb4);
     box-shadow: 0 4px 0 #4a2f15;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11430,7 +11430,7 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 .zeitung-knopf:disabled {
     opacity: 0.4;
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 
 .menue-zeitung {
@@ -11442,7 +11442,7 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     transform: translateY(-3px) rotate(-4deg);
 }
 #menue-version {
-    cursor: default;
+    cursor: var(--zeiger-pfeil);
 }
 #menue-version:hover {
     text-decoration: none;
@@ -11646,7 +11646,7 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 #pokal-knopf {
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
     padding-left: 6px;
     padding-right: 6px;
 }
@@ -12016,6 +12016,8 @@ html.touch #fx-layer {
 }
 
 :root {
+    --zeiger-pfeil: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAgCAYAAAAWl4iLAAAAhElEQVR42mPQk+L8D8IM1AY0N5jqFtDc4EdHesCYahbQ3OD/P56BMdUsoJvBVLOA7gZTbMGAGUy2BQNuMMkWDBqDibZg0BgMMxAdY1hAd4NhGnB5nRCmn8HoBhD0MrnlMcUG49JIdkVAc4NxKSQ7SGhuMKlxQXSWprrB5DbFqN6wIdZgANK0x1Ky/nPSAAAAAElFTkSuQmCC") 1 1, auto;
+    --zeiger-hand: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAiElEQVR42mNgIAD0pDj/I2MGegG6Wwyz6P+PZ2D86EgPGNPcAaMWj1o8YBbjymYUO2zQWoxLHJcDB5/FuIKQVIsJRc3AW0xtC4iNgoG3GCYB00htPHgsRo9rWjlg8FmMK5WPHIupFeREV6cDZjG1g3zoWQzTSC4muz6mu8WEqktiMdX6TtSyGAAUpTYX1EoB/QAAAABJRU5ErkJggg==") 9 1, pointer;
     --rahmen-brett: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23a8703a'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%2386501f'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%235e3516'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%2394602e'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%2386501f'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%234a2810'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%232e1a09'/%3E%3C/svg%3E");
     --rahmen-holz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23e8b46e'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%23b8783a'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%238a5426'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%23b8783a'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%237a4518'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%232e1a09'/%3E%3C/svg%3E");
     --rahmen-gruen: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%2314360e'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23b4ec7c'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%235aa832'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%233f8a22'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%235aa832'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%232f6b1a'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%2314360e'/%3E%3C/svg%3E");
@@ -12109,7 +12111,7 @@ html.touch #fx-layer {
     filter: drop-shadow(0 6px 0 rgba(46, 26, 9, 0.5));
     transition: transform 0.12s steps(3), filter 0.12s steps(3);
     animation: knopf-einblenden 0.5s ease-out both;
-    cursor: pointer;
+    cursor: var(--zeiger-hand);
 }
 
 #hauptmenue .menue-knopf::before {
@@ -12367,4 +12369,63 @@ html.touch #fx-layer {
     box-shadow: none;
     image-rendering: pixelated;
     filter: drop-shadow(0 8px 0 rgba(46, 26, 9, 0.35)) drop-shadow(0 14px 18px rgba(0, 0, 0, 0.25));
+}
+
+.popup {
+    border: 4px solid transparent;
+    border-image: var(--rahmen-pergament) 4 fill / 16px / 12px stretch;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    overflow: visible;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 8px 0 rgba(46, 26, 9, 0.4)) drop-shadow(0 18px 24px rgba(0, 0, 0, 0.35));
+}
+
+.popup-titel {
+    border-bottom: none;
+    box-shadow: 0 4px 0 var(--holz-dunkel), inset 0 3px 0 rgba(255, 255, 255, 0.25), inset 0 -4px 0 rgba(0, 0, 0, 0.18);
+    margin-bottom: 4px;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.popup-inhalt {
+    overflow-y: auto;
+}
+
+.popup-knoepfe {
+    border-top: none;
+    box-shadow: 0 -3px 0 var(--pergament-rand);
+    background-color: rgba(214, 186, 132, 0.45);
+}
+
+.popup-x {
+    border-radius: 0;
+    border: none;
+    background: rgba(0, 0, 0, 0.22);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px));
+}
+
+.popup-x:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+html,
+body {
+    cursor: var(--zeiger-pfeil);
+}
+
+body.system-zeiger {
+    --zeiger-pfeil: auto;
+    --zeiger-hand: pointer;
+}
+
+button:not(:disabled),
+select,
+summary,
+label.schalter-zeile,
+input[type="checkbox"],
+input[type="range"] {
+    cursor: var(--zeiger-hand);
 }

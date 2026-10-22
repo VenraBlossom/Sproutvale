@@ -2664,5 +2664,6 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1 种植物 · 🟫 {0} 块田地",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 {0} 种植物 · 🟫 {1} 块田地",
     "1 Rechnung": "1 张账单",
-    "{0} Rechnungen": "{0} 张账单"
+    "{0} Rechnungen": "{0} 张账单",
+    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ 像素风格鼠标指针"
 });

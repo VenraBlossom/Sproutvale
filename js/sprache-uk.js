@@ -2664,5 +2664,6 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1 рослина · 🟫 грядок: {0}",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 Рослин: {0} · 🟫 грядок: {1}",
     "1 Rechnung": "1 рахунок",
-    "{0} Rechnungen": "Рахунків: {0}"
+    "{0} Rechnungen": "Рахунків: {0}",
+    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ Піксельний курсор миші"
 });
