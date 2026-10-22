@@ -1,10 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Englische Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Englisch.
-// Wird automatisch aus den Uebersetzungs-Listen gebaut.
-// ============================================================
-
 Object.assign(UEBERSETZUNG, {
     "Trd.": "Sx",
     "Trio.": "Qi",
@@ -2691,4 +2686,3 @@ Object.assign(UEBERSETZUNG, {
     "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fonts: Fredoka, Pixelify Sans and Jersey 15 (SIL Open Font License 1.1)."
 });
 
-// Feste Texte in index.html uebersetzt sprache-ende.js (nach Spanisch und Franzoesisch)

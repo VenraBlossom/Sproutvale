@@ -1,9 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Franzoesische Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Uebersetzung.
-// Fehlt hier ein Text, gilt der englische aus sprache-en.js.
-// ============================================================
 
 if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "Trd.": "Td",

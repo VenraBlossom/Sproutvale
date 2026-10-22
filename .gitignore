@@ -1,4 +1,3 @@
-# Wird beim Bauen erzeugt oder ist nur fuer diesen PC
 desktop-app/node_modules/
 desktop-app/dist/
 desktop-app/dist-release/
@@ -6,9 +5,7 @@ desktop-app/dist-steam/
 desktop-app/build/
 Sproutvale.lnk
 save/
-.claude/
 
-# Test-Dateien (beginnen mit _), z.B. der Balancing-Bot
 _*.js
 _*.json
 changes_ignore.txt
@@ -19,10 +16,8 @@ handy-app/www/
 handy-app/android/
 handy-app/ios/
 
-# Quelldateien von Bildern (nicht ins Spiel)
 *.psd
 *.kra
 *.aseprite
 
-# Schluessel fuer den Tresor (Kaeufe). NIE ins Repo, aber gut sichern!
 desktop-app/geheim.txt

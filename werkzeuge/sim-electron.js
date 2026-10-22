@@ -1,13 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Balancing-Simulator ohne sichtbaren Browser (Test-Datei, wird nicht mitgeliefert)
-// Startet das Spiel unsichtbar in Electron (ohne Bremse fuer Hintergrund-Fenster) und laesst den
-// Balancing-Bot mehrere Story-Runs hintereinander spielen. Zwischen den Runs werden Mondblueten im
-// Mondteich ausgegeben (immer das guenstigste Upgrade) und Gutscheine am Kuschel-Automaten eingeloest.
-// Start:  desktop-app\node_modules\.bin\electron _sim-electron.js
-// Optionen ueber Umgebungsvariablen: RUNS=8 KPS=4 TAGE=45
-// ============================================================
 
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
@@ -21,14 +13,10 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 const RUNS = Number(process.env.RUNS) || 6;
 const KPS = Number(process.env.KPS) || 4;
 const TAGE = Number(process.env.TAGE) || 45;
-// Optional: Datei mit JS, das vor der Simulation im Spiel laeuft (Balancing-Varianten testen, ohne den Code zu aendern)
 const PATCH = process.env.PATCH ? fs.readFileSync(process.env.PATCH, "utf8") : "";
-// Optional: eigene Ergebnis-Dateien, damit mehrere Simulationen gleichzeitig laufen koennen
 const NAME = process.env.NAME || "_sim-ergebnis";
-// Optional: Rechnungen frueher bezahlen, sobald man FRUEH-mal so viel Gold hat (z.B. FRUEH=1.5), Standard: nie
 const FRUEH = Number(process.env.FRUEH) || 0;
 
-// Laeuft im Spiel
 async function simulation(runs, kps, tage, frueh) {
     const intro = document.getElementById("intro");
     if (intro) intro.remove();
@@ -48,7 +36,6 @@ async function simulation(runs, kps, tage, frueh) {
         eintrag.mondblueten = meta.mondblueten;
         eintrag.level = bauernRang();
         eintrag.xp = meta.bauernXp;
-        // Mondteich: immer das guenstigste sichtbare Upgrade kaufen
         for (let i = 0; i < 200; i++) {
             const angebot = META_UPGRADES.filter(d => (!d.sichtbar || d.sichtbar(meta)) && metaLevel(d.id) < (d.max ?? Infinity))
                 .map(d => ({ d, k: kostenMitFaktor(d.basiskosten, d.faktor, metaLevel(d.id)) }))
@@ -78,10 +65,8 @@ app.whenReady().then(async () => {
     const beginn = Date.now();
     let letzteMeldung = Date.now();
     const uhr = () => Math.round((Date.now() - beginn) / 60000) + "min";
-    // Ergebnisse sofort mitschreiben (bleiben erhalten, auch wenn ein spaeterer Run haengt)
     const jsonl = path.join(__dirname, "..", NAME + ".jsonl");
     fs.writeFileSync(jsonl, "");
-    // Waechter: 15 Minuten ohne jede Meldung = haengt, dann abbrechen
     setInterval(() => {
         if (Date.now() - letzteMeldung > 25 * 60000) {
             process.stdout.write("HAENGT seit 15 Minuten ohne Fortschritt (" + uhr() + "), Abbruch\n");
@@ -89,7 +74,6 @@ app.whenReady().then(async () => {
         }
     }, 30000);
     fenster.webContents.on("console-message", (e, ...alt) => {
-        // Neue Electron-Versionen: alles steckt im Ereignis, aeltere geben es als einzelne Werte
         const stufen = { verbose: 0, info: 1, warning: 2, error: 3 };
         const level = e.level !== undefined ? (stufen[e.level] ?? e.level) : alt[0];
         const text = String(e.message !== undefined ? e.message : alt[1]);

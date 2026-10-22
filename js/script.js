@@ -1,18 +1,6 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Spiellogik (Kern)
-// Kern-Loop: Samenladen klicken -> Aussaat -> Wachstum -> Ernte -> Saaten einsammeln
-// Run: Tage mit Energie (= Tageszeit), Einkaufen zwischen den Tagen, Rechnung alle 5 Tage, danach ein Segen.
-// Weitere Systeme in eigenen Dateien: haus.js (Hof, Haustier, Kosmetik), glueck.js (Gluecksspiele),
-// mondteich.js (Meta-Shop, Kuscheltiere, Sternenfall, Spielmodi), ereignisse.js (Wetter, Kraehen, Goldregen,
-// Boss-Rechnungen, Wanderhaendler, Werkzeuge), kodex.js (Sammelbuch), ui.js (Popups, Tooltips, Tasten).
-// Zahlen/Listen: daten.js, Grafiken: sprites.js, Klaenge: audio.js
-// ============================================================
 
-// ---------- HAKEN: andere Dateien haengen sich hier an Spielereignisse an ----------
-// tagVorbereiten (vor der Energie-Berechnung), tagStart, tagTick(dtMs), tagEnde, pauseStart,
-// rechnungBezahlt(nummer), runStart, runEnde
 
 const SPIEL_HAKEN = {};
 
@@ -24,20 +12,15 @@ function haken(name, ...werte) {
     (SPIEL_HAKEN[name] || []).forEach(funktion => funktion(...werte));
 }
 
-// ---------- ACKER-RASTER ----------
-// Links und rechts je 6 Spalten Felder, dazwischen der Weg mit dem Samenladen.
-// Alle Feldpositionen werden von innen (am Samenladen) nach aussen sortiert.
 
 const HALBE_SPALTEN = KONFIG.rasterSpalten / 2;
 const MITTE_ZEILE = (KONFIG.rasterZeilen - 1) / 2;
 const LADEN_MITTE_X = HALBE_SPALTEN + KONFIG.ladenBreite / 2;
 
-// Feld-Spalte -> Spalte im CSS-Raster (Spalte HALBE_SPALTEN + 1 ist der Weg)
 function cssSpalte(spalte) {
     return spalte < HALBE_SPALTEN ? spalte + 1 : spalte + 2;
 }
 
-// Mitte eines Feldes in Feld-Einheiten, der Weg ist 1,5 Felder breit
 function feldX(spalte) {
     return spalte < HALBE_SPALTEN ? spalte + 0.5 : spalte + KONFIG.ladenBreite + 0.5;
 }
@@ -66,29 +49,20 @@ function berechneFeldPositionen() {
 const FELD_POSITIONEN = berechneFeldPositionen();
 const MAX_FELDER = FELD_POSITIONEN.length;
 
-// ---------- META-FORTSCHRITT (ueberlebt Runs, wird im Browser gespeichert) ----------
 
-// Standard und Sandbox haben getrennten Fortschritt (Mondblueten, Upgrades, Tarot, Kuscheltiere, Statistik,
-// Meisterschaft ...). Geteilt sind nur die Felder in META_GETEILT (Kosmetik, DLC, Freischaltung der Sandbox ...).
-// "meta" ist immer der Fortschritt des Modus, der gerade laeuft. Der andere wartet in metaRuhend bzw. im Speicher.
 const META_SPEICHER_KEY = "sproutvale_meta";
 const SANDBOX_META_KEY = "sproutvale_meta_sandbox";
-// Endlos (intern "sandbox") hat 3 Speicherstaende. Jeder ist ein eigenes Spiel mit eigenem Fortschritt
-// (Mondblueten, Upgrades, Kuscheltiere, Erfolge, Statistik) und eigenem laufenden Hof.
 const ENDLOS_SLOTS = 3;
-// Erfolge gehoeren NICHT dazu: Story und jeder Endlos-Speicherstand haben getrennte Erfolge und Gutscheine
 const META_GETEILT = ["dlc", "freigeschaltet", "kosmetik", "sandbox", "tutorial", "letzterModus", "kaeufeUmzug", "endlosSlot", "profil", "bauernXp"];
 let speichernGesperrt = false;
 let metaProfil = "standard";
-let metaSlot = 0; // welcher Endlos-Speicherstand gerade in "meta" geladen ist (0 = Story)
-let metaRuhend = null; // Fortschritt von Story, waehrend Endlos laeuft
+let metaSlot = 0;
+let metaRuhend = null;
 
-// Gewaehlter Endlos-Speicherstand (1 bis 3)
 function endlosSlot() {
     return klemme(Math.round(meta.endlosSlot || 1), 1, ENDLOS_SLOTS);
 }
 
-// Speicher-Schluessel fuer den Fortschritt eines Endlos-Speicherstands (Nr. 1 behaelt den alten Namen)
 function endlosMetaKey(slot) {
     return slot > 1 ? SANDBOX_META_KEY + "_" + slot : SANDBOX_META_KEY;
 }
@@ -126,7 +100,6 @@ function leererMetaStand() {
     };
 }
 
-// Upgrades, die es nicht mehr gibt: [Grundkosten, Faktor], damit die Mondblueten zurueckgegeben werden koennen
 const ENTFERNTE_META_UPGRADES = { flinkeFinger: [3, 1.8], segensreich: [60, 1] };
 
 function ladeMeta(schluessel = META_SPEICHER_KEY) {
@@ -136,15 +109,12 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
             const stand = {
                 ...leererMetaStand(),
                 ...daten,
-                // alte Spielstaende: die dauerhafte Waehrung hiess vorher "Sternensamen" bzw. "Prestige"
                 mondblueten: daten.mondblueten ?? daten.sternensamen ?? daten.prestige ?? 0,
-                // Stellarium: alte Spielstaende (ohne Eintrag) haben es frei, wenn schon gespielt wurde
                 stellariumFrei: daten.stellariumFrei ?? Boolean(daten.lebenszeit && (daten.lebenszeit.runs > 0 || daten.lebenszeit.gold >= 1000)),
                 upgrades: { ...daten.upgrades },
                 tarot: Array.isArray(daten.tarot) ? daten.tarot : [],
                 tarotVerbessert: Array.isArray(daten.tarotVerbessert) ? daten.tarotVerbessert : [],
                 erfolge: { ...daten.erfolge },
-                // Aeltere Spielstaende: dort gab es den Gutschein sofort, also gilt alles Erreichte als abgeholt
                 erfolgeAbgeholt: { ...(daten.erfolgeAbgeholt || daten.erfolge) },
                 kuscheltiere: { ...daten.kuscheltiere },
                 lebenszeit: { ...leereLebenszeit(), ...daten.lebenszeit },
@@ -152,28 +122,22 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
                 sternenfallUpgrades: { ...daten.sternenfallUpgrades },
                 freigeschaltet: { ...daten.freigeschaltet },
                 kosmetik: { ...leereKosmetik(), ...daten.kosmetik },
-                // ganzes Profil behalten (Name, Aussehen, Aura ...), nur fehlende Teile auffuellen
                 profil: { ...daten.profil, name: (daten.profil && daten.profil.name) || "", teile: { ...FIGUR_STANDARD, ...(daten.profil && daten.profil.teile) } }
             };
-            // Alte Spielstaende: schon freie Mondphasen gelten als gesehen (kein Ausrufezeichen fuer Altes)
             if (daten.mondphaseGesehen === undefined) stand.mondphaseGesehen = stand.mondphaseFrei || 0;
-            // Umzug alter Felder: freieSkins/deko/haustierSkin gibt es jetzt unter freigeschaltet/kosmetik
             (daten.freieSkins || []).forEach(id => { stand.freigeschaltet["haustier:" + id] = true; });
             (daten.deko || []).forEach(id => { stand.freigeschaltet["deko:" + id] = true; });
             if (daten.haustierSkin && !daten.kosmetik) stand.kosmetik.haustier = daten.haustierSkin;
-            // Deko war frueher ein Objekt {id: an/aus}, jetzt eine Liste mit hoechstens 3 Objekten
             if (!Array.isArray(stand.kosmetik.deko)) {
                 stand.kosmetik.deko = Object.keys(stand.kosmetik.deko || {}).filter(id => stand.kosmetik.deko[id]).slice(0, 3);
             }
             ["sternensamen", "prestige", "offeneSternensamen", "freieSkins", "deko", "haustierSkin", "kuschelZuege"]
                 .forEach(alt => delete stand[alt]);
-            // Entfernte Mondteich-Upgrades: die ausgegebenen Mondblueten gibt es zurueck
             Object.entries(ENTFERNTE_META_UPGRADES).forEach(([id, [basis, faktor]]) => {
                 const stufe = stand.upgrades[id] || 0;
                 for (let i = 0; i < stufe; i++) stand.mondblueten += kostenMitFaktor(basis, faktor, i);
                 delete stand.upgrades[id];
             });
-            // Nur verbesserte Karten duerfen ausgeruestet sein
             stand.tarotSlots = (Array.isArray(daten.tarotSlots) ? daten.tarotSlots : [])
                 .filter(id => stand.tarotVerbessert.includes(id));
             return stand;
@@ -184,7 +148,6 @@ function ladeMeta(schluessel = META_SPEICHER_KEY) {
     return leererMetaStand();
 }
 
-// Nur die Fortschritts-Felder (ohne die geteilten)
 function fortschrittVon(stand) {
     const fortschritt = {};
     Object.keys(stand).forEach(schluessel => {
@@ -215,7 +178,6 @@ function speichereMeta() {
     }
 }
 
-// Tauscht den Fortschritt aus, wenn zwischen Story und Endlos (oder zwischen zwei Endlos-Speicherstaenden) gewechselt wird
 function wechsleMetaProfil(sandbox) {
     const slot = sandbox ? endlosSlot() : 0;
     if ((metaProfil === "sandbox") === sandbox && metaSlot === slot) return;
@@ -224,42 +186,31 @@ function wechsleMetaProfil(sandbox) {
     const neu = sandbox ? fortschrittVon(ladeMeta(endlosMetaKey(slot))) : metaRuhend;
     Object.keys(bisher).forEach(schluessel => delete meta[schluessel]);
     Object.assign(meta, neu);
-    // Story wartet in metaRuhend, solange irgendein Endlos-Speicherstand laeuft
     if (metaProfil === "standard") metaRuhend = bisher;
     else if (!sandbox) metaRuhend = null;
     metaProfil = sandbox ? "sandbox" : "standard";
     metaSlot = slot;
 }
 
-// Fortschritt eines Endlos-Speicherstands (auch wenn er gerade nicht geladen ist)
 function endlosMeta(slot) {
     return metaProfil === "sandbox" && metaSlot === slot ? meta : ladeMeta(endlosMetaKey(slot));
 }
 
-// Mondblueten eines Modus (auch wenn er gerade nicht laeuft), z.B. fuer das Hauptmenue
 function profilMondblueten(sandbox) {
     if (sandbox) return endlosMeta(endlosSlot()).mondblueten;
     if (metaProfil === "standard") return meta.mondblueten;
     return metaRuhend ? metaRuhend.mondblueten : meta.mondblueten;
 }
 
-// ---------- GEKAUFTE INHALTE (DLC) ----------
-// Gekauftes steht NICHT im Spielstand, sondern im Tresor (js/tresor.js, Desktop: verschluesselt im Hauptprozess).
-// Wer den Spielstand von Hand aendert ("dlc": true oder Skins in "freigeschaltet"), bekommt dadurch nichts.
-// Hier werden nur alte Eintraege aus dem Spielstand entfernt.
 function uebernehmeKaeufe(stand) {
     delete stand.dlc;
     return stand;
 }
 
-// ---------- BETA-TESTER ----------
-// Den Beta-Tester-Begleiter und das BETA Shirt gibt es mit dem Code BETAVALE (oder wer bis Beta 0.4.x
-// auf itch.io gespielt hat: das wurde in den Tresor uebernommen). Es gibt keine Automatik mehr.
 function istBetaTester() {
     return Boolean(Tresor.stand().beta);
 }
 
-// Laeuft gerade eine Alpha- oder Beta-Version?
 function istBetaVersion() {
     return /^(Alpha|Beta)\b/.test(SPIEL_VERSION);
 }
@@ -286,30 +237,25 @@ function istVerstaerkt(id) {
     return istVerbessert(id) && meta.tarotSlots.includes(id);
 }
 
-// 0 = Karte nicht im Besitz, 1 = normal, 1.5 = verbessert und ausgeruestet
 function tarotFaktor(id) {
     if (!hatTarot(id)) return 0;
     return istVerstaerkt(id) ? KONFIG.tarotVerstaerkung : 1;
 }
 
-// Aktueller Wert einer Tarotkarte (0, wenn nicht im Besitz)
 function tw(id, feld = "wert") {
     return TAROT_NACH_ID[id][feld] * tarotFaktor(id);
 }
 
-// Stufe eines Kuscheltiers (0 = nicht im Besitz). Duplikate: 1 Stueck = Stufe 1, 2 = 2, 4 = 3, 8 = 4, 16 = 5
 function kuschel(id) {
     const anzahl = meta.kuscheltiere[id] || 0;
     if (anzahl <= 0) return 0;
     return Math.min(KUSCHEL_KONFIG.maxStufe, Math.floor(Math.log2(anzahl)) + 1);
 }
 
-// Jede gekaufte Karte macht die naechste teurer (egal welche)
 function tarotKaufPreis() {
     return aufrunden(KONFIG.tarotPreis * Math.pow(KONFIG.tarotPreisFaktor, meta.tarot.length));
 }
 
-// ---------- RUN-ZUSTAND (wird bei jedem neuen Run komplett neu erzeugt) ----------
 
 let run = null;
 let naechsteRunId = 1;
@@ -329,8 +275,7 @@ function erstelleRunZustand(sandbox = false) {
     const levelStart = {};
     [...SHOP_UPGRADES, ...SKILLS].forEach(def => { levelStart[def.id] = 0; });
     levelStart.igel = aufrunden(tw("eremit"));
-    levelStart.p_weizen = 1; // der Weizen ist die Mitte des Stellariums und von Anfang an da
-    // Ist ein Nachteil schon dauerhaft geloest (Tarot, Mondteich), ist der passende Stern gleich voll
+    levelStart.p_weizen = 1;
     SKILLS.filter(def => def.erledigt && def.erledigt()).forEach(def => { levelStart[def.id] = def.max; });
     if (sandbox) {
         SKILLS.filter(def => SANDBOX_AUS_STERNE.includes(def.id)).forEach(def => { levelStart[def.id] = def.max; });
@@ -341,7 +286,7 @@ function erstelleRunZustand(sandbox = false) {
         sandbox,
         mondphase: sandbox ? 0 : Math.min(meta.mondphase || 0, meta.mondphaseFrei || 0),
         herausforderung: sandbox ? null : meta.herausforderung || null,
-        phase: "vorTag", // "tag" = spielen, "vorTag" = Einkaufen zwischen Tagen, "runEnde"
+        phase: "vorTag",
         tag: 1,
         gold: 25 * metaLevel("startgold") + 5 * kuschel("hase"),
         skillpunkte: 100 * metaLevel("startsp") + 250 * sfLevel("sternenrucksack") + aufrunden(tw("narr")) + 50 * kuschel("eule"),
@@ -370,7 +315,7 @@ function erstelleRunZustand(sandbox = false) {
         segenAusstehend: false,
         segenBoss: false,
         segenWarteschlange: 0,
-        meilensteine: 0,          // Sandbox: erreichte Meilensteine (statt bezahlter Rechnungen)
+        meilensteine: 0,
         meilensteineGemeldet: 0,
         segenAnzahl: 3,
         segenAuswahl: null,
@@ -398,13 +343,11 @@ function erstelleRunZustand(sandbox = false) {
     };
 }
 
-// UI-Zustand, der nicht zum Spielstand gehoert
 const kombo = { zaehler: 0, letzterKlick: 0, letzteStufe: 1 };
 const maus = { x: -9999, y: -9999 };
 const lootKugeln = [];
 let slotEls = [];
 let aktiverShopReiter = "allgemein";
-// Markt oder Gluecksspiel (umschalten mit Muenze / Karte oben im Markt)
 let marktModus = "markt";
 let aktiverGlueckReiter = "muenzwurf";
 let aktiverStern = "p_weizen";
@@ -417,16 +360,13 @@ let erfolgPruefMs = 0;
 let musikPruefMs = 0;
 let debugVariante = null;
 let debugTageszeit = null;
-let tageszeit = 0; // 0 = Morgen, 1 = Nacht (angezeigter Wert, gleitet weich zum Zielwert)
+let tageszeit = 0;
 
-// ---------- BERECHNUNGEN ----------
 
 function level(id) {
     return run.level[id] || 0;
 }
 
-// Stufe eines Segens; dazu kommt der Bonus fuer frueh bezahlte Rechnungen (run.segenExtra, z.B. +0,3 = 30% staerker)
-// Laufende Herausforderung (1 = aktiv) und geschaffte Herausforderungen (1 = dauerhafter Bonus)
 function hf(id) {
     return run && run.herausforderung === id ? 1 : 0;
 }
@@ -434,7 +374,6 @@ function hfGeschafft(id) {
     return meta.herausforderungen && meta.herausforderungen[id] ? 1 : 0;
 }
 
-// Gewaehlter Hof-Stil dieses Runs (1 = aktiv)
 function stil(id) {
     return run && run.stil === id ? 1 : 0;
 }
@@ -447,7 +386,6 @@ function hatWerkzeug(id) {
     return run.werkzeuge.includes(id);
 }
 
-// Werkzeug-Stufe: je spaeter gekauft, desto staerker (Stufe 1 = vor der ersten Rechnung)
 function werkzeugStufeJetzt() {
     return 1 + (run.sandbox ? run.meilensteine : run.bezahlteRechnungen);
 }
@@ -456,25 +394,21 @@ function werkzeugStufe(id) {
     return (run.werkzeugStufen && run.werkzeugStufen[id]) || 1;
 }
 
-// Wert eines Werkzeugs auf einer Stufe (ohne Besitz-Pruefung)
 function werkzeugWertFuer(w, stufe) {
     return w.wert * (1 + WERKZEUG_STUFEN_BONUS * (stufe - 1));
 }
 
-// Wert eines Werkzeugs, das man besitzt (0, wenn nicht)
 function werkzeugWert(id) {
     if (!hatWerkzeug(id)) return 0;
     return werkzeugWertFuer(WERKZEUG_NACH_ID[id], werkzeugStufe(id)) * (istEntwickelt(id) ? EVOLUTION_FAKTOR : 1);
 }
 
-// ---------- WERKZEUG-EVOLUTIONEN ----------
 function evolutionFuer(werkzeugId) {
     return WERKZEUG_EVOLUTIONEN.find(e => e.werkzeug === werkzeugId) || null;
 }
 function istEntwickelt(werkzeugId) {
     return Boolean(run && run.evolutionen && run.evolutionen[werkzeugId]);
 }
-// Werkzeug und Segen da? Dann entwickelt sich das Werkzeug (einmal pro Run, mit Banner)
 function pruefeEvolutionen() {
     if (!run) return;
     WERKZEUG_EVOLUTIONEN.forEach(e => {
@@ -506,21 +440,17 @@ function istNacht() {
     return tageszeit > 0.62 && tageszeit < 1.22;
 }
 
-// Glueck bei Gluecksspielen: 0.1 = 10% bessere Chancen
 function glueckBonus() {
     return 0.03 * level("glueckstraehne") + 0.02 * metaLevel("gluecksbringer") +
         0.05 * segen("glueckskind") + werkzeugWert("gluecksmuenze") + 0.04 * kuschel("panda") +
         0.05 * kuschel("manta") + 0.04 * sfLevel("glueckstern") + 0.04 * level("spielerglueck");
 }
 
-// Alles, was Klicks pro Samen spart. Voll ausgebaut sind es genau 20 (30 -> 10): Stellarium 13, Segen 2, Mondteich 3, Tarot 2.
-// Pakt, Werkzeug und Gacha helfen zusaetzlich, unter das Minimum geht es aber nie.
 function klickAbzug() {
     return level("s_aussaat") + Math.min(2, aufrunden(tw("kraft"))) + 2 * Math.min(1, Math.floor(segen("flink"))) + metaLevel("geschickt") +
         gachaBonus("klicks") + Math.floor(segen("kargheit"));
 }
 
-// Weniger Klicks pro Samen geht nicht mehr (weitere Stufen "Schnellere Aussaat" bringen nichts)
 function klicksAmMinimum() {
     const abzug = klickAbzug();
     return (KONFIG.startKlicksProSamen - abzug) * (1 - werkzeugWert("saatbeutel")) <= KONFIG.minKlicksProSamen;
@@ -532,16 +462,12 @@ function klicksProSamen() {
     return (bossIst("teureSaat") ? Math.ceil(klicks * 1.25) : klicks) + (bossIst("muede") ? 5 : 0);
 }
 
-// Energie ohne Wetter (Wetter wird beim Tagesstart eingerechnet)
 function energieMax() {
     let energie = KONFIG.startEnergie + 20 * level("energie") + 8 * level("sonnenuhr") +
         aufrunden(tw("wagen")) + 25 * segen("fruehstueck") + 10 * kuschel("teddy");
-    // Alle Prozent-Boni werden zusammengezaehlt (nicht malgenommen) und geben zusammen hoechstens +100%,
-    // damit die Tage auch voll ausgebaut nicht endlos lang werden (Gluehwuermchen verlaengern den Abend weiter)
     const prozent = metaWert("ausdauer") + 0.6 * grundwert("g_energie") + 0.1 * segen("kraftpaket") + werkzeugWert("taschenuhr") +
         0.2 * stil("fruehaufsteher") + 0.1 * hfGeschafft("kurzetage") + 0.25 * segen("nachtschicht") + 0.03 * kuschel("faultier");
     energie *= 1 + Math.min(1, prozent);
-    // Abzuege bleiben einzeln (Herausforderung und Pakte)
     energie *= (1 - 0.4 * hf("kurzetage")) * Math.max(0.2, 1 - 0.15 * segen("goldrausch") - 0.1 * segen("kargheit"));
     if (run.tag === 1 && metaLevel("fruehervogel") > 0) energie += 100;
     if (bossIst("kurzeTage")) energie *= 0.8;
@@ -550,10 +476,8 @@ function energieMax() {
     return Math.round(energie);
 }
 
-// [Gewoehnlich, Ungewoehnlich, Selten, Episch, Legendaer]
 function raritaetsChancen() {
     const fruehling = run && jahreszeit().id === "fruehling" ? level("bluetenzauber") : 0;
-    // Am Anfang gibt es nur gewoehnliche Saat: jede Farbe schaltet ihr Stern im Stellarium erst frei (Stufe 1)
     const gruen = (level("gruen") > 0 ? 0.12 + 0.03 * level("gruen") : 0) + tw("hohepriesterin") + 0.02 * kuschel("kueken") + 0.04 * fruehling;
     const blau = 0.02 * level("blau");
     const lila = (level("lila") > 0 ? 0.02 + 0.01 * level("lila") : 0) + 0.02 * segen("glueckspilz") + 0.01 * kuschel("drache") + 0.01 * fruehling + 0.03 * stil("gluecksritter") + 0.02 * hfGeschafft("pech");
@@ -602,7 +526,6 @@ function zinsDeckelAnteil() { return KONFIG.zinsDeckel + 0.25 * level("lagerhaus
 function zinsSatz() { return 0.02 * level("zinsen") + 0.005 * kuschel("kuh") + werkzeugWert("sparstrumpf"); }
 function extraKugelChance() { return 0.08 * segen("erntesegen") + werkzeugWert("flechtkorb") + 0.03 * level("obstkorb") + 0.01 * kuschel("marienkaefer"); }
 
-// ---------- Himmels-Ast ----------
 function gekaufteSterne() {
     return SKILLS.filter(d => level(d.id) > 0 && d.id !== "p_weizen").length;
 }
@@ -621,17 +544,14 @@ function gluehwuermchenEnergie() {
     return Math.round(basis * (1 + werkzeugWert("laterne")));
 }
 
-// Gold pro Klick auf den Samenladen ("Klingelnde Kasse")
 function klickGold() {
     if (level("kasse") <= 0) return 0;
     return Math.max(1, Math.round(verkaufswert(bestePflanze()) * 0.002 * level("kasse") * goldMulti()));
 }
 
-// Artenvielfalt: jede weitere freigeschaltete Pflanze gibt allen Pflanzen +12% Gold (neue Pflanzen lohnen sich immer)
 function artenvielfalt() {
     if (!run || !run.pflanzen) return 0;
     const freie = run.pflanzen.filter(p => p.freigeschaltet);
-    // Der Weltenbaum zaehlt doppelt
     return 0.12 * Math.max(0, freie.length - 1 + freie.filter(p => p.eigenschaft === "wurzeln").length);
 }
 
@@ -645,24 +565,16 @@ function goldMulti() {
         0.05 * kuschel("phoenix") + werkzeugWert("strohhut") + werkzeugWert("kristallkugel") +
         1.0 * sfLevel("sternenregen") + level("fuellhorn") + level("grosseernte") + gachaBonus("gold") + artenvielfalt() +
         (typeof kodexBereicheFertig === "function" ? 0.03 * kodexBereicheFertig() : 0) +
-        // alles zusammengezaehlt (nicht malgenommen), sonst schaukelt es sich im spaeten Spiel auf
         grundwert("g_gold") + level("goldmarie") + 0.25 * kuschel("mondhase") + (z_sommer() ? 0.2 * level("sonnenernte") : 0) +
-        // Mondlicht (Mondteich) zaehlt wie alle Gold-Boni dazu (frueher x1,15 pro Stufe malgenommen: schaukelte sich ueber viele Runs auf)
         0.25 * metaLevel("mondlicht") +
-        // Pokale: ihr Prozent-Bonus zaehlt ebenfalls dazu (Holz +50% ist +50% wie jeder andere Gold-Bonus)
         (pokalFaktor() - 1) +
-        // Freiwillige Werbung (nur Handy): +25% Gold fuer einen Tag
         (typeof werbeGoldBonus === "function" ? werbeGoldBonus() : 0);
     const z = jahreszeit();
-    // Pakte: Goldrausch mehr, Sternentausch und Eile weniger Gold
     const pakte = (1 - 0.1 * stil("sterndeuter")) * (1 + 0.5 * segen("goldrausch")) * Math.max(0.1, 1 - 0.15 * segen("sternentausch")) * Math.max(0.1, 1 - 0.1 * segen("eile"));
     return pakte * summe *
         (z.gold || 1) * (level("saisonfest") > 0 && istErsterJahreszeitTag() ? 1.5 : 1);
 }
 
-// Wert-Faktor fuer Sternensamen (Mantarochen, Sternensaat)
-// Alle Boni werden zusammengezaehlt (+40% und +100% = +140%), auch die Pokale. Nur Jahreszeit und der Pakt Sternentausch
-// wirken extra. Vorher wurde alles malgenommen, dadurch schaukelte sich das spaete Spiel ins Unendliche auf.
 function sternWertMulti() {
     const summe = 1 + 0.2 * kuschel("manta") + 0.25 * sfLevel("sternensaat") + gachaBonus("sterne") + werkzeugWert("wuenschelrute") +
         0.4 * level("sternenstaub") + level("sternenflut") +
@@ -672,7 +584,6 @@ function sternWertMulti() {
     return summe * (jahreszeit().sterne || 1) * (1 + 0.6 * segen("sternentausch"));
 }
 
-// Chance, dass eine Sternensamen doppelt zaehlt
 function sternDoppelChance() {
     return tw("magier") + 0.15 * segen("wissen") + 0.05 * level("sternensammler") + 0.03 * kuschel("maus") + metaWert("reicheernte");
 }
@@ -680,7 +591,7 @@ function sternDoppelChance() {
 function variantenChance(variante) {
     const skill = SKILLS.find(s => s.variante === variante);
     const tarot = variante.tarotBonus ? variante.tarotBonus.chance * tarotFaktor(variante.tarotBonus.karte) : 0;
-    if (run.sandbox && variante.energieBonus) return 0; // Blitzpflanzen geben nur Energie
+    if (run.sandbox && variante.energieBonus) return 0;
     let chance = (skill.chanceProStufe * level(skill.id) + tarot) * (1 + 0.1 * kuschel("oktopus")) * (1 + 0.1 * level("saatsortiment"));
     if (variante.id === "blitz" && wetterIst("gewitter")) chance *= 3;
     if (wetterIst("pollenflug")) chance *= 1.5;
@@ -688,13 +599,9 @@ function variantenChance(variante) {
 }
 
 function feldKosten(seite = eigeneSeite()) {
-    // Im Koop hat jede Seite ihre eigene Preisleiter.
     return feldPreisBei(seite ? run.felder.filter(f => feldSeite(f) === seite).length : run.felder.length);
 }
 
-// Preis des naechsten Feldes, wenn man schon "felder" Felder hat.
-// Das erste gekaufte Feld = 1 Gold, danach jedes Feld x1,9 (Feldvermessung macht es billiger).
-// Startfelder aus "Vorbereiteter Boden" zaehlen nicht mit, sonst waere das naechste Feld gleich teuer.
 function feldPreisBei(felder) {
     const gekauft = Math.max(0, felder - (run.startFelder || 1));
     return aufrunden(Math.pow(KONFIG.feldKostenFaktor, gekauft) * Math.pow(0.92, level("feldvermessung")) * (1 - 0.03 * kuschel("schwein")) *
@@ -707,13 +614,12 @@ function rechnungsBetrag(nummer) {
     const phase = run ? run.mondphase || 0 : 0;
     const faktor = Math.max(0.1, 1 - rabatt) * (1 + tw("teufel", "nachteil")) * (phase >= 1 ? 1.2 : 1) *
         (1 + 0.1 * segen("hochrisiko") + 0.12 * segen("vorschuss"));
-    const extra = phase >= 5 ? 3 * (phase - 4) : 0; // Sternenmond, Sternenmond II ... je +x3
+    const extra = phase >= 5 ? 3 * (phase - 4) : 0;
     let betrag = KONFIG.rechnungBasis;
     for (let i = 0; i < nummer; i++) betrag *= (KONFIG.rechnungFaktorenStart[i] || KONFIG.rechnungFaktor) + extra;
     return aufrunden(betrag * faktor * (run && run.koop ? KOOP_ANFORDERUNG : 1));
 }
 
-// Nach einer frueh bezahlten Rechnung verschiebt sich der Rhythmus (run.rechnungVersatz Tage)
 function naechsterRechnungsTag() {
     const versatz = run.rechnungVersatz || 0;
     return versatz + Math.ceil((run.tag - versatz) / KONFIG.tageProRechnung) * KONFIG.tageProRechnung;
@@ -732,8 +638,6 @@ function naechsteRechnung() {
     return rechnung;
 }
 
-// Jede 3. Rechnung (Nr. 3, 6, 9 ...) ist eine Boss-Rechnung
-// Oben in der Leiste: Pokal-Bild statt Rechnung, wenn als naechstes ein Pokal kommt
 function zeigeRechnungsSymbol(pokal) {
     const bild = rechnungDisplay.querySelector("img");
     const name = pokal ? pokal.sprite : "rechnung";
@@ -745,7 +649,6 @@ function zeigeRechnungsSymbol(pokal) {
     if (pokal) rechnungDisplay.style.setProperty("--pokal", pokal.farbe);
 }
 
-// Ist diese Rechnung ein Kredit? (ohne Ruecksicht auf Pokale, die kommen nie auf einen Kredit)
 function istKreditIndex(index) {
     const alle = run && run.mondphase >= 2 ? 2 : BOSS_KONFIG.alle;
     return (index + 1) % alle === 0;
@@ -760,12 +663,7 @@ function tageText(anzahl) {
     return anzahl === 1 ? t("1 Tag") : tf("{0} Tagen", anzahl);
 }
 
-// ---------- SANDBOX: MEILENSTEINE ----------
-// In der Sandbox gibt es keine Rechnungen. Stattdessen zaehlt, wie viel Gold du insgesamt verdient hast:
-// Jede Schwelle, an der im normalen Run eine Rechnung faellig waere, ist ein Meilenstein (Summe aller Rechnungen bis dahin).
-// Meilensteine geben einen Segen und beim Sandbox-Prestige Mondblueten (weniger als ein normaler Run).
 
-// Im Koop sind Rechnungen und Meilensteine doppelt so teuer (dafuer zaehlt das Gold beider)
 const KOOP_ANFORDERUNG = 2;
 
 function meilensteinSchwelle(nummer) {
@@ -778,7 +676,6 @@ function meilensteinSchwelle(nummer) {
     return summe * (run && run.koop ? KOOP_ANFORDERUNG : 1);
 }
 
-// Verdientes Gold fuer die Meilensteine (im Koop: beide zusammen)
 function meilensteinGold() {
     return run.gesamt.gold + (run.koop && typeof koop !== "undefined" ? koop.partnerGesamtGold || 0 : 0);
 }
@@ -793,13 +690,10 @@ function sandboxMondblueten() {
     return aufrunden(mondbluetenFuerRechnungen(run.meilensteine) * SANDBOX_KONFIG.mondbluetenAnteil);
 }
 
-// Mondblueten, die man bekommt, wenn der Run (oder die Sandbox) jetzt endet
 function mondbluetenJetzt() {
     return run.sandbox ? sandboxMondblueten() : mondbluetenFuerRechnungen(run.bezahlteRechnungen);
 }
 
-// Mondblueten fuer bezahlte Rechnungen: 2 x Nr. zum Quadrat (2, 8, 18, 32 ...), jeder Sternenfall verdreifacht alles.
-// Verdoppelt, damit schon ein kurzer erster Run ein spuerbares Upgrade im Mondteich bringt.
 const MONDBLUETEN_PRO_RECHNUNG = 2;
 function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 : 0) {
     let summe = 0;
@@ -809,28 +703,19 @@ function mondbluetenFuerRechnungen(anzahl, mondphase = run ? run.mondphase || 0 
     return aufrunden(summe * bonus * sternenfallFaktor() * pokalFaktor());
 }
 
-// +25% pro Stufe, alle 10 Stufen zusaetzlich x2
 function ertragMulti(pflanze) {
     const stufe = pflanze.level.ertrag;
     return (1 + 0.25 * stufe) * Math.pow(2, Math.floor(stufe / 10));
 }
 
-// Meisterschaft einer Pflanze (0 bis 7) aus allen Ernten ueber alle Runs
 function meisterStufe(pflanzenId) {
     const ernten = meta.kodex.pflanzen[pflanzenId] || 0;
     return MEISTER_SCHWELLEN.filter(schwelle => ernten >= schwelle).length;
 }
 
-// ---------- LEVEL (dauerhaft, ueber alle Modi und Spielstaende) ----------
-// Erfahrung gibt es fuer fast alles: Ernten, Tage, Rechnungen, Gold und Sternensamen am Feierabend,
-// Mondblueten am Run-Ende, Sternensplitter, Kuscheltiere und Erfolge. Gold und Sternensamen zaehlen
-// logarithmisch, damit Milliarden spaeter nicht alles sprengen. Level 100 braucht ~3,1 Mio. Erfahrung
-// (Langzeit-Ziel), danach geht es ohne Ende weiter. Keine Vorteile im Spiel, nur alle 5 Level eine Aura.
 function rangSchwelle(rang) {
-    // am Anfang schnell (erster Run etwa Level 6-7), hinten steil (Level 100 ~3,1 Mio.)
     return rang <= 1 ? 0 : Math.round(20 * Math.pow(rang - 1, 2.6));
 }
-// Erfahrung fuer Waehrungen: waechst nur langsam mit der Menge
 function xpAusMenge(menge, faktor) {
     return menge > 0 ? Math.round(faktor * Math.log10(1 + menge)) : 0;
 }
@@ -844,17 +729,14 @@ function gibBauernXp(menge) {
     meta.bauernXp = (meta.bauernXp || 0) + menge;
     const jetzt = bauernRang();
     if (jetzt <= vorher) return;
-    // Das Level ist nur zum Angeben: keine Vorteile im Spiel, nur Auren
     const neueAura = FIGUR_AUREN.filter(au => au.level > vorher && au.level <= jetzt).pop();
     zeigeBanner("⭐", tf("Level {0}!", jetzt), neueAura ? tf("Neue Aura: {0}", neueAura.name) : t("Weiter so!"), "#2e9e2e", 3000);
-    // kleine Feier: Konfetti in der Mitte oben, bei neuer Aura in ihrer Farbe
     Klang.stern();
     const farben = neueAura ? [neueAura.farbe, "#ffffff", "#ffd93d"] : ["#7ed957", "#ffd93d", "#ffffff"];
     partikel(window.innerWidth / 2, 90, farben, neueAura ? 40 : 22, neueAura ? 160 : 110);
     if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
 }
 
-// Wert eines Meisterschafts-Levels (Sternenfall "Sternenmeister" macht ihn staerker)
 function meisterBonus() {
     return MEISTER_BONUS + 0.02 * sfLevel("sternenmeister");
 }
@@ -865,8 +747,6 @@ function verkaufswert(pflanze) {
         (1 + level("pg_" + pflanze.id)) * erbsortenFaktor(pflanze.id, level("pe_" + pflanze.id)));
 }
 
-// Erntehase (Stellarium): erntet regelmaessig eine fertige Pflanze
-// Sternensaat je Pflanze: die ersten 5 Pflanzen je +14% (wie bisher), danach je +40%, damit Sternensamen mit dem Gold mitwachsen
 function sternensaatPflanzenFaktor(index) {
     const frueh = Math.min(index, 4);
     return Math.pow(KONFIG.sternensamenPflanzenFaktor, frueh) * Math.pow(KONFIG.sternensamenSpaetFaktor, Math.max(0, index - 4));
@@ -880,14 +760,11 @@ function prachtChance(pflanze) {
     return 0.04 * pflanze.level.pracht;
 }
 
-// ---------- JAHRESZEITEN ----------
-// Tag 1 bis 5 Fruehling, 6 bis 10 Sommer, 11 bis 15 Herbst, 16 bis 20 Winter, dann wieder Fruehling
 
 function jahreszeitIndex(tag = run.tag) {
     return Math.floor((tag - 1) / JAHRESZEITEN_KONFIG.tageProJahreszeit) % JAHRESZEITEN.length;
 }
 
-// Eine Jahreszeit so, wie sie im aktuellen Modus wirkt (Sandbox: ohne Energie)
 function jahreszeitFuer(index) {
     const z = JAHRESZEITEN[index];
     if (!run || !run.sandbox || !z.sandbox) return z;
@@ -897,10 +774,7 @@ function jahreszeitFuer(index) {
 function jahreszeit(tag) {
     let z = jahreszeitFuer(jahreszeitIndex(tag));
     if (!run) return z;
-    // Frostschutz (Stellarium): kein Winter-Malus, Stufe 2 sogar +10%
     if (z.id === "winter" && level("frostschutz") > 0) z = { ...z, wachstum: level("frostschutz") >= 2 ? 1.1 : 1 };
-    // Segen "Kind der Jahreszeiten": jeder Effekt doppelt so stark (0,85 wird 0,7, 1,2 wird 1,4)
-    // Jahresrad (Stellarium): nur die guten Effekte +25% pro Stufe
     const saison = segen("saisonkind") > 0 ? 2 : 1;
     const rad = 1 + 0.25 * level("jahresrad");
     if (saison === 1 && rad === 1) return z;
@@ -908,12 +782,10 @@ function jahreszeit(tag) {
     return { ...z, wachstum: verstaerkt(z.wachstum), energie: verstaerkt(z.energie), gold: verstaerkt(z.gold), sterne: verstaerkt(z.sterne) };
 }
 
-// Erster Tag einer Jahreszeit (Saisonfest, Sternenkalender)
 function istErsterJahreszeitTag() {
     return run && (run.tag - 1) % JAHRESZEITEN_KONFIG.tageProJahreszeit === 0;
 }
 
-// Wie viele Tage die aktuelle Jahreszeit noch dauert (der laufende Tag zaehlt mit)
 function jahreszeitRestTage() {
     const t = JAHRESZEITEN_KONFIG.tageProJahreszeit;
     return t - ((run.tag - 1) % t);
@@ -935,36 +807,28 @@ function basisStufenZeitSek(pflanze) {
     return mitUpgrade / wachstumsTempo();
 }
 
-// Hat die Pflanze ihren eigenen Bonus-Stern (pb_...) im Stellarium?
 function pflanzenBonus(pflanze, id) {
     return pflanze.id === id && level("pb_" + id) > 0;
 }
 
-// Tageszeit des laufenden Tages (0 = Morgen, 1 = Feierabend bzw. Nacht).
-// In der Sandbox geht es danach weiter bis NACHT_ENDE (Nacht und Morgengrauen), dann beginnt der naechste Tag.
 function tagesAnteil() {
     if (run.phase !== "tag") return 0;
     if (run.sandbox) return sandboxTageszeit();
     return 1 - run.energie / run.tagesMaxEnergie;
 }
 
-// Wie viel vom Tag schon vorbei ist (0 bis 1), z.B. fuer den Zeiger der Jahreszeiten-Uhr
 function tagesFortschritt() {
     if (run.phase !== "tag") return 0;
     return run.sandbox ? klemme((run.tagMs || 0) / SANDBOX_TAG_MS, 0, 1) : tagesAnteil();
 }
 
-// Sandbox: keine Energie. Ein Tag ist ein voller Kreislauf: Morgen, Mittag, Abend, Nacht, Morgengrauen (3 Minuten).
 const SANDBOX_TAG_MS = 180000;
-const NACHT_ENDE = 1.3; // Tageszeit 1,3 sieht genauso aus wie 0 (Morgen)
+const NACHT_ENDE = 1.3;
 
 function sandboxTageszeit() {
     return klemme((run.tagMs || 0) / SANDBOX_TAG_MS, 0, 1) * NACHT_ENDE;
 }
 
-// Sterne, die nur Energie geben: in der Sandbox automatisch voll (dort gibt es keine Energie)
-// Sandbox: alles, was nur mit Energie oder Rechnungen zu tun hat, gibt es dort nicht.
-// Sterne davon sind automatisch voll (damit der Weg dahinter frei ist), wirken aber nicht.
 const SANDBOX_AUS_STERNE = ["s_energie", "g_energie", "sonnenuhr", "s_laterne", "nachtwache", "gluehglas", "zinsen", "lagerhaus", "erntefest",
     "v_blitz", "pb_sonnenblume"];
 const SANDBOX_AUS_SHOP = ["energie", "laterne"];
@@ -976,13 +840,11 @@ const SANDBOX_AUS_META = ["verhandlung", "ausdauer", "fruehervogel"];
 const SANDBOX_AUS_TAROT = ["wagen", "herrscher", "gerechtigkeit"];
 const SANDBOX_AUS_KUSCHEL = ["teddy", "ente", "wal", "kuh"];
 
-// Besonderheit einer Pflanze als Text (Kaffee gibt Energie: in der Sandbox ohne Wirkung, darum dort kein Text)
 function eigenschaftText(pflanze) {
     if (run && run.sandbox && pflanze.eigenschaft === "wachmacher") return "";
     return pflanze.eigenschaftText || "";
 }
 
-// Text eines Wetters (in der Sandbox ohne den Teil mit der Energie)
 function wetterText(wetter) {
     return run && run.sandbox && wetter.textSandbox ? wetter.textSandbox : wetter.text;
 }
@@ -1006,7 +868,6 @@ function stufenZeitSek(feld) {
     return basisStufenZeitSek(feld.pflanze) / tempo;
 }
 
-// Kombo-Stufe (x1 bis x5, ganze Zahl) fuer Anzeige, Farben und Musik
 function komboStufe() {
     let multi = 1;
     KONFIG.komboStufen.forEach(stufe => {
@@ -1017,7 +878,6 @@ function komboStufe() {
     return bossIst("stille") ? Math.min(3, multi) : multi;
 }
 
-// Kombo-Boni (nur ab x2): Tiere arbeiten 25% pro Stufe schneller, Sternensamen pro Klick +100% pro Stufe
 function komboAktiv() {
     return run && run.phase === "tag" && kombo.zaehler >= 2 && komboStufe() >= 2;
 }
@@ -1028,7 +888,6 @@ function komboSternBonus() {
     return komboAktiv() ? komboStufe() : 0;
 }
 
-// So viele Klicks zaehlt ein Klick auf den Samenladen (Honigwabe: jede Stufe ueber x1 zaehlt etwas mehr)
 function komboMultiplikator() {
     return 1 + (komboStufe() - 1) * (1 + werkzeugWert("honigwabe"));
 }
@@ -1044,15 +903,12 @@ function wuerfleRaritaetIndex() {
     return 0;
 }
 
-// Legendaere Saat ist frueh im Run nur halb so viel wert (x25 statt x50), bis zur 2. Rechnung bzw. zum 2. Meilenstein.
-// Sonst entscheidet ein frueher Glueckstreffer den ganzen Run (Zinseszins ueber die Upgrades).
 const JACKPOT_FRUEH_MULTI = 25;
 const JACKPOT_FRUEH_BIS = 2;
 function jackpotFrueh() {
     return Boolean(run) && (run.sandbox ? run.meilensteine || 0 : run.bezahlteRechnungen || 0) < JACKPOT_FRUEH_BIS;
 }
 
-// Multiplikator einer Münz-Farbe (mit Edelsteinschleifer, Geizige Kundschaft, Schildkroete)
 function raritaetsMulti(index) {
     if (index === 0) return (bossIst("geizig") ? 0.5 : 1) * (1 + 0.1 * kuschel("schildkroete") + 0.2 * level("schwereMuenzen") + 0.5 * segen("gutesaat"));
     const basis = index === JACKPOT_INDEX && jackpotFrueh() ? JACKPOT_FRUEH_MULTI : RARITAETEN[index].multi;
@@ -1060,7 +916,6 @@ function raritaetsMulti(index) {
 }
 
 function wuerfleVariante() {
-    // von hinten nach vorne: seltene Varianten (Gold) werden zuerst geprueft
     for (let i = VARIANTEN.length - 1; i >= 0; i--) {
         if (Math.random() < variantenChance(VARIANTEN[i])) return VARIANTEN[i];
     }
@@ -1072,7 +927,6 @@ function bestePflanze() {
     return freie.reduce((beste, p) => (verkaufswert(p) > verkaufswert(beste) ? p : beste), freie[0]);
 }
 
-// In der Sandbox kann man jederzeit einkaufen (es gibt dort keine Pausen zwischen den Tagen)
 function darfEinkaufen() {
     if (run.rechnungOffen) return false;
     if (run.sandbox) return run.phase !== "runEnde" && !run.segenAuswahl;
@@ -1100,7 +954,6 @@ function preisText(betrag, waehrung) {
     return zahl(betrag) + " " + waehrungsName(waehrung);
 }
 
-// ---------- ELEMENTE ----------
 
 const $ = id => document.getElementById(id);
 
@@ -1190,9 +1043,6 @@ const fxLayer = $("fx-layer");
 const sammelRing = $("sammel-ring");
 const toastBox = $("toasts");
 
-// ---------- SPRITES IN DIE SEITE UEBERNEHMEN ----------
-// Alle Pixel-Bilder werden in ganzen Vielfachen ihrer Pixel angezeigt, damit gleiche Dinge gleich grosse Pixel haben:
-// Icons x2, grosse Icons x3, Hof x5 (HOF_PIXEL)
 
 const HOF_PIXEL = 5;
 
@@ -1225,14 +1075,12 @@ document.querySelectorAll("img[data-sprite]").forEach(img => {
     setzeSpriteBild(img, img.dataset.sprite, skala);
 });
 
-// Muenz-Sprite passend zu Raritaet, Muenz-Skin (Haus) und Farbenblind-Modus
 const EDELSTEIN_FARBEN = [null, "#3fbf3f", "#2f8fe0", "#9a4fe0"];
 
 function muenzeSprite(raritaet) {
     const skin = gewaehlteKosmetik("kugeln");
     const fb = einstellungen.farbenblind;
     const name = "muenze_" + raritaet + "_" + skin.id + (fb ? "_fb" : "");
-    // Saat in eigener Form (Blatt, Herz, Eichel, Kristall). Im Farbenblind-Modus bleiben die Formen fuer die Seltenheit.
     if (skin.form && !fb) {
         const farben = skin.raritaetFarben ? { ...skin.farben, ...skin.raritaetFarben[raritaet] } : { ...skin.farben };
         farben.Z = raritaet === JACKPOT_INDEX ? "#ffd93d" : raritaet === 0 ? (skin.farben.y || "#d9a82a") : EDELSTEIN_FARBEN[raritaet];
@@ -1243,8 +1091,6 @@ function muenzeSprite(raritaet) {
     return spriteVariante(name, fb ? "muenze_form_" + raritaet : "muenze", farben);
 }
 
-// ---------- HIMMEL, TAGESZEIT UND HOF-LANDSCHAFT ----------
-// Die Tageszeit folgt der Energie: volle Energie = Morgen, leere Energie = Nacht.
 
 const HIMMEL_FARBEN = [
     [0.00, "#7ab6e8", "#f6d2a8"],
@@ -1253,7 +1099,6 @@ const HIMMEL_FARBEN = [
     [0.78, "#6a78c8", "#f5a36a"],
     [0.90, "#202a60", "#5a4a8a"],
     [1.00, "#0e1436", "#26306a"],
-    // nur in der Sandbox: tiefe Nacht und Morgengrauen, 1,3 = wieder Morgen
     [1.15, "#0e1436", "#26306a"],
     [1.23, "#3a4a9a", "#e89aa8"],
     [1.30, "#7ab6e8", "#f6d2a8"]
@@ -1293,7 +1138,6 @@ let letzteHimmelZeit = -1;
 
 function aktualisiereHimmel(dtMs) {
     const ziel = zielTageszeit();
-    // Sandbox: nach dem Morgengrauen (1,3) springt die Tageszeit auf 0, beides sieht gleich aus
     if (run.sandbox && ziel < tageszeit - 0.6) tageszeit = ziel;
     else tageszeit += (ziel - tageszeit) * Math.min(1, (dtMs / 1000) * 2.5);
     if (Math.abs(tageszeit - letzteHimmelZeit) < 0.002) return;
@@ -1301,7 +1145,6 @@ function aktualisiereHimmel(dtMs) {
     const p = tageszeit;
 
     const [oben, unten] = himmelsFarben(p);
-    // Bei Regen, Gewitter und Nebel ist der Himmel grauer
     const trueb = run.phase === "tag" && ["regen", "gewitter", "nebel"].includes(run.wetter);
     himmelEl.style.background = "linear-gradient(" + oben + ", " + unten + ")";
     himmelEl.style.filter = trueb ? "saturate(0.35) brightness(0.8)" : "";
@@ -1310,12 +1153,10 @@ function aktualisiereHimmel(dtMs) {
     const horizont = hoehe * 0.55;
     const gipfel = 62;
 
-    // Sonne: geht links auf, wandert im Bogen und geht rechts unter
     const tSonne = klemme(p / 0.82, 0, 1);
     sonneEl.style.left = 6 + tSonne * 88 + "%";
     sonneEl.style.top = horizont - Math.sin(tSonne * Math.PI) * (horizont - gipfel) + "px";
     sonneEl.style.opacity = p < 0.84 && !trueb ? 1 : 0;
-    // Sandbox-Morgengrauen: die Sonne steigt links langsam wieder auf
     const morgengrauen = klemme((p - 1.15) / 0.15, 0, 1);
     if (morgengrauen > 0) {
         sonneEl.style.left = "6%";
@@ -1323,7 +1164,6 @@ function aktualisiereHimmel(dtMs) {
         sonneEl.style.opacity = trueb ? 0 : morgengrauen;
     }
 
-    // Mond: geht am Abend links auf, in der Sandbox-Nacht wandert er weiter nach rechts und geht unter
     const tMond = klemme((p - 0.7) / 0.3, 0, 1);
     mondEl.style.left = 10 + tMond * 26 + "%";
     mondEl.style.top = horizont - Math.sin(tMond * Math.PI * 0.5) * (horizont - gipfel - 10) + "px";
@@ -1343,8 +1183,6 @@ function aktualisiereHimmel(dtMs) {
     nachtSchleier.style.opacity = nacht * 0.45;
     wolkenEl.style.filter = "brightness(" + (1 - nacht * 0.55) * (trueb ? 0.75 : 1) + ")";
 
-    // Landschaft "Kosmische Nacht": kosmischer Sternenhimmel. Statt der Sonne zieht ein grosser Stern ueber den Himmel,
-    // der Mond kommt wie immer erst am Abend.
     const kosmisch = Boolean(gewaehlteKosmetik("landschaft").ewigeNacht);
     const sonnenBild = kosmisch ? "grosserstern" : "sonne";
     if (sonneEl.dataset.bild !== sonnenBild) {
@@ -1384,11 +1222,8 @@ function erstelleHimmel() {
     }
 }
 
-// Hof (Kopfbereich im Spiel, 5x vergroesserte Pixel) und Tal (Hauptmenue, 4x)
 let hofSzene = null;
 
-// Hauptmenue: dieselbe Pixel-Welt wie im Spiel. Oben Himmel mit Sonne und Wolken, in der Mitte der Hof
-// (passend zur gewaehlten Landschaft), unten die Wiese mit Ackerfeldern links und rechts vom Weg.
 function zeichneMenueHintergrund() {
     const P = HOF_PIXEL;
     const W = Math.ceil(window.innerWidth / P);
@@ -1405,7 +1240,6 @@ function zeichneMenueHintergrund() {
         const g = leinwand.getContext("2d");
         g.imageSmoothingEnabled = false;
 
-        // Himmel wie am Vormittag im Spiel (Kosmische Nacht: Sternenhimmel mit Mond)
         const nacht = gewaehlteKosmetik("landschaft").ewigeNacht;
         const himmel = g.createLinearGradient(0, 0, 0, hofY + hofH * 0.5);
         himmel.addColorStop(0, nacht ? "#0e0a36" : "#5fb0ea");
@@ -1430,13 +1264,11 @@ function zeichneMenueHintergrund() {
 
         g.drawImage(hofBild, 0, hofY);
 
-        // Wiese unter dem Zaun (dieselben Grasfliesen wie im Spiel)
         const wieseY = hofY + hofH;
         const grasName = SPRITE_ABWANDLUNGEN["gras_" + thema] ? "gras_" + thema : "gras";
         g.fillStyle = g.createPattern(spriteLeinwand(grasName), "repeat");
         g.fillRect(0, wieseY, W, H - wieseY);
 
-        // Weg in der Mitte
         const wegB = Math.round(W * 0.07);
         const wegX = Math.round(W / 2 - wegB / 2);
         g.fillStyle = "#c9a46a";
@@ -1449,7 +1281,6 @@ function zeichneMenueHintergrund() {
             g.fillRect(wegX + 1, y, wegB - 2, 1);
         }
 
-        // Ackerfelder mit Pflanzen links und rechts vom Weg
         const erde = spriteLeinwand("erde");
         const pflanzen = ["weizen", "karotte", "kartoffel", "erdbeere", "tomate", "mais", "kuerbis", "sonnenblume"];
         const feld = erde.width;
@@ -1486,7 +1317,6 @@ function zeichneLandschaften() {
         el.style.height = (licht.h / hofSzene.hoehe) * 100 + "%";
         fensterLichter.appendChild(el);
     });
-    // Laternen und Pilze leuchten den ganzen Tag ein wenig, nachts sieht man es staerker
     hofEbene.querySelectorAll(".hof-leuchten").forEach(e => e.remove());
     hofSzene.leuchten.forEach((licht, i) => {
         const el = document.createElement("div");
@@ -1510,7 +1340,6 @@ window.addEventListener("resize", () => {
     landschaftTimer = setTimeout(zeichneLandschaften, 200);
 });
 
-// ---------- FELDER ----------
 
 function erstelleSlots() {
     fieldGrid.querySelectorAll(".slot").forEach(el => el.remove());
@@ -1525,12 +1354,10 @@ function erstelleSlots() {
     });
 }
 
-// Seite eines Feldes ("links" oder "rechts" vom Samenladen)
 function feldSeite(feld) {
     return FELD_POSITIONEN[feld.slot].links ? "links" : "rechts";
 }
 
-// Naechster freier Platz (seite = null: egal welche Seite, sonst nur diese Seite)
 function naechsterSlot(seite) {
     const belegt = new Set(run.felder.map(f => f.slot));
     return FELD_POSITIONEN.findIndex((pos, i) => !belegt.has(i) && (!seite || (seite === "links") === pos.links));
@@ -1572,13 +1399,10 @@ function erstelleFeld(slot = naechsterSlot(null)) {
     zeigeBoden(run.felder[run.felder.length - 1]);
 }
 
-// Ein Listener fuer den ganzen Acker. Tagsueber erntet der Cursor-Kreis alle fertigen Pflanzen,
-// die er beruehrt (je groesser der Kreis, desto mehr). Zwischen den Tagen: naechstes Feld kaufen.
 fieldGrid.addEventListener("pointerdown", event => {
     if (event.button !== 0 || spielPausiert()) return;
     if (event.target.closest("#marktstand")) return;
     const slot = event.target.closest(".slot");
-    // Kaufkachel der eigenen Seite (Solo: die eine Kaufkachel)
     const kaufKachel = slot && Number(slot.dataset.index) === naechsterSlot(eigeneSeite());
     if (run.phase === "tag" && !(run.sandbox && kaufKachel)) {
         ernteMitCursor(event.clientX, event.clientY);
@@ -1606,7 +1430,6 @@ function ernteMitCursor(x, y) {
     treffer.forEach(t => {
         if (klickFeld(t.feld)) geerntet += 1;
     });
-    // Wachsende Pflanze anklicken: nur genau diese eine waechst ein Stueck (der Cursor-Kreis zaehlt hier nicht)
     run.felder
         .filter(feld => !feld.leer && !feld.fertig && !feld.kraehe &&
             abstandZuRechteck(x, y, feld.el.feldDiv.getBoundingClientRect()) === 0)
@@ -1619,7 +1442,6 @@ function ernteMitCursor(x, y) {
     }
 }
 
-// Ein Klick laesst eine wachsende Pflanze ein kleines Stueck weiterwachsen
 function schubsWachstum(feld) {
     const stufenMs = stufenZeitSek(feld) * 1000;
     feld.fortschrittMs += stufenMs * 3 * KONFIG.klickWachstum;
@@ -1639,7 +1461,6 @@ function feldMitte(feld) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, rect };
 }
 
-// gibt true zurueck, wenn die Pflanze geerntet wurde
 function klickFeld(feld) {
     if (!feld.fertig || run.phase !== "tag" || feld.kraehe) return false;
 
@@ -1650,7 +1471,7 @@ function klickFeld(feld) {
         partikel(x, y, ["#9fe8ff", "#ffffff", "#5aa9e6"], 6, 45);
         Klang.klick(40);
         feld.el.feldDiv.classList.remove("wackeln");
-        void feld.el.feldDiv.offsetWidth; // Animation neu starten
+        void feld.el.feldDiv.offsetWidth;
         feld.el.feldDiv.classList.add("wackeln");
         return false;
     }
@@ -1658,17 +1479,14 @@ function klickFeld(feld) {
     return true;
 }
 
-// Wie viele Felder kann ich haben? Solo alle Plaetze, im Koop nur die Plaetze meiner Seite
 function maxEigeneFelder() {
     const seite = eigeneSeite();
     return seite ? FELD_POSITIONEN.filter(pos => (seite === "links") === pos.links).length : MAX_FELDER;
 }
 
-// anzahl = so viele Felder auf einmal (Markt: x10 oder Max), solange das Gold reicht
 function kaufeFeld(anzahl = 1) {
     let gekauft = 0;
     for (let i = 0; i < anzahl; i++) {
-        // Im Koop nur auf der eigenen Seite (der Platz des Mitspielers gehoert ihm)
         const slot = naechsterSlot(eigeneSeite());
         const kosten = feldKosten();
         if (slot < 0 || !darfEinkaufen() || run.gold < kosten || run.felder.length >= maxEigeneFelder()) break;
@@ -1683,7 +1501,6 @@ function kaufeFeld(anzahl = 1) {
     aktualisiereAlles();
 }
 
-// Kaufkachel(n): Solo eine, im Koop eine pro Seite (die des Mitspielers nur zum Ansehen)
 function aktualisiereKaufKachel() {
     const seiten = koopAktiv() ? [eigeneSeite()] : [null];
     const kacheln = seiten.map(seite => ({ seite, slot: naechsterSlot(seite) })).filter(k => k.slot >= 0);
@@ -1716,11 +1533,9 @@ function setzeVariantenKlasse(feld, variante) {
     if (variante) feld.el.feldDiv.classList.add("v-" + variante.id);
 }
 
-// Sprite-Name mit dem gewaehlten Pflanzen-Look (Haus > Pflanzen)
 function pflanzenSkinSprite(name) {
     const skin = gewaehlteKosmetik("pflanzen");
     if (!skin.farben || Object.keys(skin.farben).length === 0) return name;
-    // Ist der Name selbst schon eine Farbvariante (z.B. unreif), werden beide Farbwechsel kombiniert
     const abwandlung = SPRITE_ABWANDLUNGEN[name];
     if (abwandlung) return spriteVariante(name + "_" + skin.id, abwandlung.basis, { ...abwandlung.farben, ...skin.farben });
     return spriteVariante(name + "_" + skin.id, name, skin.farben);
@@ -1732,7 +1547,6 @@ function zeigeFeldSprite(feld) {
         sprite.hidden = true;
         return;
     }
-    // Stufe 0 Samen, 1 Keimling, 2 die Pflanze selbst in unreif (kleiner, Fruechte noch gruen), 3 reif
     const name = feld.stufe === 2 ? unreifSprite(feld.pflanze.id) : feld.stufe < 3 ? STUFEN_SPRITES[feld.stufe] : feld.pflanze.id;
     sprite.src = spriteUrl(pflanzenSkinSprite(name));
     sprite.classList.toggle("unreif", feld.stufe === 2);
@@ -1758,15 +1572,10 @@ function leereFeld(feld) {
 }
 
 function aktualisiereFeldMarker(feld) {
-    // Kein Symbol mehr: Wasser und Duenger sieht man am Feld selbst (Ebene feld-marker, style.css)
     feld.el.feldDiv.classList.toggle("feld-bewaessert", feld.bewaessert);
     feld.el.feldDiv.classList.toggle("feld-geduengt", feld.geduengt);
 }
 
-// Hinweistext eines bepflanzten Feldes (Tooltip)
-// ---------- FRUCHTBARER BODEN ----------
-// Jedes Feld wird durch Ernten besser (nur in diesem Run): alle BODEN_ERNTEN Ernten eine Stufe, hoechstens 5.
-// Jede Stufe gibt +10% Gold auf diesem Feld. Der Stern "Bodenkunde" macht es schneller.
 const BODEN_ERNTEN = 30;
 const BODEN_MAX = 5;
 function bodenErntenProStufe() {
@@ -1807,7 +1616,6 @@ function feldTipp(feld) {
 }
 
 function pflanzeSamen(feld) {
-    // Neuere Pflanzen kommen oefter: jede Stufe ist 3-mal so wahrscheinlich wie die davor
     const freie = run.pflanzen.filter(p => p.freigeschaltet);
     const pflanze = gewichteterZufall(freie, p => Math.pow(3, p.index));
 
@@ -1829,7 +1637,6 @@ function pflanzeSamen(feld) {
     feld.el.balkenInnen.style.width = "0%";
     zeigeFeldSprite(feld);
 
-    // Stern "Fruehreife" dieser Pflanze: startet gleich als Keimling
     if (level("pr_" + pflanze.id) > 0 || Math.random() < 0.1 * segen("keimsegen")) wachseEineStufe(feld);
 
     run.samenGesamt += 1;
@@ -1847,8 +1654,6 @@ function pflanzeAufZufaelligeFelder(anzahl) {
     freie.slice(0, anzahl).forEach(pflanzeSamen);
 }
 
-// Wachstum: 3 Stufen (Samen, Keimling, Jungpflanze), danach fertig.
-// Der Balken laeuft einmal durch alle Stufen, das Sprite wechselt trotzdem bei jeder Stufe.
 function wachseEineStufe(feld) {
     if (feld.leer || feld.fertig) return;
     feld.stufe += 1;
@@ -1881,7 +1686,6 @@ function aktualisiereWachstum(dtMs) {
     });
 }
 
-// Nachbarn auf derselben Seite des Weges
 function nachbarFelder(feld) {
     const pos = FELD_POSITIONEN[feld.slot];
     return run.felder.filter(anderes => {
@@ -1891,7 +1695,6 @@ function nachbarFelder(feld) {
     });
 }
 
-// ---------- ERNTE ----------
 
 function berechneErnte(feld) {
     const variante = feld.variante || {};
@@ -1908,12 +1711,10 @@ function berechneErnte(feld) {
     if (Math.random() < extraKugelChance() + ueberflussChance(pflanze) + knollen) anzahlGold += 1;
     if (Math.random() < 0.03 * level("doppelernte")) anzahlGold *= 2;
     const pracht = prachtChance(pflanze);
-    // Riesenmelone (x2) und Riesenkuerbis (x5, eigener Bonus-Stern)
     let riesig = 0;
     if (pflanze.eigenschaft === "riesig" && Math.random() < (pflanzenBonus(pflanze, "melone") ? 0.5 : 0.25)) riesig = 2;
     if (pflanzenBonus(pflanze, "kuerbis") && Math.random() < 0.1) riesig = 5;
 
-    // Goldene Sichel: jede 10. Ernte bringt 10-fach Gold
     run.ernteZaehler += 1;
     const sichel = hatWerkzeug("sichel") && run.ernteZaehler % 10 === 0 ? 1 + werkzeugWert("sichel") : 0;
     const mondschein = istNacht() ? 1 + 0.2 * segen("mondschein") + 0.05 * kuschel("flamingo") : 1;
@@ -1927,7 +1728,6 @@ function berechneErnte(feld) {
     let mindestRaritaet = run.tagesBoni.mindestGruen || wetterIst("regenbogen") || pflanze.eigenschaft === "eis" ||
         pflanzenBonus(pflanze, "erdbeere") ? 1 : 0;
     if (pflanzenBonus(pflanze, "eisblume")) mindestRaritaet = 2;
-    // Kristallrose: die Haelfte ihrer Saaten ist mindestens selten
     if (pflanze.eigenschaft === "kristall" && Math.random() < 0.5) mindestRaritaet = Math.max(mindestRaritaet, 2);
 
     for (let i = 0; i < anzahlGold; i++) {
@@ -1955,7 +1755,6 @@ function berechneErnte(feld) {
     return { beute, riesig, sichel };
 }
 
-// Sternensamen-Wert einer Saat (mit Doppel-Chance und Boni, Nachkommastellen zufaellig gerundet)
 function wuerfleSternWert(basis) {
     let wert = basis * sternWertMulti();
     if (Math.random() < sternDoppelChance()) wert *= 2;
@@ -1963,7 +1762,6 @@ function wuerfleSternWert(basis) {
     return ganz + (Math.random() < wert - ganz ? 1 : 0);
 }
 
-// direkt = true: ohne Saaten sofort gutschreiben (Tarotkarte "Der Tod"), goldFaktor fuer deren Verstaerkung
 function ernteFeld(feld, direkt, goldFaktor = 1) {
     const { x, y } = feldMitte(feld);
     const variante = feld.variante;
@@ -1974,7 +1772,6 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     meta.lebenszeit.ernten += 1;
     const stufeVorher = meisterStufe(pflanze.id);
     gibErnteXp(1 + pflanze.index);
-    // Mondteich "Meisterhaende": jede Ernte zaehlt fuer die Meisterschaft oefter
     meta.kodex.pflanzen[pflanze.id] = (meta.kodex.pflanzen[pflanze.id] || 0) + 1 + metaLevel("meisterhaende") + Math.floor(segen("meisterlich"));
     if (meisterStufe(pflanze.id) > stufeVorher) {
         const stufe = meisterStufe(pflanze.id);
@@ -1994,14 +1791,12 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     beute.forEach(teil => {
         if (direkt) gutschreibenGold(aufrunden(teil.wert * goldFaktor), teil.raritaetIndex);
         else spawnLootKugel(x, y, teil.wert, teil.raritaetIndex);
-        // Midas' Beruehrung: Jackpots bringen zusaetzlich Sternensamen
         if (teil.raritaetIndex === JACKPOT_INDEX && level("midas") > 0) {
             const sterne = wuerfleSternWert(50);
             if (direkt) gibSternensamen(sterne);
             else spawnLootKugel(x, y, sterne, null, "stern");
         }
     });
-    // Ernterausch: jede 30. Ernte eines Tages startet 6 Sekunden dreifaches Gold
     if (level("ernterausch") > 0 && run.phase === "tag" && run.statistik.ernten % 30 === 0) {
         run.rauschMs = 6000;
         if (!direkt) {
@@ -2012,10 +1807,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     if (!direkt && riesig) zeigeSchwebeText(x, y - 40, riesig === 5 ? t("🎃 Riesenkürbis!") : t("🍉 Riesenmelone!"), "#2e9e2e", true);
     if (!direkt && sichel) zeigeSchwebeText(x, y - 40, "🪓 x" + zahl(Math.round(sichel * 10) / 10) + "!", "#e08a00", true);
 
-    // Jede Ernte laesst Sternensamen fallen (Punkte fuer das Stellarium)
     let sternKugeln = (variante && variante.sterne) || 1;
     if (Math.random() < 0.05 * level("milchstrasse")) sternKugeln += 1;
-    // Polarstern: die erste Ernte des Tages bringt ein grosses Geschenk
     if (level("polarstern") > 0 && run.phase === "tag" && !run.polarsternHeute) {
         run.polarsternHeute = true;
         if (direkt) gibSternensamen(polarsternSterne());
@@ -2027,7 +1820,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
     for (let i = 0; i < sternKugeln; i++) {
         const extra = (i === 0 ? 2 * level("sternenquelle") : 0) + (i === 0 && pflanzenBonus(pflanze, "weizen") ? 10 : 0);
         const basis = KONFIG.sternensamenProErnte * sternensaatPflanzenFaktor(pflanze.index) *
-            (1 + 0.5 * level("pk_" + pflanze.id)) * (1 + level("pe_" + pflanze.id)) * // Sterne "Sternenfrucht" und "Erbsorte"
+            (1 + 0.5 * level("pk_" + pflanze.id)) * (1 + level("pe_" + pflanze.id)) *
             (pflanzenBonus(pflanze, "kristallrose") ? 3 : 1);
         const sterne = wuerfleSternWert(basis + extra);
         if (sterne <= 0) continue;
@@ -2039,10 +1832,8 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         Klang.ernte(pflanze.index);
         partikel(x, y, ["#6cc24a", "#3f8a32", "#a3dc6f", "#8f6139"], 12, 55);
     }
-    // Kaffee gibt nur noch 1 Energie (im spaeten Spiel gab es sonst zu viel Energie)
     const energie = pflanze.eigenschaft === "wachmacher" ? 1 : pflanzenBonus(pflanze, "sonnenblume") ? 2 :
         pflanzenBonus(pflanze, "sonnenfrucht") ? 3 : 0;
-    // Espresso: Gratis-Klicks auf den Samenladen
     if (pflanzenBonus(pflanze, "kaffee") && run.phase === "tag" && !run.samenUnterwegs) {
         run.klickZaehler = Math.min(klicksProSamen() - 1, run.klickZaehler + 5);
         aktualisiereKnopfAnzeige();
@@ -2052,13 +1843,11 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
         if (plus > 0 && !direkt) zeigeSchwebeText(x + 20, y - 20, "+" + Math.round(plus) + " ⚡", "#c9a400", false);
     }
     leereFeld(feld);
-    // Stern "Saatkette": das Feld bekommt sofort einen neuen Samen
     if (run.phase === "tag" && Math.random() < 0.08 * level("saatkette") + 0.1 * segen("saatsegen")) pflanzeSamen(feld);
     if (run.phase === "tag") wendePflanzenBonusAn(pflanze, x, y);
     if (variante && run.phase === "tag") wendeErnteEffekteAn(feld, variante, x, y);
 }
 
-// Eigene Boni der Pflanzen (Bonus-Sterne im Stellarium), die nach der Ernte wirken
 function wendePflanzenBonusAn(pflanze, x, y) {
     if (hatWerkzeug("honigwabe")) {
         kombo.zaehler += 1;
@@ -2097,7 +1886,7 @@ function wendeErnteEffekteAn(feld, variante, x, y) {
         zeigeSchwebeText(x, y - 30, t("🔥 Funken!"), "#d9531e", false);
     }
     if (variante.magnet) {
-        run.magnetMs = 1500; // auch die eigenen Saaten werden beim Landen eingesammelt
+        run.magnetMs = 1500;
         lootKugeln.filter(l => l.gelandet).forEach(sammleEin);
     }
     if (variante.kombo) {
@@ -2127,7 +1916,6 @@ function gutschreibenGold(wert, raritaetIndex) {
     meta.lebenszeit.hoechsterGewinn = Math.max(meta.lebenszeit.hoechsterGewinn, wert);
 }
 
-// Sternensamen gibt es erst, wenn das Stellarium freigeschaltet ist (vorher gibt es nichts, wofuer man sie ausgeben koennte)
 function gibSternensamen(menge) {
     if (!stellariumFrei()) return;
     run.skillpunkte += menge;
@@ -2136,9 +1924,6 @@ function gibSternensamen(menge) {
     meta.lebenszeit.sternensamen += menge;
 }
 
-// ---------- SAMENLADEN + KOMBO ----------
-// Es wird immer nur EIN Feld gleichzeitig bepflanzt: Alle Wuerfe fliegen zum aktuellen Zielfeld.
-// Erst wenn dessen Saat gelandet ist, geht der Fortschritt fuer das naechste Feld weiter.
 
 function waehleZielFeld() {
     if (run.zielFeld) return run.zielFeld;
@@ -2155,12 +1940,9 @@ function waehleZielFeld() {
 
 let kassenTextZaehler = 0;
 
-// Samenladen laeuft heiss: ueber KONFIG.klickGrenzeProSek eigenen Klicks pro Sekunde zaehlt jeder Klick etwas weniger.
-// Normale Spieler merken nichts, sehr schnelle Klicker und Autoklicker bleiben stark, aber nicht mehr ohne Grenze.
 const eigeneKlickZeiten = [];
 let ladenHeissBis = 0;
 let dampfMs = 0;
-// Uhr fuer die Klick-Messung (der Balancing-Bot stellt sie auf seine Spielzeit um)
 function klickUhr() {
     return performance.now();
 }
@@ -2169,12 +1951,10 @@ function klickWertung() {
     const jetzt = klickUhr();
     eigeneKlickZeiten.push(jetzt);
     while (eigeneKlickZeiten.length && eigeneKlickZeiten[0] < jetzt - 1000) eigeneKlickZeiten.shift();
-    // Die Sense (gedrueckt halten) ist ausgenommen, sie ist extra freigeschaltet
     if (typeof dauerklick !== "undefined" && dauerklick && dauerklick.timer) return 1;
     if (eigeneKlickZeiten.length <= KONFIG.klickGrenzeProSek) return 1;
     ladenHeissBis = jetzt + 350;
     plantButton.classList.add("laden-heiss");
-    // Dampf steigt auf (hoechstens alle 120 ms ein Woelkchen)
     if (jetzt - dampfMs > 120) {
         dampfMs = jetzt;
         const rect = plantButton.getBoundingClientRect();
@@ -2197,13 +1977,11 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     if (run.phase !== "tag") return;
     const wertung = vonHelfer ? 1 : klickWertung();
 
-    // Sind alle Felder belegt, passiert nichts: auch die Kombo laeuft nicht weiter
     const seite = eigeneSeite();
     const allesBelegt = !run.zielFeld && !run.samenUnterwegs && !run.felder.some(f => f.leer && !f.reserviert && (!seite || feldSeite(f) === seite));
     if (allesBelegt) return;
 
     if (!vonHelfer) {
-        // Loewe (Kuscheltier): jede neue Kombo startet hoeher
         if (kombo.zaehler === 0 && kuschel("loewe") > 0) kombo.zaehler = 10 * kuschel("loewe");
         kombo.zaehler += 1 + (run.gesamt.klicks % 4 === 3 ? segen("komborausch") : 0);
         kombo.letzterKlick = performance.now();
@@ -2214,7 +1992,6 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
         Klang.klick(kombo.zaehler);
         drueckeKnopf(klickX, klickY);
 
-        // Klingelnde Kasse: Gold pro Klick
         const kasse = klickGold();
         if (kasse > 0) {
             gutschreibenGold(kasse, 0);
@@ -2228,9 +2005,7 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     const zielFeld = waehleZielFeld();
     if (!zielFeld) return;
 
-    // Jeder eigene Klick, der Fortschritt wirft, gibt Sternensamen (Helfer-Klicks nicht)
     if (!vonHelfer) {
-        // Bruchteile werden gesammelt (z.B. 0,5 pro Klick = 1 Sternensamen je 2 Klicks)
         run.sternKlickRest = (run.sternKlickRest || 0) + sternensamenProKlick() * wertung * (vonHelfer ? 1 : 1 + komboSternBonus());
         const ganze = Math.floor(run.sternKlickRest);
         run.sternKlickRest -= ganze;
@@ -2238,7 +2013,6 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
         zaehleHoch(skillpointDisplay.querySelector("span"), run.skillpunkte);
     }
 
-    // Sternenhoernchen: auch Eichhoernchen-Klicks bringen Sternensamen (1 fuer je 2 Klicks)
     if (vonHelfer && level("sternhoernchen") > 0) {
         run.hoernchenAkku = (run.hoernchenAkku || 0) + 0.5;
         if (run.hoernchenAkku >= 1) {
@@ -2261,7 +2035,6 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     if (koopAktiv()) koopSende("wurf", { slot: zielFeld.slot, samen: wirdSamen });
 
     spawnWurfKugel(knopfRect.left + knopfRect.width / 2, knopfRect.top + knopfRect.height * 0.45, zielX, zielY, wirdSamen, () => {
-        // Kein Tag-Vergleich: in der Sandbox kann waehrend des Flugs ein neuer Tag beginnen (sonst hing der Laden fest)
         if (!wirdSamen || run.id !== runId || run.phase !== "tag") return;
         run.samenUnterwegs = false;
         run.zielFeld = null;
@@ -2276,7 +2049,6 @@ function klickSamenladen(vonHelfer, klickX, klickY) {
     });
 }
 
-// Doppelwurf: ein zweiter Samen fliegt vom Samenladen auf ein anderes, noch freies Feld
 function wirfZweitenSamen() {
     const seite = eigeneSeite();
     const frei = run.felder.filter(f => f.leer && !f.reserviert && (!seite || feldSeite(f) === seite));
@@ -2297,7 +2069,6 @@ function wirfZweitenSamen() {
 let letzterKnopfDruck = 0;
 
 function drueckeKnopf(x, y) {
-    // Sehr schnelle Klicks (Autoklicker): die Wirkung zaehlt, die Animation nur ab und zu
     const jetzt = performance.now();
     if (jetzt - letzterKnopfDruck < 45) return;
     letzterKnopfDruck = jetzt;
@@ -2306,7 +2077,7 @@ function drueckeKnopf(x, y) {
         { duration: 160, easing: "ease-out" }
     );
     plantButtonCounter.animate([{ transform: "scale(1.3)" }, { transform: "scale(1)" }], { duration: 150 });
-    ladenKlick(); // legendaere Gebaeude reagieren auf jeden Klick
+    ladenKlick();
     klickRing();
     if (x !== undefined) partikel(x, y, ["#ffe066", "#a3dc6f", "#ffffff"], 4, 35);
 }
@@ -2330,11 +2101,10 @@ function aktualisiereKnopfAnzeige() {
     const anteil = Math.min(100, (run.klickZaehler / benoetigt) * 100) + "%";
     plantButtonCounter.textContent = Math.min(run.klickZaehler, benoetigt) + " / " + benoetigt;
     plantButtonFortschritt.style.width = anteil;
-    plantButtonFortschritt.style.setProperty("--fortschritt", anteil); // legendaere Gebaeude: Balken innerhalb der Mauern
+    plantButtonFortschritt.style.setProperty("--fortschritt", anteil);
     if (run.zielFeld) run.zielFeld.el.balkenInnen.style.width = anteil;
 }
 
-// Sicherheitsnetz: kommt ein fertiger Samen nie an (z.B. Tab im Hintergrund), wird er nach 2 Sekunden direkt gepflanzt
 function pruefeHaengendenSamen() {
     if (!run.samenUnterwegs || run.phase !== "tag" || performance.now() - (run.samenSeit || 0) < 2000) return;
     const feld = run.zielFeld;
@@ -2352,7 +2122,6 @@ function pruefeHaengendenSamen() {
 function aktualisiereMarktstand() {
     pruefeHaengendenSamen();
     let zustand = "offen";
-    // Legendaere Gebaeude heissen anders (Startrampe, Manege, Sternwarte)
     let label = gewaehlteKosmetik("samenladen").titel || t("Samenladen");
     if (run.phase !== "tag") {
         zustand = "geschlossen";
@@ -2402,10 +2171,8 @@ function aktualisiereKombo(jetzt) {
     komboFuellung.style.width = Math.max(0, rest / fenster) * 100 + "%";
 }
 
-// ---------- HELFER UND TIMER ----------
 
 function aktualisiereHelfer(dtMs) {
-    // Kombo: alle Tiere arbeiten schneller (Zeit laeuft fuer sie schneller)
     dtMs *= 1 + komboTierBonus();
     helferAkku += helferKlicksProSek() * dtMs / 1000;
     while (helferAkku >= 1) {
@@ -2414,10 +2181,8 @@ function aktualisiereHelfer(dtMs) {
         eichhoernchenKlickt();
     }
 
-    // Igel, Bienen, Saat-Spatz und Erntehase sind echte Figuren (helfer.js): sie arbeiten, wenn sie ankommen
     aktualisiereHelferFiguren(dtMs);
 
-    // Magnetfeld: gelandete Saaten rollen zum Cursor
     const staerke = magnetStaerke();
     if (staerke > 0 && maus.x > -1000) {
         lootKugeln.forEach(loot => {
@@ -2435,7 +2200,6 @@ function aktualisiereHelfer(dtMs) {
         });
     }
 
-    // Magnet-Hufeisen (Werkzeug): alle 2 Sekunden wird alles eingesammelt
     if (hatWerkzeug("hufeisen")) {
         run.hufeisenMs += dtMs;
         if (run.hufeisenMs >= 2000 / werkzeugWert("hufeisen")) {
@@ -2473,7 +2237,6 @@ function aktualisiereTimer(dtMs) {
         spawnSternschnuppe();
     }
 
-    // Am Abend kommen Gluehwuermchen (in der Sandbox geben sie nur Sternensamen)
     if (!bossIst("dunkel") && tagesAnteil() >= KONFIG.gluehwuermchenAbTageszeit) {
         run.gluehTimerMs -= dtMs;
         if (run.gluehTimerMs <= 0) {
@@ -2499,18 +2262,13 @@ function aktualisiereTimer(dtMs) {
     haken("tagTick", dtMs);
 }
 
-// ---------- EFFEKTE: PARTIKEL, WACKELN, SCHWEBETEXTE ----------
 
-// Obergrenze fuer Effekte auf dem Bildschirm (sonst ruckelt es bei Autoklickern)
 const FX_GRENZE = 350;
 
-// Einstellung "Weniger Partikel und Animationen" (fuer schwaechere Rechner)
 function ohneEffekte() {
     return Boolean(einstellungen.wenigerEffekte);
 }
 
-// Bei "Weniger Partikel und Animationen" springen auch JS-Animationen sofort ans Ende.
-// Nur Figuren, Begleiter und der Ball duerfen sich weiter bewegen.
 const echtesAnimate = Element.prototype.animate;
 Element.prototype.animate = function (schritte, optionen) {
     if (ohneEffekte() && !this.closest(".haustier, .hof-figur, .hof-ball")) {
@@ -2557,7 +2315,7 @@ function wackleBildschirm(staerke) {
 }
 
 function zeigeSchwebeText(x, y, text, farbe, gross, klasse) {
-    if (einstellungen.ohneTexte) return; // Einstellung "Unnötige Texte entfernen"
+    if (einstellungen.ohneTexte) return;
     if (!gross && fxLayer.querySelectorAll(".schwebe-text").length > 25) return;
     const el = document.createElement("div");
     el.classList.add("schwebe-text");
@@ -2571,7 +2329,6 @@ function zeigeSchwebeText(x, y, text, farbe, gross, klasse) {
     setTimeout(() => el.remove(), 1000);
 }
 
-// Belohnung mit Pixel-Symbolen (z.B. Energie und Sternensamen vom Gluehwuermchen): schwebt nach oben und bleibt etwas laenger
 function zeigeBelohnung(x, y, teile) {
     if (einstellungen.ohneTexte) return;
     const box = el("div", "belohnung-schild");
@@ -2595,10 +2352,8 @@ function zeigeToast(text) {
     setTimeout(() => el.remove(), 3500);
 }
 
-// ---------- KUGELN: WURF ----------
 
 function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
-    // Zu viele fliegende Kugeln (Autoklicker): ohne Bild, aber mit derselben Flugzeit
     if (!istSamen && fxLayer.querySelectorAll(".wurf-kugel").length > 24) {
         setTimeout(onAnkunft, 350);
         return;
@@ -2606,7 +2361,6 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
     const kugel = document.createElement("div");
     kugel.classList.add("wurf-kugel");
     if (istSamen) kugel.classList.add("wurf-samen");
-    // Der Samenladen-Skin bestimmt den Look der Saaten (z.B. kleine Raketen beim Feuerwerksladen)
     const laden = gewaehlteKosmetik("samenladen");
     if (laden.wurf) kugel.classList.add(laden.wurf);
     if (laden.wurf === "wurf-bunt") kugel.style.backgroundColor = zufall(laden.funken);
@@ -2621,13 +2375,11 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
         const t = Math.min(1, (jetzt - startZeit) / dauerMs);
         kugel.style.left = startX + (zielX - startX) * t + "px";
         kugel.style.top = startY + (zielY - startY) * t - Math.sin(t * Math.PI) * bogen + "px";
-        // Raketen und Sterne zeigen in Flugrichtung
         if (laden.drehen) {
             const vx = zielX - startX;
             const vy = zielY - startY - Math.cos(t * Math.PI) * Math.PI * bogen;
             kugel.style.transform = "rotate(" + (Math.atan2(vy, vx) + Math.PI / 2) + "rad)";
         }
-        // Sternwarte und Rakete ziehen eine dichte Funkenspur hinter sich her
         if (laden.spur && ++spurZaehler % (laden.spurDicht ? 1 : 3) === 0) {
             partikel(parseFloat(kugel.style.left), parseFloat(kugel.style.top), laden.spur, laden.spurDicht ? 2 : 1, laden.spurDicht ? 12 : 8);
         }
@@ -2643,12 +2395,9 @@ function spawnWurfKugel(startX, startY, zielX, zielY, istSamen, onAnkunft) {
     animiere(startZeit);
 }
 
-// ---------- KUGELN: LOOT (Gold-Muenzen und Sternensamen) ----------
-// typ "gold" (mit Raritaet) oder "stern" (Sternensamen fuer das Stellarium)
-// extra: { streicheln: true } = Muenze vom Haustier, { anzeige: "<3" } = eigener Text beim Einsammeln
 
 function spawnLootKugel(startX, startY, wert, raritaetIndex, typ = "gold", extra = {}) {
-    if (typ === "stern" && !stellariumFrei()) return null; // vor dem Stellarium faellt keine Sternensaat
+    if (typ === "stern" && !stellariumFrei()) return null;
     const el = document.createElement("img");
     el.classList.add("loot-kugel");
     if (typ === "stern") {
@@ -2692,7 +2441,6 @@ function spawnLootKugel(startX, startY, wert, raritaetIndex, typ = "gold", extra
             el.classList.add("loot-gelandet");
             if (typ === "gold" && raritaetIndex >= 2) partikel(loot.x, loot.y, [RARITAETEN[raritaetIndex].farbe, "#ffffff"], 6, 30);
             if (typ === "gold" && raritaetIndex >= 3) lichtsaeule(loot.x, loot.y, RARITAETEN[raritaetIndex].farbe);
-            // Legendaere Muenz-Looks spruehen beim Landen Funken
             const muenzLook = gewaehlteKosmetik("kugeln");
             if (typ === "gold" && muenzLook.funken) partikel(loot.x, loot.y, muenzLook.funken, 5, 28);
             if (run.magnetMs > 0 || inSammelReichweite(loot)) sammleEin(loot);
@@ -2702,7 +2450,6 @@ function spawnLootKugel(startX, startY, wert, raritaetIndex, typ = "gold", extra
     return loot;
 }
 
-// Eingesammelt wird, sobald sich der Cursor-Kreis und die Saat beruehren
 function inSammelReichweite(loot) {
     return Math.hypot(loot.x - maus.x, loot.y - maus.y) <= sammelRadius() + KONFIG.kugelRadius;
 }
@@ -2756,9 +2503,7 @@ function sammleEin(loot) {
     fliegeZuAnzeige(loot, moneyDisplay);
 }
 
-// Die Saat fliegt zur passenden Anzeige oben
 function fliegeZuAnzeige(loot, anzeige) {
-    // "Unnötige Texte entfernen": die Saat verschwindet sofort, ohne leuchtend nach oben zu fliegen
     if (einstellungen.ohneTexte) {
         loot.el.remove();
         return;
@@ -2771,7 +2516,6 @@ function fliegeZuAnzeige(loot, anzeige) {
     anzeige.animate([{ transform: "scale(1.15)" }, { transform: "scale(1)" }], { duration: 200, delay: 350 });
 }
 
-// Sandbox (kein Feierabend): liegende Saaten werden in 60 Sekunden langsam grau und verschwinden dann
 const KUGEL_LEBENSDAUER_MS = 60000;
 
 function altereKugeln(dtMs) {
@@ -2798,8 +2542,6 @@ function lassVerfallen(loot) {
     setTimeout(() => loot.el.remove(), 600);
 }
 
-// ---------- STERNSCHNUPPE (Mini-Event waehrend des Tages) ----------
-// Leuchtender Kopf mit Schweif, der in Flugrichtung zeigt und Funken hinter sich laesst.
 
 function sternschnuppeSek() {
     return KONFIG.sternschnuppeBuffSek + 3 * segen("sternenstaub") + kuschel("schaf") + 3 * level("schnuppenfaenger");
@@ -2832,7 +2574,6 @@ function spawnSternschnuppe() {
         run.goldBuffMs += sek * 1000;
         run.gesamt.sterne += 1;
         meta.lebenszeit.sterne += 1;
-        // Auch alle Muenzen, die schon auf dem Acker liegen, sind jetzt doppelt so viel wert
         const liegend = lootKugeln.filter(loot => loot.typ === "gold" && !loot.weg && !loot.streicheln);
         liegend.forEach(loot => {
             loot.wert *= 2;
@@ -2870,7 +2611,6 @@ function spawnSternschnuppe() {
     animiere(startZeit);
 }
 
-// ---------- GLUEHWUERMCHEN (am Abend, anklicken = der Abend wird etwas laenger) ----------
 
 function spawnGluehwuermchen() {
     const el = document.createElement("div");
@@ -2892,7 +2632,6 @@ function spawnGluehwuermchen() {
     el.addEventListener("pointerdown", () => {
         if (!el.isConnected || run.phase !== "tag") return;
         el.remove();
-        // Energie (ausser in der Sandbox) und immer auch Sternensamen, damit sie bei voller Energie nicht nutzlos sind
         const plus = run.sandbox ? 0 : gibEnergie(gluehwuermchenEnergie());
         const sterne = wuerfleSternWert(KONFIG.gluehwuermchenSterne * (1 + segen("gluehfreund")) * (1 + 0.1 * kuschel("otter")));
         gibSternensamen(sterne);
@@ -2923,28 +2662,24 @@ function spawnGluehwuermchen() {
     animiere(startZeit);
 }
 
-// ---------- MAUS: SAMMELRADIUS ----------
 
-// pointermove statt mousemove: gilt fuer Maus UND Finger (auf dem Handy sammelt man durch Wischen ein)
 document.addEventListener("pointermove", event => {
     maus.x = event.clientX;
     maus.y = event.clientY;
     sammelRing.style.left = maus.x + "px";
     sammelRing.style.top = maus.y + "px";
 
-    // auch zwischen den Tagen, damit man Muenzen einsammeln kann
     if (run.phase === "runEnde") return;
     lootKugeln
         .filter(loot => loot.gelandet && inSammelReichweite(loot))
         .forEach(sammleEin);
 });
 
-// Der Cursor-Kreis faengt auch Sternschnuppen, Gluehwuermchen und Kraehen (groesserer Cursor = leichter zu treffen)
 document.addEventListener("pointerdown", event => {
     if (event.button !== 0 || !run || run.phase !== "tag" || spielPausiert()) return;
     const radius = sammelRadius();
     fxLayer.querySelectorAll(".sternschnuppe, .gluehwuermchen, .kraehe.gelandet").forEach(ziel => {
-        if (ziel.contains(event.target)) return; // ein direkter Treffer laeuft ueber den eigenen Klick
+        if (ziel.contains(event.target)) return;
         if (abstandZuRechteck(event.clientX, event.clientY, ziel.getBoundingClientRect()) <= radius) {
             ziel.dispatchEvent(new PointerEvent("pointerdown", { button: 0 }));
         }
@@ -2955,7 +2690,6 @@ document.documentElement.addEventListener("mouseleave", () => {
     maus.x = -9999;
     maus.y = -9999;
 });
-// Finger hebt ab: der Sammelkreis bleibt nicht unsichtbar auf dem Feld liegen
 document.addEventListener("pointerup", event => {
     if (event.pointerType !== "touch") return;
     maus.x = -9999;
@@ -2969,13 +2703,11 @@ function aktualisiereSammelRing() {
     sammelRing.style.height = durchmesser + "px";
 }
 
-// ---------- ERFOLGE (dauerhaft, jede Stufe gibt 1 Kuschel-Gutschein) ----------
 
 function erfolgStufeId(kette, index) {
     return kette.id + "_" + index;
 }
 
-// Name fuer Steam (spaeter): z.B. "GOLD_1", "RECHNUNG_3"
 function steamErfolgId(kette, index) {
     return (kette.id + "_" + (index + 1)).toUpperCase();
 }
@@ -2987,8 +2719,6 @@ function meldeAnDesktop(art, wert) {
     else desktop.steam.status(wert);
 }
 
-// Beim Start alle schon erreichten Erfolge und Pokale an Steam melden (z.B. aus der Zeit vor Steam).
-// Steam merkt sich doppelte Meldungen nicht doppelt, darum ist das harmlos.
 function synchronisiereSteamErfolge() {
     if (!window.sproutvaleDesktop || (run && run.sandbox)) return;
     Object.keys(meta.erfolge || {}).forEach(id => {
@@ -3001,13 +2731,12 @@ function synchronisiereSteamErfolge() {
 function pruefeErfolge() {
     let neu = false;
     erfolgKettenFuer(run.sandbox).forEach(kette => {
-        const wert = Number(kette.wert(meta, run)) || 0; // fehlende Werte aus alten Spielstaenden zaehlen als 0
+        const wert = Number(kette.wert(meta, run)) || 0;
         kette.ziele.forEach((ziel, index) => {
             const id = erfolgStufeId(kette, index);
             if (meta.erfolge[id] || wert < ziel) return;
             meta.erfolge[id] = true;
             neu = true;
-            // Die Belohnung holt man bei den Erfolgen ab (dort leuchtet der Erfolg)
             zeigeBanner(kette.icon, tf("Erfolg: {0}", kette.text(ziel)), "", "#7c4fb3", 3600);
             if (!run.sandbox) meldeAnDesktop("erfolg", steamErfolgId(kette, index));
             Klang.erfolg();
@@ -3027,14 +2756,12 @@ function anzahlErfolge(m = meta, sandbox = run ? run.sandbox : metaProfil === "s
     return { geschafft, gesamt };
 }
 
-// Komplett abgeschlossene Erfolge (alle Stufen einer Kette geschafft)
 function komplettErfolge(m, sandbox) {
     const ketten = erfolgKettenFuer(sandbox);
     const geschafft = ketten.filter(k => k.ziele.every((_, i) => m && m.erfolge && m.erfolge[erfolgStufeId(k, i)])).length;
     return { geschafft, gesamt: ketten.length };
 }
 
-// Erreichte Stufen einer Kette, deren Gutschein noch nicht abgeholt ist
 function abholbareStufen(kette, m = meta) {
     const abgeholt = m.erfolgeAbgeholt || {};
     return kette.ziele.map((_, i) => erfolgStufeId(kette, i)).filter(id => m.erfolge[id] && !abgeholt[id]);
@@ -3044,7 +2771,6 @@ function anzahlAbholbar(m = meta, sandbox = metaProfil === "sandbox") {
     return erfolgKettenFuer(sandbox).reduce((summe, k) => summe + abholbareStufen(k, m).length, 0);
 }
 
-// Gutscheine einer Kette abholen (nur im gerade aktiven Modus)
 function holeErfolgAb(kette, knopf) {
     const offen = abholbareStufen(kette);
     if (offen.length === 0) return;
@@ -3065,7 +2791,6 @@ function holeErfolgAb(kette, knopf) {
     if (!prestigeShop.classList.contains("versteckt")) renderPrestigeShop();
 }
 
-// Welcher Erfolgs-Stand gezeigt wird: im Spiel immer der laufende Modus, im Hauptmenue waehlbar
 let erfolgeAnsicht = null;
 
 function erfolgsProfil(sandbox) {
@@ -3076,7 +2801,6 @@ function erfolgsProfil(sandbox) {
 }
 
 function renderErfolge() {
-    // Die Erfolge stehen in den Einstellungen (Reiter "Erfolge")
     if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "erfolge") return;
 
     erfolgeContent.innerHTML = "";
@@ -3087,7 +2811,6 @@ function renderErfolge() {
     const { m, r, aktiv } = erfolgsProfil(sandbox);
     const { geschafft: fertig, gesamt: alle } = anzahlErfolge(m, sandbox);
 
-    // Im Hauptmenue: Reiter Standard / Sandbox (getrennte Fortschritte)
     if (imMenue) {
         const leiste = el("div", "haus-reiter erfolg-modi");
         [["standard", t("🌾 Story")], ["sandbox", t("♾️ Endlos")]].forEach(([id, name]) => {
@@ -3103,7 +2826,6 @@ function renderErfolge() {
         erfolgeContent.appendChild(leiste);
     }
     const offen = anzahlAbholbar(m, sandbox);
-    // Gutscheine offen: oben immer "Alle abholen" (auch wenn es nur einer ist)
     if (aktiv && offen > 0) {
         const alle = el("button", "knopf knopf-lila erfolg-alle", tf("🎟️ Alle abholen ({0})", offen));
         alle.addEventListener("click", () => {
@@ -3158,8 +2880,6 @@ function renderErfolge() {
     });
 }
 
-// ---------- STATISTIK ----------
-// [Schluessel, Name, Name im Reiter "Gesamt" (falls anders)]
 
 const STATISTIK_ZEILEN = [
     ["tage", t("📅 Tage"), t("📅 Gespielte Tage")],
@@ -3222,9 +2942,7 @@ function istBessererRun(neu, alt) {
 }
 
 function renderStatistik() {
-    // Die Statistik steht in den Einstellungen (Reiter "Statistik")
     if (einstellungenFenster.classList.contains("versteckt") || aktiverEinstellungsReiter !== "statistik") return;
-    // Die Sandbox hat eigene Zahlen (getrennt vom Standard-Modus) und keinen "besten Run"
     const reiter = run.sandbox
         ? [{ id: "aktuell", text: t("Dieser Spielstand") }, { id: "gesamt", text: t("Endlos gesamt") }]
         : [{ id: "aktuell", text: t("Aktueller Run") }, { id: "bester", text: t("Bester Run") }, { id: "gesamt", text: t("Gesamt") }];
@@ -3257,7 +2975,6 @@ function renderStatistik() {
 
 }
 
-// ---------- SEGEN-KNOPF in der Kopfleiste: alle Segen dieses Runs ----------
 
 const segenKnopf = $("segen-button");
 segenKnopf.prepend(pixelIcon("🙏", 28, "icon"));
@@ -3293,7 +3010,6 @@ segenKnopf.addEventListener("click", () => {
     zeigePopup({ titel: t("🙏 Deine Segen in diesem Run"), inhalt, breite: 620 });
 });
 
-// ---------- SEGEN (nach jeder bezahlten Rechnung, Pflicht-Auswahl) ----------
 
 function segenAuswahlAnzahl() {
     const extra = hfGeschafft("ohnesegen");
@@ -3301,11 +3017,9 @@ function segenAuswahlAnzahl() {
     return ((kuschel("phoenix") > 0 || run.segenBoss) ? 4 : 3) + extra;
 }
 
-// Kurze Sperre nach dem Oeffnen: Wer gerade noch schnell auf den Samenladen klickt, waehlt sonst aus Versehen einen Segen
 const SEGEN_SPERRE_MS = 1100;
 let segenSperreBis = 0;
 
-// auswahl: gespeicherte Auswahl (nach dem Laden eines Spielstands), sonst wird neu gewuerfelt
 function zeigeSegenAuswahl(auswahl) {
     if (hf("ohnesegen") && !run.sandbox) {
         run.segenAuswahl = null;
@@ -3315,12 +3029,10 @@ function zeigeSegenAuswahl(auswahl) {
         segenFenster.classList.add("versteckt");
         return;
     }
-    // Segen mit "max" (z.B. Flinke Haende) verschwinden aus der Auswahl, wenn man sie so oft hat
     const moeglich = SEGEN.filter(s => (!run.sandbox || !SANDBOX_AUS_SEGEN.includes(s.id)) && !(s.max && (run.segen[s.id] || 0) >= s.max));
     if (!auswahl) {
         const normal = mische(moeglich.filter(s => !s.pakt)).slice(0, segenAuswahlAnzahl());
         const pakte = moeglich.filter(s => s.pakt);
-        // 40% Chance: die letzte Karte ist ein Pakt (stark, aber mit Nachteil)
         if (pakte.length > 0 && normal.length > 1 && Math.random() < SEGEN_PAKT_CHANCE) normal[normal.length - 1] = zufall(pakte);
         auswahl = normal.map(s => s.id);
     }
@@ -3359,13 +3071,11 @@ function zeigeSegenAuswahl(auswahl) {
 function waehleSegen(id, karte) {
     if (!run.segenAuswahl || performance.now() < segenSperreBis) return;
     run.segen[id] = (run.segen[id] || 0) + 1;
-    // Pakt "Vorschuss": sofort die Haelfte der naechsten Rechnung (schon mit dem Aufschlag gerechnet)
     if (id === "vorschuss" && !run.sandbox) {
         const vorschuss = aufrunden(0.5 * rechnungsBetrag(run.bezahlteRechnungen) / (run.koop ? KOOP_ANFORDERUNG : 1));
         run.gold += vorschuss;
         zeigeToast(tf("💰 +{0} Gold Vorschuss", zahl(vorschuss)));
     }
-    // Frueh bezahlte Rechnung: dieser Segen wirkt staerker
     if (run.fruehBonus) {
         if (!run.segenExtra) run.segenExtra = {};
         run.segenExtra[id] = (run.segenExtra[id] || 0) + run.fruehBonus;
@@ -3389,9 +3099,7 @@ function waehleSegen(id, karte) {
     aktualisiereAlles();
 }
 
-// ---------- TAGE, ENERGIE, RECHNUNGEN ----------
 
-// Extra-Energie waehrend des Tages, mit Deckel (sonst koennte ein Tag nie enden). Gibt die wirklich erhaltene Menge zurueck.
 function gibEnergie(menge) {
     const deckel = run.tagesMaxEnergie * KONFIG.bonusEnergieDeckel;
     const plus = Math.max(0, Math.min(menge, deckel - run.bonusEnergie));
@@ -3403,7 +3111,7 @@ function gibEnergie(menge) {
 function aktualisiereEnergie(dtMs) {
     run.tagMs = (run.tagMs || 0) + dtMs;
     if (run.sandbox) {
-        run.energie = run.tagesMaxEnergie; // Sandbox: keine Energie, der Tag geht einfach weiter
+        run.energie = run.tagesMaxEnergie;
         if (run.tagMs >= SANDBOX_TAG_MS) naechsterSandboxTag();
         return;
     }
@@ -3426,7 +3134,6 @@ function verteileFeldEffekte() {
     run.felder.forEach(aktualisiereFeldMarker);
 }
 
-// fortsetzen = true: eine gespeicherte Sandbox laeuft weiter (ohne Start-Klang)
 function starteTag(fortsetzen = false) {
     if (koopAktiv() && !run.sandbox && !koop.tagStartFrei && run.phase === "vorTag" && !run.segenAuswahl && !run.rechnungOffen) {
         koopBereit();
@@ -3438,7 +3145,7 @@ function starteTag(fortsetzen = false) {
     pruefeEvolutionen();
     run.tagesBoni = run.naechsterTag;
     run.naechsterTag = leereTagesBoni();
-    haken("tagVorbereiten"); // Wetter wird ausgewuerfelt
+    haken("tagVorbereiten");
     let energie = energieMax() + run.tagesBoni.energie;
     if (wetterIst("hitze") && !hatWerkzeug("strohhut")) energie *= 0.8;
     run.tagesMaxEnergie = Math.round(energie);
@@ -3458,9 +3165,9 @@ function starteTag(fortsetzen = false) {
     run.samenUnterwegs = false;
     run.haendler = null;
     helferAkku = 0;
-    kombo.zaehler = 15 * level("morgenkombo"); // Stern "Morgen-Schwung"
+    kombo.zaehler = 15 * level("morgenkombo");
     kombo.letzteStufe = 1;
-    if (kombo.zaehler > 0) kombo.letzterKlick = performance.now() + 2000; // kurz Zeit, bevor die Kombo abbricht
+    if (kombo.zaehler > 0) kombo.letzterKlick = performance.now() + 2000;
 
     verteileFeldEffekte();
     pflanzeAufZufaelligeFelder(run.tagesBoni.samenregen ? run.felder.length : level("fruehaufsteher") + 2 * sfLevel("sternenwurzel"));
@@ -3477,7 +3184,6 @@ function starteTag(fortsetzen = false) {
     aktualisiereAlles();
 }
 
-// Sandbox: sobald genug Gold verdient ist, gibt es sofort einen Segen (das Spiel pausiert waehrend der Auswahl)
 function pruefeMeilensteine() {
     const neu = erreichteMeilensteine() - run.meilensteine;
     if (neu <= 0) return;
@@ -3491,7 +3197,6 @@ function pruefeMeilensteine() {
     run.meilensteineGemeldet = run.meilensteine;
     zeigeBanner("🏁", tf("Meilenstein {0} erreicht!", run.meilensteine), tf("{0} Gold verdient. Wähle einen Segen!", zahl(meilensteinSchwelle(run.meilensteine))), "#2e9e2e", 3200);
     Klang.rechnung();
-    // Ein Segen pro Meilenstein, mehrere nacheinander
     if (run.segenAuswahl) {
         run.segenWarteschlange += neu;
         return;
@@ -3502,7 +3207,6 @@ function pruefeMeilensteine() {
     aktualisiereAlles();
 }
 
-// Sandbox: nach Nacht und Morgengrauen beginnt nahtlos der naechste Tag (ohne Feierabend, die Pflanzen bleiben stehen)
 function naechsterSandboxTag() {
     run.tagMs -= SANDBOX_TAG_MS;
     meta.lebenszeit.tage += 1;
@@ -3519,8 +3223,8 @@ function naechsterSandboxTag() {
     run.bonusEnergie = 0;
     run.haendler = null;
     aktualisiereLebenszeitMaxima();
-    haken("pauseStart"); // der Wanderhaendler kann kommen
-    haken("tagVorbereiten"); // neues Wetter
+    haken("pauseStart");
+    haken("tagVorbereiten");
     verteileFeldEffekte();
     haken("tagStart");
     if (!imHauptmenue()) zeigeBanner("☀️", tf("Tag {0}", run.tag), t("Ein neuer Tag beginnt"), "#e0a800", 2600);
@@ -3530,7 +3234,6 @@ function naechsterSandboxTag() {
     aktualisiereAlles();
 }
 
-// 6 Rechnungen in der hoechsten freien Mondphase schalten die naechste frei
 function pruefeMondphaseFrei() {
     const frei = meta.mondphaseFrei || 0;
     if (run.sandbox || run.mondphase !== frei || frei >= MONDPHASEN.length - 1) return;
@@ -3543,7 +3246,6 @@ function pruefeMondphaseFrei() {
 }
 
 function bezahleRechnungen() {
-    // gibt false zurueck, wenn der Run vorbei ist. In der Sandbox gibt es statt Rechnungen Meilensteine.
     if (run.sandbox) {
         pruefeMeilensteine();
         return true;
@@ -3567,8 +3269,6 @@ function bezahleRechnungen() {
     return false;
 }
 
-// Rechnung bezahlen (am Zahltag oder frueher): Gold weg, Segen ausstehend, Boni
-// Sieg: Pokal gewonnen. In Story kann man einen neuen Run starten oder weiterspielen, in Endlos geht es einfach weiter.
 function zeigeSieg(pokal) {
     if (!meta.trophaeen) meta.trophaeen = {};
     const neu = !meta.trophaeen[pokal.id];
@@ -3603,7 +3303,6 @@ function zeigeSieg(pokal) {
     partikel(r, window.innerHeight / 2 - 60, [pokal.farbe, "#ffffff", "#ffd93d"], 60, 220);
 }
 
-// Knopf oben in der Leiste: zeigt den besten Pokal (oder einen schwarzen Platzhalter) und oeffnet die Pokal-Vitrine
 const pokalKnopf = $("pokal-knopf");
 function aktualisierePokalKnopf() {
     if (!pokalKnopf) return;
@@ -3623,7 +3322,6 @@ function oeffnePokalVitrine() {
         setzeSpriteBild(bild, hat ? tr.sprite : "sym_pokal_schwarz", 6);
         platz.style.setProperty("--pokal", tr.farbe);
         platz.appendChild(bild);
-        // Beim Drueberfahren: Name und Bonus in Prozent, gewonnene zeigen den Bonus auch darunter
         setzeTipp(platz, tr.name + " · " + pokalProzent(tr.faktor));
         const spalte = el("div", "pokal-spalte", null, [platz]);
         if (hat) spalte.appendChild(el("div", "pokal-bonus", tf("Alle Währungen {0}", pokalProzent(tr.faktor))));
@@ -3662,7 +3360,6 @@ function zahleRechnung(faellig) {
         run.segenBoss = true;
         run.nachrichten.push(tf("🏦 Kredit abbezahlt! +{0} Sternensamen und ein zusätzlicher Segen zur Auswahl", zahl(bonus)));
     }
-    // Mondteich "Startkapital": nach jeder Rechnung ein Geschenk, das mit dem Run mitwaechst
     const startkapital = aufrunden(metaWert("startgold") * naechsteRechnung().betrag);
     if (startkapital > 0) {
         run.gold += startkapital;
@@ -3673,12 +3370,8 @@ function zahleRechnung(faellig) {
     haken("rechnungBezahlt", run.bezahlteRechnungen, warBoss);
 }
 
-// ---------- RECHNUNG FRUEHER BEZAHLEN (nur Story, solo, zwischen den Tagen) ----------
-// Hat man das Gold schon vor dem Zahltag, kann man sofort bezahlen: Der naechste Rechnungs-Abschnitt beginnt dann jetzt
-// (der Run wird kuerzer), und der naechste Segen wird pro Tag, den man frueher bezahlt, 10% staerker.
 const FRUEH_BEZAHLT_BONUS = 0.1;
 
-// Im Duo zaehlt das Gold beider zusammen, und es gilt fuer beide (der Mitspieler bekommt eine Nachricht)
 function kannFrueherBezahlen() {
     if (!run || run.sandbox || run.phase !== "vorTag" || run.gnadenRechnung || run.rechnungOffen) return false;
     if (run.segenAuswahl || run.segenAusstehend) return false;
@@ -3686,7 +3379,6 @@ function kannFrueherBezahlen() {
     return koopGesamtGold() >= naechsteRechnung().betrag;
 }
 
-// selbst = false: der Mitspieler hat im Duo frueher bezahlt, hier wird nur mitgezogen
 function bezahleFrueher(selbst = true) {
     if (selbst && !kannFrueherBezahlen()) return;
     if (!selbst && (run.phase !== "vorTag" || run.rechnungOffen || run.sandbox)) return;
@@ -3695,13 +3387,11 @@ function bezahleFrueher(selbst = true) {
     const tageFrueher = rechnung.tageBis;
     meta.lebenszeit.fruehBezahlt = (meta.lebenszeit.fruehBezahlt || 0) + 1;
     zahleRechnung(rechnung.betrag);
-    // Der naechste Zahltag ist in 5 Tagen, gezaehlt ab dem Tag, der als naechstes kommt
     run.rechnungVersatz = (run.tag - 1) % KONFIG.tageProRechnung;
     run.fruehBonus = (run.fruehBonus || 0) + FRUEH_BEZAHLT_BONUS * tageFrueher;
     zeigeBanner("🧾", t("Früher bezahlt!"), tf("{0} Tage früher: der nächste Segen ist {1}% stärker", tageFrueher,
         Math.round(run.fruehBonus * 100)), "#2e9e2e", 3200);
     speichereMeta();
-    // Waehlt man gerade noch einen Segen (nur im Duo moeglich), kommt der neue danach
     if (run.segenAuswahl) run.segenWarteschlange = (run.segenWarteschlange || 0) + 1;
     else zeigeSegenAuswahl();
     renderTagesKarte();
@@ -3719,7 +3409,6 @@ function aktualisiereLebenszeitMaxima() {
     if (run.sandbox) l.maxMeilensteine = Math.max(l.maxMeilensteine || 0, run.meilensteine);
 }
 
-// Ernte-Erfahrung: pro Tag bis 400 voll, danach nur noch 3% (sonst waere Level 100 spaet in 2 Runs erreicht)
 const ERNTE_XP_PRO_TAG = 400;
 function gibErnteXp(menge) {
     const heute = run.ernteXpHeute || 0;
@@ -3732,11 +3421,10 @@ function gibErnteXp(menge) {
     gibBauernXp(ganz);
 }
 
-// Feierabend: Tag geschafft, dazu etwas fuer Gold und Sternensamen im Beutel
 function gibTagesXp() {
     run.ernteXpHeute = 0;
     gibBauernXp(25 + Math.min(run.tag, 50) + xpAusMenge(run.gold, 12) + xpAusMenge(run.skillpunkte, 10));
-    if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf(); // XP-Leiste auffrischen
+    if (typeof aktualisiereProfilKnopf === "function") aktualisiereProfilKnopf();
 }
 
 function beendeTag() {
@@ -3757,7 +3445,6 @@ function beendeTag() {
         run.felder.filter(f => f.fertig && !f.kraehe).forEach(f => ernteFeld(f, true, 1));
     }
 
-    // Feierabend: liegengebliebene Saaten verfallen (ausser mit "Der Tod")
     [...lootKugeln].forEach(loot => {
         if (hatTarot("tod")) sammleEin(loot);
         else lassVerfallen(loot);
@@ -3772,7 +3459,6 @@ function beendeTag() {
     run.klickZaehler = 0;
     kombo.zaehler = 0;
 
-    // Zinsen, hoechstens die Haelfte der naechsten Rechnung (sonst wird Sparen zu stark)
     const zinsDeckel = (run.sandbox ? rechnungsBetrag(run.meilensteine) : naechsteRechnung().betrag) * zinsDeckelAnteil();
     const zinsen = Math.min(aufrunden(run.gold * zinsSatz()), aufrunden(zinsDeckel));
     if (zinsen > 0) {
@@ -3780,7 +3466,6 @@ function beendeTag() {
         run.nachrichten.push(tf("🐷 Zinsen: +{0} Gold", zahl(zinsen)));
     }
 
-    // Kredit-Auflage "Steuerpruefung": 10% des Tagesgewinns sind weg
     if (bossIst("steuer") && run.statistik.gold > 0) {
         const steuer = Math.min(run.gold, aufrunden(run.statistik.gold * 0.1));
         run.gold -= steuer;
@@ -3789,8 +3474,6 @@ function beendeTag() {
 
     aktualisiereLebenszeitMaxima();
     Klang.feierabend();
-    // Rechnung faellig und genug Gold: der Spieler entscheidet (bezahlen oder den Run beenden).
-    // Reicht das Gold nicht, endet der Run wie gewohnt (bzw. greift die Gerechtigkeit).
     const faellig = faelligeRechnung();
     if (faellig > 0 && koopGesamtGold() >= faellig) {
         run.rechnungOffen = true;
@@ -3805,7 +3488,7 @@ function beendeTag() {
 
 function schliesseFeierabendAb() {
     run.tag += 1;
-    haken("pauseStart"); // z.B. kommt der Wanderhaendler
+    haken("pauseStart");
     speichereMeta();
     zeigeTagesKarte("feierabend");
     if (run.segenAusstehend) zeigeSegenAuswahl();
@@ -3813,7 +3496,6 @@ function schliesseFeierabendAb() {
     aktualisiereAlles();
 }
 
-// Brief aus dem Dorf mit kleinem Geschenk (Gold, Sternensamen, Energie oder Duenger fuer morgen)
 function zeigeBrief() {
     if (!run || run.phase !== "vorTag" || run.segenAuswahl) return;
     const brief = zufall(BRIEFE);
@@ -3843,13 +3525,10 @@ function zeigeBrief() {
         } }] });
 }
 
-// Betrag, der heute Abend faellig ist (0 = keine Rechnung)
-// Gold fuer die Rechnung: im Koop das Gold beider zusammen
 function koopGesamtGold() {
     return run.gold + (run.koop && typeof koop !== "undefined" ? koop.partnerGold || 0 : 0);
 }
 
-// Wie viel von der Rechnung ich zahle (im Koop: im Verhaeltnis zum eigenen Gold)
 function koopEigenerAnteil(betrag) {
     if (!run.koop) return betrag;
     const summe = koopGesamtGold();
@@ -3861,7 +3540,6 @@ function faelligeRechnung() {
     return run.gnadenRechnung || (istRechnungsTag() ? rechnungsBetrag(run.bezahlteRechnungen) : 0);
 }
 
-// "Rechnung bezahlen" ist kurz gesperrt, damit man nicht aus Versehen weiterklickt
 const RECHNUNG_SPERRE_MS = 1200;
 
 function zeigeRechnungsFrage() {
@@ -3887,7 +3565,7 @@ function zeigeRechnungsFrage() {
             { text: t("🏳️ Run beenden"), klasse: "knopf-rot", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
                 if (run.koop) return koopRechnungEntscheidung(false, true);
                 run.rechnungOffen = false;
-                run.tag += 1; // der heutige Tag zaehlt als gespielt
+                run.tag += 1;
                 beendeRun(0, true);
             } },
             { text: pokal ? t("🏆 Pokal holen") : kredit ? t("🏦 Kredit bezahlen") : t("🧾 Rechnung bezahlen"), klasse: "knopf-gruen", sperreMs: RECHNUNG_SPERRE_MS, aktion: () => {
@@ -3908,7 +3586,6 @@ function beendeRun(offenerBetrag, freiwillig) {
 
     const mondblueten = mondbluetenJetzt();
     meta.mondblueten += mondblueten;
-    // Mondteich "Saatbank": ein Teil der Sternensamen wandert in den naechsten Run
     if (metaLevel("saatbank") > 0) meta.saatbank = Math.floor(run.skillpunkte * 0.05 * metaLevel("saatbank"));
     meta.mondbluetenSeitSternenfall += mondblueten;
     meta.lebenszeit.runs += 1;
@@ -3937,17 +3614,14 @@ function starteNeuenRun(sandbox = false) {
     aktiverShopReiter = "allgemein";
     kombo.zaehler = 0;
 
-    // Saatgut-Vorrat und der verbesserte Gehaengte schalten Pflanzen zum Start frei
     const startPflanzen = metaLevel("saatvorrat");
     run.pflanzen.slice(1, 1 + startPflanzen).forEach(p => {
         p.freigeschaltet = true;
         run.level["p_" + p.id] = 1;
     });
 
-    // Mondteich "Erbstueck": der Weizen startet mit Ertrag-Stufen
     const weizen = run.pflanzen.find(p => p.id === "weizen");
     if (weizen) weizen.level.ertrag += 2 * metaLevel("erbstueck");
-    // Mondteich "Saatbank": Sternensamen aus dem letzten Run
     if (meta.saatbank > 0) {
         run.skillpunkte += meta.saatbank;
         meta.saatbank = 0;
@@ -3961,15 +3635,12 @@ function starteNeuenRun(sandbox = false) {
     prestigeShop.classList.add("versteckt");
     segenFenster.classList.add("versteckt");
     haken("runStart");
-    // Die Sandbox hat keine Pausen zwischen den Tagen: sie laeuft sofort los
     if (sandbox) starteTag();
     else zeigeTagesKarte("start");
-    // Mondteich "Segenstart": gleich eine Segen-Auswahl
     if (metaLevel("segenstart") > 0 && !run.koop) {
         run.segenAusstehend = true;
         zeigeSegenAuswahl();
     }
-    // Ab dem 2. Story-Run: Hof-Stil waehlen
     if (!sandbox && !run.koop && (meta.lebenszeit.runs || 0) >= 1) zeigeStilAuswahl();
     aktualisiereAlles();
 }
@@ -4010,7 +3681,6 @@ function zeigeStilAuswahl() {
         inhalt: el("div", null, null, [el("p", "stil-hinweis", t("Er gilt für den ganzen Run.")), reihe]) });
 }
 
-// ---------- TAGES-KARTE ----------
 
 function beschreibeNaechstenTag() {
     const boni = run.naechsterTag;
@@ -4027,7 +3697,6 @@ function beschreibeNaechstenTag() {
 function zeigeTagesKarte(modus, daten = {}) {
     run.karte = { modus, daten };
     karteEingeklappt = false;
-    // Der Zettel faehrt aus dem Kopfbereich herunter
     kartenHalter.classList.remove("versteckt");
     kartenHalter.classList.add("eingeklappt");
     void kartenHalter.offsetWidth;
@@ -4125,7 +3794,6 @@ function renderTagesKarte() {
     const istRunEnde = modus === "runEnde";
     karteShop.classList.toggle("versteckt", istRunEnde);
     karteSkilltree.classList.toggle("versteckt", istRunEnde);
-    // Zum Mondteich am Run-Anfang kommt man nur ueber den echten Teich im Hintergrund
     kartePrestige.classList.add("versteckt");
     const hatMeta = meta.mondblueten > 0 || meta.tarot.length > 0 || Object.keys(meta.upgrades).length > 0 || meta.gutscheine > 0;
     if (modus === "start" && hatMeta && !run.sandbox) {
@@ -4135,23 +3803,19 @@ function renderTagesKarte() {
     karteWeiter.textContent = istRunEnde ? t("Zum Mondteich") : tf("Tag {0} starten", run.tag);
     karteWeiter.disabled = Boolean(run.segenAuswahl);
 
-    // Frueher aufhoeren geht nach jedem Tag (die Mondblueten fuer bezahlte Rechnungen gibt es trotzdem)
     const aufgebenMoeglich = modus === "feierabend";
     karteAufgeben.parentElement.classList.toggle("versteckt", !aufgebenMoeglich);
     karteAufgeben.disabled = Boolean(run.segenAuswahl);
     karteAufgeben.textContent = t("🏳️ Run beenden");
 }
 
-// Zusaetzliche Zeilen auf der Tageskarte (Boss-Regel, Werkzeuge ...), von ereignisse.js gefuellt
 function karteZusatzHtml() {
     const teile = [];
     haken("karteZusatz", teile);
     return teile.join("");
 }
 
-// ---------- ANZEIGEN ----------
 
-// Hover ueber dem Kalender: alles, was im Moment wirkt (Tageszeit, Wetter, Boss-Regel, Mondphase, Segen, Werkzeuge)
 function aktivTipp() {
     const z = jahreszeit();
     const zeilen = [tf("## {0}Tag {1} · {2} {3}", (run.sandbox ? t("Endlos · ") : ""), run.tag, z.symbol, z.name)];
@@ -4205,8 +3869,6 @@ function aktualisiereTopBar() {
     setzeTipp(skillpointDisplay, tf("## ✨ Sternensamen\n= {0}\nFür das Stellarium.\n- Jede Ernte lässt Sternensaat fallen\n- Jeder Klick auf den Samenladen: +{1}\n- In diesem Run gesammelt: {2}", zahl(run.skillpunkte), sternensamenProKlick(), zahl(gesamtSterne)));
     setzeTipp(kalenderDisplay, aktivTipp());
     kalenderDisplay.classList.toggle("zahltag-warnung", !run.sandbox && run.phase !== "runEnde" && naechsteRechnung().tageBis <= 1);
-    // Aktuelle Mondphase (Schwierigkeit), nur in Story
-    // Mondphase oben: in Story die des Runs, in Endlos die fuer Story gewaehlte (dort gibt es keine Mondphasen)
     mondphaseDisplay.classList.remove("versteckt");
     if (run.sandbox) {
         const sm = storyMeta();
@@ -4225,7 +3887,6 @@ function aktualisiereTopBar() {
     }
     aktualisiereMondphaseHinweis();
     if (run.sandbox) {
-        // Meilensteine erreicht man einfach (nichts wird abgezogen): angezeigt wird nur das naechste Ziel
         const ziel = meilensteinSchwelle(run.meilensteine + 1);
         rechnungDisplay.querySelector("span").textContent = tf("🏁 {0} Gold", zahl(ziel));
         zeigeRechnungsSymbol(trophaeFuer(run.meilensteine));
@@ -4244,7 +3905,6 @@ function aktualisiereTopBar() {
 }
 
 function aktualisiereEnergieAnzeige() {
-    // Sandbox: keine Energie. An ihrer Stelle steht der Knopf fuer den Neuanfang (Sandbox-Prestige).
     const energieBox = energieFuellung.parentElement.parentElement;
     energieBox.classList.toggle("sandbox-box", run.sandbox);
     neuanfangKnopf.classList.toggle("versteckt", !run.sandbox || run.phase === "runEnde");
@@ -4262,7 +3922,6 @@ function aktualisiereEnergieAnzeige() {
     energieText.textContent = Math.ceil(wert);
 }
 
-// Kleine Hinweis-Punkte an Knoepfen, wenn man sich etwas leisten kann
 function aktualisiereHinweisPunkte() {
     const shopKnopf = $("shop-button");
     const sternKnopf = $("skilltree-button");
@@ -4294,7 +3953,6 @@ function aktualisiereAlles() {
     renderStatistik();
 }
 
-// ---------- PANELS: GEMEINSAME BAUSTEINE ----------
 
 function erstelleKarte({ titel, beschreibung, info, knopfText, aktiv, onKauf, icon }) {
     const item = el("div", "upgrade-item");
@@ -4348,7 +4006,6 @@ function upgradeKarte(def, waehrung) {
     });
 }
 
-// anzahl = so viele Stufen auf einmal (Markt x10/Max, Stellarium Max), solange das Guthaben reicht
 function kaufeUpgrade(def, waehrung, anzahl = 1) {
     const ersteKosten = waehrung === "skillpunkte" ? knotenKosten(def) : kostenMitFaktor(def.basiskosten, def.faktor, level(def.id));
     if (!darfEinkaufen() || level(def.id) >= def.max || guthaben(waehrung) < ersteKosten) return;
@@ -4357,7 +4014,6 @@ function kaufeUpgrade(def, waehrung, anzahl = 1) {
     if (def.vor && !istVorgaengerErfuellt(def.vor, def.vorMax)) return;
     if (vorigePflanzeFehlt(def)) return;
     if (def.bedingung && !def.bedingung()) return;
-    // Herausforderung "Nur Weizen": keine neuen Pflanzen
     if (hf("nurweizen") && def.id.startsWith("p_") && def.id !== "p_weizen" && run.pflanzen.some(p => "p_" + p.id === def.id)) {
         Klang.fehler();
         zeigeToast(t("🌾 Herausforderung „Nur Weizen“: keine neuen Pflanzen."));
@@ -4380,16 +4036,12 @@ function kaufeUpgrade(def, waehrung, anzahl = 1) {
     if (waehrung === "skillpunkte") sternGekauft(def);
 }
 
-// ---------- SHOP (Gold) ----------
 
-// Weizen-Upgrades sind 10% billiger (der Einstieg soll flott gehen)
-// Ertrag ist auf den ersten Stufen guenstiger (Stufe 1 halber Preis, ab Stufe 10 normal): der Einstieg geht flott
 function pflanzenUpgradeKosten(pflanze, upgrade, stufe = pflanze.level[upgrade.id]) {
     const einstieg = upgrade.id === "ertrag" ? Math.min(1, 0.5 + 0.05 * stufe) : 1;
     return Math.max(1, Math.round(kostenMitFaktor(upgrade.basiskosten * pflanze.verkaufswert * (pflanze.id === "weizen" ? 0.9 : 1), upgrade.faktor, stufe) * einstieg));
 }
 
-// anzahl = so viele Stufen auf einmal (Markt: x10 oder Max), solange das Gold reicht
 function kaufePflanzenUpgrade(pflanze, upgrade, anzahl = 1) {
     if (!darfEinkaufen() || !pflanzenUpgradeFrei(pflanze, upgrade)) return;
     let gekauft = 0;
@@ -4400,7 +4052,6 @@ function kaufePflanzenUpgrade(pflanze, upgrade, anzahl = 1) {
         run.gold -= kosten;
         pflanze.level[upgrade.id] += 1;
         gekauft += 1;
-        // selbst gekaufte Ertrag-Stufen zaehlen fuer das Freischalten der naechsten Pflanze (geerbte Stufen nicht)
         if (upgrade.id === "ertrag") pflanze.level.ertragEigen = (pflanze.level.ertragEigen || 0) + 1;
         if (upgrade.id === "ertrag" && pflanze.level.ertrag % 10 === 0) verdoppelt = true;
     }
@@ -4413,10 +4064,6 @@ function kaufePflanzenUpgrade(pflanze, upgrade, anzahl = 1) {
     aktualisiereAlles();
 }
 
-// ---------- KAUFMENGE (Markt: x1, x10 oder so viel wie moeglich; Umschalter oben im Markt) ----------
-// kostenBei(stufe) = Preis von Stufe "stufe" auf "stufe + 1". Ergebnis { anzahl, kosten }:
-// x1 und x10 = genau so viele Stufen (weniger nur, wenn das Maximum erreicht ist),
-// "max" = so viele, wie das Guthaben reicht (reicht es fuer keine, steht der Preis einer Stufe da).
 const KAUF_MENGEN = [1, 10, "max"];
 function kaufMenge() {
     return KAUF_MENGEN.includes(einstellungen.kaufMenge) ? einstellungen.kaufMenge : 1;
@@ -4435,8 +4082,6 @@ function kaufPaket(kostenBei, stufe, max, guthabenWert, menge = kaufMenge()) {
     return { anzahl: Math.max(1, anzahl), kosten };
 }
 
-// Eine Stand-Karte auf dem Markt: Symbol, Name, Stufe, Wirkung, "Du hast jetzt", Stufenpunkte, Kaufknopf
-// kostenBei(stufe) = Preis einer Stufe: dann gilt die Kaufmenge (x1, x10, Max). Shift + Klick kauft immer so viel wie moeglich.
 function marktKarte({ icon, name, lvl = 0, max = 1, beschreibung, jetzt, kosten, kostenBei, onKauf, zusatz }) {
     const istMax = lvl >= max;
     const paket = kostenBei && !istMax ? kaufPaket(kostenBei, lvl, max, run.gold) : { anzahl: 1, kosten };
@@ -4476,7 +4121,6 @@ function marktGesperrt(titel, text) {
 
 const PFLANZEN_UPGRADE_ICONS = { ertrag: "💰", wachstum: "⏱️", pracht: "🎨", ueberfluss: "➕" };
 
-// Oben im Markt: Muenze = normaler Markt, Karte = Gluecksspiel
 function renderMarktModus() {
     const leiste = $("markt-modus");
     leiste.innerHTML = "";
@@ -4495,7 +4139,6 @@ function renderMarktModus() {
     });
 }
 
-// Umschalter x1 / x10 / Max oben im Markt (gilt fuer Felder und alle Upgrades, wird gemerkt)
 function renderKaufMenge() {
     const leiste = $("markt-menge");
     leiste.innerHTML = "";
@@ -4515,7 +4158,6 @@ function renderKaufMenge() {
 }
 
 function renderShop() {
-    // Waehrend eine Muenze fliegt oder die Huehner rennen, wird der Glueck-Reiter nicht neu aufgebaut
     if (glueckAnimation && marktModus === "glueck" && !shopPanel.classList.contains("hidden")) return;
     if (!hatGluecksspiel()) marktModus = "markt";
     renderMarktModus();
@@ -4525,7 +4167,6 @@ function renderShop() {
     goldAnzeige.innerHTML = "";
     goldAnzeige.append(spriteIcon("muenze"), tf(" {0} Gold", zahl(run.gold)));
 
-    // Gluecksspiel: eigene Reiter, ein Spiel pro Reiter
     if (marktModus === "glueck") {
         const spiele = freieGluecksspiele();
         if (!spiele.some(s => s.id === aktiverGlueckReiter)) aktiverGlueckReiter = spiele[0].id;
@@ -4576,7 +4217,6 @@ function renderShop() {
     }
 
     const pflanze = run.pflanzen.find(p => p.id === aktiverShopReiter);
-    // Kopf: die Pflanze mit ihren Werten
     const meister = meisterStufe(pflanze.id);
     const kopfBild = spriteIcon(pflanze.id, true);
     kopfBild.classList.add("markt-pflanze-bild");
@@ -4610,16 +4250,11 @@ function renderShop() {
     shopContent.appendChild(raster);
 }
 
-// ---------- STERNENBAUM (kostet Sternensamen) ----------
-// Ein grosser Baum (Daten in daten.js, SKILLS). Mit gedrueckter Maus verschieben, mit dem Mausrad zoomen.
-// Jeder Stern ist gesperrt, bis sein Vorgaenger ("vor") mindestens 1x gekauft wurde.
-// Bei vorMax (Münz-Farben) muss der Vorgaenger komplett ausgebaut sein.
-// Sichtbar sind gekaufte und kaufbare Sterne, einen Schritt dahinter nur ein Schatten, alles weitere ist noch verborgen.
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const baumWelt = $("baum-welt");
 const baumHimmel = $("sternbild-himmel");
-const baumAnsicht = { x: 0, y: -60, zoom: 0.85 }; // x/y = Punkt des Baums in der Mitte der Ansicht
+const baumAnsicht = { x: 0, y: -60, zoom: 0.85 };
 const BAUM_ZOOM = { min: 0.3, max: 1.6 };
 let baumZug = null;
 
@@ -4632,7 +4267,6 @@ function istKnotenMax(id) {
 }
 
 function istVorgaengerErfuellt(vor, vorMax) {
-    // Ein erledigter Stern zaehlt erst, wenn man bis zu ihm gekommen ist
     const vorDef = SKILL_NACH_ID[vor];
     if (vorDef && istSternErledigt(vorDef)) return istKnotenOffen(vorDef);
     return vorMax ? istKnotenMax(vor) : istKnotenGekauft(vor);
@@ -4641,7 +4275,6 @@ function istSternErledigt(def) {
     return Boolean(def.erledigt && def.erledigt());
 }
 
-// Nicht bis zur 6. Pflanze durchskippen: eine neue Pflanze gibt es erst, wenn in die vorige investiert wurde
 const PFLANZE_ERTRAG_VOR = 3;
 function vorigePflanzeFehlt(def) {
     if (def.art !== "pflanze" || !def.vor) return null;
@@ -4656,7 +4289,6 @@ function istKnotenOffen(def) {
 }
 
 function knotenKosten(def, stufe = level(def.id)) {
-    // Mondteich "Sternenkarte": alle Sterne billiger
     return Math.max(1, Math.round(kostenMitFaktor(def.basiskosten, def.faktor, stufe) * (1 - 0.03 * metaLevel("sternenkarte")) * (1 - 0.1 * hfGeschafft("blind"))));
 }
 
@@ -4670,7 +4302,6 @@ function knotenLeistbar(def) {
     return istKnotenOffen(def) && level(def.id) < def.max && darfEinkaufen() && run.skillpunkte >= knotenKosten(def);
 }
 
-// Ist das Markt-Upgrade schon im Stellarium freigeschaltet?
 function shopUpgradeFrei(def) {
     if (istSandboxAus(def.id)) return false;
     if (def.id === "stellarium") return !stellariumFrei() || level("stellarium") > 0;
@@ -4684,8 +4315,6 @@ function pflanzenUpgradeFrei(pflanze, upgrade) {
 function schalteSternFrei(def) {
     if (def.art === "pflanze") {
         const pflanze = run.pflanzen.find(p => p.id === def.pflanze);
-        // Erfahrung: eine neue Pflanze startet mit der hoechsten Ertrag-Stufe deiner bisherigen Pflanzen,
-        // dadurch ist sie sofort mehr wert als die alten und Freischalten lohnt sich immer
         const bisher = Math.max(0, ...run.pflanzen.filter(p => p.freigeschaltet).map(p => p.level.ertrag));
         pflanze.level.ertrag = Math.max(pflanze.level.ertrag, bisher);
         pflanze.freigeschaltet = true;
@@ -4717,7 +4346,6 @@ function setzeBaumAnsicht(gleiten) {
     baumWelt.classList.toggle("gleitet", Boolean(gleiten));
     baumWelt.style.transform = "translate(" + (breite / 2 - baumAnsicht.x * baumAnsicht.zoom) + "px, " +
         (hoehe / 2 - baumAnsicht.y * baumAnsicht.zoom) + "px) scale(" + baumAnsicht.zoom + ")";
-    // Der Sternenhimmel im Hintergrund zieht leicht mit (Tiefe)
     himmelPunkte.style.transform = "translate(" + (-baumAnsicht.x * 0.05) % 60 + "px, " + (-baumAnsicht.y * 0.05) % 60 + "px)";
 }
 
@@ -4732,7 +4360,6 @@ function zoomeBaum(faktor, cx, cy) {
     const rect = baumHimmel.getBoundingClientRect();
     const px = cx === undefined ? rect.width / 2 : cx - rect.left;
     const py = cy === undefined ? rect.height / 2 : cy - rect.top;
-    // Der Punkt unter der Maus bleibt beim Zoomen an seiner Stelle
     const weltX = baumAnsicht.x + (px - rect.width / 2) / baumAnsicht.zoom;
     const weltY = baumAnsicht.y + (py - rect.height / 2) / baumAnsicht.zoom;
     baumAnsicht.zoom = klemme(baumAnsicht.zoom * faktor, BAUM_ZOOM.min, BAUM_ZOOM.max);
@@ -4741,7 +4368,6 @@ function zoomeBaum(faktor, cx, cy) {
     setzeBaumAnsicht(false);
 }
 
-// Zwei Finger (Handy, Tablet): auseinanderziehen zoomt wie das Mausrad
 const baumFinger = new Map();
 let baumPinch = null;
 function baumFingerAbstand() {
@@ -4782,7 +4408,6 @@ baumHimmel.addEventListener("pointermove", event => {
     baumAnsicht.y -= dy / baumAnsicht.zoom;
     baumZug.x = event.clientX;
     baumZug.y = event.clientY;
-    // Viele Mausbewegungen pro Bild: nur einmal pro Bild verschieben (sonst ruckelt es)
     if (baumBildGeplant) return;
     baumBildGeplant = true;
     requestAnimationFrame(() => {
@@ -4794,7 +4419,7 @@ function baumFingerWeg(event) {
     baumFinger.delete(event.pointerId);
     if (baumFinger.size < 2 && baumPinch) {
         baumPinch = null;
-        baumZug = null; // nach dem Zoomen nicht aus Versehen einen Stern auswaehlen
+        baumZug = null;
         baumHimmel.classList.remove("zieht");
     }
 }
@@ -4809,7 +4434,6 @@ baumHimmel.addEventListener("pointerup", event => {
     const warGezogen = baumZug.gezogen;
     baumZug = null;
     baumHimmel.classList.remove("zieht");
-    // Ein kurzer Klick (ohne Ziehen) waehlt den Stern darunter aus
     if (!warGezogen) {
         const stern = document.elementsFromPoint(event.clientX, event.clientY).find(e => e.classList && e.classList.contains("stern"));
         if (stern) {
@@ -4821,7 +4445,6 @@ baumHimmel.addEventListener("pointerup", event => {
 });
 $("baum-mitte").addEventListener("click", () => springeZu(BAUM_ZIELE[0].pos[0], BAUM_ZIELE[0].pos[1], 0.85));
 
-// "?" im Stellarium: die Erklaerungen, die sonst immer im Weg standen
 $("baum-hilfe").addEventListener("click", () => {
     const punkte = [
         tf("{0} für jeden Klick auf den Samenladen, der einen Samen wirft ({1} pro Klick).", tf("✨ Sternensamen bekommst du bei jeder Ernte ({0} pro Ernte) und", KONFIG.sternensamenProErnte), sternensamenProKlick()),
@@ -4834,7 +4457,6 @@ $("baum-hilfe").addEventListener("click", () => {
     zeigePopup({ titel: t("✨ So funktioniert das Stellarium"), breite: 560, inhalt: el("div", "hilfe-liste", null, punkte.map(p => el("p", null, p))) });
 });
 
-// Springt der Reihe nach zu allen Sternen, die man sich gerade leisten kann
 let naechsterKaufbarIndex = 0;
 const baumNaechster = $("baum-naechster");
 baumNaechster.addEventListener("click", () => {
@@ -4866,7 +4488,6 @@ function renderSkilltree() {
     SKILLS.forEach(def => {
         const sicht = knotenSicht(def);
         if (sicht === "versteckt" || istSandboxAus(def.id)) return;
-        // In der Sandbox fehlen manche Sterne: die Linie geht dann zum naechsten sichtbaren Vorgaenger
         let vor = SKILL_NACH_ID[def.vor];
         while (vor && istSandboxAus(vor.id)) vor = SKILL_NACH_ID[vor.vor];
         if (vor && knotenSicht(vor) !== "versteckt") {
@@ -4920,7 +4541,6 @@ const AST_NAMEN = {
     jahreszeit: t("🎡 Jahreszeiten")
 };
 
-// Stufen als kleine Punkte (bis 10 Stufen), sonst als Zahl
 function stufenPunkte(lvl, max) {
     if (max === Infinity) return el("div", "stern-stufen-text", tf("Stufe {0} · unendlich", lvl));
     if (max === 1) return el("div", "stern-stufen-text", lvl > 0 ? t("✔ Freigeschaltet") : t("Noch nicht gekauft"));
@@ -4930,12 +4550,9 @@ function stufenPunkte(lvl, max) {
     return leiste;
 }
 
-// Kurze Karte rechts: Symbol, Name, ein Satz, Stufen-Punkte, "Jetzt", Preis
-// Erklaert in 1 bis 3 kurzen Saetzen, was beim Kauf passiert
 function sternErklaerung(def) {
     const box = el("div", "stern-karte-text");
     if (def.markt) {
-        // Stern schaltet etwas auf dem Markt frei: Name und Wirkung des Upgrades zeigen
         box.appendChild(el("div", "stern-markt", null, [
             el("div", "stern-markt-titel", tf("🛒 Neu auf dem Markt{0}", (def.marktReiter ? tf(" (Reiter {0})", def.marktReiter) : ""))),
             el("b", null, (def.markt.icon ? def.markt.icon + " " : "") + def.markt.name),
@@ -4977,7 +4594,6 @@ function renderSternDetails(def) {
         verborgen ? el("div", "stern-karte-text", def.bedingungText && (!def.vor || istVorgaengerErfuellt(def.vor, def.vorMax)) ? def.bedingungText : t("Noch verborgen")) : sternErklaerung(def)
     );
     if (!verborgen) {
-        // Was der Stern dir gerade bringt (ohne Pfeile, nur der Stand)
         if (def.wirkung && lvl > 0) {
             karte.appendChild(el("div", "stern-karte-rechnung", null, [
                 el("span", "stern-jetzt", t("Du hast jetzt: ")), el("b", null, def.wirkung(lvl)),
@@ -4988,13 +4604,11 @@ function renderSternDetails(def) {
     }
     let knopfText = istMax ? (def.max > 1 ? t("Maximal") : t("Freigeschaltet")) : zahl(kosten);
     if (!offen) knopfText = t("🔒 Gesperrt");
-    // Preis mit Sternensamen-Symbol davor
     const zeigtPreis = offen && !istMax;
     const knopf = el("button", "knopf knopf-gruen stern-karte-kaufen", zeigtPreis ? null : knopfText,
         zeigtPreis ? [spriteIcon("sternensamen"), el("span", null, knopfText)] : null);
     knopf.disabled = !(offen && !istMax && darfEinkaufen() && run.skillpunkte >= kosten);
     knopf.addEventListener("click", event => kaufeUpgrade(def, "skillpunkte", event.shiftKey ? 1000 : 1));
-    // Gesperrt: Klick springt zum Stern, der noch fehlt (bei Pflanzen ohne genug Ertrag ein Hinweis)
     if (!offen) {
         const fehlt = !def.vor || istVorgaengerErfuellt(def.vor, def.vorMax) ? (def.bedingungStern || null) : def.vor;
         const pflanze = vorigePflanzeFehlt(def);
@@ -5015,7 +4629,6 @@ function renderSternDetails(def) {
         };
     }
     karte.appendChild(knopf);
-    // Sterne mit vielen Stufen: auf einmal so viele kaufen, wie die Sternensamen reichen
     if (zeigtPreis && def.max > 1 && darfEinkaufen()) {
         const paket = kaufPaket(stufe => knotenKosten(def, stufe), lvl, def.max, run.skillpunkte, "max");
         if (paket.anzahl >= 2 && paket.kosten <= run.skillpunkte) {
@@ -5027,7 +4640,6 @@ function renderSternDetails(def) {
         }
     }
     sternbildDetails.appendChild(karte);
-    // Lange Namen ("Edelsteinschleifer") etwas kleiner schreiben, statt sie abzuschneiden oder im Wort zu trennen
     const nameEl = karte.querySelector(".stern-karte-name");
     let groesse = 1.2;
     while (nameEl.scrollWidth > nameEl.clientWidth + 1 && groesse > 0.75) {
@@ -5048,9 +4660,7 @@ function renderSternDetails(def) {
     }
 }
 
-// ---------- HAUPTMENUE UND EINSTELLUNGEN ----------
 
-// Ist gerade das Hauptmenue offen? (dann keine Spiel-Meldungen oben)
 function imHauptmenue() {
     return !hauptmenue.classList.contains("versteckt");
 }
@@ -5070,7 +4680,6 @@ function zeigeHauptmenue(lobbyBehalten) {
 }
 
 function zeigeMenueSeite(seite) {
-    // Wer die Duo-Seite verlaesst (Zurueck, Hauptmenue), schliesst seine Lobby
     if (seite !== "koop" && typeof koop !== "undefined" && (koop.code || koop.verbunden || koop.imSpiel)) koopVerlassen(true);
     $("menue-start").classList.toggle("versteckt", seite !== "start");
     $("menue-art").classList.toggle("versteckt", seite !== "art");
@@ -5080,7 +4689,6 @@ function zeigeMenueSeite(seite) {
     if (seite === "koop") renderKoopLobby();
 }
 
-// Spielen: erst Solo oder Duo
 $("art-solo-bild").appendChild(pixelIcon("👤", 96));
 $("art-duo-bild").appendChild(pixelIcon("👥", 96));
 $("art-solo").addEventListener("click", () => {
@@ -5098,7 +4706,6 @@ function menueSeiteModiOffen() {
     return !hauptmenue.classList.contains("versteckt") && !$("menue-modi").classList.contains("versteckt");
 }
 
-// Kurzer Stand eines Modus fuer die Karte im Hauptmenue (laufender Run oder gespeicherter Spielstand)
 function modusStand(sandbox) {
     const live = run && run.sandbox === sandbox && (!sandbox || (run.slot || 1) === endlosSlot()) && run.phase !== "runEnde";
     const daten = live ? null : leseRunSpeicher(sandbox);
@@ -5138,7 +4745,6 @@ function renderModusKarten() {
     guthaben.innerHTML = "";
     guthaben.append(
         el("span", null, null, [spriteIcon("pokal"), el("span", null, (() => {
-            // Story + der Endlos-Spielstand mit den meisten Erfolgen, nur komplett abgeschlossene Erfolge (keine Stufen)
             const story = komplettErfolge(erfolgsProfil(false).m, false);
             const endlos = [1, 2, 3].map(slot => {
                 try { return komplettErfolge(endlosMeta(slot), true).geschafft; } catch (fehler) { return 0; }
@@ -5159,7 +4765,6 @@ function renderModusKarten() {
     ].forEach(modus => {
         const frei = !modus.sandbox || hatSandbox();
         const stand = frei ? modusStand(modus.sandbox) : null;
-        // "Zuletzt gespielt" erst, wenn in diesem Modus schon gespielt wurde (nicht bei einem ganz neuen Spiel)
         const aktiv = run && run.sandbox === modus.sandbox && run.phase !== "runEnde" && Boolean(stand && !stand.neu);
         const karte = el("button", "modus-karte" + (frei ? "" : " gesperrt") + (aktiv ? " zuletzt" : ""));
         karte.dataset.modus = modus.sandbox ? "sandbox" : "standard";
@@ -5189,11 +4794,9 @@ function renderModusKarten() {
         ].filter(Boolean));
         karte.addEventListener("click", event => {
             if (event.target === info) return;
-            // Endlos: direkt der gewaehlte Speicherstand (auswaehlen kann man bei "Speicherstaende")
             spieleModus(modus.sandbox);
         });
 
-        // Story: Spielstand loeschen. Endlos: die Speicherstaende (jeder mit eigenem Loeschen-Knopf)
         const reset = modus.sandbox
             ? el("button", "knopf modus-reset modus-slots", t("💾 Speicherstände"))
             : el("button", "knopf modus-reset", t("🗑️ Spielstand löschen"));
@@ -5204,7 +4807,6 @@ function renderModusKarten() {
 }
 
 function spieleModus(sandbox) {
-    // Aus einem Koop-Spiel heraus: erst das Koop-Spiel verlassen
     if (typeof koop !== "undefined" && koop.imSpiel) koopVerlassen(false);
     if (sandbox && !hatSandbox()) {
         Klang.fehler();
@@ -5215,7 +4817,6 @@ function spieleModus(sandbox) {
     Klang.start();
     hauptmenue.classList.add("versteckt");
     aktualisiereAlles();
-    // Offene Rechnung aus dem letzten Feierabend (Spiel wurde waehrend der Frage geschlossen)
     if (run.rechnungOffen) zeigeRechnungsFrage();
 }
 
@@ -5241,7 +4842,6 @@ function frageModusReset(sandbox) {
     });
 }
 
-// Wolken und Teilchen im Hauptmenue
 (function schmueckeHauptmenue() {
     const wolken = $("menue-wolken");
     for (let i = 0; i < 4; i++) {
@@ -5257,7 +4857,6 @@ function frageModusReset(sandbox) {
     }
     const teilchen = $("menue-teilchen");
     const farben = ["#ffc2da", "#ff94be", "#ffffff", "#fff6a0", "#a3dc6f"];
-    // Goldene Funken steigen langsam auf
     setInterval(() => {
         if (hauptmenue.classList.contains("versteckt") || document.hidden || teilchen.children.length > 40) return;
         const funke = el("div", "menue-funke");
@@ -5283,8 +4882,6 @@ function frageModusReset(sandbox) {
 let aktiverEinstellungsReiter = "audio";
 
 function oeffneEinstellungen(ausMenue) {
-    // Im Hauptmenue waeren "Hauptmenue" und "Zurueck" dasselbe, dort gibt es nur "Zurueck".
-    // Den kompletten Spielstand loeschen kann man nur aus dem Hauptmenue.
     einstellungenHauptmenue.classList.toggle("versteckt", ausMenue);
     resetZeile.classList.toggle("versteckt", !ausMenue);
     einstellungenSchliessen.textContent = ausMenue ? t("Zurück") : t("Zurück zum Spiel");
@@ -5293,7 +4890,6 @@ function oeffneEinstellungen(ausMenue) {
 }
 
 function renderEinstellungen() {
-    // Ohne laufenden Spielstand (Hauptmenue beim Start) gibt es noch keine Statistik
     const reiter = [
         { id: "erfolge", text: t("🏆 Erfolge") },
         hauptmenue.classList.contains("versteckt") ? { id: "kodex", text: t("📖 Kodex") } : null,
@@ -5317,11 +4913,9 @@ function renderEinstellungen() {
     document.querySelectorAll(".einstellungs-seite").forEach(seite => {
         seite.classList.toggle("versteckt", seite.dataset.seite !== aktiverEinstellungsReiter);
     });
-    // breite Seiten fuer Erfolge, Kodex und Statistik
     document.querySelector(".einstellungen-rahmen").classList.toggle("breit",
         ["erfolge", "kodex", "statistik"].includes(aktiverEinstellungsReiter));
     zeigeLautstaerken();
-    // Von Hand speichern (gespeichert wird ausserdem automatisch); in Endlos mit Auswahl des Speicherstands
     const spielLaeuft = run && run.phase !== "runEnde" && hauptmenue.classList.contains("versteckt");
     $("spiel-speichern-zeile").classList.toggle("versteckt", !spielLaeuft);
     if (spielLaeuft) $("spiel-speichern-text").textContent = run.sandbox
@@ -5330,7 +4924,6 @@ function renderEinstellungen() {
     renderErfolge();
     if (aktiverEinstellungsReiter === "kodex") renderKodex($("kodex-seite"));
     aktualisiereNeuPunkt();
-    // Schalter fuer Anzeige-Optionen
     document.querySelectorAll("[data-option]").forEach(schalter => {
         schalter.checked = einstellungen[schalter.dataset.option] !== false && einstellungen[schalter.dataset.option] !== undefined
             ? Boolean(einstellungen[schalter.dataset.option]) : false;
@@ -5356,9 +4949,6 @@ document.querySelectorAll("[data-option]").forEach(schalter => {
     });
 });
 
-// Kompletter Neustart: Meta-Fortschritt, Erfolge, Statistik und beide Spielstaende (Run und Sandbox) werden geloescht.
-// Unterstuetzer-Inhalte (DLC), die gewaehlte Kosmetik und die Einstellungen (Klang, Anzeige ...) bleiben erhalten.
-// Erst ein rotes Warnfenster, dann wird wirklich geloescht
 function frageAllesLoeschen() {
     Klang.fehler();
     zeigePopup({
@@ -5424,7 +5014,6 @@ $("menue-beenden").addEventListener("click", () => {
     });
 });
 
-// Vollbild: in der Desktop-App ueber Electron (auch F11), im Browser ueber die Fullscreen-API
 function wechsleVollbild() {
     if (window.sproutvaleDesktop) {
         window.sproutvaleDesktop.vollbild();
@@ -5437,7 +5026,6 @@ function wechsleVollbild() {
 $("vollbild-knopf").addEventListener("click", wechsleVollbild);
 $("einstellungen-button").addEventListener("click", () => oeffneEinstellungen(false));
 einstellungenSchliessen.addEventListener("click", () => einstellungenFenster.classList.add("versteckt"));
-// Aus dem Spiel ins Hauptmenue: im Duo verlaesst man dabei auch die Lobby
 einstellungenHauptmenue.addEventListener("click", () => {
     if (typeof koop !== "undefined" && (koop.verbunden || koop.code || koop.imSpiel)) koopVerlassen();
     zeigeHauptmenue();
@@ -5445,7 +5033,6 @@ einstellungenHauptmenue.addEventListener("click", () => {
 spielstandLoeschen.addEventListener("click", frageAllesLoeschen);
 $("spiel-speichern").addEventListener("click", () => {
     if (!run || run.phase === "runEnde") return;
-    // Endlos (allein und im Duo): einen der 3 Speicherstaende waehlen. Story hat nur einen Stand.
     if (run.sandbox) {
         zeigeSpeicherWahl();
         return;
@@ -5456,7 +5043,6 @@ $("spiel-speichern").addEventListener("click", () => {
     zeigeToast(t("💾 Gespeichert"));
 });
 
-// Beschreibung eines Speicherstands wie in der Auswahl im Hauptmenue
 function speicherZeilen(r, m) {
     if (!r && !(m && ((m.lebenszeit && m.lebenszeit.tage) || m.mondblueten))) return [el("span", null, t("Leer"))];
     const zeilen = [el("span", null, r ? tf("📅 Tag {0} · 🏁 {1} Meilensteine · 🪙 {2} Gold", r.tag, (r.meilensteine || 0), zahl(r.gold || 0))
@@ -5465,8 +5051,6 @@ function speicherZeilen(r, m) {
     return zeilen;
 }
 
-// Speichern-Fenster: 3 Speicherstaende, der aktuelle ist markiert. Ein anderer Platz wird ueberschrieben
-// und ist ab dann der Platz dieses Spiels.
 function zeigeSpeicherWahl() {
     const imDuo = Boolean(run.koop);
     const aktuell = imDuo ? run.koopSlot || 0 : run.slot || 1;
@@ -5513,7 +5097,6 @@ function speichereInSlot(slot) {
         else koop.gastPlatz = slot;
         koopSchreibeStand(runDaten());
     } else {
-        // Endlos allein: Fortschritt und Hof auf den neuen Platz, ab jetzt wird dort weiter gespeichert
         run.slot = slot;
         meta.endlosSlot = slot;
         metaSlot = slot;
@@ -5528,7 +5111,6 @@ function speichereInSlot(slot) {
     zeigeToast(tf("💾 Gespeichert: Speicherstand {0}", slot));
 }
 
-// Lautstaerke: Regler oder Klick aufs Symbol (stumm / wieder die vorige Lautstaerke)
 const musikStumm = $("musik-stumm");
 const sfxStumm = $("sfx-stumm");
 
@@ -5565,14 +5147,10 @@ musikStumm.addEventListener("click", () => wechsleStumm("musik"));
 sfxStumm.addEventListener("click", () => wechsleStumm("sfx"));
 reglerSfx.addEventListener("change", () => Klang.muenze(2));
 
-// ---------- MUSIK: welches Lied gerade laeuft ----------
-// "auto": Morgentau am Morgen, Sproutvale am Tag, Abendrot am Abend und Mondnacht in der Nacht
-// (Abend- und Nachtlied nur, wenn im Haus freigeschaltet). Mondteich und Gluecksspiel haben eigene Lieder.
 
 function gewuenschtesLied() {
     if (!prestigeShop.classList.contains("versteckt")) return "mondteich";
     if (!shopPanel.classList.contains("hidden") && marktModus === "glueck") return "gluecksspiel";
-    // Beim Probehoeren im Haus laeuft das angeprobierte Lied
     const gewaehlt = gewaehlteKosmetik("musik").id;
     if (gewaehlt !== "auto" && LIEDER[gewaehlt]) return gewaehlt;
     const frei = id => istKosmetikFrei(MUSIK_TITEL.find(t => t.id === id), "musik");
@@ -5584,12 +5162,10 @@ function gewuenschtesLied() {
 
 function aktualisiereMusik() {
     Klang.waehleLied(gewuenschtesLied());
-    // Bei hoher Kombo wird die Musik etwas schneller
     const multi = run.phase === "tag" ? komboStufe() : 1;
     Klang.setzeTempoFaktor(1 + 0.04 * (multi - 1));
 }
 
-// ---------- PANELS OEFFNEN/SCHLIESSEN ----------
 
 function oeffnePanel(panel) {
     schliessePanels();
@@ -5598,8 +5174,6 @@ function oeffnePanel(panel) {
     haken("panelOffen", panel.id);
 }
 
-// Das Stellarium muss man einmal im Markt freischalten (200 Gold). Wer schon gespielt hat, hat es sofort.
-// Neue Spielstaende haben stellariumFrei: false. Alte Spielstaende (ohne diesen Eintrag) haben es frei, wenn schon gespielt wurde.
 function stellariumFrei() {
     if (meta.stellariumFrei === undefined) return Boolean(meta.lebenszeit && (meta.lebenszeit.runs > 0 || meta.lebenszeit.gold >= 1000));
     if (hf("blind")) return false;
@@ -5625,8 +5199,6 @@ function schliessePanels() {
 
 $("shop-button").addEventListener("click", () => oeffnePanel(shopPanel));
 $("skilltree-button").addEventListener("click", oeffneSkilltree);
-// Erfolge, Kodex und Statistik: Einstellungen direkt auf dem passenden Reiter oeffnen (E, K, I).
-// Ist genau dieser Reiter schon offen, schliesst die Taste das Fenster wieder.
 function oeffneEinstellungsReiter(id) {
     if (!einstellungenFenster.classList.contains("versteckt") && aktiverEinstellungsReiter === id) {
         einstellungenFenster.classList.add("versteckt");
@@ -5640,14 +5212,11 @@ function oeffneStatistik() {
     oeffneEinstellungsReiter("statistik");
 }
 
-// ---------- ROTES AUSRUFEZEICHEN: neue Erfolge oder neue Kodex-Eintraege ----------
-// Gemerkt wird, wie viele man schon gesehen hat (in den Einstellungen, damit es einen Reset uebersteht).
 
 function kodexEntdeckt() {
     return KODEX_REITER.reduce((summe, r) => summe + kodexEintraege(r.id).filter(e => e.anzahl > 0).length, 0);
 }
 
-// Nur noch abholbare Erfolge zeigen das rote Ausrufezeichen (Kodex und Meisterschaft geben ihre Belohnung sofort)
 function neuStand() {
     return { neu: { erfolge: anzahlAbholbar() > 0 } };
 }
@@ -5674,7 +5243,6 @@ karteWeiter.addEventListener("click", () => {
     if (run.phase === "runEnde") oeffnePrestigeShop();
     else starteTag();
 });
-// Run beenden: rotes Warnfenster, damit man sich nicht verklickt
 karteAufgeben.addEventListener("click", () => {
     if (run.phase !== "vorTag" || run.segenAuswahl) return;
     zeigePopup({
@@ -5695,11 +5263,8 @@ karteAufgeben.addEventListener("click", () => {
         ]
     });
 });
-// Neuer Run (bzw. frisch vorbereiteter Tag 1) uebernimmt alle Upgrades, Tarotkarten und ausgeruesteten Karten
-// gleicher Modus wie zuletzt (im Koop: zurueck in die Lobby, der Host startet den naechsten Run)
 prestigeWeiter.addEventListener("click", () => (run.koop ? koopZurueckZurLobby(false) : starteNeuenRun(run.sandbox)));
 
-// Sandbox-Prestige: kleines Fenster, dann beginnt die Sandbox von vorn (ueber den Mondteich)
 function frageNeuanfang() {
     if (!run.sandbox || run.phase === "runEnde" || spielPausiert()) return;
     const mondblueten = mondbluetenJetzt();
@@ -5718,7 +5283,6 @@ function frageNeuanfang() {
         knoepfe: [
             { text: t("Weiterspielen") },
             { text: t("Neuanfang wagen"), klasse: "knopf-lila", aktion: () => {
-                // Im Duo fangen beide neu an (jeder bekommt seine Mondblueten), danach geht es in die Lobby
                 if (run.koop) koopSende("ende");
                 beendeRun(0, true);
             } }
@@ -5727,13 +5291,11 @@ function frageNeuanfang() {
 }
 neuanfangKnopf.addEventListener("click", frageNeuanfang);
 
-// pointerdown statt click: reagiert schon beim Runterdruecken, fuehlt sich beim schnellen Klicken direkter an
 plantButton.addEventListener("pointerdown", event => {
     if (event.button === 0) klickSamenladen(false, event.clientX, event.clientY);
     if (event.button === 0) starteDauerklick(event);
 });
 
-// Dauerklick: gedrueckt halten klickt 15-mal pro Sekunde (erst nach einer kurzen Pause, damit Einzelklicks normal bleiben)
 const DAUERKLICK_PRO_SEK = 15;
 let dauerklick = null;
 function starteDauerklick(event) {
@@ -5763,13 +5325,7 @@ plantButton.addEventListener("pointermove", event => {
 ["pointerup", "pointerleave", "pointercancel"].forEach(typ => plantButton.addEventListener(typ, stoppeDauerklick));
 window.addEventListener("blur", stoppeDauerklick);
 
-// ---------- RUN-SPIELSTAND ----------
-// Der laufende Run wird zwischen den Tagen gespeichert (nach jedem Einkauf, Segen, Gluecksspiel ...).
-// Wird das Spiel mitten an einem Tag geschlossen, geht es beim naechsten Start vor diesem Tag weiter.
-// Am Ende eines Runs wird der Run-Spielstand geloescht (die Mondblueten stecken dann schon im Meta-Spielstand).
 
-// Normaler Run und Sandbox haben je einen eigenen Spielstand. Die Sandbox wird auch mitten am Tag gespeichert
-// (inklusive der Pflanzen auf den Feldern), weil es dort keine Pausen zwischen den Tagen gibt.
 
 const RUN_SPEICHER_KEY = "sproutvale_run";
 const SANDBOX_SPEICHER_KEY = "sproutvale_sandbox";
@@ -5782,7 +5338,6 @@ function runSpeicherKey(sandbox, slot = endlosSlot()) {
     return slot > 1 ? SANDBOX_SPEICHER_KEY + "_" + slot : SANDBOX_SPEICHER_KEY;
 }
 
-// Was auf einem Feld waechst (nur fuer die Sandbox)
 function feldStand(feld) {
     if (feld.leer) return null;
     return {
@@ -5808,7 +5363,6 @@ function stelleFeldWiederHer(feld, stand) {
     zeigeFeldSprite(feld);
 }
 
-// Der ganze Run als speicherbare Daten (Felder mit Pflanzen nur in Endlos)
 function runDaten() {
     const { felder, zielFeld, pflanzen, ...rest } = run;
     return {
@@ -5823,7 +5377,6 @@ function runDaten() {
 
 function speichereRun() {
     if (speichernGesperrt || !run || run.phase === "runEnde") return;
-    // Normale Runs nur zwischen den Tagen (mitten am Tag geht es beim Laden vor diesem Tag weiter)
     if (!run.sandbox && run.phase !== "vorTag") return;
     const daten = runDaten();
     try {
@@ -5835,8 +5388,6 @@ function speichereRun() {
     }
 }
 
-// Endlos nach einem Neuanfang: "im Mondteich" speichern. Wer das Spiel jetzt schliesst, landet beim naechsten Mal
-// wieder im Mondteich dieses Speicherstands (vorher war der Stand weg, und das Spiel sprang zurueck in Story).
 function speichereEndlosNeuanfang() {
     if (speichernGesperrt || !run || !run.sandbox || run.koop || run.phase !== "runEnde") return;
     try {
@@ -5864,7 +5415,6 @@ function leseRunSpeicher(sandbox, slot = endlosSlot()) {
     return null;
 }
 
-// Gibt true zurueck, wenn ein gespeicherter Run (bzw. die gespeicherte Sandbox) geladen wurde
 function ladeRun(sandbox = false) {
     const daten = leseRunSpeicher(sandbox);
     if (!daten) return false;
@@ -5880,10 +5430,9 @@ function ladeRun(sandbox = false) {
         pflanze.freigeschaltet = gespeichert.freigeschaltet;
         pflanze.level = { ...pflanze.level, ...gespeichert.level };
     });
-    const imMondteich = sandbox && rest.phase === "runEnde"; // Endlos: nach einem Neuanfang gespeichert
+    const imMondteich = sandbox && rest.phase === "runEnde";
     Object.assign(neu, { phase: imMondteich ? "runEnde" : "vorTag", felder: [], zielFeld: null, samenUnterwegs: false, klickZaehler: 0, wetter: null });
-    delete neu.lebenszeitSicherung; // aus alten Spielstaenden
-    // Werkzeuge, die es nicht mehr gibt (z.B. Gartenhandschuhe), fallen aus alten Spielstaenden heraus
+    delete neu.lebenszeitSicherung;
     neu.werkzeuge = (neu.werkzeuge || []).filter(id => WERKZEUG_NACH_ID[id]);
     if (neu.haendler && neu.haendler.angebote) {
         neu.haendler.angebote = neu.haendler.angebote.filter(a => a.art !== "werkzeug" || WERKZEUG_NACH_ID[a.id]);
@@ -5899,10 +5448,8 @@ function ladeRun(sandbox = false) {
     prestigeShop.classList.add("versteckt");
     segenFenster.classList.add("versteckt");
     if (imMondteich) {
-        // Nach dem Neuanfang: Tageskarte "Neuanfang" mit dem Knopf zum Mondteich, der neue Run startet von dort
         zeigeTagesKarte("runEnde", run.karte ? run.karte.daten : {});
     } else if (sandbox) {
-        // Die Sandbox laeuft sofort weiter, an derselben Tageszeit und mit denselben Pflanzen
         const tagMs = run.tagMs || 0;
         starteTag(true);
         run.tagMs = tagMs;
@@ -5927,7 +5474,6 @@ function raeumeLootAuf() {
     fxLayer.querySelectorAll(".sternschnuppe, .gluehwuermchen, .kraehe").forEach(e => e.remove());
 }
 
-// Speichert den laufenden Modus und raeumt ihn weg (vor dem Wechsel zwischen Run und Sandbox)
 function legeRunBeiseite() {
     if (!run) return;
     speichereRun();
@@ -5939,7 +5485,6 @@ function legeRunBeiseite() {
     speichereMeta();
 }
 
-// Wechselt zwischen normalem Run und Sandbox. Jeder Modus macht dort weiter, wo man aufgehoert hat.
 function wechsleZuModus(sandbox) {
     if (run && run.sandbox === sandbox && (!sandbox || run.slot === endlosSlot())) return;
     legeRunBeiseite();
@@ -5947,8 +5492,6 @@ function wechsleZuModus(sandbox) {
     speichereMeta();
 }
 
-// Spielstand eines Modus loeschen (Hauptmenue > Spielen). Meta-Fortschritt bleibt.
-// Standard: nur der laufende Run. Sandbox: Run und der ganze Sandbox-Fortschritt (eigene Mondblueten, Kuscheltiere ...).
 function setzeModusZurueck(sandbox, slot = endlosSlot()) {
     const aktiv = run && run.sandbox === sandbox && (!sandbox || (run.slot || 1) === slot);
     if (aktiv) {
@@ -5968,8 +5511,6 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
             console.warn("Endlos-Speicherstand konnte nicht geloescht werden", fehler);
         }
     } else {
-        // Story loeschen = der ganze Story-Fortschritt faengt neu an (Mondteich, Tarot, Kuscheltiere, Sternenfall,
-        // Erfolge, Statistik, Meisterschaft). Kosmetik, Kaeufe, Profil und Endlos bleiben ("Run beenden" behaelt dagegen alles).
         const frisch = fortschrittVon(leererMetaStand());
         if (metaProfil === "standard") {
             Object.keys(fortschrittVon(meta)).forEach(schluessel => delete meta[schluessel]);
@@ -5979,7 +5520,6 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
         }
     }
     if (aktiv) {
-        // Ein geloeschter Endlos-Speicherstand: zurueck zu Story (dort geht es weiter)
         if (sandbox) {
             speichernGesperrt = true;
             if (!ladeRun(false)) starteNeuenRun(false);
@@ -5991,19 +5531,16 @@ function setzeModusZurueck(sandbox, slot = endlosSlot()) {
     speichereMeta();
 }
 
-// Spielzeit lesbar: "2 Std. 15 Min." bzw. "15 Min."
 function spielzeitText(ms) {
     const minuten = Math.floor((ms || 0) / 60000);
     const stunden = Math.floor(minuten / 60);
     return stunden > 0 ? tf("{0} Std. {1} Min.", stunden, minuten % 60) : tf("{0} Min.", minuten);
 }
 
-// Story-Fortschritt, auch wenn gerade Endlos laeuft
 function storyMeta() {
     return metaProfil === "standard" ? meta : metaRuhend || meta;
 }
 
-// ---------- ENDLOS: 3 SPEICHERSTAENDE ----------
 
 function endlosSlotStand(slot) {
     const live = run && run.sandbox && (run.slot || 1) === slot && run.phase !== "runEnde";
@@ -6080,7 +5617,6 @@ function frageSlotLoeschen(slot) {
     });
 }
 
-// Nach jeder Aenderung zwischen den Tagen kurz warten und dann speichern. Die Sandbox hoechstens alle 5 Sekunden.
 registriereHaken("anzeige", () => {
     if (!run || run.phase === "runEnde") return;
     if (!run.sandbox && run.phase !== "vorTag") return;
@@ -6092,7 +5628,6 @@ registriereHaken("runEnde", () => {
     if (run.koop) koopLoescheEigenenRun(run.sandbox, run.koopSlot);
     else loescheRunSpeicher(run.sandbox, run.slot || 1);
 });
-// Die Sandbox zusaetzlich alle 20 Sekunden sichern (falls das Spiel abstuerzt)
 setInterval(() => {
     if (run && run.sandbox && run.phase === "tag" && !spielPausiert()) speichereRun();
 }, 20000);
@@ -6101,9 +5636,6 @@ window.addEventListener("beforeunload", () => {
     speichereMeta();
 });
 
-// ---------- HAUPTSCHLEIFE ----------
-// requestAnimationFrame pausiert automatisch, wenn der Tab nicht sichtbar ist (kein Offline-Fortschritt).
-// Im Hauptmenue und in den Einstellungen ist das Spiel ebenfalls pausiert.
 
 let letzteZeit = performance.now();
 
@@ -6125,7 +5657,7 @@ function hauptSchleife(jetzt) {
         aktualisiereHimmel(dtMs);
 
         erfolgPruefMs += dtMs;
-        if (erfolgPruefMs >= 1000) { // Erfolge pruefen kostet ein paar Millisekunden, einmal pro Sekunde reicht
+        if (erfolgPruefMs >= 1000) {
             erfolgPruefMs = 0;
             pruefeErfolge();
         }
@@ -6137,9 +5669,8 @@ function hauptSchleife(jetzt) {
             renderStatistik();
         }
     } else {
-        kombo.letzterKlick += dtMs; // Kombo bricht in der Pause nicht ab
+        kombo.letzterKlick += dtMs;
     }
-    // Die Figuren laufen auch im Hauptmenue und in der Pause (nur Aussehen)
     if (typeof aktualisiereFiguren === "function") aktualisiereFiguren(dtMs, jetzt);
 
     musikPruefMs += dtMs;
@@ -6151,7 +5682,6 @@ function hauptSchleife(jetzt) {
     requestAnimationFrame(hauptSchleife);
 }
 
-// ---------- FEEDBACK: per Discord an VenraBlossom ----------
 $("feedback-version").textContent = SPIEL_VERSION;
 $("discord-oeffnen").addEventListener("click", () => window.open("https://discord.com/users/218383099443150849", "_blank"));
 $("discord-server").addEventListener("click", () => window.open("https://discord.gg/vmzYDU5", "_blank"));
@@ -6165,7 +5695,6 @@ $("discord-kopieren").addEventListener("click", () => {
     );
 });
 
-// ---------- JAHRESZEITEN-AST: Sternenkalender und Saisonfest ----------
 registriereHaken("tagStart", () => {
     if (!run || run.tag <= 1 || !istErsterJahreszeitTag()) return;
     const z = jahreszeit();

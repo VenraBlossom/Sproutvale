@@ -1,11 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Kodex (Sammelbuch)
-// Zeigt alles, was du schon entdeckt hast: Pflanzen, Spezialpflanzen, Wetter, Werkzeuge, Boss-Regeln und Besucher.
-// Unentdecktes bleibt ein Schatten mit "???". Die Zaehler stehen in meta.kodex (script.js / ereignisse.js).
-// ============================================================
-
 let aktiverKodexReiter = "pflanzen";
 
 function kodexEintraege(reiter) {
@@ -61,13 +55,10 @@ const KODEX_REITER = [
     { id: "besucher", text: t("🐦 Besucher") }
 ];
 
-// Der Kodex steht in den Einstellungen (Reiter "Kodex")
 function oeffneKodex() {
     oeffneEinstellungsReiter("kodex");
 }
 
-// ---------- KODEX-BELOHNUNGEN ----------
-// Alle 10 Entdeckungen: 1 Kuschel-Gutschein. Ein ganzer Bereich vollstaendig: 2 Gutscheine und fuer immer +3% Gold.
 const KODEX_BELOHNUNG = { alleEntdeckungen: 10, gutscheineBereich: 2, goldBereich: 0.03 };
 
 function kodexStand(reiterId) {
@@ -75,7 +66,6 @@ function kodexStand(reiterId) {
     return { entdeckt: eintraege.filter(e => e.anzahl > 0).length, gesamt: eintraege.length };
 }
 
-// Wie viele Bereiche fuer immer vollstaendig sind (fuer den Gold-Bonus)
 function kodexBereicheFertig() {
     return Object.keys(meta.kodexBelohnt || {}).length;
 }
@@ -98,7 +88,6 @@ function pruefeKodexBelohnungen() {
         }
     });
     meta.kodexEntdecktZahl = summe;
-    // Gutschein alle 10 Entdeckungen (zaehlt ab jetzt, bereits entdecktes zaehlt beim ersten Mal mit)
     const stufe = Math.floor(summe / KODEX_BELOHNUNG.alleEntdeckungen);
     if (meta.kodexStufe === undefined) meta.kodexStufe = 0;
     if (stufe > meta.kodexStufe) {
@@ -114,7 +103,6 @@ setInterval(pruefeKodexBelohnungen, 2500);
 
 function renderKodex(inhalt) {
     inhalt.innerHTML = "";
-    // Fortschritt und Belohnungen oben
     const alle = KODEX_REITER.reduce((summe, r) => summe + kodexStand(r.id).entdeckt, 0);
     const naechste = (Math.floor(alle / KODEX_BELOHNUNG.alleEntdeckungen) + 1) * KODEX_BELOHNUNG.alleEntdeckungen;
     const aktuell = kodexStand(aktiverKodexReiter);
@@ -166,7 +154,6 @@ function renderKodex(inhalt) {
             entdeckt && e.extra ? el("div", "kodex-meister", e.extra) : null,
             entdeckt && e.detail ? el("div", "kodex-detail versteckt", e.detail) : null
         ]);
-        // Werkzeuge: Klick zeigt, wie viel jede Stufe dazugibt
         if (entdeckt && e.detail) {
             karte.classList.add("klickbar");
             karte.addEventListener("click", () => {
@@ -178,5 +165,4 @@ function renderKodex(inhalt) {
     });
     inhalt.appendChild(raster);
 }
-
 

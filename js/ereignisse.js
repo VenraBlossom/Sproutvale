@@ -1,25 +1,11 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Ereignisse waehrend eines Runs
-// - Wetter (selten: an den meisten Tagen gibt es keins)
-// - Kraehen (meistens 0 oder 1 pro Tag, hoechstens 3), Vogelscheuche verscheucht die erste
-// - Goldregen (sehr selten)
-// - Boss-Rechnungen (jede 3. Rechnung hat eine Zusatzregel)
-// - Wanderhaendler mit Werkzeugen (Joker fuer den laufenden Run) und Waren
-// - Jahreszeiten: Uhr in der Kopfleiste, Banner, Stimmung im Hof (die Effekte stehen in script.js)
-// Gehoert zu script.js (die Wirkungen stehen dort in den Formeln, z.B. wetterIst(), bossIst(), hatWerkzeug()).
-// ============================================================
-
 const wetterEbene = $("wetter-ebene");
 const wetterSchleier = $("wetter-schleier");
 const wetterAnzeige = $("wetter-anzeige");
 const werkzeugLeiste = $("werkzeug-leiste");
 
-// Zeit seit Tagesbeginn und geplante Ereignisse des Tages
 const tagesPlan = { ms: 0, kraehen: [], goldregen: null, blitzMs: 0, kraehenHeute: 0 };
-
-// ---------- WETTER ----------
 
 function wetterChance() {
     if (run && hatWerkzeug("kristallkugel")) return 1;
@@ -30,7 +16,6 @@ function wetterChance() {
 function wuerfleWetter() {
     run.wetter = null;
     const nurGut = hatWerkzeug("kristallkugel");
-    // Boss-Regel "Unwetter": jeden Tag schlechtes Wetter (ausser mit der Kristallkugel)
     const saison = jahreszeit().wetter || {};
     const saisonGewicht = w => (saison[w.id] === undefined ? 1 : saison[w.id]);
     if (bossIst("unwetter") && !nurGut) {
@@ -42,7 +27,6 @@ function wuerfleWetter() {
     if (run.tag < WETTER_KONFIG.abTag || Math.random() >= wetterChance()) return;
     const gutBonus = 1 + 0.25 * metaLevel("wettergott") + 0.2 * level("wetterfrosch");
     const schlechtFaktor = segen("wetterglueck") > 0 ? 0.5 : 1;
-    // Boss-Regel "Duerre": kein Regen und kein Gewitter
     const trocken = w => bossIst("duerre") && (w.id === "regen" || w.id === "gewitter");
     const moeglich = WETTER.filter(w => (w.gut || !nurGut) && saisonGewicht(w) > 0 && !trocken(w));
     const wetter = gewichteterZufall(moeglich, w => w.gewicht * (w.gut ? gutBonus : schlechtFaktor) * saisonGewicht(w));
@@ -86,7 +70,6 @@ function zeigeWetter(mitBanner) {
     if (mitBanner) zeigeBanner(wetter.symbol, wetter.name, wetterText(wetter), wetter.gut ? "#2f7fcf" : "#b86a1a", 4200);
 }
 
-// Gewitter: ab und zu schlaegt ein Blitz in eine wachsende Pflanze ein und macht sie sofort reif
 function gewitterTick(dtMs) {
     tagesPlan.blitzMs -= dtMs;
     if (tagesPlan.blitzMs > 0) return;
@@ -103,14 +86,11 @@ function gewitterTick(dtMs) {
     zeigeSchwebeText(x, y - 30, t("⚡ Blitz!"), "#2f7fcf", false);
 }
 
-// ---------- KRAEHEN ----------
-
 function kraehenZahl() {
-    if (wetterIst("wind")) return 0; // Windiger Tag: keine Kraehen
+    if (wetterIst("wind")) return 0;
     if (bossIst("kraehenplage")) return 2 + Math.floor(Math.random() * 3);
     const chancen = KRAEHEN_KONFIG.anzahlChancen;
     const wurf = () => gewichteterZufall(chancen.map((_, i) => i), i => chancen[i]);
-    // Mondphase Vollmond: es kommen mehr Kraehen (der hoehere von zwei Wuerfen)
     return run.mondphase >= 4 ? Math.max(wurf(), wurf()) : wurf();
 }
 
@@ -132,10 +112,9 @@ function planeKraehen() {
 function kraeheKommt() {
     const ziele = run.felder.filter(f => !f.leer && !f.kraehe && !f.reserviert);
     if (ziele.length === 0) {
-        tagesPlan.kraehen.push(tagesPlan.ms + 3000); // spaeter nochmal versuchen
+        tagesPlan.kraehen.push(tagesPlan.ms + 3000);
         return;
     }
-    // Kraehen moegen fertige Pflanzen am liebsten
     const fertige = ziele.filter(f => f.fertig);
     const feld = zufall(fertige.length > 0 && Math.random() < 0.7 ? fertige : ziele);
     const ziel = feldMitte(feld);
@@ -154,7 +133,6 @@ function kraeheKommt() {
     const eintrag = { el: kraehe, feld, restMs: stehlZeitMs(), gelandet: false, weg: false, x: startX, y: startY };
     feld.kraehe = eintrag;
     tagesPlan.kraehenHeute += 1;
-    // Vogelscheuche: die erste Kraehe des Tages wird mitten im Anflug verjagt und macht in der Luft kehrt
     const scheuche = level("vogelscheuche") > 0 && tagesPlan.kraehenHeute === 1;
     Klang.kraehe();
 
@@ -207,7 +185,6 @@ function verscheucheKraehe(eintrag) {
     fliegeKraeheWeg(eintrag);
 }
 
-// Die Vogelscheuche ruft "Buh!", wackelt mit den Armen, die Kraehe erschrickt in der Luft und fliegt zurueck
 function vogelscheucheBuh(eintrag, herkunftX) {
     const scheuche = hofEbene.querySelector('.deko[data-deko="vogelscheuche"]');
     if (scheuche) {
@@ -255,7 +232,6 @@ function kraehenTick(dtMs) {
         k.restMs -= dtMs;
         k.el.classList.toggle("eilig", k.restMs < 1500);
         if (k.restMs > 0) return;
-        // Zu spaet: die Kraehe stiehlt die Pflanze
         feld.kraehe = null;
         run.statistik.gestohlen += 1;
         const { x, y } = feldMitte(feld);
@@ -273,8 +249,6 @@ function entferneAlleKraehen() {
     });
     tagesPlan.kraehen = [];
 }
-
-// ---------- GOLDREGEN ----------
 
 function goldregenTick() {
     if (tagesPlan.goldregen === null || tagesPlan.ms < tagesPlan.goldregen) return;
@@ -315,7 +289,6 @@ function goldregenTick() {
     }
 }
 
-// Erntefieber: ein paar Sekunden wachsen alle Pflanzen rasend schnell, der Rand leuchtet
 function fieberTick(dtMs) {
     if (tagesPlan.fieber !== null && tagesPlan.fieber !== undefined && tagesPlan.ms >= tagesPlan.fieber) {
         tagesPlan.fieber = null;
@@ -334,8 +307,6 @@ function fieberTick(dtMs) {
     }
 }
 
-// ---------- BOSS-RECHNUNGEN ----------
-
 function waehleBossRegel() {
     run.bossRegel = !run.sandbox && istBossRechnung(run.bezahlteRechnungen) ? zufall(BOSS_REGELN).id : null;
     if (run.bossRegel) {
@@ -347,9 +318,6 @@ function waehleBossRegel() {
     }
 }
 
-// ---------- WANDERHAENDLER UND WERKZEUGE ----------
-
-// 1 Platz, die Tarotkarte "Der Gehaengte" gibt +1 und verbessert (ausgeruestet) noch einmal +1
 function werkzeugPlaetze() {
     return KONFIG.werkzeugPlaetze + (hatTarot("gehaengte") ? 1 : 0) + (istVerstaerkt("gehaengte") ? 1 : 0);
 }
@@ -360,7 +328,6 @@ function haendlerChance() {
         0.05 * kuschel("papagei"));
 }
 
-// Preise richten sich nach der naechsten Rechnung (in der Sandbox nach dem naechsten Meilenstein)
 function haendlerBasis() {
     const nummer = run.sandbox ? run.meilensteine : run.bezahlteRechnungen;
     return rechnungsBetrag(nummer) * (1 - 0.25 * stil("haendler")) * (1 - 0.15 * kuschel("greif")) * (1 - Math.min(0.5, werkzeugWert("kompass")));
@@ -384,7 +351,6 @@ function haendlerKommt() {
     }
     run.haendler = { angebote };
     Klang.haendler();
-    // Sandbox: das Haendler-Symbol oben blinkt 10 Sekunden lang
     if (run.sandbox) {
         haendlerKnopf.classList.remove("blinkt");
         void haendlerKnopf.offsetWidth;
@@ -407,7 +373,7 @@ function kaufeAngebot(angebot) {
     }
     run.gold -= angebot.preis;
     angebot.gekauft = true;
-    run.haendler.gekauft = true; // pro Besuch nur ein Kauf, die anderen Angebote sind danach weg
+    run.haendler.gekauft = true;
     if (angebot.art === "werkzeug") {
         gibWerkzeug(angebot.id, angebot.preis, angebot.stufe);
     } else {
@@ -526,7 +492,6 @@ function oeffneHaendler() {
     });
 }
 
-// Werkzeuge: oben ein Knopf "🧰 1/2", ein Klick klappt die Plaetze auf
 const werkzeugKnopf = $("werkzeug-knopf");
 const werkzeugBereich = $("werkzeug-bereich");
 werkzeugKnopf.prepend(pixelIcon("🧰", 28, "icon"));
@@ -564,15 +529,12 @@ function renderWerkzeugLeiste() {
     }
 }
 
-// ---------- HAKEN: alles an die Spielschleife anschliessen ----------
-
 registriereHaken("runStart", () => {
     run.werkzeugPreise = {};
     run.werkzeugStufen = {};
     tagesPlan.kraehen = [];
     tagesPlan.goldregen = null;
     waehleBossRegel();
-    // Sternenfall-Upgrade "Kometenschweif": Start mit zufaelligen Werkzeugen
     mische(WERKZEUGE).slice(0, Math.min(sfLevel("kometenschweif"), werkzeugPlaetze())).forEach(w => gibWerkzeug(w.id, werkzeugPreis(w)));
     zeigeWetter();
 });
@@ -637,7 +599,6 @@ registriereHaken("karteZusatz", teile => {
 
 registriereHaken("anzeige", renderWerkzeugLeiste);
 
-// Sandbox: keine Tageskarte, darum sitzt der Haendler-Knopf oben in der Leiste
 const haendlerKnopf = $("haendler-button");
 registriereHaken("anzeige", () => {
     haendlerKnopf.classList.toggle("versteckt", !(run.sandbox && run.haendler && run.phase !== "runEnde"));
@@ -645,14 +606,9 @@ registriereHaken("anzeige", () => {
 haendlerKnopf.addEventListener("click", oeffneHaendler);
 karteHaendler.addEventListener("click", oeffneHaendler);
 
-// ---------- JAHRESZEITEN: UHR, BANNER, STIMMUNG IM HOF ----------
-// Die Uhr in der Kopfleiste ist eine Scheibe mit 4 Farben (Fruehling, Sommer, Herbst, Winter).
-// Der Zeiger wandert ueber alle 20 Tage, auch waehrend eines Tages ein kleines Stueck weiter.
-
 const jahreszeitUhr = $("jahreszeit-uhr");
 const uhrZeiger = jahreszeitUhr.querySelector(".uhr-zeiger");
 
-// Kurzer Effekt-Text einer Jahreszeit aus ihren Faktoren (mit Segen "Kind der Jahreszeiten" doppelt so stark)
 function jahreszeitEffekte(z) {
     const prozent = (faktor, name) => (faktor > 1 ? "+" : "-") + Math.round(Math.abs(faktor - 1) * 100) + "% " + name;
     const teile = [];
@@ -713,18 +669,15 @@ registriereHaken("tagTick", () => {
         tagesFortschritt()) / (JAHRESZEITEN_KONFIG.tageProJahreszeit * JAHRESZEITEN.length) * 360 + "deg");
 });
 
-// Banner am ersten Tag einer Jahreszeit
 registriereHaken("tagStart", () => {
     if ((run.tag - 1) % JAHRESZEITEN_KONFIG.tageProJahreszeit !== 0) return;
     const z = jahreszeit();
     meta.kodex.jahreszeiten = meta.kodex.jahreszeiten || {};
     meta.kodex.jahreszeiten[z.id] = (meta.kodex.jahreszeiten[z.id] || 0) + 1;
-    // Laeuft der Tag nur im Hintergrund hinter dem Hauptmenue an, keine Meldung
     if (imHauptmenue()) return;
     zeigeBanner(z.symbol, tf("{0} beginnt!", z.name), z.text, z.farbe, 4000);
 });
 
-// Zeile auf der Tageskarte: welche Jahreszeit der naechste Tag hat
 registriereHaken("karteZusatz", teile => {
     if (run.karte.modus === "runEnde") return;
     const z = jahreszeit();
@@ -734,15 +687,8 @@ registriereHaken("karteZusatz", teile => {
         (neu ? `<b>${t("Ab morgen:")} ${z.name}!</b> ` : `<b>${z.name}</b> (${tf("noch {0}", rest === 1 ? t("1 Tag") : tf("{0} Tage", rest))}): `) + `${z.text}</p>`);
 });
 
-// ---------- JAHRESZEITEN-TEILCHEN ----------
-// Nur ab und zu und nur wenige gleichzeitig: sie zeigen, welche Jahreszeit gerade ist, ohne den Bildschirm zu fuellen.
-// Fruehling rosa Kirschblueten, Sommer Schmetterlinge, Herbst Blaetter, Winter Schneeflocken.
-// Abschaltbar in den Einstellungen (Anzeige). Bei Wetter (Regen ...) Pause.
-// Jedes Teilchen: aussen faellt es, innen wiegt es hin und her. Alles nur CSS-Animationen.
-
 const jahreszeitEbene = $("jahreszeit-ebene");
 
-// chance = wie oft pro Versuch (alle 1,2 Sekunden) etwas kommt, max = hoechstens so viele gleichzeitig
 const JAHRESZEIT_TEILCHEN = {
     bluete: { farben: ["#ff94be", "#ffb3d1", "#ff7fb0"], bilder: ["🌸"], bildChance: 0.4, max: 5, chance: 0.45 },
     schmetterling: { max: 2, chance: 0.15 },
@@ -779,7 +725,6 @@ function erzeugeJahreszeitTeilchen(art) {
     setTimeout(() => aussen.remove(), dauer * 1000 + 200);
 }
 
-// Sommer: ab und zu flattert ein Schmetterling quer ueber Hof und Acker (in verschiedenen Farben)
 function schickeSchmetterling() {
     const flieger = el("div", "jz-schmetterling" + (Math.random() < 0.5 ? " links" : ""));
     const fluegel = pixelIcon("🦋", 32, "jz-fluegel");
@@ -803,7 +748,6 @@ setInterval(() => {
     if (jahreszeitEbene.querySelectorAll(".jz-teilchen").length < k.max) erzeugeJahreszeitTeilchen(art);
 }, 1200);
 
-// Ausgeschaltet oder bei Wetter: vorhandene Teilchen weg
 registriereHaken("anzeige", () => {
     if (einstellungen.jahreszeitTeilchen === false) jahreszeitEbene.innerHTML = "";
 });
@@ -811,7 +755,6 @@ registriereHaken("tagVorbereiten", () => {
     if (run.wetter) jahreszeitEbene.innerHTML = "";
 });
 
-// Regengeraeusch nur, solange man wirklich auf dem Hof ist (nicht im Hauptmenue)
 setInterval(() => {
     if (!run) return;
     Klang.regen(run.phase === "tag" && (run.wetter === "regen" || run.wetter === "gewitter") && !imHauptmenue());

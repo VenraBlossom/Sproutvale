@@ -1,9 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Mondteich (dauerhafte Upgrades, Tarot, Kuscheltiere, Sternenfall, Spielmodi)
-// Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
-// ============================================================
 
 function oeffnePrestigeShop() {
     schliessePanels();
@@ -16,7 +12,6 @@ function schliessePrestigeShop() {
     prestigeShop.classList.add("versteckt");
 }
 
-// ---------- DAUERHAFTE UPGRADES (Mondblueten) ----------
 
 function kaufeMetaUpgrade(def) {
     if (def.sichtbar && !def.sichtbar(meta)) return;
@@ -36,7 +31,6 @@ function renderMetaUpgrades() {
         : t("Mondblüten bekommst du am Ende jedes Runs für bezahlte Rechnungen (1. = 2, 2. = 8, 3. = 18 …)")) +
         (meta.sternenfaelle > 0 ? tf(", durch deine Sternenfälle x{0}.", zahl(sternenfallFaktor())) : ".");
     META_UPGRADES.filter(def => !(run.sandbox && SANDBOX_AUS_META.includes(def.id))).forEach(def => {
-        // Noch nicht entdeckt: nur ein Geheimnis mit Hinweis
         if (def.sichtbar && !def.sichtbar(meta)) {
             prestigeInhalt.appendChild(erstelleKarte({ titel: t("🔒 Noch unbekannt"), beschreibung: def.sichtbarText, info: "",
                 knopfText: t("Gesperrt"), aktiv: false, onKauf: () => {} }));
@@ -58,8 +52,6 @@ function renderMetaUpgrades() {
     });
 }
 
-// ---------- TAROTKARTEN ----------
-// Alle Karten sind gleich gross. Klick auf eine Karte oeffnet sie gross mit allen Texten und Knoepfen.
 
 function kaufeTarot(karte) {
     const preis = tarotKaufPreis();
@@ -170,9 +162,6 @@ function zeigeTarotDetails(karte) {
     zeigePopup({ titel: karte.nummer + " · " + karte.name, inhalt, farbe: "#7c4fb3", breite: 640, knoepfe, klasse: "tarot-popup" });
 }
 
-// ---------- KUSCHEL-AUTOMAT (Gacha, Kuscheltiere bleiben fuer immer) ----------
-// Ein Zug pro Klick (keine 10er-Zuege). Mit Gutschein kostenlos, sonst Mondblueten:
-// der erste Zug kostet 1, jeder bezahlte Zug macht den naechsten um 1 teurer (mit Kuschel-Rabatt nur jeder 2.).
 
 function kuschelPreis() {
     const schritte = metaLevel("kuschelrabatt") > 0 ? Math.floor(meta.kuschelZuegeBezahlt / 2) : meta.kuschelZuegeBezahlt;
@@ -183,12 +172,10 @@ function wuerfleKuschelRaritaet() {
     return KUSCHEL_RARITAETEN.indexOf(gewichteterZufall(KUSCHEL_RARITAETEN, r => r.chance));
 }
 
-// Wie viele Stueck braucht man fuer die naechste Stufe? (1, 2, 4, 8, 16)
 function kuschelNaechsteStufeBei(stufe) {
     return Math.pow(2, stufe);
 }
 
-// Sind die Gutscheine gerade aufgebraucht, kann man kurz nicht mit Mondblueten ziehen (sonst gibt man sie aus Versehen aus)
 const KUSCHEL_SPERRE_MS = 2500;
 let kuschelSperreBis = 0;
 
@@ -213,7 +200,6 @@ function zieheKuschel(mitGutschein) {
     zeigeKapsel({ tier, raritaet, neu: stufeVorher === 0, stufe: stufeNachher, aufgestiegen: stufeVorher > 0 && stufeNachher > stufeVorher });
 }
 
-// Kapsel faellt, wackelt 3-mal und springt auf. Je seltener, desto bunter die Strahlen.
 function zeigeKapsel(ergebnis) {
     const r = KUSCHEL_RARITAETEN[ergebnis.raritaet];
     const buehne = el("div", "kapsel-buehne");
@@ -227,7 +213,6 @@ function zeigeKapsel(ergebnis) {
     const inhalt = el("div", null, null, [buehne, unten]);
     const schliesse = zeigePopup({ titel: t("🎪 Kuschel-Automat"), inhalt, farbe: r.rand, breite: 560, schliessbar: false, klasse: "kapsel-popup" });
 
-    // Selten und besser wackelt laenger (Spannung!). "Ueberspringen" oeffnet die Kapsel sofort.
     const wackler = ergebnis.raritaet >= 3 ? 3 : 2;
     const timer = [];
     for (let i = 0; i < wackler; i++) {
@@ -246,7 +231,7 @@ function zeigeKapsel(ergebnis) {
         geoeffnet = true;
         timer.forEach(clearTimeout);
         ueberspringen.remove();
-        renderPrestigeShop(); // erst jetzt erscheint das Tier in der Sammlung dahinter
+        renderPrestigeShop();
         kapsel.classList.add("offen");
         strahlen.classList.add("an", "r-" + r.id);
         Klang.kapselAuf(ergebnis.raritaet);
@@ -269,7 +254,6 @@ function zeigeKapsel(ergebnis) {
             ? el("button", "knopf knopf-lila", tf("Nochmal mit Gutschein 🎟️ ({0})", meta.gutscheine))
             : el("button", "knopf knopf-lila", tf("Nochmal · {0} Mondblüten", zahl(kuschelPreis())));
         nochmal.disabled = meta.gutscheine <= 0 && meta.mondblueten < kuschelPreis();
-        // Letzter Gutschein verbraucht: kurz warten und deutlich sagen, dass jetzt Mondblueten kosten
         const rest = kuschelSperreBis - performance.now();
         if (meta.gutscheine <= 0 && rest > 0 && !nochmal.disabled) {
             nochmal.disabled = true;
@@ -347,7 +331,6 @@ function renderKuscheltiere() {
     prestigeInhalt.appendChild(sammlung);
 }
 
-// ---------- STERNENFALL (zweite Prestige-Ebene) ----------
 
 function sternenfallSplitter() {
     return Math.floor(Math.sqrt(meta.mondbluetenSeitSternenfall / STERNENFALL_KONFIG.splitterTeiler) * pokalFaktor());
@@ -363,7 +346,7 @@ function loeseSternenfallAus() {
     const geschenk = 5 * sfLevel("himmelsgabe");
     meta.sternensplitter += splitter;
     meta.sternenfaelle += 1;
-    gibBauernXp(1000 + 400 * splitter); // Sternensplitter sind selten, darum viel Erfahrung
+    gibBauernXp(1000 + 400 * splitter);
     meta.mondblueten = 0;
     meta.mondbluetenSeitSternenfall = 0;
     meta.upgrades = {};
@@ -372,7 +355,6 @@ function loeseSternenfallAus() {
     Klang.goldregen();
     bildschirmBlitz("#c9b0f5", 0.6, 600);
     zeigeBanner("☄️", t("Sternenfall!"), tf("+{0} Sternensplitter · alle Mondblüten ab jetzt x{1}{2}", splitter, zahl(sternenfallFaktor()), (geschenk ? tf(" · +{0} Gutscheine", geschenk) : "")), "#7c4fb3", 4500);
-    // Ein vorbereiteter Tag 1 wird mit den neuen Werten neu aufgebaut
     if (run.phase === "vorTag" && run.tag === 1 && !run.koop) starteNeuenRun(false);
     oeffnePrestigeShop();
 }
@@ -448,10 +430,8 @@ function renderSternenfall() {
     });
 }
 
-// ---------- SPIELMODI ----------
 
 function hatSandbox() {
-    // Endlos: im Mondteich gekauft, mit dem Unterstuetzer-Paket oder mit dem Code BETAVALE
     return meta.sandbox || hatDlc() || Boolean(Tresor.stand().endlos);
 }
 
@@ -465,18 +445,15 @@ function kaufeSandbox() {
     renderPrestigeShop();
 }
 
-// Mondphasen gehoeren zu Story. Laeuft gerade Endlos, liegt der Story-Fortschritt in metaRuhend.
 function storyMeta() {
     return metaProfil === "standard" ? meta : metaRuhend || meta;
 }
 
-// Mondphasen: Auswahl der Schwierigkeit fuer den naechsten normalen Run (auch aus Endlos heraus)
 function waehleMondphase(index) {
     const m = storyMeta();
     if (index > (m.mondphaseFrei || 0)) return;
     m.mondphase = index;
     speichereMeta();
-    // Ein vorbereiteter Tag 1 uebernimmt die Phase sofort (im Duo nicht: dort waehlt der Host beim Start)
     if (run.phase === "vorTag" && run.tag === 1 && !run.sandbox && !run.koop) starteNeuenRun(false);
     Klang.stern();
     oeffnePrestigeShop();
@@ -549,7 +526,6 @@ function renderHerausforderungen() {
 
 function renderSpielmodi() {
     prestigeInfo.textContent = t("Spielmodi verändern die Regeln eines Runs.");
-    // Im Duo startet nur der Host neue Runs, und zwar aus der Lobby
     if (run.koop) {
         prestigeInhalt.appendChild(erstelleHinweis(t("👥 Im Duo startet der Host neue Runs in der Lobby. Die Mondphase des Hosts gilt für euch beide. ") +
             t("Deine Auswahl hier gilt für deine Solo-Runs.")));
@@ -561,9 +537,8 @@ function renderSpielmodi() {
         }
         return;
     }
-    renderMondphasen(); // gelten nur fuer Story, sind aber auch aus Endlos heraus waehlbar
+    renderMondphasen();
     renderHerausforderungen();
-    // Neue Mondphasen sind jetzt gesehen (das Ausrufezeichen verschwindet beim naechsten Oeffnen)
     if (neueMondphase()) {
         storyMeta().mondphaseGesehen = storyMeta().mondphaseFrei || 0;
         speichereMeta();
@@ -594,18 +569,15 @@ function renderSpielmodi() {
     }));
 }
 
-// Wurde eine neue Mondphase frei, die man sich noch nicht angesehen hat?
 function neueMondphase() {
     return (storyMeta().mondphaseFrei || 0) > (storyMeta().mondphaseGesehen || 0);
 }
 
-// Ausrufezeichen am Mondteich-Knopf (Tageskarte)
 function aktualisiereMondphaseHinweis() {
     const knopf = $("karte-prestige");
     if (knopf) knopf.classList.toggle("hat-neues", neueMondphase());
 }
 
-// ---------- MONDTEICH-FENSTER ----------
 
 function renderPrestigeShop() {
     prestigeGuthaben.innerHTML = "";
@@ -638,19 +610,16 @@ function renderPrestigeShop() {
     else renderMetaUpgrades();
 }
 
-// Klick auf die Mondphase oben: direkt zur Auswahl im Mondteich (wenn er gerade offen sein darf)
 mondphaseDisplay.addEventListener("click", () => {
     if (spielPausiert()) return;
     if (darfMondteich()) aktiverPrestigeReiter = "modi";
     versucheMondteich();
 });
 
-// Nach dem Run: Mondteich einklappen, um Markt, Stellarium usw. in Ruhe anzuschauen (kaufen geht erst im neuen Run)
 const prestigeEinklappen = $("prestige-einklappen");
 setzeTipp(prestigeEinklappen, t("Mondteich einklappen: Markt, Stellarium und Hof ansehen, bevor du neu startest (kaufen geht erst im neuen Run)"));
 prestigeEinklappen.addEventListener("click", () => {
     schliessePrestigeShop();
-    // Zurueck in den Mondteich geht es ueber den leuchtenden Teich im Hof
     zeigeToast(t("👀 Nur ansehen: Kaufen geht erst im neuen Run. Klick auf den leuchtenden Mondteich, um weiterzumachen."));
 });
 registriereHaken("anzeige", () => {

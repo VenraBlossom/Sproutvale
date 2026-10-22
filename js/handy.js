@@ -1,24 +1,13 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Bruecke zur Handy-App (Capacitor, siehe handy-app/README.md)
-// Laeuft nur, wenn das Spiel in der Handy-App steckt (window.Capacitor ist da). Im Browser und in der
-// Desktop-App passiert hier nichts.
-// Stellt window.sproutvaleHandy bereit, das kasse.js benutzt:
-//   kasse:   Gems kaufen ueber Google Play / App Store (Plugin: @revenuecat/purchases-capacitor)
-//   werbung: freiwillige Belohnungs-Werbung (Plugin: @capacitor-community/admob), nur auf Knopfdruck
-// Fehlt ein Plugin oder ist es nicht eingerichtet, meldet die Bruecke "nicht bereit" und das Spiel zeigt nichts davon.
-// ============================================================
 
 (function handyBruecke() {
     const cap = window.Capacitor;
     if (!cap || !cap.isNativePlatform || !cap.isNativePlatform()) return;
     const plugins = cap.Plugins || {};
 
-    // Hier die IDs eintragen, sobald die Konten bei Google/Apple, RevenueCat und AdMob angelegt sind
     const HANDY_KONFIG = {
         revenueCatSchluessel: { android: "", ios: "" },
-        // Produkt-IDs im Play Store / App Store = Paket-IDs aus kasse.js (gems_100, gems_500, gems_1100)
         admobBelohnung: { android: "", ios: "" }
     };
     const plattform = cap.getPlatform ? cap.getPlatform() : "android";
@@ -27,7 +16,6 @@
     let werbungBereit = false;
     const offen = [];
 
-    // Kaeufe
     const kaeufe = plugins.Purchases;
     const kaufSchluessel = HANDY_KONFIG.revenueCatSchluessel[plattform];
     if (kaeufe && kaufSchluessel) {
@@ -36,7 +24,6 @@
             .catch(fehler => console.warn("Kaeufe nicht verfuegbar", fehler));
     }
 
-    // Werbung
     const admob = plugins.AdMob;
     const werbeId = HANDY_KONFIG.admobBelohnung[plattform];
     if (admob && werbeId) {

@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sproutvale</title>
     <link rel="icon" href="assets/Icon.png">
-    <!-- Pixel-Schriften liegen lokal im Ordner fonts (funktioniert auch ohne Internet) -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Intro: Arcade-Automat schaltet sich ein und zeigt das Studio-Logo (Klick ueberspringt) -->
     <div id="intro">
         <div id="intro-buehne">
             <canvas id="intro-leinwand" width="640" height="360"></canvas>
@@ -23,7 +21,6 @@
         </div>
     </div>
     <div id="crt-filter"></div>
-    <!-- Kopfbereich: Himmel (Tageszeit), Sonne/Mond, Wolken, Hof-Landschaft, Haustier und Deko, oben die Holzleiste -->
     <header id="top-bar">
         <div id="himmel"></div>
         <div id="himmel-sterne"></div>
@@ -46,7 +43,6 @@
             <button class="stat stat-klein info-knopf versteckt" id="koop-knopf"><img class="icon" alt="" data-symbol="duo"><span></span></button>
             <button class="stat stat-klein info-knopf" id="pokal-knopf"><img class="icon" alt=""></button>
             <div class="stat stat-klein info-knopf" id="rechnung-display" data-tipp="Nächste Rechnung. Jede 3. ist ein Kredit mit Auflage."><img class="icon" data-sprite="rechnung" alt=""><span></span></div>
-            <!-- Werkzeuge vom Wanderhaendler (1 Platz, mehr durch die Tarotkarte "Der Gehaengte") -->
             <div id="werkzeug-bereich">
                 <button class="knopf top-knopf" id="werkzeug-knopf" data-tipp="Deine Werkzeuge (anklicken)"><span>0/1</span></button>
                 <div id="werkzeug-leiste" class="versteckt"></div>
@@ -68,14 +64,10 @@
     </header>
 
 
-    <!-- Nacht: verdunkelt Hof und Acker passend zur Tageszeit -->
     <div id="nacht-schleier"></div>
-    <!-- Wetter ueber dem Acker (Regen, Nebel, Hitze) -->
     <div id="wetter-schleier"></div>
-    <!-- Jahreszeit: Kirschblueten, Pusteblumen, Laub oder Schnee ueber dem ganzen Hof und Acker -->
     <div id="jahreszeit-ebene"></div>
 
-    <!-- Acker: links und rechts je 6 Spalten Felder, in der Mitte der Weg mit dem Samenladen -->
     <main id="field-grid">
         <div id="weg"></div>
         <div id="marktstand">
@@ -95,7 +87,6 @@
         </div>
     </main>
 
-    <!-- Tageskarte wie ein Bestellzettel: faehrt aus dem Kopfbereich herunter, hochgeschoben bleibt nur die Lasche sichtbar -->
     <div id="karten-halter" class="versteckt">
         <div id="karten-schieber">
         <div id="tages-karte" class="pergament">
@@ -135,7 +126,6 @@
 
 
 
-    <!-- Stellarium: ein grosser Skilltree, verschiebbar und zoombar -->
     <div id="skilltree-fenster" class="versteckt">
         <div class="sternbild-fenster">
             <div class="sternbild-kopf">
@@ -175,7 +165,6 @@
         </div>
     </div>
 
-    <!-- Profil: Name und eigene Figur (aus dem Hauptmenue) -->
     <div id="profil-fenster" class="overlay versteckt">
         <div class="profil-rahmen pergament">
             <div class="profil-kopf">
@@ -186,7 +175,6 @@
         </div>
     </div>
 
-    <!-- Pflicht-Auswahl nach jeder bezahlten Rechnung -->
     <div id="segen-fenster" class="overlay versteckt">
         <div class="segen-rahmen pergament">
             <h2>🧾 Rechnung bezahlt!</h2>
@@ -201,7 +189,6 @@
             <div class="einstellungen-reiter" id="einstellungen-reiter"></div>
 
             <div class="einstellungs-seite" data-seite="audio">
-                <!-- Klick auf das Symbol schaltet stumm bzw. wieder laut -->
                 <div class="einstellung">
                     <span><button class="stumm-knopf" id="musik-stumm" data-tipp="Musik stumm schalten">🎵</button> Musik</span>
                     <input type="range" id="regler-musik" min="0" max="100">
@@ -329,7 +316,6 @@
         </div>
     </div>
 
-    <!-- Hauptmenue: Startseite und Auswahl des Spielmodus (Standard oder Sandbox, jeder mit eigenem Spielstand) -->
     <div id="hauptmenue">
         <button class="knopf profil-knopf" id="profil-knopf">Profil</button>
         <div id="menue-wolken"></div>
@@ -385,12 +371,10 @@
 
     <div id="toasts"></div>
 
-    <!-- Ebene fuer fliegende Saaten, Loot, Partikel, Schwebetexte, Sternschnuppen, Gluehwuermchen und den Sammelradius -->
     <div id="fx-layer">
         <div id="sammel-ring" class="versteckt"></div>
     </div>
 
-    <!-- Reihenfolge wichtig: Grafiken, Daten, Klang, Oberflaechen-Bausteine, Kern, Zusatz-Systeme, zuletzt der Start -->
     <script src="js/speicher.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/tresor.js"></script>

@@ -1,28 +1,14 @@
 "use strict";
 
-// ============================================================
-// TRESOR: gekaufte Inhalte, Gems und eingeloeste Codes (nur Desktop-App, laeuft im Hauptprozess)
-// - Liegt verschluesselt (AES-256-GCM) in save/tresor.dat. Wer die Datei von Hand aendert, macht sie nur kaputt:
-//   eine Datei, die nicht zum Schluessel passt, zaehlt als leer.
-// - Der Schluessel kommt aus desktop-app/geheim.txt. Diese Datei ist NICHT im Repo (.gitignore) und steckt beim
-//   Bauen in der app.asar. Sie darf sich nie aendern, sonst koennen Spieler ihre Kaeufe nicht mehr lesen. Sichern!
-// - Das Spiel (Renderer) darf hier nichts frei setzen: es kann nur Gems AUSGEBEN (Preise stehen hier),
-//   Codes einloesen (Codes stehen hier als Pruefsumme) und den Stand lesen. Gems gutschreiben und das
-//   Unterstuetzer-Paket freischalten geht nur ueber Steam (steam.js) oder einen Code.
-// ============================================================
 
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
 const VERSION = 1;
-// Preise in Gems (gleich wie im Spiel: DLC_KRISTALLE und LEGENDAER_KRISTALLE in js/haus.js / js/daten.js)
 const PREIS_DLC = 500;
 const PREIS_EINZELN = 50;
-// Promocodes: SHA-256 von "sproutvale-code:" + CODE (Grossbuchstaben). Der Code selbst steht nirgends im Repo.
-// Neuen Code anlegen: node -e "console.log(require('crypto').createHash('sha256').update('sproutvale-code:MEINCODE').digest('hex'))"
 const CODES = [
-    // BETAVALE: Beta-Tester-Begleiter, BETA Shirt und Endless
     { pruef: "de2954897ffb496230445a593cbbda6cd156edbf05da4f79362a7f32a1d1f8d9", beta: true, endlos: true, aktiv: true }
 ];
 
@@ -35,7 +21,6 @@ function leererStand() {
     return { v: VERSION, gems: 0, gekauft: [], codes: [], beta: false, endlos: false, altUebernommen: false };
 }
 
-// Geheimnis lesen (oder beim allerersten Start auf dem Entwickler-PC anlegen)
 function ladeSchluessel() {
     const pfad = path.join(__dirname, "geheim.txt");
     let geheim = "";
@@ -72,11 +57,10 @@ function entschluessele(text) {
         const daten = Buffer.concat([entziffer.update(roh.subarray(28)), entziffer.final()]);
         return JSON.parse(daten.toString("utf8"));
     } catch (fehler) {
-        return null; // falscher Schluessel oder von Hand geaendert
+        return null;
     }
 }
 
-// Gespeichert wird zweimal: tresor.dat und tresor.bak (falls eine Datei einmal kaputtgeht)
 function speichere() {
     try {
         const inhalt = verschluessele(stand);
@@ -88,8 +72,6 @@ function speichere() {
     }
 }
 
-// ---------- UEBERNAHME ALTER DATEIEN (bis Beta 0.4.x) ----------
-// Damals gab es kaeufe.dat und beta.dat mit einer einfachen Pruefsumme. Beta-Tester behalten ihre Belohnung.
 function altePruefsumme(text) {
     const salz = "sv-" + text.length + "-bl00m";
     let h1 = 0xdeadbeef ^ 0x5eed;
@@ -125,7 +107,6 @@ function uebernimmAlteDateien(ordner) {
             if (beta && beta.beta) stand.beta = true;
         }
     } catch (fehler) {
-        // keine alte Datei
     }
 }
 
@@ -145,9 +126,8 @@ module.exports = {
         if (!stand) {
             const neu = !fs.existsSync(datei);
             if (!neu) {
-                // Ungueltige Datei aufheben (fuer den Support), dann leer anfangen
                 console.warn("[Tresor] tresor.dat ist ungueltig und wird zurueckgesetzt.");
-                try { fs.renameSync(datei, datei + ".ungueltig"); } catch (fehler) { /* egal */ }
+                try { fs.renameSync(datei, datei + ".ungueltig"); } catch (fehler) {  }
             }
             stand = leererStand();
             if (neu) uebernimmAlteDateien(speicherOrdner);
@@ -155,7 +135,6 @@ module.exports = {
         }
         stand = { ...leererStand(), ...stand };
     },
-    // Steam meldet beim Start, ob das Unterstuetzer-Paket (DLC) gekauft ist
     setzeSteamDlc(besitz) {
         steamDlc = Boolean(besitz);
     },
@@ -169,7 +148,6 @@ module.exports = {
             codes: stand.codes.length
         };
     },
-    // Mit Gems kaufen: "dlc" (Unterstuetzer-Paket) oder ein legendaerer Einzel-Inhalt "kategorie:id"
     kaufe(was) {
         was = String(was || "");
         if (!(was === "dlc" || /^[a-z_]+:[a-z0-9_]+$/i.test(was))) return { ok: false, grund: "ungueltig" };
@@ -181,7 +159,6 @@ module.exports = {
         speichere();
         return { ok: true, stand: this.lesen() };
     },
-    // Promocode einloesen (jeder Code nur einmal pro Spieler)
     code(text) {
         const sauber = String(text || "").trim().toUpperCase();
         const pruef = crypto.createHash("sha256").update("sproutvale-code:" + sauber).digest("hex");
@@ -195,13 +172,10 @@ module.exports = {
         speichere();
         return { ok: true, belohnung: { gems: code.gems || 0, beta: Boolean(code.beta), endlos: Boolean(code.endlos) }, stand: this.lesen() };
     },
-    // Gems gutschreiben: NUR fuer bestaetigte Kaeufe (Steam) aus dem Hauptprozess, nie vom Spiel aus
     gutschreiben(menge) {
         stand.gems += Math.max(0, Math.floor(Number(menge) || 0));
         speichere();
     },
-    // Einmalig: Gems, Gekauftes und Codes aus dem alten Browser-Speicher des Spiels uebernehmen.
-    // Grosszuegig, aber begrenzt: Bis Beta 0.4.x gab es keine echten Kaeufe, nur den alten Code (50 Gems).
     uebernimmAlt(daten) {
         if (stand.altUebernommen) return this.lesen();
         stand.altUebernommen = true;
@@ -217,7 +191,6 @@ module.exports = {
         speichere();
         return this.lesen();
     },
-    // Nur in der Entwickler-Version (nicht in der fertigen App): Werte zum Testen setzen
     entwickler(art, wert) {
         if (art === "gems") stand.gems = Math.max(0, Math.floor(Number(wert) || 0));
         if (art === "dlc") stand.gekauft = wert ? [...new Set([...stand.gekauft, "dlc"])] : stand.gekauft.filter(w => w !== "dlc");

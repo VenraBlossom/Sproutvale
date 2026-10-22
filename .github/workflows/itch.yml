@@ -1,12 +1,3 @@
-# ============================================================
-# Veroeffentlicht Sproutvale auf itch.io (https://venrablossom.itch.io/sproutvale)
-#
-# Startet NUR, wenn ein Versions-Tag hochgeladen wird (z.B. v0.2.0) oder per Hand
-# (GitHub > Actions > "Auf itch.io veroeffentlichen" > Run workflow). Normale Aenderungen laden nichts hoch.
-#
-# Einmalig noetig: itch.io > Settings > API keys > Schluessel erzeugen und auf GitHub unter
-# Settings > Secrets and variables > Actions als "BUTLER_API_KEY" eintragen.
-# ============================================================
 name: Auf itch.io veroeffentlichen
 
 on:
@@ -44,7 +35,6 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
-          # Versionsnummer aus dem Tag (v0.2.0 -> 0.2.0), sonst aus desktop-app/package.json
           $version = "${{ github.ref_name }}" -replace '^v', ''
           if ("${{ github.ref_type }}" -ne "tag") { $version = (Get-Content desktop-app/package.json | ConvertFrom-Json).version }
           ./butler/butler.exe push desktop-app/dist-release/Sproutvale venrablossom/sproutvale:windows --userversion $version

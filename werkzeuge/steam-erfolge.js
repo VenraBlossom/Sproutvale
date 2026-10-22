@@ -1,13 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Liste aller Steam-Erfolge erzeugen (Test-Werkzeug, wird nicht mitgeliefert)
-// Laedt das Spiel unsichtbar in Electron und schreibt werkzeuge/steam-erfolge.csv:
-// API-Name (so meldet das Spiel den Erfolg an Steam) und Name/Beschreibung in allen Sprachen des Spiels.
-// Die Spalten heissen wie die Sprachen in Steamworks (german, english, schinese, ...).
-// Diese Liste traegt man in Steamworks unter "Statistiken und Errungenschaften" ein.
-// Start:  desktop-app\node_modules\.bin\electron werkzeuge\steam-erfolge.js
-// ============================================================
 
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
@@ -17,10 +9,8 @@ const os = require("os");
 app.setPath("userData", fs.mkdtempSync(path.join(os.tmpdir(), "sproutvale-erfolge-")));
 
 const SPRACHEN = ["de", "en", "es", "fr", "it", "pt", "nl", "pl", "tr", "ru", "uk", "ja", "zh", "ko"];
-// So heissen die Sprachen in Steamworks
 const STEAM_NAMEN = { de: "german", en: "english", es: "spanish", fr: "french", it: "italian", pt: "brazilian", nl: "dutch", pl: "polish",
     tr: "turkish", ru: "russian", uk: "ukrainian", ja: "japanese", zh: "schinese", ko: "koreana" };
-// Zwischen den Sprachen ist kurz kein Fenster offen: dann nicht beenden
 app.on("window-all-closed", () => {});
 
 async function erfolgeIn(sprache) {
@@ -28,7 +18,6 @@ async function erfolgeIn(sprache) {
     await fenster.loadFile(path.join(__dirname, "..", "index.html")).catch(() => {});
     await new Promise(ok => setTimeout(ok, 1000));
     await fenster.webContents.executeJavaScript(`localStorage.setItem("sproutvale_einstellungen", JSON.stringify({ sprache: "${sprache}" })); true`);
-    // Das Spiel laedt sich nach dem Sprachwechsel evtl. selbst neu: Fehler beim Laden sind dann egal
     await fenster.loadFile(path.join(__dirname, "..", "index.html")).catch(() => {});
     await new Promise(ok => setTimeout(ok, 2500));
     const liste = await fenster.webContents.executeJavaScript(`(() => {

@@ -1,23 +1,5 @@
 "use strict";
 
-// ============================================================
-// Zwei Arten zu bauen (im Ordner desktop-app):
-//
-// "npm run exe"      Entwickler-Version (dist/Sproutvale-win32-x64) + Verknuepfung "Sproutvale.lnk".
-//                    Die .exe laedt das Spiel aus DEINEM Projektordner (Pfad in resources/spielordner.txt).
-//                    Nur fuer dich: auf anderen PCs gibt es diesen Ordner nicht.
-//
-// "npm run release"  Version zum Weitergeben (dist-release). Alle Spieldateien stecken in resources/spiel.
-//                    Dazu entsteht dist-release/Sproutvale.rar zum Hochladen (ZIP, falls WinRAR fehlt).
-//                    Darin: Ordner "Sproutvale" mit Sproutvale.exe. Laedt Updates ueber GitHub (Tags).
-//
-// "npm run steam"    Version fuer Steam (dist-steam/Sproutvale). Die Spieldateien stecken gepackt in resources/spiel.asar,
-//                    kein eigener Updater (Steam aktualisiert), keine Entwickler-Werkzeuge. Den Ordner dist-steam/Sproutvale
-//                    laedst du mit SteamPipe (Steamworks) hoch. steam_appid.txt gehoert NICHT dazu (Steam startet das Spiel selbst).
-//
-// Alle fertigen Versionen brauchen desktop-app/geheim.txt (Schluessel fuer den Tresor mit den Kaeufen). Die Datei
-// entsteht beim ersten Start und darf sich nie aendern: gut sichern, nicht ins Repo!
-// ============================================================
 
 const path = require("path");
 const fs = require("fs");
@@ -30,20 +12,17 @@ const BUILD = path.join(HIER, "build");
 const STEAM = process.argv.includes("--steam");
 const RELEASE = process.argv.includes("--release") || STEAM;
 
-// Diese Dateien und Ordner gehoeren zum Spiel (Test-Dateien mit "_" am Anfang bleiben draussen)
 function istSpielDatei(name) {
     if (name.startsWith("_") || name.startsWith(".")) return false;
     if (["js", "css", "assets", "fonts"].includes(name)) return true;
-    if (name === "LIZENZ-SCHRIFTEN.txt") return true; // Lizenz der Schriften muss mit (OFL), andere .txt nicht
+    if (name === "LIZENZ-SCHRIFTEN.txt") return true;
     return /\.(html|js|css|png|jpg|ogg|mp3|wav|woff2?)$/i.test(name);
 }
 
-// Kopiert das Spiel nach build/spiel (wird in der Release-Version zu resources/spiel)
 function kopiereSpiel() {
     const ziel = path.join(BUILD, "spiel");
     fs.rmSync(ziel, { recursive: true, force: true });
     fs.mkdirSync(ziel, { recursive: true });
-    // Quelldateien von Bildern (Photoshop, Krita, Aseprite) gehoeren nicht ins Spiel
     const ohneQuellen = quelle => !/\.(psd|kra|aseprite|ase|xcf)$/i.test(quelle);
     fs.readdirSync(PROJEKT).filter(istSpielDatei).forEach(name => {
         fs.cpSync(path.join(PROJEKT, name), path.join(ziel, name), { recursive: true, filter: ohneQuellen });
@@ -52,9 +31,6 @@ function kopiereSpiel() {
     return ziel;
 }
 
-// ZIP mit dem in Windows eingebauten tar.exe (ZIP oeffnet Windows ohne Zusatzprogramm, anders als RAR).
-// tar schreibt Pfade mit "/", damit auch der Linux-Server von itch.io die Ordner (z.B. fonts) richtig entpackt.
-// mitOrdner = true: im ZIP liegt ein Ordner (beim Entpacken entsteht nicht ein Haufen loser Dateien)
 function packeZip(ordner, zipDatei, mitOrdner) {
     fs.rmSync(zipDatei, { force: true });
     const basis = mitOrdner ? path.dirname(ordner) : ordner;
@@ -62,16 +38,13 @@ function packeZip(ordner, zipDatei, mitOrdner) {
     execFileSync("tar", ["-a", "-c", "-f", zipDatei, "-C", basis, ...inhalt], { stdio: "inherit" });
 }
 
-// RAR mit WinRAR (falls installiert), sonst ZIP. Im Archiv liegt der Ordner "Sproutvale" mit allem darin.
 const WINRAR = ["C:/Program Files/WinRAR/Rar.exe", "C:/Program Files (x86)/WinRAR/Rar.exe"].find(p => fs.existsSync(p));
 
 function packeRar(ordner, rarDatei) {
     fs.rmSync(rarDatei, { force: true });
-    // a = hinzufuegen, -r = mit Unterordnern, -ep1 = Pfad vor dem Ordner weglassen, -m5 = beste Kompression
     execFileSync(WINRAR, ["a", "-r", "-ep1", "-m5", "-idq", rarDatei, ordner], { stdio: "inherit" });
 }
 
-// Macht aus assets/Icon.png ein Windows-Icon mit allen ueblichen Groessen (scharf in Taskleiste, Explorer und Desktop)
 function erstelleIcon() {
     const groessen = [16, 24, 32, 48, 64, 128, 256];
     const quelle = path.join(PROJEKT, "assets", "Icon.png");
@@ -93,19 +66,19 @@ function erstelleIcon() {
 
     const bilder = groessen.map(g => fs.readFileSync(path.join(BUILD, "icon-" + g + ".png")));
     const kopf = Buffer.alloc(6 + 16 * bilder.length);
-    kopf.writeUInt16LE(0, 0);                 // reserviert
-    kopf.writeUInt16LE(1, 2);                 // Typ: Icon
-    kopf.writeUInt16LE(bilder.length, 4);     // Anzahl Bilder
+    kopf.writeUInt16LE(0, 0);
+    kopf.writeUInt16LE(1, 2);
+    kopf.writeUInt16LE(bilder.length, 4);
     let start = kopf.length;
     bilder.forEach((bild, i) => {
         const g = groessen[i];
         const o = 6 + 16 * i;
-        kopf.writeUInt8(g >= 256 ? 0 : g, o);      // Breite (0 = 256)
-        kopf.writeUInt8(g >= 256 ? 0 : g, o + 1);  // Hoehe
-        kopf.writeUInt8(0, o + 2);                 // Farbpalette
-        kopf.writeUInt8(0, o + 3);                 // reserviert
-        kopf.writeUInt16LE(1, o + 4);              // Farbebenen
-        kopf.writeUInt16LE(32, o + 6);             // Bits pro Pixel
+        kopf.writeUInt8(g >= 256 ? 0 : g, o);
+        kopf.writeUInt8(g >= 256 ? 0 : g, o + 1);
+        kopf.writeUInt8(0, o + 2);
+        kopf.writeUInt8(0, o + 3);
+        kopf.writeUInt16LE(1, o + 4);
+        kopf.writeUInt16LE(32, o + 6);
         kopf.writeUInt32LE(bild.length, o + 8);
         kopf.writeUInt32LE(start, o + 12);
         start += bild.length;
@@ -117,8 +90,6 @@ function erstelleIcon() {
 
 function erstelleVerknuepfung(exe) {
     const lnk = path.join(PROJEKT, "Sproutvale.lnk");
-    // Windows merkt sich Icons ueber den Pfad: jede Version bekommt eine eigene Icon-Datei,
-    // sonst zeigt die Verknuepfung nach einem neuen Icon.png weiter das alte Bild
     fs.readdirSync(BUILD).filter(n => /^verknuepfung-\d+\.ico$/.test(n)).forEach(n => fs.rmSync(path.join(BUILD, n)));
     const icon = path.join(BUILD, "verknuepfung-" + Date.now() + ".ico");
     fs.copyFileSync(path.join(BUILD, "icon.ico"), icon);
@@ -135,7 +106,6 @@ function erstelleVerknuepfung(exe) {
     return lnk;
 }
 
-// Steam: die Spieldateien als ein gepacktes Archiv (spiel.asar), dazu vertrieb.txt ("steam" = kein eigener Updater)
 async function packeSpielFuerSteam(ordner) {
     const asar = require("@electron/asar");
     const archiv = path.join(BUILD, "spiel.asar");
@@ -172,7 +142,6 @@ async function baue() {
         arch: "x64",
         icon,
         overwrite: true,
-        // Programmdateien (z.B. von steamworks.js) koennen nicht aus dem Archiv geladen werden: entpackt lassen
         asar: { unpack: "**/*.{node,dll,so,dylib}" },
         prune: true,
         ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/dist-steam($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/,
@@ -195,7 +164,6 @@ async function baue() {
     }
     if (RELEASE) {
         const windowsArchiv = path.join(ausgabe, WINRAR ? "Sproutvale.rar" : "Sproutvale.zip");
-        // Ordner schoen benennen, damit beim Entpacken "Sproutvale" entsteht
         const schoen = path.join(ausgabe, "Sproutvale");
         fs.rmSync(schoen, { recursive: true, force: true });
         fs.renameSync(ordner[0], schoen);

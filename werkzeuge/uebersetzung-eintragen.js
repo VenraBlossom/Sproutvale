@@ -1,15 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Neue oder geaenderte Uebersetzungen in alle Sprachdateien eintragen (Test-Werkzeug, wird nicht mitgeliefert)
-// Start (im Projektordner):  node werkzeuge/uebersetzung-eintragen.js texte.json
-// texte.json sieht so aus (deutscher Text = Schluessel, fehlende Sprachen werden einfach ausgelassen):
-//   { "Neuer Text {0}": { "en": "New text {0}", "es": "...", "fr": "...", "it": "...", "pt": "...", "nl": "...",
-//                         "pl": "...", "tr": "...", "ru": "...", "uk": "...", "ja": "...", "zh": "...", "ko": "..." } }
-// Gibt es den Schluessel schon, wird der Wert ersetzt, sonst kommt er ans Ende der Datei.
-// Danach pruefen: node werkzeuge/pruefe-uebersetzung.js
-// ============================================================
-
 const fs = require("fs");
 const path = require("path");
 

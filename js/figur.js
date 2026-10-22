@@ -1,26 +1,15 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Eigene Figur (Profil im Hauptmenue) und Figuren auf dem Hof
-// - Profil: Name (fuer Duo) und Aussehen aus Teilen (FIGUR_TEILE in daten.js), gespeichert in meta.profil (fuer alle Spielstaende)
-// - Die Figur laeuft wie der Begleiter ueber den Hof, etwas groesser und ein paar Pixel weiter hinten.
-//   Linksklick: Herzen am Mauszeiger. Rechtsklick: Emotes. Ab und zu eine Idle-Animation (hacken, strecken, winken).
-// - Duo: die Figur und der Begleiter des Mitspielers laufen mit (mit Namensschild)
-// Gehoert zu script.js, haus.js und sprites.js (gemeinsame Funktionen stehen dort).
-// ============================================================
 
-// Platz links und rechts neben der Figur (fuer grosse Fluegel); gezeichnet wird weiter mit x = 0 bis 18
 const FIGUR_LINKS = 3;
 const FIGUR_BREITE = 18 + 2 * FIGUR_LINKS;
-const FIGUR_OBEN = 5;   // Platz ueber dem Kopf (hohe Huete, Heiligenschein, Flammenhaar)
+const FIGUR_OBEN = 5;
 const FIGUR_HOEHE = 26 + FIGUR_OBEN;
-// Schichten von hinten nach vorne (hinten = Fluegel, Rucksack, Umhang)
 const FIGUR_SCHICHTEN = ["umriss", "hinten", "haut", "augen", "kleidung", "haare", "kopf", "accessoire", "werkzeug"];
 const FIGUR_BILDER = { stehen: 2, laufen: 4, sitzen: 2, schlafen: 2, winken: 2, jubeln: 2, tanzen: 4, hacken: 4 };
 const FIGUR_BILD_DAUER = { stehen: 700, laufen: 130, sitzen: 800, schlafen: 1100, winken: 220, jubeln: 260, tanzen: 240, hacken: 230 };
 const FIGUR_FESTE_FARBEN = { w: "#ffffff", 7: "#2a1a12", t: "#9a6634", e: "#b8c0cc", i: "#1a1010" };
 
-// ---------- PROFIL ----------
 
 function leeresProfil() {
     return { name: "", teile: { ...FIGUR_STANDARD } };
@@ -43,14 +32,12 @@ function figurTeil(kategorie, id) {
     return liste.find(e => e.id === id) || liste[0];
 }
 
-// Nur Teile, die man besitzt (sonst das Standard-Teil); vorschau = Teile, die man nur anprobiert
 function figurTeileAus(teile, pruefen = true) {
     const ergebnis = {};
     FIGUR_KATEGORIEN.forEach(k => {
         const teil = figurTeil(k.id, teile[k.id] || FIGUR_STANDARD[k.id]);
         ergebnis[k.id] = !pruefen || istKosmetikFrei(teil, "figur_" + k.id) ? teil : figurTeil(k.id, FIGUR_STANDARD[k.id]);
     });
-    // Eigene Farben (nicht bei legendaeren Teilen): als eigene Variante, damit der Bild-Zwischenspeicher sie trennt
     const farben = teile.farben || {};
     FIGUR_FARBBAR.forEach(k => {
         const haupt = farben[k];
@@ -62,7 +49,6 @@ function figurTeileAus(teile, pruefen = true) {
     return ergebnis;
 }
 
-// Welche Farb-Buchstaben die Zweitfarbe ersetzt (Muster, Streifen, Band, Glaeser ...)
 function figurZweitfarbe(kategorie, hex) {
     if (kategorie === "oberteil") return { k: hex };
     if (kategorie === "hose") return { u: hex };
@@ -72,7 +58,6 @@ function figurZweitfarbe(kategorie, hex) {
     return {};
 }
 
-// Welche Farb-Buchstaben eine eigene Farbe ersetzt (hell und dunkel werden abgeleitet)
 function figurFarbwechsel(kategorie, hex) {
     const dunkel = mischeHex(hex, "#000000", 0.3);
     const hell = mischeHex(hex, "#ffffff", 0.35);
@@ -84,7 +69,6 @@ function figurFarbwechsel(kategorie, hex) {
     return { 5: hex };
 }
 
-// Gewaehlte Aura (nur freigeschaltete, sonst die hoechste erlaubte Stufe darunter)
 function profilAura() {
     const level = bauernRang();
     const gewaehlt = FIGUR_AUREN.find(au => au.id === profil().aura);
@@ -93,13 +77,9 @@ function profilAura() {
 function auraVon(id) {
     return FIGUR_AUREN.find(au => au.id === id) || FIGUR_AUREN[0];
 }
-// Aura an ein Element haengen (Figur oder Namensschild)
-// Die Aura wird alle 10 Level dicker (bis Level 100), egal welche Aura gewaehlt ist
 function auraStaerke(level) {
     return Math.min(10, Math.floor(Math.max(1, level) / 10));
 }
-// Regenbogen-Aura: die Farbe laeuft ueber die Zeit durch (per Code, weil die Figur ihre Klassen oft neu setzt
-// und eine CSS-Animation dadurch immer wieder von vorn beginnen wuerde)
 function regenbogenFarbe() {
     return "hsl(" + Math.round((performance.now() / 12) % 360) + ", 95%, 62%)";
 }
@@ -122,13 +102,7 @@ function profilName() {
     return name || t("Bauer");
 }
 
-// ---------- ZEICHNEN ----------
 
-// Raster in doppelter Aufloesung: gezeichnet wird in "Figur-Pixeln" (18 breit), jeder davon besteht aus 2x2 feinen Pixeln.
-// punkt/rechteck/ellipse/linie arbeiten in Figur-Pixeln (Rundungen werden fein berechnet und dadurch weicher),
-// fein/feinLinie setzen einzelne feine Pixel (Koordinaten in Figur-Pixeln, halbe Werte erlaubt) fuer Details.
-// Doppelte Aufloesung, aber pixelig wie der Rest des Spiels: Grundformen (Ellipsen, Linien, Umriss) liegen auf dem
-// groben Raster, die feinen Pixel sind nur fuer kleine Details, Animationen und Fluegel da
 const FIGUR_FEIN = 2;
 const FIGUR_RB = Math.round(FIGUR_BREITE * FIGUR_FEIN);
 const FIGUR_RH = Math.round(FIGUR_HOEHE * FIGUR_FEIN);
@@ -138,7 +112,6 @@ function figurGitter() {
     const setzeFein = (fx, fy, farbe) => {
         if (fx >= 0 && fy >= 0 && fx < FIGUR_RB && fy < FIGUR_RH) raster[fy][fx] = farbe;
     };
-    // Figur-Pixel (x, y) -> 2x2 feine Pixel; y ohne den Platz oben (0 = Kopfbereich)
     const setze = (x, y, farbe) => {
         const lx = Math.round(x) + FIGUR_LINKS;
         const ly = Math.round(y) + FIGUR_OBEN;
@@ -160,7 +133,6 @@ function figurGitter() {
             const fh = Math.max(1, Math.round(h * FIGUR_FEIN));
             for (let dy = 0; dy < fh; dy++) for (let dx = 0; dx < fb; dx++) setzeFein(fx0 + dx, fy0 + dy, farbe);
         },
-        // Ellipse auf ganzen Figur-Pixeln (pixelig); filter(x, y) bekommt die Figur-Pixel-Koordinaten
         ellipse(cx, cy, rx, ry, farbe, filter) {
             for (let y = -FIGUR_OBEN; y < FIGUR_HOEHE - FIGUR_OBEN; y++) {
                 for (let x = -FIGUR_LINKS; x < FIGUR_BREITE - FIGUR_LINKS; x++) {
@@ -170,7 +142,6 @@ function figurGitter() {
                 }
             }
         },
-        // Ellipse fein gerastert (nur fuer Fluegel und kleine Details)
         ellipseFein(cx, cy, rx, ry, farbe, filter) {
             for (let fy = 0; fy < FIGUR_RH; fy++) {
                 for (let fx = 0; fx < FIGUR_RB; fx++) {
@@ -182,12 +153,10 @@ function figurGitter() {
                 }
             }
         },
-        // Linie auf ganzen Figur-Pixeln (pixelig)
         linie(x0, y0, x1, y1, farbe) {
             const schritte = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
             for (let i = 0; i <= schritte; i++) setze(x0 + ((x1 - x0) * i) / schritte, y0 + ((y1 - y0) * i) / schritte, farbe);
         },
-        // Linie fein (2 feine Pixel dick, fuer Fluegel)
         linieFein(x0, y0, x1, y1, farbe) {
             const schritte = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1) * FIGUR_FEIN;
             for (let i = 0; i <= schritte; i++) {
@@ -199,7 +168,6 @@ function figurGitter() {
                 setzeFein(fx + 1, fy + 1, farbe);
             }
         },
-        // duenne Linie (1 feiner Pixel)
         feinLinie(x0, y0, x1, y1, farbe) {
             const schritte = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 0.5) * FIGUR_FEIN * 2;
             for (let i = 0; i <= schritte; i++) fein(x0 + ((x1 - x0) * i) / schritte, y0 + ((y1 - y0) * i) / schritte, farbe);
@@ -207,7 +175,6 @@ function figurGitter() {
     };
 }
 
-// Koerperhaltung fuer eine Pose (Positionen in Figur-Pixeln)
 function figurHaltung(pose, bild) {
     const h = { wippen: 0, sitzt: false, beinVorn: 0, beinHinten: 0, armVorn: "unten", armHinten: "unten", armSchwung: 0, lehnen: 0, werkzeug: null };
     if (pose === "laufen") {
@@ -239,19 +206,15 @@ function figurHaltung(pose, bild) {
     return h;
 }
 
-// ---------- AUGEN ----------
-// ax/ay = linke obere Ecke eines Auges (2x2 Figur-Pixel = 4x4 fein). anim = Animationsbild fuer legendaere Augen
 function figurAuge(g, ax, ay, augen, geschlossen, anim, gespiegelt) {
     const a = g.augen;
     if (geschlossen) {
-        // geschlossenes Auge: kleiner Bogen
         a.feinLinie(ax, ay + 1.2, ax + 1.5, ay + 1.2, "7");
         a.fein(ax, ay + 0.8, "7");
         a.fein(ax + 1.5, ay + 0.8, "7");
         return;
     }
     if (augen.form === "herz") {
-        // Herz: .X.X / XXXX / XXXX / .XX. , pulsiert
         const gross = anim % 2 === 0;
         const ox = ax - (gross ? 0.5 : 0);
         const oy = ay - (gross ? 0.5 : 0);
@@ -263,7 +226,6 @@ function figurAuge(g, ax, ay, augen, geschlossen, anim, gespiegelt) {
         return;
     }
     if (augen.form === "stern") {
-        // Sternauge: Iris mit sternfoermiger Pupille, funkelt
         a.rechteck(ax, ay, 2, 2, "5");
         const hell = anim % 2 === 0 ? "w" : "v";
         a.fein(ax + 0.5, ay, hell);
@@ -279,23 +241,19 @@ function figurAuge(g, ax, ay, augen, geschlossen, anim, gespiegelt) {
         a.fein(ax + 1, ay, "w");
         return;
     }
-    // Normales Auge: Iris, dunkle Pupille, zwei Glanzpunkte, Wimpern oben
     a.rechteck(ax, ay, 2, 2, "5");
     a.rechteck(ax + (gespiegelt ? 0 : 0.5), ay + 0.5, 1, 1.5, "i");
     a.fein(ax + (gespiegelt ? 1.5 : 0), ay, "w");
     a.fein(ax + (gespiegelt ? 0.5 : 1), ay + 1, "w");
     a.feinLinie(ax - 0.5, ay - 0.5, ax + 1.5, ay - 0.5, "7");
     if (augen.form === "leuchten") {
-        // Leuchtende Augen: heller Kern, der im Takt pulsiert
         a.rechteck(ax + 0.5, ay + 0.5, 1, 1, anim % 2 ? "v" : "w");
     }
 }
 
-// ---------- KOPF ----------
 
 function figurKopfSeite(g, cx, cy, geschlossen, augen, blinzelt, anim) {
     g.haut.ellipse(cx, cy, 4.6, 4.5, "4");
-    // Schatten am Kinn und hinten, kleines Ohr
     g.haut.ellipse(cx, cy, 4.6, 4.5, "s", (x, y) => y + 0.5 > cy + 3.2 || x + 0.5 < cx - 3.8);
     g.haut.ellipse(cx - 1.2, cy + 0.6, 0.9, 1.1, "s");
     g.haut.rechteck(cx + 2.5, cy + 1.5, 1.5, 0.5, "r");
@@ -307,11 +265,9 @@ function figurKopfSeite(g, cx, cy, geschlossen, augen, blinzelt, anim) {
     if (g.gesicht) figurGesicht(g, "seite", cx, Math.round(cy) - 1, g.gesicht, anim);
 }
 
-// Gesichts-Details auf der Augen-Schicht (liegt ueber der Haut). ay = obere Kante der Augen
 function figurGesicht(g, blick, cx, ay, teil, anim) {
     const a = g.augen;
     const vorne = blick === "vorne";
-    // Wangen-Mitten (vorne zwei, seitlich eine vor dem Ohr)
     const wangen = vorne ? [cx - 3.5, cx + 3] : [cx + 2.5];
     const mundX = vorne ? cx - 1 : cx + 2.2;
     switch (teil.form) {
@@ -340,7 +296,6 @@ function figurGesicht(g, blick, cx, ay, teil, anim) {
         a.feinLinie(mundX, ay + 3.5, mundX + (vorne ? 2 : 1), ay + 3.5, "m");
         break;
     case "pflaster": {
-        // Pflaster quer auf der Wange (auf der Stirn lagen die Haare darueber)
         const px = vorne ? cx + 1.5 : cx + 1;
         a.rechteck(px - 0.5, ay + 2, 3.5, 1.5, "H");
         a.rechteck(px, ay + 2, 2.5, 1, "G");
@@ -351,7 +306,6 @@ function figurGesicht(g, blick, cx, ay, teil, anim) {
         wangen.forEach(x => { a.feinLinie(x - 0.5, ay + 2, x + 1, ay + 2, "G"); a.feinLinie(x - 0.5, ay + 3, x + 1, ay + 3, "H"); });
         break;
     case "sternenwangen":
-        // kleine Sterne auf den Wangen, die abwechselnd aufleuchten
         wangen.forEach((x, i) => {
             const hell = (anim + i) % 2 === 0 ? "H" : "G";
             a.fein(x + 0.5, ay + 2, hell);
@@ -368,7 +322,6 @@ function figurGesicht(g, blick, cx, ay, teil, anim) {
 function figurKopfVorne(g, cx, cy, geschlossen, augen, blinzelt, anim) {
     g.haut.ellipse(cx, cy, 4.8, 4.5, "4");
     g.haut.ellipse(cx, cy, 4.8, 4.5, "s", (x, y) => y + 0.5 > cy + 3.2);
-    // Ohren an den Seiten
     g.haut.ellipse(cx - 4.9, cy + 0.6, 0.7, 1, "4");
     g.haut.ellipse(cx + 4.9, cy + 0.6, 0.7, 1, "4");
     const ay = Math.round(cy) - 1;
@@ -378,7 +331,6 @@ function figurKopfVorne(g, cx, cy, geschlossen, augen, blinzelt, anim) {
     g.haut.rechteck(cx + 2.5, ay + 2.5, 1.5, 0.5, "r");
     if (g.gesicht) figurGesicht(g, "vorne", cx, ay, g.gesicht, anim);
     if (!geschlossen) {
-        // kleines Laecheln
         g.haut.feinLinie(cx - 0.5, ay + 3.5, cx + 0.5, ay + 3.5, "m");
         g.haut.fein(cx - 1, ay + 3, "m");
         g.haut.fein(cx + 1, ay + 3, "m");
@@ -391,7 +343,6 @@ function figurKopfHinten(g, cx, cy) {
     g.haut.ellipse(cx + 4.9, cy + 0.6, 0.7, 1, "s");
 }
 
-// Legendaere Haut: Sterne in der Haut, Kristall-Facetten (nur Aussehen, im Takt der Animation)
 function figurHautMuster(g, teile, cx, cy, y0, blick, anim) {
     const form = teile.haut.form;
     if (form === "sternenhaut") {
@@ -406,7 +357,6 @@ function figurHautMuster(g, teile, cx, cy, y0, blick, anim) {
     }
 }
 
-// ---------- HAARE ----------
 
 function figurHaare(g, blick, cx, cy, form, bild, anim) {
     const p = g.haare;
@@ -449,17 +399,14 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
         return;
     }
     if (form === "stoppel_details" || form === "undercut_details") form = form.replace("_details", "");
-    // Grundform: Oberkopf mit Glanz und Schattenkante
     if (blick === "hinten" && form !== "stoppel" && form !== "undercut") {
         p.ellipse(cx, cy, 5, 4.8, "2");
         p.ellipse(cx, cy, 5, 4.8, "d", (x, y) => y + 0.5 > cy + 2.6);
         glanz(cx - 2.5, cy - 3.5, cx + 1, cy - 4);
         p.feinLinie(cx, cy - 4.5, cx, cy + 3, "d");
     } else if (form === "stoppel" || form === "undercut") {
-        // nur die eigenen Teile (siehe unten)
     } else if (blick === "vorne") {
         p.ellipse(cx, cy, 5, 4.8, "2", (x, y) => y + 0.5 < cy - 1.4 || ((x + 0.5 < cx - 3.7 || x + 0.5 > cx + 3.7) && y + 0.5 < cy + 1.6));
-        // Pony in feinen Straehnen
         for (let x = cx - 4; x <= cx + 4; x += 1) {
             const laenge = [1, 1.5, 1, 0.5, 1, 1.5, 1, 1.5, 1][Math.round(x - (cx - 4))] || 1;
             p.rechteck(x, cy - 1.5, 1, laenge, "2");
@@ -496,7 +443,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             }
         }
         if (form === "sterne") {
-            // funkelnde Sterne im Haar, wandern mit der Animation
             const sterne = seite ? [[cx - 4, cy + 2], [cx - 3, cy + 5], [cx + 1, cy - 4], [cx - 2, cy - 3]]
                 : [[cx - 5, cy + 3], [cx + 5, cy + 5], [cx, cy - 4], [cx - 3, cy - 3], [cx + 3, cy - 3.5], [cx - 5, cy + 6]];
             sterne.forEach(([x, y], i) => {
@@ -548,7 +494,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.fein(x + 0.5, y + 0.5, "d");
         });
     } else if (form === "scheitel") {
-        // Seitenscheitel: Scheitel links, der Pony faellt zur Seite
         if (blick === "vorne") {
             p.rechteck(cx - 4, cy - 2, 7, 1, "2");
             p.rechteck(cx - 4, cy - 1, 3, 1, "2");
@@ -560,10 +505,8 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.feinLinie(cx + 1.5, cy - 4.5, cx + 1.5, cy - 2, "d");
         }
     } else if (form === "stoppel") {
-        // sehr kurz: nur eine duenne Schicht, feine Stoppel-Punkte
         for (let x = cx - 4; x <= cx + 4; x += 1) for (let y = cy - 4; y <= cy - 1; y += 1) if ((x + y) % 2 === 0) p.fein(x + 0.5, y + 0.5, "d");
     } else if (form === "wuschel") {
-        // verwuschelt: kleine Buschel rundherum
         const buschel = seite
             ? [[cx - 4, cy - 4], [cx - 1, cy - 5.5], [cx + 2, cy - 5], [cx - 5.5, cy - 1], [cx + 4, cy - 3]]
             : [[cx - 4.5, cy - 3.5], [cx - 1.5, cy - 5.5], [cx + 1.5, cy - 5.5], [cx + 4.5, cy - 3.5], [cx, cy - 6]];
@@ -573,7 +516,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.fein(x, y, "h");
         });
     } else if (form === "tolle") {
-        // Tolle: vorne hochgekaemmt
         if (seite) {
             p.ellipse(cx + 2, cy - 5, 2.6, 1.8, "2");
             p.punkt(cx + 4, cy - 5, "2");
@@ -585,7 +527,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.ellipse(cx, cy - 4.8, 3.6, 1.4, "2");
         }
     } else if (form === "undercut") {
-        // Undercut: oben laenger, an den Seiten kurz rasiert
         p.ellipse(cx + (seite ? 1 : 0), cy - 4.6, seite ? 4 : 4.4, 2, "2");
         if (seite) p.rechteck(cx + 3, cy - 4, 2, 1, "2");
         for (let y = cy - 2; y <= cy + 1; y += 1) {
@@ -596,14 +537,12 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             }
         }
     } else if (form === "afro") {
-        // grosser, runder Afro rund um den Kopf (das Gesicht bleibt frei)
         const frei = (x, y) => blick === "vorne" ? Math.abs(x + 0.5 - cx) < 3.8 && y + 0.5 > cy - 1.6
             : blick === "seite" ? x + 0.5 > cx - 0.8 && y + 0.5 > cy - 1.6 : false;
         p.ellipse(cx - (seite ? 0.6 : 0), cy - 1.6, 6.4, 5.8, "2", (x, y) => !frei(x, y));
         [[cx - 3, cy - 5], [cx + 2, cy - 6], [cx - 5, cy - 2]].forEach(([x, y]) => p.fein(x, y, "h"));
         [[cx - 4, cy - 3], [cx + 3, cy - 4], [cx, cy - 6.5]].forEach(([x, y]) => p.fein(x, y, "d"));
     } else if (form === "bob") {
-        // Bob: kinnlang, gerade Kante
         if (seite) p.rechteck(cx - 5, cy, 4, 3.5, "2");
         else {
             p.rechteck(cx - 5.5, cy - 1, 2, 4.5, "2");
@@ -612,7 +551,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
         }
         p.feinLinie(cx - 5, cy + 3.5, cx - 3.5, cy + 3.5, "d");
     } else if (form === "seitenzopf") {
-        // geflochtener Zopf ueber der Schulter
         const x = seite ? cx - 3 : blick === "vorne" ? cx + 4.5 : cx - 4.5;
         for (let i = 0; i < 4; i++) {
             p.ellipse(x + (i % 2 ? 0.5 : 0), cy + 2 + i * 1.6, 1.1, 1, "2");
@@ -633,7 +571,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.feinLinie(x0, y0 + 0.5, x1 - 0.5, y1, "h");
         });
     } else if (form === "flamme") {
-        // Flammenhaar: drei Farben, drei Animationsbilder, die Zungen zucken
         const zungen = seite ? [cx - 3.5, cx - 1.5, cx + 0.5, cx + 2.5] : [cx - 4, cx - 2, cx, cx + 2, cx + 4];
         zungen.forEach((x, i) => {
             const hoehe = [4, 5.5, 3.5, 5, 4.5][(i + anim) % 5];
@@ -643,7 +580,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.fein(x + wack, cy - 3.5 - hoehe - 0.5, "g");
         });
     } else if (form === "meer") {
-        // Meerjungfrauen-Wellen: lange Wellen, die sanft schwingen
         const welle = i => Math.sin((i + anim) * 0.9) * 0.6;
         const seiten = seite ? [cx - 4.5] : [cx - 5.5, cx + 5.5];
         seiten.forEach(x => {
@@ -655,7 +591,6 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
     }
 }
 
-// ---------- HUT ----------
 
 function figurHut(g, blick, cx, cy, form, bild, anim) {
     const p = g.kopf;
@@ -665,7 +600,6 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.ellipse(cx + (vorne ? 0 : 0.5), oben + 1.5, 7.6, 1, "a");
         p.ellipse(cx, oben, vorne ? 4.4 : 3.6, 2.4, "a", (x, y) => y + 0.5 < oben + 1);
         p.rechteck(vorne ? cx - 4 : cx - 3, oben, vorne ? 8 : 7, 1, "c");
-        // Stroh-Muster
         for (let x = cx - 6; x <= cx + 6; x += 1.5) p.fein(x, oben + 1.5, "b");
         for (let x = cx - 3; x <= cx + 3; x += 1.5) p.fein(x, oben - 1.5, "b");
     } else if (form === "muetze") {
@@ -735,12 +669,10 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         [cx - 2.5, cx + 2].forEach(x => p.rechteck(x, oben - 0.5, 1, 1, "c"));
         p.rechteck(cx - 0.5, oben - 1, 1, 1, "c");
         p.rechteck(cx - 4, oben + 1, 8.5, 0.5, "b");
-        // Glanz wandert ueber die Krone
         const glanzX = cx - 4 + (anim % 4) * 2.5;
         p.fein(glanzX, oben - 0.5, "w");
         p.fein(glanzX + 0.5, oben, "w");
     } else if (form === "schein") {
-        // Duenner Ring aus feinen Pixeln (schwebt sanft auf und ab, ein Glanz wandert herum)
         const y = oben - 3 + (anim % 2 ? -0.5 : 0);
         p.ellipseFein(cx, y, 4, 1.3, "b");
         p.ellipseFein(cx, y - 0.1, 3.4, 0.8, "a");
@@ -755,19 +687,16 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         });
         p.rechteck(cx - 6, oben + 1 + hueft, 13, 0.5, "b");
     } else if (form === "schleife") {
-        // grosse rote Schleife seitlich am Kopf, mit Knoten in der Mitte
         const sx = blick === "vorne" ? cx + 3 : blick === "hinten" ? cx - 3 : cx - 0.5;
         const sy = oben;
         p.ellipse(sx - 2.2, sy, 2.2, 1.9, "a");
         p.ellipse(sx + 2.2, sy, 2.2, 1.9, "a");
-        // dunkle Falten in den Schlaufen und ein runder Knoten in der Mitte
         p.feinLinie(sx - 3, sy, sx - 1.5, sy, "b");
         p.feinLinie(sx + 1.5, sy, sx + 3, sy, "b");
         p.ellipse(sx, sy, 1.1, 1.1, "b");
         p.fein(sx - 3, sy - 1, "c");
         p.fein(sx + 1.5, sy - 1, "c");
     } else if (form === "wikinger") {
-        // runder Helm mit Band, Nieten und zwei Hoernern
         p.ellipse(cx, oben + 1, 5, 3.4, "a", (x, y) => y + 0.5 < oben + 2);
         p.rechteck(cx - 5, oben + 1, 10.5, 1, "b");
         for (let x = cx - 4; x <= cx + 4; x += 2) p.fein(x, oben + 1.5, "w");
@@ -779,7 +708,6 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
             p.fein(x0 + r * 3.2, oben - 4, "c");
         });
     } else if (form === "partyhut") {
-        // spitzer Partyhut mit Streifen und Bommel, leicht schraeg
         for (let i = 0; i < 7; i++) {
             const breite = 7 - i;
             p.rechteck(cx - breite / 2 + i * 0.15, oben + 1 - i, breite, 1, i % 2 ? "a" : "b");
@@ -788,7 +716,6 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.fein(cx + 0.8, oben - 7.2, "w");
         p.feinLinie(cx - 3, oben + 1.5, cx - 1, oben + 3.5, "w");
     } else if (form === "hasenohren") {
-        // zwei lange Ohren, eins knickt ab und zu um
         const ohren = blick === "seite" ? [cx - 0.5, cx + 1.5] : [cx - 2.5, cx + 2.5];
         ohren.forEach((x, i) => {
             const knick = i === 1 && anim % 4 === 0;
@@ -802,19 +729,16 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         });
         p.rechteck(cx - 4, oben + 0.5, 8.5, 1, "c");
     } else if (form === "einhorn") {
-        // gedrehtes Horn mit Glitzer, der hochwandert
         const hx = blick === "seite" ? cx + 1.5 : cx;
         for (let i = 0; i < 6; i++) p.rechteck(hx - 1.5 + i * 0.25, oben - i, 3 - i * 0.5, 1, i % 2 ? "a" : "b");
         p.fein(hx, oben - 6.5, "c");
         p.fein(hx - 1 + (anim % 3) * 0.5, oben - 0.5 - (anim % 4) * 1.4, "w");
-        // kleine Maehne vorne
         if (blick !== "hinten") [[cx - 2, "b"], [cx - 1, "c"], [cx + 1, "b"]].forEach(([x, f]) => p.fein(x, oben + 1, f));
     } else if (form === "stirnband") {
         p.rechteck(cx - 4.5, cy - 2.5, 9.5, 1, "a");
         p.feinLinie(cx - 4.5, cy - 2, cx + 4.5, cy - 2, "b");
         if (blick === "vorne") p.fein(cx - 3, cy - 2.5, "c");
     } else if (form === "cowboy") {
-        // Cowboyhut: breite, hochgebogene Krempe, Delle oben, Band
         p.rechteck(cx - 7, oben + 1, 15, 1, "a");
         p.punkt(cx - 7, oben, "a");
         p.punkt(cx + 7, oben, "a");
@@ -825,13 +749,11 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
         p.fein(cx - 2, oben, "c");
         p.feinLinie(cx - 6, oben + 1.5, cx + 6, oben + 1.5, "b");
     } else if (form === "barett") {
-        // Barett: flach und schraeg, mit Stiel
         p.ellipse(cx + (vorne ? 0.5 : -0.5), oben, 5.6, 1.8, "a");
         p.feinLinie(cx - 4, oben + 1, cx + 4.5, oben + 1, "b");
         p.fein(cx + 1, oben - 2, "c");
         p.fein(cx + 1, oben - 1.5, "c");
     } else if (form === "bandana") {
-        // Bandana: Tuch ueber dem Kopf, hinten ein Knoten mit zwei Enden
         p.ellipse(cx, cy, 5, 4.8, "a", (x, y) => y + 0.5 < cy - 1.5);
         [[cx - 3, cy - 4], [cx, cy - 4.5], [cx + 3, cy - 3.5], [cx - 1.5, cy - 2.5], [cx + 1.5, cy - 3]].forEach(([x, y]) => p.fein(x, y, "c"));
         if (blick !== "vorne") {
@@ -841,7 +763,6 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
             p.linie(kx, cy - 1, kx + 1, cy + 1.5, "a");
         }
     } else if (form === "regenwolke") {
-        // eine kleine Regenwolke schwebt ueber dem Kopf, darunter fallen Tropfen (animiert)
         const y = oben - 3.5 + (anim % 2 ? -0.5 : 0);
         [[cx - 2, y + 0.5], [cx, y - 0.5], [cx + 2, y + 0.5], [cx + 3.5, y + 1]].forEach(([x, yy]) => p.ellipse(x, yy, 1.8, 1.4, "a"));
         p.rechteck(cx - 3.5, y + 1.2, 8, 0.5, "b");
@@ -854,16 +775,13 @@ function figurHut(g, blick, cx, cy, form, bild, anim) {
     }
 }
 
-// ---------- OBERTEIL ----------
 
-// x0 = linke Kante des Oberkoerpers, y0 = Schulterhoehe. Seite: 5 breit (Blick nach rechts), vorne/hinten: 6 breit
 function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
     const k = g.kleidung;
     const form = oberteil.form;
     const breite = blick === "seite" ? 5 : 6;
     const mitte = x0 + breite / 2;
     if (form === "umhang") {
-        // Umhang weht hinten, mit Sternen, die funkeln
         const wehen = (anim % 2) * 0.5 + (h.armSchwung ? 0.5 : 0);
         const lang = h.sitzt ? 6 : 10;
         if (blick === "seite") {
@@ -877,7 +795,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
         }
     }
     k.rechteck(x0, y0, breite, 6, "6");
-    // Licht oben, Schatten hinten bzw. unten
     if (blick === "seite") {
         k.rechteck(x0, y0, 1, 6, "8");
         k.feinLinie(x0 + 1, y0, x0 + breite - 0.5, y0, "o");
@@ -909,7 +826,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             k.rechteck(x0, y0 + 4, breite, 2, "6");
         }
     } else if (form === "beta") {
-        // "BE" und "TA" in zwei Zeilen, weisse Pixelschrift (3x5 feine Pixel pro Buchstabe)
         if (blick !== "seite") {
             const zeichen = {
                 B: ["110", "101", "110", "101", "110"], E: ["111", "100", "110", "100", "111"],
@@ -956,7 +872,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
         }
         k.rechteck(x0, y0 + 3, breite, 1, "k");
         k.feinLinie(x0, y0 + 3.5, x0 + breite - 0.5, y0 + 3.5, "8");
-        // kleine Blueten auf dem Stoff
         [[x0 + 1, y0 + 4.5], [x0 + breite - 1.5, y0 + 1.5]].forEach(([x, y]) => k.fein(x, y, "k"));
         if (blick === "hinten") k.rechteck(mitte - 1.5, y0 + 2, 3, 3, "k");
     } else if (form === "matrose") {
@@ -988,7 +903,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
         k.rechteck(x, y0, blick === "seite" ? 1 : 2, 1, "k");
         k.fein(x + 0.5, y0, "w");
     } else if (form === "kleid") {
-        // Bluetenkleid: weiter Rock, Blueten, die im Takt die Farbe wechseln
         k.ellipse(mitte, y0 + 6.5, breite / 2 + 2, 2.5, "6", (x, y) => y + 0.5 < y0 + 7);
         k.rechteck(x0 - 2, y0 + 6, breite + 4, 0.5, "8");
         const blueten = [[x0, y0 + 5], [x0 + 3, y0 + 1], [x0 + breite, y0 + 5.5], [x0 + 2, y0 + 3.5], [x0 - 1, y0 + 6]];
@@ -998,7 +912,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             k.fein(x + 0.5, y, "p");
         });
     } else if (form === "astronaut") {
-        // Raumanzug: weiss mit Panel und blinkenden Lichtern
         k.rechteck(x0 + (blick === "seite" ? 2 : 1.5), y0 + 1.5, blick === "seite" ? 2.5 : 3, 2.5, "8");
         k.fein(x0 + (blick === "seite" ? 2.5 : 2), y0 + 2, anim % 2 ? "p" : "k");
         k.fein(x0 + (blick === "seite" ? 3.5 : 3.5), y0 + 2, anim % 2 ? "k" : "p");
@@ -1008,7 +921,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             g.hinten.fein(x0 + 1, y0 + 1, "p");
         }
     } else if (form === "regenmantel") {
-        // Regenmantel: Kragen, dicke Knoepfe, Taschen, unten etwas laenger
         k.rechteck(x0 - 0.5, y0 + 5.5, breite + 1, 1.5, "6");
         k.feinLinie(x0 - 0.5, y0 + 6.5, x0 + breite, y0 + 6.5, "8");
         if (blick === "vorne") {
@@ -1025,7 +937,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
             k.rechteck(x0, y0, breite, 1, "8");
         }
     } else if (form === "imker") {
-        // Imkeranzug: hell, Reissverschluss, kleine Biene auf der Brust
         if (blick === "vorne") {
             k.feinLinie(mitte - 0.5, y0 + 0.5, mitte - 0.5, y0 + 5.5, "8");
             k.rechteck(x0 + breite - 2, y0 + 1.5, 1, 0.5, "k");
@@ -1036,21 +947,18 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
         }
         k.feinLinie(x0, y0 + 5, x0 + breite - 0.5, y0 + 5, "8");
     } else if (form === "flicken") {
-        // Arbeitshemd mit bunten Flicken und Naehten
         [[x0 + 0.5, y0 + 1], [x0 + breite - 2, y0 + 3.5]].forEach(([x, y], i) => {
             k.rechteck(x, y, 1.5, 1.5, i ? "p" : "k");
             k.fein(x, y, "w");
         });
         for (let y = 0.5; y < 6; y += 1.5) k.fein(mitte - 0.5, y0 + y, "8");
     } else if (form === "blaetter") {
-        // legendaer: Weste aus Laub, von den Schultern fallen ab und zu Blaetter
         for (let y = 0; y < 6; y += 1) for (let x = (y % 2) * 0.5; x < breite; x += 1.5) k.fein(x0 + x, y0 + y, y % 3 ? "8" : "k");
         k.feinLinie(x0, y0 + 5.5, x0 + breite - 0.5, y0 + 5.5, "p");
         const fall = anim % 4;
         const bx = blick === "seite" ? x0 - 1 : x0 - 1.5 + ((anim >> 2) % 2) * (breite + 2.5);
         k.fein(bx + (fall % 2) * 0.5, y0 + 1 + fall * 2, fall % 2 ? "k" : "p");
     } else if (form === "jacke") {
-        // offene Jacke: Hemd in der Mitte, Kragen, Knoepfe, Brusttasche
         if (blick === "vorne") {
             k.rechteck(mitte - 1, y0, 2, 6, "k");
             k.linie(mitte - 2, y0, mitte - 1, y0 + 2, "8");
@@ -1069,7 +977,6 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
     } else if (form === "ringel") {
         for (let y = 1; y < 6; y += 2) k.rechteck(x0, y0 + y, breite, 1, "k");
     } else if (form === "regenbogen") {
-        // Regenbogenpulli: sechs Farbstreifen, die langsam nach unten wandern
         const farben = ["A", "B", "C", "D", "E", "F"];
         for (let y = 0; y < 6; y++) k.rechteck(x0, y0 + y, breite, 1, farben[(y - anim + 12) % 6]);
         k.rechteck(x0, y0 + 5.5, breite, 0.5, "8");
@@ -1077,10 +984,7 @@ function figurOberteil(g, blick, h, x0, y0, oberteil, anim) {
     }
 }
 
-// ---------- ARME, BEINE, WERKZEUG ----------
 
-// richtung: nach welcher Seite ein erhobener Arm geht (1 = rechts, -1 = links), weite: wie weit neben den Kopf
-// (erhobene Arme gehen schraeg nach aussen, damit sie nicht ueber dem Gesicht haengen)
 function figurArm(g, sx, sy, art, schwung, farbe, hinten, richtung = 1, weite = 2) {
     const k = g.kleidung;
     const hand = hinten ? "s" : "4";
@@ -1143,7 +1047,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         if (stiefel) {
             k.rechteck(x, 21, 2, 3, "1");
             k.feinLinie(x, 21, x + 1.5, 21, "l");
-            // Cowboystiefel: goldene Ziernaht am Schaft
             if (schuhe.form === "cowboy") {
                 k.fein(x + 0.5, 22, "n");
                 k.fein(x + 1, 22.5, "n");
@@ -1157,13 +1060,11 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
             k.fein(x < 9 ? x - 0.5 : x + 2, 24, "l");
         }
         if (schuhe.form === "sandalen") {
-            // Sandalen: die Zehen schauen raus, ein Riemen darueber
             k.fein(blick === "seite" ? x + 2 : x + 0.5, 24, "4");
             k.fein(blick === "seite" ? x + 2.5 : x + 1.5, 24, "4");
             k.feinLinie(x, 23.5, x + 2, 23.5, "l");
         }
         if (schuhe.form === "blitz") {
-            // Blitzschuhe: der ganze Schuh in der Hauptfarbe, die Blitze in der Zweitfarbe springen links und rechts
             if (blick === "seite") k.rechteck(x, 24, 3, 1, "1");
             else k.rechteck(x - (x < 9 ? 0.5 : 0), 24, 2.5, 1, "1");
             const links = (anim + (x < 9 ? 0 : 1)) % 2 === 0;
@@ -1175,12 +1076,10 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
             g.werkzeug.fein(bx, 22, "w");
         }
         if (schuhe.form === "wolke") {
-            // Wolkenschuhe: die Wolke unter dem Schuh atmet sichtbar, kleine Woelkchen steigen auf und verpuffen
             const puff = [0, 0.5, 1, 0.5][anim % 4];
             g.kleidung.ellipse(x + 1, 24.6, 2 + puff * 0.7, 1 + puff * 0.3, "1");
             g.kleidung.fein(x - 0.5, 24.2 - puff * 0.5, "l");
             g.kleidung.fein(x + 2.5, 24.6 - puff * 0.5, "l");
-            // aufsteigende Woelkchen (abwechselnd links und rechts)
             const schritt = (anim + (x < 9 ? 0 : 2)) % 4;
             const wx = schritt < 2 ? x - 1.5 : x + 3;
             const wy = 25 - schritt % 2 * 1.5;
@@ -1208,7 +1107,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
                 k.feinLinie(x, 23, x + 2.5, 23, "l");
                 k.fein(x + 2.5, 24, "l");
             } else {
-                // Raketenschuhe: Flammen unter den Sohlen, die flackern
                 k.feinLinie(x, 24.5, x + 2, 24.5, "l");
                 const lang = 1 + (anim % 2) * 0.5;
                 g.werkzeug.fein(x + 0.5, 25, "f");
@@ -1218,7 +1116,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         });
     }
     if (hose.form === "cargo") {
-        // Cargohose: aufgesetzte Seitentasche mit hellerer Klappe
         beine.forEach(([x, dunkel]) => {
             if (dunkel) return;
             k.rechteck(x, oben + 2, 2, 1.5, "9");
@@ -1226,7 +1123,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         });
     }
     if (hose.form === "risse") {
-        // Zerrissene Jeans: Haut an Knie und Oberschenkel, mit weissen Faeden
         beine.forEach(([x], i) => {
             const y = oben + (i % 2 ? 3 : 2);
             k.rechteck(x + 0.5, y, 1, 0.5, "4");
@@ -1235,7 +1131,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
         });
     }
     if (hose.form === "lava") {
-        // Lavahose: gluehende Risse, die im Takt heller und dunkler werden
         beine.forEach(([x], i) => {
             const hell = (anim + i) % 2 === 0 ? "j" : "u";
             const dunkel = hell === "j" ? "u" : "j";
@@ -1253,7 +1148,6 @@ function figurBeine(g, beine, oben, hose, schuhe, blick, anim) {
     }
 }
 
-// ---------- ACCESSOIRES ----------
 
 function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
     const a = g.accessoire;
@@ -1272,7 +1166,6 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
         const glaeser = seite ? [Math.round(cx + 1)] : [cx - 3, cx + 1];
         glaeser.forEach(gx => {
             if (form === "herzbrille") {
-                // Herz-Glaeser: deutliche Herzform mit Rahmen
                 const reihen = [".XX.XX.", "XYYXYYX", "XYYYYYX", ".XYYYX.", "..XYX..", "...X..."];
                 reihen.forEach((reihe, y) => [...reihe].forEach((c, x) => {
                     if (c === "X") a.fein(gx - 0.75 + x / 2, ay - 0.5 + y / 2, "x");
@@ -1367,7 +1260,6 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
             a.fein(cx - 1.5, cy + 1.5, "z");
         }
     } else if (form === "tasche") {
-        // Umhaengetasche: Riemen quer ueber den Koerper, Tasche an der Huefte
         if (blick === "vorne") {
             a.linie(x0, y0, x0 + breite - 1, y0 + 4, "y");
             a.rechteck(x0 + breite - 1, y0 + 4, 2.5, 2, "x");
@@ -1381,22 +1273,19 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
             a.linie(x0 + breite - 1, y0, x0, y0 + 4, "y");
         }
     } else if (form === "vogel") {
-        // kleiner Vogel sitzt auf der Schulter und hopst ab und zu
         const hops = anim % 4 === 0 ? -0.5 : 0;
-        // ausserhalb vom Kopf, sonst verdeckt ihn der Kopf. Blick immer nach aussen.
         const links = seite || blick === "hinten";
         const vx = links ? x0 - 3.5 : x0 + breite - 0.5;
         const vy = y0 - 2 + hops;
         const r = links ? -1 : 1;
-        a.rechteck(vx, vy + 1, 3.5, 2, "x");                 // Koerper
-        a.rechteck(vx + (links ? -0.5 : 2), vy - 0.5, 2, 2, "x"); // Kopf
-        a.fein(vx + (links ? 0 : 3), vy, "z");               // Auge
-        a.rechteck(vx + (links ? -1.5 : 4), vy + 0.5, 1, 0.5, "y"); // Schnabel
-        a.feinLinie(vx + (links ? 3 : -0.5), vy + 1.5, vx + (links ? 4 : 0.5), vy + 2, "x"); // Schwanz
-        a.feinLinie(vx + 0.5, vy + 2, vx + 2.5, vy + 2, "z"); // Fluegel-Kante
-        a.fein(vx + 1 + r * 0.5, vy + 3, "y");              // Fuesse
+        a.rechteck(vx, vy + 1, 3.5, 2, "x");
+        a.rechteck(vx + (links ? -0.5 : 2), vy - 0.5, 2, 2, "x");
+        a.fein(vx + (links ? 0 : 3), vy, "z");
+        a.rechteck(vx + (links ? -1.5 : 4), vy + 0.5, 1, 0.5, "y");
+        a.feinLinie(vx + (links ? 3 : -0.5), vy + 1.5, vx + (links ? 4 : 0.5), vy + 2, "x");
+        a.feinLinie(vx + 0.5, vy + 2, vx + 2.5, vy + 2, "z");
+        a.fein(vx + 1 + r * 0.5, vy + 3, "y");
     } else if (form === "giesskanne") {
-        // Giesskanne in der Hand (vorne rechts), ab und zu tropft es
         const gx = seite ? x0 + breite : x0 + breite + 0.5;
         const gy = y0 + 5;
         a.rechteck(gx, gy, 2.5, 2, "x");
@@ -1404,7 +1293,6 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
         a.linie(gx + 2.5, gy + 0.5, gx + 4, gy - 1, "y");
         if (anim % 3 === 0) a.fein(gx + 4, gy + 0.5, "z");
     } else if (form === "gitarre") {
-        // Gitarre auf dem Ruecken: schraeg, mit Hals und Schallloch
         const ziel = blick === "hinten" ? a : hinten;
         const gx = seite ? x0 - 1 : x0 + 2;
         ziel.ellipse(gx, y0 + 5, 2.2, 2, "x");
@@ -1414,7 +1302,6 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
         if (blick === "hinten") ziel.ellipse(gx + 0.2, y0 + 4.2, 0.7, 0.7, "y");
         ziel.fein(gx - 1, y0 + 4.5, "z");
     } else if (form === "gluehwuermchen") {
-        // drei Gluehwuermchen kreisen um den Kopf
         for (let i = 0; i < 3; i++) {
             const winkel = (anim / 4 + i / 3) * Math.PI * 2;
             const x = cx + Math.cos(winkel) * 6;
@@ -1428,13 +1315,11 @@ function figurAccessoire(g, blick, cx, cy, y0, x0, acc, bild, anim) {
     }
 }
 
-// Fluegel am Ruecken: 4 Animationsbilder (auf, mitte, ab, mitte), jede Art mit eigener Form und Zeichnung
 function figurFluegel(p, form, seite, x0, y0, breite, anim) {
     const schlag = [-2.5, -1, 1, -1][anim % 4];
     const fluegel = (fx, r) => {
         const y = y0 + 1;
         if (form === "fluegel" || form === "libelle") {
-            // Feen- und Libellenfluegel: zwei grosse, durchscheinende Blaetter mit Adern
             const schmal = form === "libelle";
             p.ellipseFein(fx + r * 4.5, y - 3.5 + schlag, 4.6, schmal ? 1.8 : 4, "x");
             p.ellipseFein(fx + r * 3.5, y + 4 + schlag * 0.4, schmal ? 4.2 : 3.2, schmal ? 1.5 : 3, "y");
@@ -1442,8 +1327,6 @@ function figurFluegel(p, form, seite, x0, y0, breite, anim) {
             p.feinLinie(fx, y + 1, fx + r * 6, y + 5 + schlag * 0.4, "z");
             p.feinLinie(fx + r * 3, y - 2 + schlag * 0.5, fx + r * 6, y - 2 + schlag, "z");
         } else if (form === "engel") {
-            // Engelsfluegel wie beim Engel-Begleiter: ein Faecher aus Schwungfedern, der vom Ruecken ausgeht,
-            // darueber Deckfedern, graue Trennlinien. Beim Schlagen heben sich die Spitzen und gehen nach aussen.
             const spitzen = [[7.5, -6], [9, -3], [9, 0.5], [8, 3.5], [6, 6]];
             spitzen.forEach(([sx, sy], i) => {
                 const hoch = schlag * (1.3 - i * 0.22);
@@ -1486,8 +1369,6 @@ function figurFluegel(p, form, seite, x0, y0, breite, anim) {
     }
 }
 
-// ---------- DIE GANZE FIGUR ----------
-// blick: "seite" (Blick nach rechts, fuer links wird gespiegelt), "vorne" oder "hinten"; anim = Animationsbild (0 bis 3)
 function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
     const g = {};
     FIGUR_SCHICHTEN.forEach(s => { g[s] = figurGitter(); });
@@ -1561,7 +1442,6 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
         figurAccessoire(g, blick, cx, cy, y0, x0, teile.accessoire, bild, anim);
     }
 
-    // Umriss so dick wie im restlichen Spiel (2 feine Pixel) um alles, was gezeichnet ist
     const vollRaster = Array.from({ length: FIGUR_RH }, (_, y) => Array.from({ length: FIGUR_RB }, (_, x) =>
         FIGUR_SCHICHTEN.some(s => s !== "umriss" && g[s].raster[y][x])));
     const voll = (x, y) => x >= 0 && y >= 0 && x < FIGUR_RB && y < FIGUR_RH && vollRaster[y][x];
@@ -1577,7 +1457,6 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
             if (nah) g.umriss.raster[y][x] = "7";
         }
     }
-    // Schatten auf dem Boden
     for (let y = FIGUR_RH - 2; y < FIGUR_RH; y++) {
         for (let x = Math.round((4 + FIGUR_LINKS) * FIGUR_FEIN); x < Math.round((14 + FIGUR_LINKS) * FIGUR_FEIN); x++) if (!g.umriss.raster[y][x] && !voll(x, y)) g.umriss.raster[y][x] = "q";
     }
@@ -1586,7 +1465,6 @@ function figurRaster(pose, bild, blinzelt, teile, blick = "seite", anim = 0) {
 
 const figurUrlCache = {};
 
-// Farben aller Teile; abgeleitet: d = dunkle Haarfarbe, o = helle Oberteil-Kante
 function figurFarben(teile) {
     const f = {
         ...FIGUR_FESTE_FARBEN, q: "rgba(0, 0, 0, 0.18)",
@@ -1603,12 +1481,10 @@ function figurFarben(teile) {
     return f;
 }
 
-// Hat die Figur legendaere, animierte Teile? Dann gibt es 4 Animationsbilder
 function figurHatAnimation(teile) {
     return Object.values(teile).some(tl => tl.anim);
 }
 
-// Farbe als [r, g, b, a] (fuer das schnelle Zeichnen der Schichten), mit Zwischenspeicher
 const figurFarbCache = {};
 function figurRgba(farbe) {
     if (!figurFarbCache[farbe]) {
@@ -1629,8 +1505,6 @@ function figurFarbStift() {
     return figurFarbLeinwand.getContext("2d", { willReadFrequently: true });
 }
 
-// Alle Schichten eines Figur-Bilds als Leinwaende (null = Schicht ist leer). Kein PNG-Kodieren mehr:
-// das hat pro neuem Bild ca. 10 ms gekostet und im Duo (zwei Figuren) zu Rucklern gefuehrt.
 function figurSchichten(teile, pose, bild, blinzelt, blick = "seite", anim = 0) {
     const schluessel = FIGUR_KATEGORIEN.map(k => teile[k.id].id).join(",") + "|" + pose + "|" + bild + "|" + (blinzelt ? 1 : 0) + "|" + blick + "|" + anim;
     if (!figurUrlCache[schluessel]) {
@@ -1668,8 +1542,6 @@ function figurSchichten(teile, pose, bild, blinzelt, blick = "seite", anim = 0) 
     return figurUrlCache[schluessel];
 }
 
-// Haeufige Bilder einer Figur vorbereiten, wenn der Browser gerade nichts zu tun hat (ein Bild pro Pause),
-// damit beim Laufen und Blinzeln kein neues Bild mitten im Spiel gezeichnet werden muss
 const figurVorbereitet = new Set();
 const figurWarteschlange = [];
 function figurVorwaermen(teile) {
@@ -1695,7 +1567,6 @@ function figurArbeite() {
     });
 }
 
-// Welche Schicht bekommt welchen CSS-Effekt (nur Aussehen)
 function figurSchichtFx(teile) {
     return {
         haut: teile.haut.fx, augen: teile.augen.fx, haare: teile.haarfarbe.fx || teile.frisur.fx,
@@ -1704,7 +1575,6 @@ function figurSchichtFx(teile) {
     };
 }
 
-// Eine Figur als Element mit gestapelten Schicht-Bildern (fuer Hof, Profil-Vorschau und Kacheln)
 function erstelleFigurBild(groesse) {
     const huelle = el("div", "figur-bild");
     huelle.style.width = FIGUR_BREITE * groesse + "px";
@@ -1722,7 +1592,6 @@ function erstelleFigurBild(groesse) {
 }
 
 function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
-    // Legendaere Teile haben eigene Animationsbilder (unabhaengig von der Pose, etwa 4-mal pro Sekunde)
     const anim = figurHatAnimation(teile) ? Math.floor(performance.now() / 240) % 4 : 0;
     const schichten = figurSchichten(teile, pose, nummer % (FIGUR_BILDER[pose] || 1), blinzelt, blick, anim);
     const fx = figurSchichtFx(teile);
@@ -1739,19 +1608,15 @@ function zeigeFigurBild(bild, teile, pose, nummer, blinzelt, blick = "seite") {
         const klasse = "figur-schicht schicht-" + s + (teilMitFx ? " figfx-" + teilMitFx : "");
         if (img.className !== klasse) img.className = klasse;
     });
-    // Farbe fuer Leuchten und Funkeln
     const leuchtTeil = [teile.augen, teile.kopf, teile.accessoire, teile.frisur, teile.haarfarbe, teile.haut, teile.oberteil].find(tl => tl.fxFarbe);
     if (leuchtTeil) bild.huelle.style.setProperty("--fx-farbe", leuchtTeil.fxFarbe);
     bild.huelle.classList.toggle("figfx-schwebt", Object.values(teile).some(tl => tl.fx === "schweben" || tl.fx === "geist"));
 }
 
-// ---------- FIGUREN AUF DEM HOF ----------
-// Jede Figur: { art: "mensch" | "begleiter", teile/skin, name, partner, x, zielX, richtung, zustand, ... }
 
 const figuren = [];
 
-// Wo auf dem Hof gelaufen wird (in Prozent der Breite): Spieler rechts, Begleiter links
-const FIGUR_BEREICH = { mensch: [56, 76], begleiter: [34, 50] }; // Spieler nicht vor der Scheune, Begleiter nicht im Teich
+const FIGUR_BEREICH = { mensch: [56, 76], begleiter: [34, 50] };
 function figurBereich(art) {
     return FIGUR_BEREICH[art === "mensch" ? "mensch" : "begleiter"];
 }
@@ -1765,7 +1630,7 @@ function neueFigur(art, optionen) {
     f.x = von + Math.random() * (bis - von);
     const huelle = el("div", "hof-objekt hof-figur " + (art === "mensch" ? "figur-mensch" : "figur-begleiter") + (f.partner ? " figur-partner" : ""));
     if (art === "mensch") {
-        f.bildEl = erstelleFigurBild(HOF_PIXEL - 1); // etwas groesser als der Begleiter
+        f.bildEl = erstelleFigurBild(HOF_PIXEL - 1);
         huelle.appendChild(f.bildEl.huelle);
     } else {
         const img = document.createElement("img");
@@ -1808,8 +1673,6 @@ function entferneFigur(f) {
     if (i >= 0) figuren.splice(i, 1);
 }
 
-// Blickrichtung zur Pose: Laufen und Hacken von der Seite, Sitzen und Emotes von vorne,
-// beim Stehen schaut die Figur mal nach vorne, mal zur Seite, mal nach hinten (auf den Hof)
 function blickFuer(zustand) {
     if (zustand === "laufen" || zustand === "hacken") return "seite";
     if (zustand !== "stehen") return "vorne";
@@ -1856,7 +1719,6 @@ function naechsterFigurZustand(f) {
     }
 }
 
-// Kleine Idle-Animationen: mit der Hacke den Boden bearbeiten, sich strecken, winken
 function figurIdle(f) {
     const wurf = Math.random();
     if (wurf < 0.5) figurPose(f, "hacken", 4 * FIGUR_BILD_DAUER.hacken * 3);
@@ -1884,7 +1746,6 @@ function aktualisiereFigur(f, dtMs, jetzt) {
     if (f.bildMs >= dauer) {
         f.bildMs = 0;
         f.bild += 1;
-        // Beim Hacken fliegt Erde, wenn die Hacke den Boden trifft
         if (f.zustand === "hacken" && f.bild % 4 === 2) {
             const { rect } = figurMitte(f);
             const x = f.richtung > 0 ? rect.right - rect.width * 0.1 : rect.left + rect.width * 0.1;
@@ -1942,7 +1803,6 @@ function zeichneFigur(f, jetzt) {
         zeigeFigurBild(f.bildEl, teile, f.zustand, f.bild, blinzelt, blick);
         f.bildEl.huelle.style.transform = blick === "seite" && f.richtung < 0 ? "scaleX(-1)" : "";
         figurFunkeln(f, teile);
-        // Aura aus dem Level (im Profil gewaehlt), beim Mitspieler seine eigene
         const aura = f.partner ? auraVon(koop.partnerProfil && koop.partnerProfil.aura) : profilAura();
         const auraLevel = f.partner ? (koop.partnerProfil && koop.partnerProfil.level) || 1 : bauernRang();
         f.bildEl.huelle.classList.add("figur-aura");
@@ -1950,7 +1810,6 @@ function zeichneFigur(f, jetzt) {
         if (f.schild) setzeAura(f.schild, aura, auraLevel);
         return;
     }
-    // Begleiter des Mitspielers: gleiches Bild und dieselben Effekte wie der eigene
     const skin = HAUSTIER_SKINS.find(s => s.id === f.skin) || HAUSTIER_SKINS[0];
     const pose = ["laufen", "stehen", "sitzen", "liegen", "schlafen"].includes(f.zustand) ? f.zustand : "sitzen";
     const url = haustierUrl(skin, pose, f.bild, blinzelt, haustierAnim(skin));
@@ -1977,7 +1836,6 @@ function zeichneFigur(f, jetzt) {
     }
 }
 
-// Legendaere Teile mit "funkeln": ab und zu ein kleiner Stern an der Figur
 function figurFunkeln(f, teile) {
     const funkelnd = Object.values(teile).find(tl => tl.fx === "funkeln");
     if (!funkelnd) return;
@@ -1993,14 +1851,12 @@ function figurFunkeln(f, teile) {
     setTimeout(() => stern.remove(), 1600);
 }
 
-// Eigene Figur, im Duo auch Figur und Begleiter des Mitspielers
 function aktualisiereFiguren(dtMs, jetzt) {
     if (!hofEbene) return;
     let eigene = figuren.find(f => f.art === "mensch" && !f.partner);
     if (!eigene) eigene = neueFigur("mensch", { teile: profil().teile });
     eigene.teile = profil().teile;
     const imDuo = typeof koopAktiv === "function" && koopAktiv() && koop.verbunden && koop.partnerProfil;
-    // Namensschild nur im Duo
     const name = imDuo ? profilName() : "";
     if ((eigene.schild ? eigene.schild.textContent : "") !== name) {
         if (!eigene.schild) {
@@ -2010,9 +1866,7 @@ function aktualisiereFiguren(dtMs, jetzt) {
         eigene.schild.textContent = name;
         eigene.schild.classList.toggle("versteckt", !name);
     }
-    // Der Host hat ein gelbes Namensschild
     if (eigene.schild) eigene.schild.classList.toggle("host-name", Boolean(imDuo) && koop.rolle === "host");
-    // Duo: Mitspieler-Figur und sein Begleiter
     let partner = figuren.find(f => f.art === "mensch" && f.partner);
     let partnerTier = figuren.find(f => f.art === "begleiter" && f.partner);
     if (imDuo) {
@@ -2032,7 +1886,6 @@ function aktualisiereFiguren(dtMs, jetzt) {
     figuren.forEach(f => aktualisiereFigur(f, dtMs, jetzt));
 }
 
-// ---------- EMOTES (Rechtsklick auf die eigene Figur) ----------
 
 let emoteMenue = null;
 
@@ -2055,7 +1908,6 @@ function oeffneEmoteMenue(f, event) {
     setTimeout(() => document.addEventListener("pointerdown", emoteMenueAussen), 0);
 }
 
-// Host: Rechtsklick auf die Figur des Mitspielers
 function oeffneMitspielerMenue(event) {
     schliesseEmoteMenue();
     emoteMenue = el("div", "emote-menue mitspieler-menue");
@@ -2093,14 +1945,12 @@ function spieleEmote(f, e) {
     }
 }
 
-// Emote vom Mitspieler (Duo)
 function zeigePartnerEmote(id) {
     const f = figuren.find(fi => fi.art === "mensch" && fi.partner);
     const e = FIGUR_EMOTES.find(em => em.id === id);
     if (f && e) spieleEmote(f, e);
 }
 
-// Profil an den Mitspieler schicken (Name, Aussehen, eigener Begleiter)
 function koopSendeProfil() {
     if (typeof koop === "undefined" || !koop.verbunden) return;
     koopSende("profil", { name: profilName(), level: bauernRang(), aura: profilAura().id, teile: figurTeileIds(), begleiter: meta.kosmetik.haustier || "rot" });
@@ -2109,16 +1959,15 @@ function koopSendeProfil() {
 function figurTeileIds() {
     const teile = figurTeileAus(profil().teile);
     const ids = {};
-    FIGUR_KATEGORIEN.forEach(k => { ids[k.id] = teile[k.id].id.split("~")[0]; }); // ohne Farb-Anhang
+    FIGUR_KATEGORIEN.forEach(k => { ids[k.id] = teile[k.id].id.split("~")[0]; });
     if (profil().teile.farben) ids.farben = { ...profil().teile.farben };
     return ids;
 }
 
-// ---------- PROFIL-FENSTER (Hauptmenue oben rechts) ----------
 
 let profilKategorie = "haut";
-let profilVorschau = null;     // anprobierte Teile (auch nicht besessene)
-let profilPose = null;         // null = steht ruhig und schaut nach vorne
+let profilVorschau = null;
+let profilPose = null;
 let profilTakt = null;
 
 function oeffneProfil() {
@@ -2170,7 +2019,6 @@ function xpLeiste(anteil) {
     return leiste;
 }
 
-// Kleiner Ausschnitt der eigenen Figur als Symbol fuer eine Kategorie (Kopf, Oberkoerper oder Beine)
 const FIGUR_AUSSCHNITTE = { haut: 3, augen: 7, frisur: 2, haarfarbe: 2, kopf: 0, oberteil: 16, accessoire: 14, hose: 22, schuhe: 26, gesicht: 8 };
 function figurAusschnitt(kategorie) {
     const fenster = el("div", "figur-ausschnitt");
@@ -2183,11 +2031,10 @@ function figurAusschnitt(kategorie) {
 }
 
 function renderProfil() {
-    if (!profilVorschau) return; // Fenster ist schon zu (z.B. schneller Doppelklick beim Schliessen)
+    if (!profilVorschau) return;
     const inhalt = $("profil-inhalt");
     inhalt.innerHTML = "";
 
-    // Links: grosse Vorschau, Name, Posen
     const links = el("div", "profil-links");
     const buehne = el("div", "profil-buehne");
     const figur = erstelleFigurBild(8);
@@ -2203,7 +2050,6 @@ function renderProfil() {
         const symbol = { laufen: "kat_schuhe", winken: "hand", hacken: "hacke", tanzen: "note", jubeln: "party", sitzen: "stuhl" }[pose];
         const knopf = el("button", "knopf profil-pose" + (pose === profilPose ? " aktiv" : ""), null, [pixelIcon("sprite:sym_" + symbol, 22)]);
         setzeTipp(knopf, name);
-        // Nochmal anklicken schaltet die Animation wieder aus
         knopf.addEventListener("click", () => {
             profilPose = profilPose === pose ? null : pose;
             renderProfil();
@@ -2225,7 +2071,6 @@ function renderProfil() {
     nameZeile.appendChild(eingabe);
     links.appendChild(nameZeile);
 
-    // Level mit Erfahrungsleiste
     const level = bauernRang();
     const xp = meta.bauernXp || 0;
     const von = rangSchwelle(level), bis = rangSchwelle(level + 1);
@@ -2235,7 +2080,6 @@ function renderProfil() {
         el("span", "profil-level-xp", zahl(xp - von) + " / " + zahl(bis - von) + " XP")
     ]));
 
-    // Aura: alle 5 Level eine neue, gesperrte zeigen das noetige Level
     const auraReihe = el("div", "profil-auren", null, [el("span", "profil-farben-titel", t("✨ Aura:"))]);
     const aktuelleAura = profilAura();
     FIGUR_AUREN.forEach(au => {
@@ -2257,14 +2101,12 @@ function renderProfil() {
     figur.huelle.classList.add("figur-aura");
     setzeAura(figur.huelle, aktuelleAura);
 
-    // Hinweis, wenn etwas nur anprobiert ist
     const nichtBesessen = FIGUR_KATEGORIEN.filter(k => !istKosmetikFrei(figurTeil(k.id, profilVorschau[k.id]), "figur_" + k.id));
     if (nichtBesessen.length > 0) {
         links.appendChild(el("div", "profil-anprobe", tf("👀 Nur anprobiert: {0}. Im Spiel trägst du dafür dein bisheriges Teil.", nichtBesessen.map(k => figurTeil(k.id, profilVorschau[k.id]).name).join(", "))));
     }
     inhalt.appendChild(links);
 
-    // Rechts: Reiter fuer die Teile und das Inventar (immer offen)
     const rechts = el("div", "profil-rechts");
     const reiter = el("div", "profil-reiter");
     FIGUR_KATEGORIEN.forEach(k => {
@@ -2277,8 +2119,6 @@ function renderProfil() {
     });
     rechts.appendChild(reiter);
 
-    // Eigene Farbe fuer Kleidung und Augen (fuer alle frei, nicht bei legendaeren Teilen)
-    // Hauptfarbe (das Teil selbst) und Zweitfarbe (Streifen, Band, Sohle, Glaeser ...)
     if (FIGUR_FARBBAR.includes(profilKategorie)) {
         const reihen = [[profilKategorie, FIGUR_ZWEITFARBE.includes(profilKategorie) ? t("🎨 Hauptfarbe:") : t("🎨 Farbe:")]];
         if (FIGUR_ZWEITFARBE.includes(profilKategorie)) reihen.push([profilKategorie + "2", t("🎨 Zweitfarbe:")]);
@@ -2316,7 +2156,6 @@ function renderProfil() {
         const gewaehlt = profilVorschau[profilKategorie] === teil.id;
         const kachel = el("button", "profil-kachel" + (gewaehlt ? " gewaehlt" : "") + (frei ? "" : " gesperrt"));
         kachel.style.setProperty("--seltenheit", seltenheit.rand);
-        // Kacheln zeigen jedes Teil in seiner Originalfarbe
         const probe = { ...profilVorschau, [profilKategorie]: teil.id, farben: { ...(profilVorschau.farben || {}), [profilKategorie]: null, [profilKategorie + "2"]: null } };
         const mini = erstelleFigurBild(3);
         zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false, "vorne");
@@ -2333,7 +2172,6 @@ function renderProfil() {
         kachel.addEventListener("click", () => {
             if (!profilVorschau) return;
             profilVorschau[profilKategorie] = teil.id;
-            // Besessene Teile werden gleich uebernommen, andere nur anprobiert
             if (frei) {
                 profil().teile[profilKategorie] = teil.id;
                 speichereMeta();
@@ -2346,7 +2184,6 @@ function renderProfil() {
         raster.appendChild(kachel);
     });
     rechts.appendChild(raster);
-    // Unten links: Fragezeichen, Kristalle, DLC, Code
     rechts.appendChild(el("div", "profil-shop-leiste", null, [kristallInfoKnopf(), kristallKnopf(), dlcKnopf(() => renderProfil()), codeKnopf()]));
     inhalt.appendChild(rechts);
 }

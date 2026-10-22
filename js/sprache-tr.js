@@ -1,10 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Tuerkische Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Uebersetzung.
-// Fehlt hier ein Text, gilt der englische aus sprache-en.js.
-// ============================================================
-
 if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Trd.": "Sk",
     "Trio.": "Kn",

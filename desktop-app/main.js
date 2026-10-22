@@ -1,13 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE DESKTOP (Electron)
-// Oeffnet das Spiel als eigenes Fenster. Das Spiel wird direkt aus dem Projektordner geladen,
-// darum ist jede Code-Aenderung beim naechsten Start sofort drin. Aendert sich eine Datei,
-// waehrend das Spiel offen ist, laedt das Fenster automatisch neu.
-//
-// Tasten: F11 = Vollbild, Strg+F12 in den Einstellungen (Reiter Klang) = Debug-Fenster (Strg+Umschalt+F12 = Entwickler-Werkzeuge), Strg+R = neu laden
-// ============================================================
 
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const path = require("path");
@@ -17,11 +9,7 @@ const crypto = require("crypto");
 const steam = require("./steam");
 const tresor = require("./tresor");
 
-// Entwickler-Version (aus dem Projektordner oder "npm run exe"): Entwickler-Werkzeuge und Test-Befehle erlaubt.
-// Fertige Versionen (itch.io und Steam): beides aus.
 const ENTWICKLER = !app.isPackaged || fs.existsSync(path.join(process.resourcesPath || "", "spielordner.txt"));
-// Wo wird das Spiel verteilt? "steam" (Steam aktualisiert selbst, kein eigener Updater) oder "itch" (Updater ueber GitHub).
-// Steht in resources/vertrieb.txt (legt "npm run steam" an).
 const VERTRIEB = (() => {
     try {
         return fs.readFileSync(path.join(process.resourcesPath || "", "vertrieb.txt"), "utf8").trim() || "itch";
@@ -30,8 +18,6 @@ const VERTRIEB = (() => {
     }
 })();
 
-// Wo liegt das Spiel? 1) Umgebungsvariable, 2) spielordner.txt neben der .exe (Entwickler-Version),
-// 3) mitgelieferter Ordner resources/spiel (Release-Version zum Weitergeben), 4) Ordner ueber desktop-app
 function spielOrdner() {
     const kandidaten = [];
     if (process.env.SPROUTVALE_ORDNER) kandidaten.push(process.env.SPROUTVALE_ORDNER);
@@ -43,7 +29,6 @@ function spielOrdner() {
     }
     kandidaten.push(path.resolve(__dirname, ".."));
     const ordner = kandidaten.find(o => fs.existsSync(path.join(o, "index.html"))) || kandidaten[kandidaten.length - 1];
-    // Release-Version: ein fertig geladenes, neueres Update hat Vorrang
     if (istReleaseOrdner(ordner)) {
         const update = neuestesUpdate();
         if (update && vergleicheVersion(update.version, liesVersion(ordner)) > 0) return update.ordner;
@@ -51,29 +36,20 @@ function spielOrdner() {
     return ordner;
 }
 
-// ---------- AUTO-PATCHER (nur Release-Version) ----------
-// Beim Start wird auf GitHub nach dem neuesten Versions-Tag (vX.Y.Z-alpha) geschaut. Ist er neuer, werden nur die
-// geaenderten Spieldateien geladen (Vergleich ueber die Git-Pruefsumme) und in %APPDATA%/Sproutvale/updates/<version>
-// abgelegt. Das Spiel fragt dann, ob es neu laden soll. Spielstaende liegen woanders und bleiben unberuehrt.
-// Ist das Repo nicht oeffentlich oder kein Internet da, passiert einfach nichts.
 const UPDATE_REPO = "VenraBlossom/Sproutvale";
 const UPDATE_ORDNER = path.join(app.getPath("userData"), "updates");
-const UPDATE_AUSLASSEN = [/^desktop-app\//, /^werkzeuge\//, /^\.github\//, /^\.claude\//, /^\.git/, /\.md$/i, /^docs\//];
+const UPDATE_AUSLASSEN = [/^desktop-app\//, /^werkzeuge\//, /^\.github\//, /^\.git/, /\.md$/i, /^docs\//];
 
 function istReleaseOrdner(ordner) {
-    // Steam-Version: Steam kuemmert sich um Updates, der GitHub-Updater bleibt aus
     if (VERTRIEB === "steam") return false;
     return app.isPackaged && !process.env.SPROUTVALE_ORDNER && path.resolve(ordner) === path.resolve(process.resourcesPath, "spiel");
 }
 
-// "Alpha 0.7.2" oder "v0.7.2-alpha" -> [0, 7, 2]
 function versionTeile(text) {
     const treffer = String(text || "").match(/(\d+)\.(\d+)\.(\d+)/);
     return treffer ? treffer.slice(1).map(Number) : null;
 }
 
-// Phase einer Version: Alpha < Beta < fertige Version. Die Beta hat wieder bei 0.1 angefangen,
-// darum zaehlt zuerst die Phase und erst dann die Nummer (sonst waere "Alpha 1.0.1" neuer als "Beta 0.4.2")
 function versionPhase(text) {
     if (/alpha/i.test(String(text))) return 0;
     if (/beta/i.test(String(text))) return 1;
@@ -92,7 +68,6 @@ function vergleicheVersion(a, b) {
 
 function liesVersion(ordner) {
     try {
-        // Seit 0.7.3 liegen die Skripte in js/, aeltere Versionen hatten sie direkt im Spielordner
         const datei = [path.join(ordner, "js", "daten.js"), path.join(ordner, "daten.js")].find(p => fs.existsSync(p));
         const daten = fs.readFileSync(datei, "utf8");
         const treffer = daten.match(/SPIEL_VERSION\s*=\s*"([^"]+)"/);
@@ -142,7 +117,6 @@ function holeDaten(url, alsJson) {
     });
 }
 
-// Git-Pruefsumme einer Datei (so kann man ohne Download sehen, ob sie sich geaendert hat)
 function gitSha(puffer) {
     return crypto.createHash("sha1").update("blob " + puffer.length + "\0").update(puffer).digest("hex");
 }
@@ -151,13 +125,11 @@ async function suchePatch() {
     if (!istReleaseOrdner(ORDNER) && !process.env.SPROUTVALE_UPDATE_TEST) return;
     const lokal = liesVersion(ORDNER);
     const tags = await holeDaten("https://api.github.com/repos/" + UPDATE_REPO + "/tags?per_page=100", true);
-    // Geladene Updates, deren Tag es auf GitHub nicht mehr gibt (z.B. alte Alpha-Versionen), wieder loeschen
     try {
         const namen = new Set(tags.map(tag => String(tag.name).replace(/^v/, "")));
         fs.readdirSync(UPDATE_ORDNER).filter(name => !name.endsWith(".laden") && !namen.has(name))
             .forEach(name => fs.rmSync(path.join(UPDATE_ORDNER, name), { recursive: true, force: true }));
     } catch (fehler) {
-        // noch kein Update-Ordner
     }
     const neuester = tags.map(tag => tag.name).filter(name => /^v\d+\.\d+\.\d+/.test(name))
         .sort((a, b) => vergleicheVersion(b, a))[0];
@@ -176,7 +148,6 @@ async function suchePatch() {
     for (const eintrag of dateien) {
         const zielDatei = path.join(temp, ...eintrag.path.split("/"));
         fs.mkdirSync(path.dirname(zielDatei), { recursive: true });
-        // Unveraendert? Dann aus dem aktuellen Spielordner kopieren statt laden
         const alteDatei = path.join(ORDNER, ...eintrag.path.split("/"));
         if (fs.existsSync(alteDatei) && gitSha(fs.readFileSync(alteDatei)) === eintrag.sha) {
             fs.copyFileSync(alteDatei, zielDatei);
@@ -190,12 +161,10 @@ async function suchePatch() {
     fs.writeFileSync(path.join(temp, "fertig.txt"), neuester + "\n" + new Date().toISOString());
     fs.rmSync(ziel, { recursive: true, force: true });
     fs.renameSync(temp, ziel);
-    // Alte Updates aufraeumen (nur das neueste behalten)
     try {
         fs.readdirSync(UPDATE_ORDNER).filter(name => name !== version).forEach(name =>
             fs.rmSync(path.join(UPDATE_ORDNER, name), { recursive: true, force: true }));
     } catch (e) {
-        // egal
     }
     meldeUpdate(version);
 }
@@ -209,18 +178,13 @@ function meldeUpdate(version) {
 let ORDNER = spielOrdner();
 let fenster = null;
 
-// ---------- SPIELSTAND-ORDNER "save" ----------
-// Liegt im Benutzerordner (Windows: %APPDATA%\Sproutvale\save), getrennt vom Spielordner. Eine neue Version
-// findet den Spielstand automatisch, man muss nichts kopieren. Die Dateien sind lesbares JSON.
-// Endlos hat 3 Speicherstaende: persistedsavefile_1.json bis _3.json. Darin stehen Fortschritt und Hof zusammen.
 
-// Schluessel im Spiel -> [Datei, Teil in der Datei (leer = die ganze Datei)]
 const SPEICHER_DATEIEN = {
     sproutvale_meta: ["fortschritt.json"],
     sproutvale_run: ["run.json"],
     sproutvale_einstellungen: ["einstellungen.json"],
-    sproutvale_kaeufe: ["kaeufe.dat"], // gekaufte Inhalte mit Pruefsumme (Hand-Aenderungen gelten nicht)
-    sproutvale_beta: ["beta.dat"], // Beta-Tester (vor dem Release gespielt), bleibt fuer immer
+    sproutvale_kaeufe: ["kaeufe.dat"],
+    sproutvale_beta: ["beta.dat"],
     sproutvale_meta_sandbox: ["persistedsavefile_1.json", "fortschritt"],
     sproutvale_sandbox: ["persistedsavefile_1.json", "run"],
     sproutvale_meta_sandbox_2: ["persistedsavefile_2.json", "fortschritt"],
@@ -240,7 +204,6 @@ try {
 }
 
 function schreibeSicher(ziel, inhalt) {
-    // erst in eine Zwischendatei, dann umbenennen: so ist die Datei nie halb geschrieben
     fs.writeFileSync(ziel + ".tmp", inhalt, "utf8");
     fs.renameSync(ziel + ".tmp", ziel);
 }
@@ -254,8 +217,6 @@ function liesJson(pfad) {
     }
 }
 
-// Umzug: Bis Alpha 0.6.1 lag der Ordner "save" neben der .exe (bzw. im Projektordner). Ist der neue Ordner
-// noch leer, werden die alten Dateien einmal hierher kopiert.
 (function zieheAltenSpielstandUm() {
     const alt = app.isPackaged ? path.join(path.dirname(process.execPath), "save") : path.join(ORDNER, "save");
     try {
@@ -270,7 +231,6 @@ function liesJson(pfad) {
     }
 })();
 
-// Alte Dateinamen: sandbox.json + sandbox-fortschritt.json werden zu persistedsavefile_1.json
 (function wandleAlteNamenUm() {
     const altRun = path.join(SPEICHER_ORDNER, "sandbox.json");
     const altFortschritt = path.join(SPEICHER_ORDNER, "sandbox-fortschritt.json");
@@ -344,9 +304,8 @@ ipcMain.on("speicher-schreiben", (_event, schluessel, text) => {
         }
         let inhalt = text;
         try {
-            inhalt = JSON.stringify(JSON.parse(text), null, 2); // schoen eingerueckt, damit man die Zahlen lesen kann
+            inhalt = JSON.stringify(JSON.parse(text), null, 2);
         } catch (fehler) {
-            // kein JSON: so speichern, wie es ist
         }
         schreibeSicher(ziel, inhalt);
     } catch (fehler) {
@@ -376,7 +335,6 @@ ipcMain.on("speicher-loeschen", (_event, schluessel) => {
 
 ipcMain.on("speicher-pfad", event => { event.returnValue = SPEICHER_ORDNER; });
 
-// ---------- TRESOR (Kaeufe, Gems, Codes) ----------
 tresor.starte(SPEICHER_ORDNER);
 ipcMain.on("tresor-lesen", event => { event.returnValue = tresor.lesen(); });
 ipcMain.on("tresor-kaufe", (event, was) => { event.returnValue = tresor.kaufe(String(was)); });
@@ -399,13 +357,12 @@ function erstelleFenster() {
         title: "Sproutvale",
         icon: path.join(ORDNER, "assets", "Icon.png"),
         autoHideMenuBar: true,
-        fullscreen: true, // Spiel startet im Vollbild (F11 wechselt)
+        fullscreen: true,
         show: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
             nodeIntegration: false,
-            // Fertige Versionen: keine Entwickler-Werkzeuge (sonst koennte man dort alles umschreiben)
             devTools: ENTWICKLER,
             backgroundThrottling: false
         }
@@ -416,7 +373,6 @@ function erstelleFenster() {
     if (fs.existsSync(startseite)) {
         fenster.loadFile(startseite);
     } else {
-        // Statt eines leeren gruenen Fensters: sagen, was fehlt
         const text = "<body style='font-family:sans-serif;background:#86c457;color:#2e1a09;padding:40px'>" +
             "<h2>Sproutvale: Spieldateien nicht gefunden</h2><p>Gesucht in: " + ORDNER + "</p>" +
             "<p>Bitte die Release-Version benutzen (npm run release) und den ganzen Ordner weitergeben.</p></body>";
@@ -430,24 +386,20 @@ function erstelleFenster() {
             fenster.setFullScreen(!fenster.isFullScreen());
             event.preventDefault();
         } else if (eingabe.key === "F12" && eingabe.control && eingabe.shift && ENTWICKLER) {
-            // Nur fuer die Entwicklung versteckt: Strg+Umschalt+F12 = Entwickler-Werkzeuge. Strg+F12 im Klang-Reiter der Einstellungen oeffnet das Debug-Fenster.
             fenster.webContents.toggleDevTools();
             event.preventDefault();
         }
     });
 
-    // Links (z.B. spaeter Store-Seite) im normalen Browser oeffnen, nicht im Spielfenster
     fenster.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
         return { action: "deny" };
     });
 }
 
-// Auto-Neuladen: Aenderungen an Spieldateien laden das Fenster neu (nicht in desktop-app, .claude usw.)
-// Nur in der Entwickler-Version (in der Release-Version aendert sich nichts).
 function beobachteSpielordner() {
     if (ORDNER === path.join(process.resourcesPath || "", "spiel") || ORDNER.startsWith(UPDATE_ORDNER)) return;
-    const ignorieren = ["desktop-app", ".claude", "node_modules", ".git"];
+    const ignorieren = ["desktop-app", "node_modules", ".git"];
     let timer = null;
     try {
         fs.watch(ORDNER, { recursive: true }, (_art, datei) => {
@@ -474,7 +426,6 @@ ipcMain.on("steam-dlc", event => { event.returnValue = steam.dlcBesitz(); });
 ipcMain.on("kasse-bereit", event => { event.returnValue = steam.kassBereit(); });
 ipcMain.handle("kasse-kaufe", (_event, paketId) => steam.kaufe(String(paketId)));
 
-// Update anwenden: Spielordner neu bestimmen und das Fenster mit den neuen Dateien laden
 ipcMain.on("update-anwenden", () => {
     const neu = spielOrdner();
     if (neu === ORDNER || !fenster) return;
@@ -483,15 +434,12 @@ ipcMain.on("update-anwenden", () => {
 });
 ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
 
-// Steam vor "ready" starten: das Steam-Overlay (Umschalt+Tab, auch fuer Kaeufe) laesst sich in Electron nur vorher einschalten
 steam.starte();
 
 app.whenReady().then(() => {
-    // Unterstuetzer-Paket auf Steam gekauft? Das zaehlt bei jedem Start neu (nicht aus einer Datei)
     tresor.setzeSteamDlc(steam.dlcBesitz().includes("unterstuetzer"));
     erstelleFenster();
     beobachteSpielordner();
-    // Nach dem Start in Ruhe nach einem Update schauen (Fehler sind egal, dann eben beim naechsten Mal)
     setTimeout(() => suchePatch().catch(fehler => console.warn("Update-Suche:", fehler.message)), 4000);
 });
 

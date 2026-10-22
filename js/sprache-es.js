@@ -1,10 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Spanische Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Uebersetzung.
-// Fehlt hier ein Text, gilt der englische aus sprache-en.js.
-// ============================================================
-
 if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Trd.": "mil Tr",
     "Trio.": "Tr",

@@ -1,16 +1,6 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Tresor fuer Gekauftes, Gems und Promocodes (wird vor script.js geladen)
-// Desktop-App: Alles liegt verschluesselt im Hauptprozess (desktop-app/tresor.js). Das Spiel kann dort nur
-//   lesen, mit Gems kaufen und Codes einloesen. Die Preise und Codes kennt nur der Hauptprozess, und das
-//   Unterstuetzer-Paket kommt von Steam. Wer Dateien im Spielstand aendert, bekommt dadurch nichts.
-// Browser und Handy: einfacher Speicher mit Pruefsumme im localStorage. Das schuetzt nur gegen versehentliches Aendern,
-//   nicht gegen Absicht (der Rechenweg steht hier). Auf dem Handy muessen Kaeufe spaeter ueber RevenueCat geprueft werden.
-// Der Stand wird zwischengespeichert, weil das Spiel ihn sehr oft fragt (z.B. fuer jeden Skin im Haus).
-// ============================================================
 
-// Einfache Pruefsumme (cyrb53 mit Salz). Nur fuer den Browser-Speicher und alte Spielstaende.
 function kaufPruefsumme(text) {
     const salz = "sv-" + text.length + "-bl00m";
     let h1 = 0xdeadbeef ^ 0x5eed;
@@ -26,16 +16,13 @@ function kaufPruefsumme(text) {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
-// Alte Schluessel im Browser-Speicher (bis Beta 0.4.x): werden einmal in den Tresor uebernommen
 const TRESOR_ALT = { gems: "sproutvale_gems", gekauft: "sproutvale_gekauft", codes: "sproutvale_codes", beta: "sproutvale_beta" };
 
 const Tresor = (() => {
     const desktop = window.sproutvaleDesktop && window.sproutvaleDesktop.tresor ? window.sproutvaleDesktop.tresor : null;
     let zwischen = null;
 
-    // ---------- Browser: Speicher mit Pruefsumme ----------
     const BROWSER_KEY = "sproutvale_tresor";
-    // Codes im Browser: kaufPruefsumme("code:" + CODE). Gleiche Belohnungen wie in desktop-app/tresor.js.
     const BROWSER_CODES = [{ pruef: kaufPruefsumme("code:BETAVALE"), beta: true, endlos: true }];
     const PREIS_DLC = 500;
     const PREIS_EINZELN = 50;
@@ -50,7 +37,6 @@ const Tresor = (() => {
                 return { ...browserLeer(), ...JSON.parse(decodeURIComponent(escape(atob(roh.daten)))) };
             }
         } catch (fehler) {
-            // ungueltig: leer
         }
         return browserLeer();
     }
@@ -129,7 +115,6 @@ const Tresor = (() => {
 
     const quelle = desktop || browser;
 
-    // Einmal beim Start: alte Werte aus dem Browser-Speicher des Spiels uebernehmen (Desktop: der Hauptprozess prueft sie)
     try {
         if (desktop) {
             const roh = {};
@@ -154,7 +139,6 @@ const Tresor = (() => {
             }
             return zwischen;
         },
-        // Mit Gems kaufen: "dlc" oder "kategorie:id". Gibt { ok, grund } zurueck.
         kaufe(was) {
             const antwort = quelle.kaufe(was) || { ok: false };
             zwischen = null;
@@ -165,12 +149,10 @@ const Tresor = (() => {
             zwischen = null;
             return antwort;
         },
-        // Nur fuer die Entwicklung (Debug-Fenster). In der fertigen Desktop-App wirkt das nicht.
         entwickler(art, wert) {
             quelle.entwickler(art, wert);
             zwischen = null;
         },
-        // Handy (spaeter): bestaetigte Kaeufe aus dem App-Store gutschreiben. Im Desktop macht das der Hauptprozess.
         gutschreibenBrowser(menge) {
             if (desktop) return;
             const stand = browserLesen();

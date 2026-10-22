@@ -1,10 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Polnische Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Uebersetzung.
-// Fehlt hier ein Text, gilt der englische aus sprache-en.js.
-// ============================================================
-
 if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Trd.": "Sx",
     "Trio.": "Qi",

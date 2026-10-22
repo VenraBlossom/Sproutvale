@@ -1,12 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Tutorial fuer den ersten Run (jederzeit ueberspringbar)
-// Eine kleine Sprechblase zeigt Schritt fuer Schritt auf das, was als Naechstes wichtig ist.
-// Jeder Schritt geht weiter, sobald man das Gezeigte gemacht hat (Haken aus script.js).
-// Stand in meta.tutorial: Nummer des Schritts oder "fertig". Neu starten: Einstellungen > Spielstand.
-// In der Sandbox gibt es kein Tutorial.
-// ============================================================
 
 const TUTORIAL_SCHRITTE = [
     { text: t("Willkommen in Sproutvale! 🌱 Jeder Tag hat Energie. Ist sie leer, ist Feierabend. Starte deinen ersten Tag!"),
@@ -38,7 +31,6 @@ tutorialBlase.append(tutorialKopf, tutorialText, tutorialKnoepfe);
 document.body.appendChild(tutorialBlase);
 let tutorialZiel = null;
 
-// Wer schon gespielt hat, bekommt kein Tutorial mehr
 if (meta.tutorial === undefined) meta.tutorial = meta.lebenszeit.tage > 0 ? "fertig" : 0;
 
 function tutorialAktiv() {
@@ -67,7 +59,6 @@ function starteTutorialNeu() {
     zeigeTutorial();
 }
 
-// Blase anzeigen, verstecken und neben das Ziel setzen
 function zeigeTutorial() {
     if (tutorialZiel) tutorialZiel.classList.remove("tutorial-ziel");
     tutorialZiel = null;
@@ -98,7 +89,6 @@ function zeigeTutorial() {
     const rect = tutorialZiel.getBoundingClientRect();
     const breite = tutorialBlase.offsetWidth;
     const hoehe = tutorialBlase.offsetHeight;
-    // Ziele in der Tageskarte: Blase unter die ganze Karte samt Lasche, sonst verdeckt sie die Lasche
     const karte = tutorialZiel.closest("#karten-halter");
     let y = (karte ? karte.getBoundingClientRect().bottom : rect.bottom) + 14;
     let unten = true;
@@ -114,7 +104,6 @@ function zeigeTutorial() {
     tutorialBlase.style.setProperty("--pfeil-x", klemme(rect.left + rect.width / 2 - x, 20, breite - 20) + "px");
 }
 
-// Jeder Schritt wartet auf ein bestimmtes Spielereignis
 ["tagStart", "samen", "ernte", "eingesammelt", "tagEnde", "panelOffen"].forEach(name => {
     registriereHaken(name, wert => {
         if (!tutorialAktiv() || run.sandbox) return;
@@ -125,7 +114,6 @@ function zeigeTutorial() {
     });
 });
 
-// Ziele bewegen sich (Felder, Fenster), darum regelmaessig neu ausrichten
 setInterval(zeigeTutorial, 300);
 
 $("tutorial-neu").addEventListener("click", () => {

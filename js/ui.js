@@ -1,25 +1,11 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Oberflaechen-Bausteine
-// - pixelIcon(): macht aus einem Emoji ein 16x16-Pixelbild (alle Icons gleich gross und im Pixel-Stil)
-// - zeigePopup(): schoene Fenster mit Animation statt schlichter Dialoge
-// - zeigeBanner(): kurze Einblendung oben (Wetter, Boss-Rechnung, Erfolge ...)
-// - Tooltips (data-tipp="..."), abschaltbar in den Einstellungen
-// - zaehleHoch(): Zahlen zaehlen sichtbar hoch statt zu springen
-// - Tastenkuerzel
-// ============================================================
 
-// ---------- PIXEL-ICONS AUS EMOJIS ----------
-// Das Emoji wird klein (16x16) auf eine Leinwand gemalt und dann pixelig vergroessert.
-// So sehen alle Symbole (Tarot, Kuscheltiere, Segen, Sterne) einheitlich aus.
 
 const pixelIconCache = {};
 
 function pixelIconUrl(emoji, pixel = 16) {
-    // "sprite:name" = eigenes Pixel-Sprite statt Emoji (z.B. die Sense)
     if (emoji.startsWith("sprite:")) return spriteUrl(emoji.slice(7));
-    // Eigene Pixel-Symbole statt Emojis (auch ohne das unsichtbare Variantenzeichen)
     const symbol = PIXEL_SYMBOLE[emoji] || PIXEL_SYMBOLE[emoji.replace(/️/g, "")] || PIXEL_SYMBOLE[emoji + "️"];
     if (symbol) return spriteUrl("sym_" + symbol);
     const schluessel = emoji + "|" + pixel;
@@ -32,7 +18,6 @@ function pixelIconUrl(emoji, pixel = 16) {
         stift.textBaseline = "middle";
         stift.font = Math.round(pixel * 0.86) + "px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif";
         stift.fillText(emoji, pixel / 2, pixel / 2 + pixel * 0.06);
-        // Halbtransparente Kantenpixel hart machen, damit es wie echte Pixelart aussieht
         const daten = stift.getImageData(0, 0, pixel, pixel);
         for (let i = 3; i < daten.data.length; i += 4) daten.data[i] = daten.data[i] > 110 ? 255 : 0;
         stift.putImageData(daten, 0, 0);
@@ -41,7 +26,6 @@ function pixelIconUrl(emoji, pixel = 16) {
     return pixelIconCache[schluessel];
 }
 
-// Liefert ein <img> mit dem Pixel-Icon. groesse = Bildschirm-Pixel (Vielfaches von 16 empfohlen)
 function pixelIcon(emoji, groesse = 32, klasse) {
     const img = document.createElement("img");
     img.classList.add("pixel-icon");
@@ -54,10 +38,6 @@ function pixelIcon(emoji, groesse = 32, klasse) {
     return img;
 }
 
-// ---------- POPUPS ----------
-// zeigePopup({ titel, inhalt (Element oder Text), farbe, breite, knoepfe: [{ text, klasse, aktion, bleibtOffen }],
-//              klasse, schliessbar (Standard true), onSchliessen })
-// Gibt eine Funktion zurueck, die das Popup schliesst.
 
 const offenePopups = [];
 
@@ -65,7 +45,6 @@ function zeigePopup(optionen) {
     const o = { schliessbar: true, knoepfe: [], ...optionen };
     const huelle = document.createElement("div");
     huelle.classList.add("popup-huelle");
-    // Ein Popup liegt immer ueber allem, was schon offen ist (z.B. Profil oder andere Fenster)
     let oben = 45;
     document.querySelectorAll(".overlay:not(.versteckt), .popup-huelle").forEach(e => {
         const z = parseInt(getComputedStyle(e).zIndex, 10);
@@ -106,7 +85,6 @@ function zeigePopup(optionen) {
             if (k.klasse) knopf.classList.add(k.klasse);
             knopf.textContent = k.text;
             if (k.deaktiviert) knopf.disabled = true;
-            // kurz gesperrt, damit man nicht aus Versehen draufklickt (mit kleinem Ladebalken)
             if (k.sperreMs) {
                 knopf.disabled = true;
                 knopf.classList.add("knopf-gesperrt-zeit");
@@ -145,7 +123,6 @@ function zeigePopup(optionen) {
         if (o.onSchliessen) o.onSchliessen();
     }
     eintrag.schliesse = schliesse;
-    // Erst gesperrtes Popup spaeter mit Esc/Klick daneben schliessbar machen (z.B. nach einer Animation)
     schliesse.erlaubeSchliessen = () => {
         eintrag.schliessbar = true;
         huelle.addEventListener("pointerdown", event => {
@@ -168,7 +145,6 @@ function popupOffen() {
     return offenePopups.length > 0;
 }
 
-// Kleines Element aus HTML-freien Bausteinen: el("div", "klasse", "Text", [Kinder])
 function el(tag, klasse, text, kinder) {
     const e = document.createElement(tag);
     if (klasse) e.className = klasse;
@@ -177,9 +153,7 @@ function el(tag, klasse, text, kinder) {
     return e;
 }
 
-// ---------- BANNER (kurze Einblendung oben in der Mitte) ----------
 
-// Hoechstens 2 Banner gleichzeitig, weitere warten (sonst bedecken viele Erfolge auf einmal den Bildschirm)
 const BANNER_MAX = 2;
 const bannerWarteschlange = [];
 
@@ -194,7 +168,6 @@ function zeigeBanner(symbol, titel, text, farbe, dauerMs = 3200) {
         bannerWarteschlange.push([symbol, titel, text, farbe, dauerMs]);
         return;
     }
-    // Stehen noch viele in der Schlange, sind die einzelnen Banner etwas kuerzer zu sehen
     if (bannerWarteschlange.length > 2) dauerMs = Math.min(dauerMs, 2000);
     const banner = el("div", "banner", null, [
         symbol ? pixelIcon(symbol, 48) : null,
@@ -210,9 +183,6 @@ function zeigeBanner(symbol, titel, text, farbe, dauerMs = 3200) {
     }, dauerMs + 450);
 }
 
-// ---------- TOOLTIPS ----------
-// Jedes Element mit data-tipp="Text" zeigt beim Drueberfahren einen Hinweis (abschaltbar: Einstellungen > Tipps).
-// Zeilen, die mit "## " beginnen, werden als Ueberschrift gezeigt, Zeilen mit "> " als hervorgehobene Zeile.
 
 let tippEl = null;
 let tippZiel = null;
@@ -240,7 +210,6 @@ function zeigeTippFuer(ziel) {
         else tippEl.appendChild(el("div", "tipp-zeile", zeile || " "));
     });
     tippEl.classList.toggle("tipp-breit", ziel.dataset.tipp.length > 220);
-    // Infokarten der oberen Leiste haben einen eigenen, groesseren Look
     tippEl.classList.toggle("tipp-karte", Boolean(ziel.closest("#top-leiste")));
     tippEl.classList.toggle("tipp-fest", tippFest === ziel);
     tippEl.classList.add("sichtbar");
@@ -255,7 +224,6 @@ function zeigeTippFuer(ziel) {
     tippEl.style.top = y + "px";
 }
 
-// Infokarten in der oberen Leiste: anklicken haelt sie offen, bis man woanders hinklickt
 let tippFest = null;
 
 function versteckeTipp() {
@@ -266,7 +234,6 @@ function versteckeTipp() {
 }
 
 document.addEventListener("pointerover", event => {
-    // Finger: Hinweise kommen nur per langem Antippen (sonst springt bei jedem Tippen ein Hinweis auf)
     if (tippFest || event.pointerType === "touch") return;
     const ziel = event.target.closest ? event.target.closest("[data-tipp]") : null;
     if (ziel === tippZiel) return;
@@ -290,7 +257,6 @@ document.addEventListener("pointerdown", event => {
     tippFest = null;
     versteckeTipp();
 });
-// Offene Infokarte laufend aktualisieren (Zahlen aendern sich)
 setInterval(() => {
     if (tippFest && tippFest.isConnected && tippEl && tippEl.classList.contains("sichtbar")) zeigeTippFuer(tippFest);
     else if (tippFest && !tippFest.isConnected) {
@@ -299,16 +265,12 @@ setInterval(() => {
     }
 }, 500);
 
-// ---------- TOUCH: langes Antippen ----------
-// Auf Handy und Tablet gibt es keinen Rechtsklick und kein Drueberfahren. Langes Antippen (0,5 Sek.) wirkt wie ein
-// Rechtsklick (Begleiter, Figur, Werkzeuge ...). Hat die Stelle kein eigenes Menue, zeigt es stattdessen den Hinweis.
 const LANG_TIPPEN_MS = 500;
 let langTippen = null;
 document.addEventListener("pointerdown", event => {
     if (event.pointerType !== "touch") return;
     clearTimeout(langTippen && langTippen.timer);
     const ziel = event.target;
-    // Auf dem Samenladen heisst Gedrueckthalten "Sense" (klickt von allein): dort kein langes Antippen
     if (ziel.closest && ziel.closest("#plant-button")) {
         langTippen = null;
         return;
@@ -329,7 +291,6 @@ document.addEventListener("pointerdown", event => {
                 zeigeTippFuer(tippZielEl);
             }
         }
-        // kurzes Vibrieren als Rueckmeldung (nur wenn der Browser es nach einer Beruehrung erlaubt)
         if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(12);
     }, LANG_TIPPEN_MS);
 }, true);
@@ -340,7 +301,6 @@ document.addEventListener("pointermove", event => {
 ["pointerup", "pointercancel"].forEach(art => document.addEventListener(art, event => {
     if (!langTippen || event.pointerType !== "touch") return;
     clearTimeout(langTippen.timer);
-    // Nach einem langen Antippen keinen normalen Klick hinterher ausloesen
     if (langTippen.ausgeloest) {
         const schlucke = e => { e.stopPropagation(); e.preventDefault(); };
         document.addEventListener("click", schlucke, { capture: true, once: true });
@@ -348,7 +308,6 @@ document.addEventListener("pointermove", event => {
     }
     langTippen = null;
 }, true));
-// Manche Browser (Android) melden langes Antippen selbst als Rechtsklick: dann nicht noch einmal
 document.addEventListener("contextmenu", event => {
     if (langTippen && event.isTrusted) {
         langTippen.nativ = true;
@@ -357,7 +316,6 @@ document.addEventListener("contextmenu", event => {
     }
 }, true);
 
-// Hat niemand den (echten) Rechtsklick vom langen Antippen gebraucht: Hinweis zeigen statt Browser-Menue
 document.addEventListener("contextmenu", event => {
     if (!event.isTrusted || !langTippen || !langTippen.nativ || event.defaultPrevented) return;
     event.preventDefault();
@@ -369,8 +327,6 @@ document.addEventListener("contextmenu", event => {
     zeigeTippFuer(tippZielEl);
 });
 
-// ---------- ZAHLEN HOCHZAEHLEN ----------
-// Die Anzeige laeuft in ca. 0,35 Sekunden vom alten zum neuen Wert.
 
 const zaehlerZustand = new WeakMap();
 
@@ -387,7 +343,6 @@ function zaehleHoch(element, zielwert, format = zahl) {
     z.start = z.angezeigt;
     z.ziel = zielwert;
     z.startZeit = performance.now();
-    // grosse Spruenge nach unten (Einkaufen) sofort zeigen, Gewinne zaehlen hoch
     if (zielwert < z.start) {
         z.angezeigt = zielwert;
         element.textContent = format(zielwert);
@@ -406,7 +361,6 @@ function zaehleHoch(element, zielwert, format = zahl) {
     requestAnimationFrame(schritt);
 }
 
-// ---------- BARRIEREFREIHEIT ----------
 
 function wackelnErlaubt() {
     return einstellungen.wackeln !== false;
@@ -416,7 +370,6 @@ function blitzeErlaubt() {
     return einstellungen.blitze !== false;
 }
 
-// Kurzer heller Blitz ueber dem ganzen Bildschirm (Gewitter, Jackpot), abschaltbar
 function bildschirmBlitz(farbe = "#ffffff", staerke = 0.7, dauerMs = 220) {
     if (!blitzeErlaubt()) return;
     const blitz = el("div", "bildschirm-blitz");
@@ -425,12 +378,9 @@ function bildschirmBlitz(farbe = "#ffffff", staerke = 0.7, dauerMs = 220) {
     blitz.animate([{ opacity: staerke }, { opacity: 0 }], { duration: dauerMs, easing: "ease-out" }).onfinish = () => blitz.remove();
 }
 
-// ---------- TASTENKUERZEL ----------
-// Die Aktionen stehen in TASTENKUERZEL (start.js), hier nur die Verteilung.
 
 const tastenAktionen = {};
 
-// anzeige = wie die Taste in den Einstellungen heisst (z.B. "Leertaste")
 function registriereTaste(taste, beschreibung, aktion, anzeige) {
     tastenAktionen[taste.toLowerCase()] = { beschreibung, aktion, taste, anzeige };
 }
@@ -450,10 +400,6 @@ document.addEventListener("keydown", event => {
     if (eintrag.aktion(event) !== false) event.preventDefault();
 });
 
-// ---------- EMOJIS IM TEXT ALS PIXEL-ART ----------
-// Ueberall, wo Text mit Emojis im Spiel auftaucht (Titel, Toasts, Tipps, Karten ...), wird jedes Emoji
-// durch sein Pixel-Bild ersetzt. Das Emoji bleibt als (unsichtbarer) Text erhalten, damit textContent gleich bleibt.
-// Pfeile wie ▶ oder ✕ sind keine Emoji-Darstellung und bleiben normale Schrift.
 const EMOJI_MUSTER = /(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️)(?:‍(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️?))*️?/gu;
 const EMOJI_TEST = /\p{Emoji_Presentation}|\p{Extended_Pictographic}️/u;
 const EMOJI_AUSNAHMEN = "script, style, textarea, input, select, option, canvas, [data-kein-emoji], .px-emoji";

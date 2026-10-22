@@ -1,14 +1,6 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Hof und Haus
-// - Kosmetik (Klick aufs Bauernhaus): Haustiere, Landschaft, Deko, Musik, Samenladen, Felder, Muenzen, Rahmen, Pflanzen
-// - Haustier: laufen, schlafen, streicheln (Linksklick), Aktionen (Rechtsklick), hilft beim Einsammeln
-// - Mondteich im Hof
-// Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
-// ============================================================
 
-// ---------- KOSMETIK: WAS IST FREIGESCHALTET? ----------
 
 const KOSMETIK_LISTEN = {
     haustier: HAUSTIER_SKINS,
@@ -22,7 +14,6 @@ const KOSMETIK_LISTEN = {
     pflanzen: PFLANZEN_SKINS,
     haus: HAUS_SKINS,
     scheune: SCHEUNEN_SKINS,
-    // Teile der eigenen Figur (Profil im Hauptmenue, nicht im Haus)
     figur_haut: FIGUR_TEILE.haut,
     figur_augen: FIGUR_TEILE.augen,
     figur_frisur: FIGUR_TEILE.frisur,
@@ -35,33 +26,25 @@ const KOSMETIK_LISTEN = {
     figur_gesicht: FIGUR_TEILE.gesicht
 };
 
-// frei = immer, erspielt = Bedingung einmal erfuellt (bleibt dann fuer immer),
-// dlc = Unterstuetzer-Paket oder einzeln mit Gems gekauft (steht nur im Tresor, nie im Spielstand),
-// beta = Beta-Tester (Code BETAVALE)
 function istKosmetikFrei(eintrag, kategorie) {
     if (!eintrag) return false;
     const schluessel = kategorie + ":" + eintrag.id;
     if (eintrag.quelle === "frei") return true;
     if (eintrag.quelle === "beta") return typeof istBetaTester === "function" && istBetaTester();
-    // Bezahlte Inhalte: nur was im Tresor steht (ein Eintrag in "freigeschaltet" im Spielstand zaehlt hier nicht)
     if (eintrag.quelle === "dlc") return hatGekauft(schluessel) || (eintrag.paket === "unterstuetzer" && hatDlc());
     if (meta.freigeschaltet[schluessel]) return true;
-    // Erspielt wird nur im Standard-Modus (die Sandbox hat eigenen Fortschritt)
     if (eintrag.bedingung && metaProfil !== "sandbox" && eintrag.bedingung()) {
         meta.freigeschaltet[schluessel] = true;
-        // neue Deko steht gleich im Hof, wenn noch ein Platz frei ist
         if (kategorie === "deko" && meta.kosmetik.deko.length < DEKO_MAX) meta.kosmetik.deko.push(eintrag.id);
         return true;
     }
     return false;
 }
 
-// Anprobieren im Haus: ein Inhalt wird kurz angezeigt, auch wenn man ihn (noch) nicht besitzt
-let kosmetikVorschau = null; // { kategorie, id }
+let kosmetikVorschau = null;
 
 function gewaehlteKosmetik(kategorie) {
     const liste = KOSMETIK_LISTEN[kategorie];
-    // Koop: gemeinsame Skins (standardmaessig die des Leiters, wer zuletzt waehlt, gewinnt)
     if (typeof koopAktiv === "function" && koopAktiv() && koop.kosmetik && kategorie !== "deko" && kategorie !== "haustier" && koop.kosmetik[kategorie] &&
         !(kosmetikVorschau && kosmetikVorschau.kategorie === kategorie)) {
         const eintrag = liste.find(e => e.id === koop.kosmetik[kategorie]);
@@ -73,7 +56,6 @@ function gewaehlteKosmetik(kategorie) {
     return eigeneKosmetik(kategorie);
 }
 
-// Was man selbst ausgewaehlt hat (ohne Vorschau)
 function eigeneKosmetik(kategorie) {
     const liste = KOSMETIK_LISTEN[kategorie];
     const eintrag = liste.find(e => e.id === meta.kosmetik[kategorie]);
@@ -84,7 +66,6 @@ function aktuellerSkin() {
     return gewaehlteKosmetik("haustier");
 }
 
-// Deko, die gerade im Hof steht (hoechstens 3, beim Anprobieren ersetzt die Vorschau den letzten Platz)
 function aufgestellteDeko() {
     const koopDeko = typeof koopAktiv === "function" && koopAktiv() && Array.isArray(koop.kosmetik.deko) ? koop.kosmetik.deko : null;
     const liste = (koopDeko || meta.kosmetik.deko)
@@ -97,7 +78,6 @@ function aufgestellteDeko() {
     return liste.slice(0, DEKO_MAX);
 }
 
-// Meldet neu erspielte Kosmetik (wird alle 2 Sekunden geprueft)
 function pruefeNeueKosmetik() {
     if (!run || run.sandbox) return;
     let neu = false;
@@ -121,13 +101,11 @@ function dunklereFarbe(hex, faktor) {
     return "#" + [16, 8, 0].map(s => Math.round(((n >> s) & 255) * faktor).toString(16).padStart(2, "0")).join("");
 }
 
-// Setzt genau eine Klasse aus einer Liste (z.B. den Look des Samenladens)
 function setzeLookKlasse(element, liste, klasse) {
     liste.forEach(e => { if (e.klasse) element.classList.remove(e.klasse); });
     if (klasse) element.classList.add(klasse);
 }
 
-// Uebertraegt die gewaehlte Kosmetik ins Spiel (CSS-Farben, Bilder, Landschaft, Effekte)
 let letztesHofThema = null;
 
 function wendeKosmetikAn() {
@@ -164,7 +142,7 @@ function wendeKosmetikAn() {
     }
 
     const geldIcon = moneyDisplay.querySelector("img");
-    if (geldIcon) setzeSpriteBild(geldIcon, "muenze_0", 2); // Muenz-Looks gibt es nur fuer die Saat im Spiel
+    if (geldIcon) setzeSpriteBild(geldIcon, "muenze_0", 2);
     document.body.classList.toggle("farbenblind", Boolean(einstellungen.farbenblind));
     document.body.classList.toggle("ohne-effekte", Boolean(einstellungen.wenigerEffekte));
     document.body.classList.toggle("crt", Boolean(einstellungen.crt));
@@ -172,10 +150,9 @@ function wendeKosmetikAn() {
     haustier.letzteUrl = "";
     if (haustier.bild) zeigeHaustierBild();
     renderDeko();
-    if (run) run.felder.filter(f => !f.leer).forEach(zeigeFeldSprite); // Pflanzen-Look sofort sichtbar
+    if (run) run.felder.filter(f => !f.leer).forEach(zeigeFeldSprite);
 }
 
-// ---------- HOF: DEKO UND MONDTEICH ----------
 
 function hofSprite(name, xProzent, klasse) {
     const img = document.createElement("img");
@@ -188,7 +165,6 @@ function hofSprite(name, xProzent, klasse) {
     return img;
 }
 
-// Deko steht auf 3 Plaetzen im Hintergrund der Wiese (hinter Haustier und Teich)
 function renderDeko() {
     hofEbene.querySelectorAll(".deko").forEach(e => e.remove());
     aufgestellteDeko().forEach((deko, index) => {
@@ -199,7 +175,6 @@ function renderDeko() {
         if (deko.effekt) bild.classList.add("deko-" + deko.effekt);
         if (deko.partikel) bild.dataset.partikel = deko.partikel.join(",");
         setzeTipp(bild, deko.name);
-        // Windmuehle: die Fluegel drehen sich vor dem Turm
         if (deko.fluegel) {
             const fluegel = hofSprite("muehlenfluegel", DEKO_SLOTS[index].x, "deko");
             fluegel.classList.add("muehlen-fluegel");
@@ -208,10 +183,9 @@ function renderDeko() {
     });
 }
 
-// Feuerwerksfest: eine Rakete steigt in den Himmel und zerplatzt in bunte Pixel-Funken
 function starteFeuerwerk(farben) {
     const x = 6 + Math.random() * 88;
-    const ziel = 27 + Math.random() * 12; // unter der oberen Leiste, ueber der Wiese
+    const ziel = 27 + Math.random() * 12;
     const farbe = zufall(farben);
     const rakete = el("div", "feuerwerk-rakete");
     rakete.style.left = x + "%";
@@ -224,7 +198,6 @@ function starteFeuerwerk(farben) {
         const anzahl = 12 + Math.floor(Math.random() * 6);
         const radius = 28 + Math.random() * 26;
         const zweiteFarbe = zufall(farben);
-        // aussen ein grosser Ring, innen ein kleinerer in der zweiten Farbe
         [[anzahl, 1, farbe], [Math.round(anzahl * 0.6), 0.5, zweiteFarbe]].forEach(([n, groesse, ringFarbe]) => {
             for (let i = 0; i < n; i++) {
                 const winkel = (i / n) * Math.PI * 2 + Math.random() * 0.2;
@@ -247,7 +220,6 @@ function starteFeuerwerk(farben) {
     }, 900);
 }
 
-// Zauberwald: ein leuchtender Falter flattert quer ueber die Wiese
 function starteZauberfalter(farbe) {
     const vonLinks = Math.random() < 0.5;
     const falter = el("div", "zauber-falter");
@@ -260,7 +232,6 @@ function starteZauberfalter(farbe) {
     setTimeout(() => falter.remove(), 16000);
 }
 
-// Deko mit Bildfolge (Kraehe, Koi-Teich, Gluecksdrache): nur der bewegte Teil aendert sich, der Rest bleibt stehen
 function setzeDekoAblauf(bild, deko) {
     if (!deko.ablauf) return;
     bild.dataset.ablauf = deko.ablauf;
@@ -304,15 +275,12 @@ registriereHaken("anzeige", () => {
     if (teichEl) teichEl.classList.toggle("leuchtet", darfMondteich());
 });
 
-// Gebaeude als Knopf (die Landschaft ist ein einziges Bild): die Aura liegt als Pixel-Rand genau um das Gebaeude,
-// klickbar sind nur die Pixel des Gebaeudes selbst (nicht das Rechteck drumherum)
 const GEBAEUDE_RAND = 2;
 function macheGebaeudeKnopf(flaeche, teil, aktion) {
     const aura = document.createElement("canvas");
     aura.className = "gebaeude-aura";
     flaeche.appendChild(aura);
     let sprite = null;
-    // Deckkraft aller Pixel einmal merken (nicht bei jeder Mausbewegung neu aus der Leinwand lesen)
     let alpha = null;
     const deckend = event => {
         if (!sprite || !alpha) return false;
@@ -330,7 +298,6 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
         flaeche.style.top = (g.y / szene.hoehe) * 100 + "%";
         flaeche.style.width = (g.b / szene.breite) * 100 + "%";
         flaeche.style.height = (g.h / szene.hoehe) * 100 + "%";
-        // Aura: alle leeren Pixel bis GEBAEUDE_RAND Pixel neben dem Gebaeude, innen kraeftiger
         const r = GEBAEUDE_RAND;
         aura.width = g.b + 2 * r;
         aura.height = g.h + 2 * r;
@@ -354,7 +321,6 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
             stift.fillRect(x + r, y + r, 1, 1);
         }
     });
-    // Hinweis nur zeigen, wenn die Maus ueber dem Gebaeude selbst ist (nicht im leeren Rechteck drumherum)
     const tippText = t(flaeche.dataset.tipp || "");
     setzeTipp(flaeche, null);
     const setzeDrueber = an => {
@@ -377,7 +343,6 @@ function macheGebaeudeKnopf(flaeche, teil, aktion) {
 const hausFlaeche = $("haus-klickflaeche");
 macheGebaeudeKnopf(hausFlaeche, "haus", () => oeffneHaus());
 
-// Klickflaeche ueber der Scheune: dort kann man den Tag frueh beenden (wie ein ganz normales Tagesende)
 macheGebaeudeKnopf($("scheune-klickflaeche"), "scheune", () => oeffneScheune());
 
 function oeffneScheune() {
@@ -400,8 +365,6 @@ function beendeTagFrueh() {
     else beendeTag();
 }
 
-// ---------- SCHORNSTEIN ----------
-// Aus dem Bauernhaus steigt leise Rauch auf (am Abend und in der Nacht etwas mehr)
 
 setInterval(() => {
     if (!hofSzene || !hofSzene.schornstein || document.hidden || ohneEffekte()) return;
@@ -416,7 +379,6 @@ setInterval(() => {
     setTimeout(() => puff.remove(), 3200);
 }, 700);
 
-// Legendaere Haeuser und Scheunen: kleine Funken steigen am Gebaeude auf
 setInterval(() => {
     if (!hofSzene || document.hidden || ohneEffekte()) return;
     ["haus", "scheune"].forEach(teil => {
@@ -432,10 +394,8 @@ setInterval(() => {
     });
 }, 450);
 
-// Deko mit Teilchen (Lagerfeuer, Feenbrunnen ...) und Landschaften mit Funkeln (Zauberwald)
 setInterval(() => {
     if (document.hidden || ohneEffekte()) return;
-    // Bienenkorb: ab und zu fliegt eine Biene eine kleine Runde
     hofEbene.querySelectorAll(".deko-bienen").forEach(korb => {
         if (Math.random() < 0.45 || fxLayer.querySelectorAll(".deko-biene").length > 5) return;
         const rect = korb.getBoundingClientRect();
@@ -484,7 +444,6 @@ setInterval(() => {
     if (thema.feuerwerk && hofEbene.querySelectorAll(".feuerwerk-rakete").length < 2 && Math.random() < 0.16) {
         starteFeuerwerk(thema.feuerwerk);
     }
-    // Kosmische Nacht: Sternschnuppen ueber dem Hof
     if (thema.sternschnuppen && Math.random() < 0.07) {
         const kopf = topBar.getBoundingClientRect();
         miniSchnuppe(kopf.left + kopf.width * (0.1 + Math.random() * 0.8), kopf.top + kopf.height * (0.3 + Math.random() * 0.15),
@@ -503,7 +462,6 @@ setInterval(() => {
     }
 }, 450);
 
-// ---------- LEGENDAERE PFLANZEN-LOOKS: eigener Ernte-Effekt und Funkeln an reifen Pflanzen ----------
 function fxTeil(klasse, x, y, farbe) {
     const teil = el("div", klasse);
     teil.style.left = x + "px";
@@ -518,7 +476,6 @@ function fliegeWeg(teil, schritte, dauer) {
 }
 
 const PFLANZEN_EFFEKTE = {
-    // Sternenpflanzen: Pixel-Sterne fliegen auseinander, manchmal zieht eine kleine Sternschnuppe los
     sterne: {
         ernte(x, y, look) {
             for (let i = 0; i < 7; i++) {
@@ -539,7 +496,6 @@ const PFLANZEN_EFFEKTE = {
             ], 900);
         }
     },
-    // Kristallpflanzen: die Pflanze zerspringt in glitzernde Splitter, dazu ein heller Ring
     kristall: {
         ernte(x, y, look) {
             for (let i = 0; i < 9; i++) {
@@ -566,7 +522,6 @@ const PFLANZEN_EFFEKTE = {
             ], 600);
         }
     },
-    // Glutblaetter: eine Stichflamme puffert hoch, Glutfunken spruehen und steigen langsam auf
     glut: {
         ernte(x, y, look) {
             fliegeWeg(fxTeil("fx-flamme", x, y), [
@@ -595,7 +550,6 @@ registriereHaken("ernte", feld => {
     effekt.ernte(rect.left + rect.width / 2, rect.top + rect.height * 0.45, look);
 });
 
-// Reife Pflanzen funkeln ab und zu (Sterne, Kristallglanz, kleine Flammen)
 setInterval(() => {
     if (document.hidden || !run || spielPausiert() || ohneEffekte()) return;
     const look = gewaehlteKosmetik("pflanzen");
@@ -608,7 +562,6 @@ setInterval(() => {
         const rect = zufall(pflanzen).el.spriteEl.getBoundingClientRect();
         effekt.reif(rect.left + rect.width * (0.2 + Math.random() * 0.6), rect.top + rect.height * (0.15 + Math.random() * 0.5), look);
     }
-    // Sternenpflanzen: ab und zu zieht eine kleine Sternschnuppe ueber den Acker
     if (look.effekt === "sterne" && Math.random() < 0.12) {
         const rect = zufall(pflanzen).el.spriteEl.getBoundingClientRect();
         miniSchnuppe(rect.left + rect.width / 2, rect.top, Math.random() < 0.5 ? 1 : -1);
@@ -625,9 +578,6 @@ function steigendesTeilchen(x, y, farben) {
     setTimeout(() => funke.remove(), 1800);
 }
 
-// ---------- SKIN-EFFEKTE ----------
-// Samenladen: Funken bei jedem Samen, Feuerwerksladen schiesst tagsueber Raketen.
-// Haustiere mit "effekt": Blasen, Herzen, Funkeln oder kleine Flammen.
 
 function ladenOben() {
     const rect = plantButton.getBoundingClientRect();
@@ -641,11 +591,7 @@ registriereHaken("samen", () => {
     partikel(x, y, laden.funken, 14, 70);
 });
 
-// ---------- LEGENDAERE SAMENLAEDEN: eigene Gebaeude ----------
-// Feuerwerksstand, Zirkuszelt und Sternwarte bekommen einen eigenen Aufbau (Dach, Kisten, Kuppel ...),
-// ein eigenes Symbol in der Mitte und kleine Animationen, auch zwischen den Tagen.
 
-// Jedes legendaere Gebaeude besteht aus eigenen Teilen (Aussehen in style.css, Abschnitt LEGENDAERE GEBAEUDE)
 const LADEN_BAUTEILE = {
     feuerwerk: ["bau-abendhimmel", "bau-scheinwerfer links", "bau-scheinwerfer rechts", "bau-turm", "bau-arm", "bau-flamme",
         "bau-rakete", "bau-rauch", "bau-rampe", "bau-kiste rechts"],
@@ -654,7 +600,6 @@ const LADEN_BAUTEILE = {
     hexe: ["bau-huette", "bau-dach", "bau-kessel", "bau-blasen"],
     leuchtturm: ["bau-strahl", "bau-leuchtturm", "bau-galerie", "bau-laterne", "bau-fels", "bau-moewe"],
     mondteich: ["bau-mondlicht", "bau-teichrand", "bau-wasser", "bau-mondspiegel", "bau-seerosen", "bau-schimmer"],
-    // epische Gebaeude: ruhig, ohne grosse Animationen
     kisten: ["bau-tafel", "bau-kisten", "bau-gemuese"],
     beerenbusch: ["bau-busch-blaetter", "bau-busch", "bau-beeren"],
     strandbude: ["bau-sand", "bau-bude", "bau-strohdach", "bau-surfbrett"],
@@ -669,16 +614,13 @@ const LADEN_BAUTEILE = {
 function baueLaden(laden) {
     const bauweise = laden.bauweise || "";
     $("plant-button-bild").src = laden.bild ? pixelIconUrl(laden.bild) : spriteUrl("saatsack");
-    plantButton.dataset.zustand = ""; // Beschriftung (Startrampe, Manege ...) neu setzen
+    plantButton.dataset.zustand = "";
     if ((marktstand.dataset.bauweise || "") === bauweise) return;
-    // Ohne Gebaeude darf das Attribut gar nicht da sein (sonst greifen die Gebaeude-Styles)
     if (bauweise) marktstand.dataset.bauweise = bauweise;
     else delete marktstand.dataset.bauweise;
-    // epische Gebaeude: kein Bild in der Mitte, Schild unten, keine Leerlauf-Animationen
     marktstand.classList.toggle("bau-ruhig", Boolean(bauweise) && laden.paket === "unterstuetzer");
     marktstand.querySelectorAll(".laden-bau").forEach(e => e.remove());
     if (!bauweise) return;
-    // Das Gebaeude ist eine Pixel-Grafik (laeden-pixel.js), legendaere wechseln ihre Animationsbilder
     const bau = el("div", "laden-bau");
     const bild = document.createElement("img");
     bild.className = "laden-pixelbild";
@@ -689,7 +631,6 @@ function baueLaden(laden) {
     marktstand.appendChild(bau);
 }
 
-// Animationsbilder der legendaeren Laeden weiterschalten
 let ladenBildNummer = 0;
 setInterval(() => {
     const bild = marktstand.querySelector(".laden-pixelbild");
@@ -699,7 +640,6 @@ setInterval(() => {
     bild.src = ladenPixelBild(marktstand.dataset.bauweise, ladenBildNummer);
 }, 220);
 
-// Ein Punkt auf der Pixel-Grafik (in Raster-Pixeln) als Bildschirm-Koordinate
 function ladenPunkt(px, py) {
     const bild = marktstand.querySelector(".laden-pixelbild");
     const def = LADEN_PIXEL[marktstand.dataset.bauweise];
@@ -711,14 +651,12 @@ function ladenPunkt(px, py) {
     return { x: r.left + (px / LADEN_PIXEL_BREITE) * r.width, y: r.top + (py / def.hoehe) * r.height, rect: r };
 }
 
-// Oberkante des Gebaeudes (Dach, Zelt oder Kuppel), dort starten die Idle-Effekte
 function ladenSpitze() {
     const def = LADEN_PIXEL[marktstand.dataset.bauweise];
     const [px, py] = def && def.spitze ? def.spitze : [16, 2];
     return ladenPunkt(px, py);
 }
 
-// Feuerwerk: Teilchen fliegen gleichmaessig im Kreis auseinander und sinken dann leicht
 function feuerwerkRing(x, y, farben, anzahl, radius) {
     const versatz = Math.random() * Math.PI * 2;
     for (let i = 0; i < anzahl; i++) {
@@ -742,7 +680,6 @@ function feuerwerkRing(x, y, farben, anzahl, radius) {
     }
 }
 
-// Kleine Sternschnuppe, die von einem Punkt schraeg nach oben fliegt (Sternwarte, Sternenkatze)
 function miniSchnuppe(x, y, richtung = 1) {
     const kopf = el("div", "mini-schnuppe");
     kopf.style.left = x + "px";
@@ -791,7 +728,6 @@ function schiesseRakete(farben) {
     flieg();
 }
 
-// Kurze Reaktion des Gebaeudes auf jeden Klick (Rakete ruckelt, Robbe huepft, Teleskop blitzt)
 function ladenKlick() {
     if (!marktstand.dataset.bauweise) return;
     marktstand.classList.remove("bau-klick");
@@ -799,7 +735,6 @@ function ladenKlick() {
     marktstand.classList.add("bau-klick");
 }
 
-// Was ein legendaeres Gebaeude ab und zu von allein macht
 function ladenIdle(laden) {
     const spitze = ladenSpitze();
     if (laden.bauweise === "feuerwerk") {
@@ -807,7 +742,6 @@ function ladenIdle(laden) {
         if (Math.random() < 0.4) setTimeout(() => schiesseRakete(laden.funken), 350);
     } else if (laden.bauweise === "zirkus") {
         partikel(spitze.x, spitze.y - 10, laden.funken, 18, 80);
-        // Ab und zu macht die Robbe einen Salto
         if (Math.random() < 0.5) {
             marktstand.classList.remove("bau-trick");
             void marktstand.offsetWidth;
@@ -817,7 +751,6 @@ function ladenIdle(laden) {
         const rohr = ladenPunkt(26, 5);
         miniSchnuppe(rohr.x, rohr.y, 1);
     } else if (laden.bauweise === "hexe") {
-        // Der Kessel blubbert ueber, ab und zu wackelt der Hut
         const kessel = ladenPunkt(27, 38);
         partikel(kessel.x, kessel.y, laden.funken, 12, 55);
         if (Math.random() < 0.5) {
@@ -826,14 +759,12 @@ function ladenIdle(laden) {
             marktstand.classList.add("bau-trick");
         }
     } else if (laden.bauweise === "mondteich") {
-        // Ab und zu laeuft ein Schimmer ueber das Wasser, dazu ein paar Glitzerpunkte
         marktstand.classList.remove("bau-trick");
         void marktstand.offsetWidth;
         marktstand.classList.add("bau-trick");
         const wasser = ladenPunkt(16, 23);
         partikel(wasser.x, wasser.y, laden.funken, 8, 35);
     } else if (laden.bauweise === "leuchtturm") {
-        // Das Licht blitzt kurz hell auf
         marktstand.classList.remove("bau-trick");
         void marktstand.offsetWidth;
         marktstand.classList.add("bau-trick");
@@ -847,13 +778,11 @@ function ladenIdle(laden) {
     setTimeout(ladenIdleSchleife, 2600 + Math.random() * 2200);
 })();
 
-// Landung eines Wurfs: kleine Explosion (Feuerwerk), Konfetti (Zirkus) oder Sternenglitzer (Sternwarte)
 function wurfAnkunft(x, y, laden, istSamen) {
     if (laden.bauweise === "feuerwerk") {
         feuerwerkRing(x, y, istSamen ? laden.ankunft : [zufall(laden.ankunft), "#ffffff"], istSamen ? 18 : 8, istSamen ? 38 : 18);
         if (istSamen) Klang.plinkoNagel(2);
     } else if (laden.bauweise === "mondteich") {
-        // Blasen platzen auf dem Feld und ziehen kleine Wasserringe
         const ring = el("div", "wasser-ring" + (istSamen ? " gross" : ""));
         ring.style.left = x + "px";
         ring.style.top = y + "px";
@@ -879,7 +808,6 @@ const HAUSTIER_EFFEKTE = {
 let haustierEffektMs = 0;
 let haustierIdleMs = 6000;
 
-// Atem-Wolke aus dem Maul (Feuer, Frost): Teilchen fliegen in Blickrichtung
 function haustierAtem(farben, anzahl) {
     const kopf = haustierKopf();
     const richtung = haustier.richtung;
@@ -901,9 +829,7 @@ function haustierAtem(farben, anzahl) {
     }
 }
 
-// Eigene Animationen der legendaeren Haustiere (kommen alle paar Sekunden, wenn das Tier ruht)
 const HAUSTIER_IDLE = {
-    // Papa P: die Augen gluehen auf, Funken stieben von den Flammen-Haenden, dann ein kurzes Nicken
     papa: () => {
         const kopf = haustierKopf();
         haustier.bild.animate([{ filter: "brightness(1)" }, { filter: "brightness(1.6) drop-shadow(0 0 6px #ff2a1a)" }, { filter: "brightness(1)" }],
@@ -915,7 +841,6 @@ const HAUSTIER_IDLE = {
             { duration: 300, easing: "ease-out" }), 700);
         Klang.blockLaut(true);
     },
-    // Blockmensch: haut dreimal auf den Boden, Bloecke splittern, am Ende ein kleiner Freudensprung
     block: () => {
         const rect = haustier.bild.getBoundingClientRect();
         const x = rect.left + rect.width * (haustier.richtung < 0 ? 0.2 : 0.8);
@@ -1011,7 +936,6 @@ function aktualisiereHaustierEffekt(dtMs) {
     setTimeout(() => teil.remove(), 1600);
 }
 
-// ---------- HAUS: KOSMETIK-FENSTER ----------
 
 let aktiveKosmetikKategorie = "haustier";
 let hausSchliessen = null;
@@ -1029,13 +953,10 @@ function beendeKosmetikVorschau() {
     aktualisiereMusik();
 }
 
-// ---------- KRISTALLE UND SHOP ----------
-// Gems und Gekauftes gehoeren dem Spieler, nicht einem Spielstand: sie stehen im Tresor (js/tresor.js).
 function kristallStand() {
     return Tresor.stand().gems;
 }
 
-// Unterstuetzer-Paket: auf Steam gekauft oder mit Gems
 function hatDlc() {
     return Boolean(Tresor.stand().dlc);
 }
@@ -1043,7 +964,6 @@ function hatGekauft(schluessel) {
     return Tresor.stand().gekauft.includes(schluessel);
 }
 
-// Mit Gems kaufen ("dlc" oder "kategorie:id"). Den Preis kennt der Tresor selbst. Gibt true zurueck, wenn es geklappt hat.
 function kaufeMitGems(was) {
     const antwort = Tresor.kaufe(was);
     if (!antwort.ok) {
@@ -1058,7 +978,6 @@ function aktualisiereKristallAnzeigen() {
     document.querySelectorAll(".kristall-zahl").forEach(e => { e.textContent = zahl(kristallStand()); });
 }
 
-// Kristall-Anzeige als Knopf: oeffnet den Gem-Shop (kasse.js)
 function kristallKnopf() {
     const knopf = el("button", "knopf kristall-knopf", null, [
         pixelIcon("💎", 22), el("span", "kristall-zahl", zahl(kristallStand())), el("span", "kristall-plus", "+")
@@ -1082,7 +1001,6 @@ function kristallInfoKnopf() {
     return knopf;
 }
 
-// Unterstuetzer-Paket fuer 500 Kristalle
 const DLC_KRISTALLE = 500;
 function dlcKnopf(danach) {
     const knopf = el("button", "knopf knopf-lila dlc-knopf", "DLC");
@@ -1118,10 +1036,6 @@ function dlcKnopf(danach) {
     return knopf;
 }
 
-// ---------- PROMOCODES ----------
-// Die Codes stehen nur als Pruefsumme im Tresor (Desktop: desktop-app/tresor.js), Gross-/Kleinschreibung egal.
-// Jeder Code geht pro Spieler nur einmal. Neue Codes nur auf Ansage anlegen.
-// BETAVALE: Beta-Tester-Begleiter, BETA Shirt und Endless (keine anderen Skins).
 function loeseCodeEin(text) {
     const antwort = Tresor.code(text);
     if (!antwort.ok) {
@@ -1165,7 +1079,6 @@ function codeKnopf() {
     return knopf;
 }
 
-// Legendaere Skins einzeln fuer Kristalle kaufen
 function istEinzelKaufbar(eintrag, kategorie) {
     return eintrag.quelle === "dlc" && eintrag.paket === "einzeln" && !istKosmetikFrei(eintrag, kategorie);
 }
@@ -1212,7 +1125,6 @@ function oeffneHaus(kategorie) {
     });
     Klang.banner();
     renderHaus(inhalt);
-    // Oben rechts neben dem X: Code, DLC, Kristalle, Fragezeichen
     const fenster = inhalt.closest(".popup");
     if (fenster) fenster.appendChild(el("div", "haus-shop-leiste", null, [codeKnopf(), dlcKnopf(() => renderHaus(inhalt)), kristallKnopf(), kristallInfoKnopf()]));
 }
@@ -1239,7 +1151,6 @@ function kosmetikBild(kategorie, eintrag) {
             if (eintrag.effekt) bild.classList.add("deko-" + eintrag.effekt);
             setzeDekoAblauf(bild, eintrag);
             if (eintrag.fluegel) {
-                // Vorschau der Windmuehle: Turm mit drehenden Fluegeln
                 const fluegel = document.createElement("img");
                 fluegel.alt = "";
                 fluegel.classList.add("vorschau-fluegel");
@@ -1281,7 +1192,6 @@ function kosmetikBild(kategorie, eintrag) {
         case "musik":
             return pixelIcon(MUSIK_SYMBOLE[eintrag.id] || "🎵", 64, "haus-vorschau");
         case "haus": {
-            // Bauernhaus in den Farben des Skins, mit seinen Pixel-Details (legendaere leuchten)
             const sprite = Object.keys(eintrag.farben || {}).length ? spriteVariante("bauernhaus_" + eintrag.id, "bauernhaus", eintrag.farben) : "bauernhaus";
             const leinwand = document.createElement("canvas");
             leinwand.width = 24;
@@ -1302,7 +1212,7 @@ function kosmetikBild(kategorie, eintrag) {
             const sprite = Object.keys(eintrag.farben || {}).length ? spriteVariante("scheune_" + eintrag.id, "scheune", eintrag.farben) : "scheune";
             const leinwand = document.createElement("canvas");
             leinwand.width = 20;
-            leinwand.height = 25; // oben Platz fuer Details auf dem Dach (Wetterhahn)
+            leinwand.height = 25;
             const stift = leinwand.getContext("2d");
             stift.drawImage(spriteLeinwand(sprite), 0, 6);
             if (eintrag.extra) zeichneScheuneExtra(eintrag.extra, (x, y, farbe) => { stift.fillStyle = farbe; stift.fillRect(x, y + 6, 1, 1); });
@@ -1316,7 +1226,6 @@ function kosmetikBild(kategorie, eintrag) {
             return bild;
         }
         default: {
-            // Pflanzen-Look: Vorschau mit der Tomate
             const hatFarben = eintrag.farben && Object.keys(eintrag.farben).length > 0;
             setzeSpriteBild(bild, hatFarben ? spriteVariante("tomate_" + eintrag.id, "tomate", eintrag.farben) : "tomate", 4);
             return bild;
@@ -1324,7 +1233,6 @@ function kosmetikBild(kategorie, eintrag) {
     }
 }
 
-// Was ein Klick auf eine Kachel macht: auswaehlen (eigene Inhalte) oder anprobieren (fremde Inhalte)
 function waehleKosmetik(kategorie, eintrag, inhalt) {
     const frei = istKosmetikFrei(eintrag, kategorie);
     if (!frei) {
@@ -1353,9 +1261,7 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
     } else {
         meta.kosmetik[kategorie] = eintrag.id;
     }
-    // Koop: die Wahl gilt auch fuer den Mitspieler
     if (typeof koopAktiv === "function" && koopAktiv()) {
-        // Den Begleiter waehlt jeder fuer sich, der Mitspieler sieht ihn ueber das Profil
         if (kategorie === "haustier") koopSendeProfil();
         else koopSetzeKosmetik(kategorie, kategorie === "deko" ? [...meta.kosmetik.deko] : eintrag.id);
     }
@@ -1368,7 +1274,6 @@ function waehleKosmetik(kategorie, eintrag, inhalt) {
     if (!prestigeShop.classList.contains("versteckt")) renderPrestigeShop();
 }
 
-// Blendet das Haus-Fenster kurz aus, damit man die Vorschau im Hof sieht, und fuehrt Effekte vor
 function zeigeVorschauKurz(inhalt) {
     const huelle = inhalt.closest(".popup-huelle");
     if (!huelle) return;
@@ -1382,7 +1287,6 @@ function zeigeVorschauKurz(inhalt) {
             ladenIdle(laden);
             setTimeout(() => ladenIdle(laden), 1100);
         }
-        // Ein paar Probewuerfe auf den Acker (es wird nichts gepflanzt)
         const knopf = plantButton.getBoundingClientRect();
         const acker = fieldGrid.getBoundingClientRect();
         for (let i = 0; i < 4; i++) {
@@ -1449,7 +1353,6 @@ function renderHaus(inhalt) {
     };
     inhalt.appendChild(el("div", "panel-hinweis", hinweise[kategorie]));
 
-    // Vorschau-Leiste: was gerade anprobiert wird und was es kostet
     if (kosmetikVorschau && kosmetikVorschau.kategorie === kategorie) {
         const eintrag = KOSMETIK_LISTEN[kategorie].find(e => e.id === kosmetikVorschau.id);
         const woher = eintrag.quelle === "dlc" ? tf("Bald im Steam-Shop: {0}", dlcPreisText(eintrag))
@@ -1472,7 +1375,6 @@ function renderHaus(inhalt) {
     }
 
     const raster = el("div", "haus-raster");
-    // Beta-Inhalte sieht nur, wer sie hat
     const sortiert = KOSMETIK_LISTEN[kategorie].filter(e => e.quelle !== "beta" || istKosmetikFrei(e, kategorie)).map((eintrag, index) => ({ eintrag, index }))
         .sort((a, b) => kosmetikSeltenheit(a.eintrag) - kosmetikSeltenheit(b.eintrag) || a.index - b.index)
         .map(x => x.eintrag);
@@ -1510,8 +1412,6 @@ function renderHaus(inhalt) {
     inhalt.appendChild(raster);
 }
 
-// ---------- HAUSTIER ----------
-// Kleine Zustaende: sitzen, laufen, stehen, liegen, schlafen (nachts lieber schlafen)
 
 const haustier = {
     el: null, bild: null, x: 30, zielX: 30, richtung: 1,
@@ -1521,7 +1421,6 @@ const haustier = {
 
 const HAUSTIER_BILD_DAUER = { laufen: 130, stehen: 700, sitzen: 650, liegen: 900, schlafen: 1100 };
 
-// Chance, dass das Haustier alle paar Sekunden liegende Muenzen fuer dich einsammelt
 function haustierHilfeChance() {
     return Math.min(0.9, KONFIG.haustierHilfeChance + 0.1 * level("haustiertraining")) * (1 + 0.1 * kuschel("hundplueschi"));
 }
@@ -1551,7 +1450,6 @@ function erstelleHaustier() {
     zeigeHaustierBild();
 }
 
-// Legendaere Begleiter haben eigene Animationsbilder (etwa 5-mal pro Sekunde), die anderen nicht
 function haustierAnim(skin) {
     return skin && skin.paket === "einzeln" ? Math.floor(performance.now() / 190) % 4 : 0;
 }
@@ -1564,12 +1462,10 @@ function zeigeHaustierBild() {
         haustier.letzteUrl = url;
     }
     haustier.bild.style.transform = haustier.richtung < 0 ? "scaleX(-1)" : "";
-    // Legendaere Tiere leuchten und schweben teilweise
     const skin = aktuellerSkin();
     haustier.el.classList.toggle("haustier-aura", Boolean(skin.aura));
     haustier.el.classList.toggle("haustier-schwebt", Boolean(skin.schwebt));
     if (skin.aura) haustier.el.style.setProperty("--aura", skin.aura);
-    // Besondere Figuren (z.B. Geisterkatze) bekommen einen eigenen Look
     const klasse = skin.klasse || "";
     if (haustier.el.dataset.klasse !== klasse) {
         if (haustier.el.dataset.klasse) haustier.el.classList.remove(haustier.el.dataset.klasse);
@@ -1661,7 +1557,6 @@ function aktualisiereHaustier(dtMs, jetzt) {
         haustier.blinzeltBis = jetzt + 160;
     }
 
-    // Tagsueber hilft das Haustier manchmal und sammelt liegende Muenzen ein
     if (run.phase === "tag" && !spielPausiert()) {
         haustier.hilfeMs += dtMs;
         if (haustier.hilfeMs >= KONFIG.haustierHilfeSek * 1000) {
@@ -1698,7 +1593,6 @@ function zeigeZzz() {
     setTimeout(() => zzz.remove(), 1800);
 }
 
-// Sprechblase mit Pixel-Symbol ueber dem Kopf
 function zeigeEmote(symbol) {
     const kopf = haustierKopf();
     const blase = el("div", "emote", null, [pixelIcon(symbol, 32)]);
@@ -1708,7 +1602,6 @@ function zeigeEmote(symbol) {
     setTimeout(() => blase.remove(), 1500);
 }
 
-// Legendaerer Jackpot: das Haustier springt vor Freude (hoechstens alle 2 Sekunden)
 let letzteFreude = 0;
 
 function haustierFreutSich() {
@@ -1752,7 +1645,6 @@ let letztesStreichelnMs = 0;
 
 function streichleHaustier(event) {
     if (spielPausiert()) return;
-    // Zu schnell hintereinander zaehlt nicht (Autoklicker), die Herzen gibt es trotzdem
     const jetzt = performance.now();
     const zaehlt = jetzt - letztesStreichelnMs >= KONFIG.streichelSperreMs;
     if (zaehlt) letztesStreichelnMs = jetzt;
@@ -1774,8 +1666,6 @@ function streichleHaustier(event) {
     );
     zeigeHerzen(event.clientX, event.clientY);
 
-    // Jedes 3. Streicheln gibt eine Saat, aber nur waehrend eines Tages und hoechstens streichelMaxProTag pro Tag.
-    // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und die Saat ist 3-mal so viel wert.
     if (zaehlt && run.phase === "tag" && (run.streichelHeute || 0) < KONFIG.streichelMaxProTag) {
         run.streichelZaehler += 1;
         if (run.streichelZaehler % KONFIG.streichelnFuerGold === 0) {
@@ -1789,9 +1679,6 @@ function streichleHaustier(event) {
     }
 }
 
-// Das Haustier laesst eine Saat fallen, die man einsammeln muss. Die Farbe wird wie bei einer Ernte gewuerfelt
-// (dieselben Chancen), ihr Wert ist ein kleiner Anteil der aktuellen Rechnung bzw. des Meilensteins:
-// 0,1% gewoehnlich bis 0,5% legendaer, mit Mindestwert. Ab dem 33.333. Streicheln "<3" = 3-fach.
 function streichelZiel() {
     return run.sandbox ? meilensteinSchwelle(run.meilensteine + 1) - meilensteinSchwelle(run.meilensteine) : naechsteRechnung().betrag;
 }
@@ -1809,7 +1696,6 @@ function gibStreichelGold() {
     });
 }
 
-// ---------- HAUSTIER: AKTIONEN (Rechtsklick, funktionieren immer) ----------
 
 let haustierMenue = null;
 
@@ -1852,7 +1738,6 @@ document.addEventListener("keydown", event => {
     if (event.key === "Escape") schliesseHaustierMenue();
 });
 
-// Leckerli passend zum Tier
 function futterSymbol() {
     const skin = aktuellerSkin();
     const stil = skin.stil || {};
@@ -1898,7 +1783,6 @@ function fuehreHaustierAktionAus(id) {
             ], { duration: 2000, easing: "ease-in-out" });
             break;
         case "rolle": {
-            // Seitliche Rolle ueber die Wiese: hin, kurz liegen bleiben, stolz aufstehen
             wechsleHaustierZustand("sitzen", 3200);
             Klang.trick();
             const weg = haustier.richtung * 60;
@@ -1941,8 +1825,6 @@ function fuehreHaustierAktionAus(id) {
     }
 }
 
-// Ball werfen: er fliegt in hohem Bogen, huepft zweimal auf, das Haustier rennt hin
-// und bringt ihn im Maul zurueck an die Stelle, von der es losgelaufen ist
 function wirfBall() {
     if (haustier.ball) haustier.ball.remove();
     const hof = topBar.getBoundingClientRect();
@@ -1981,7 +1863,6 @@ function wirfBall() {
     }, 450);
 }
 
-// Ball erreicht: aufheben, zurueckbringen, vor die Fuesse legen
 function holeBall() {
     const ball = haustier.ball;
     if (!ball) return;
@@ -2004,7 +1885,6 @@ function holeBall() {
     haustierLaut();
 }
 
-// Waehrend das Tier den Ball traegt, sitzt er an seinem Maul
 function bewegeBallImMaul() {
     const ball = haustier.ball;
     if (!ball || !ball.classList.contains("im-maul")) return;

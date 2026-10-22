@@ -1,10 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Portugiesische (Brasilien) Texte. Schluessel = deutscher Text im Code (t("...")), Wert = Uebersetzung.
-// Fehlt hier ein Text, gilt der englische aus sprache-en.js.
-// ============================================================
-
 if (SPRACHE === "pt") Object.assign(UEBERSETZUNG, {
     "Trd.": "sext.",
     "Trio.": "quint.",

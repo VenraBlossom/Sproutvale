@@ -1,7 +1,5 @@
 "use strict";
 
-// Kopiert das Spiel (index.html, js, css, assets) in den Ordner www, den Capacitor in die App packt.
-// Test-Dateien (mit "_" am Anfang), Grafik-Arbeitsdateien, Werkzeuge und die Desktop-App kommen nicht mit.
 const fs = require("fs");
 const path = require("path");
 
@@ -14,7 +12,6 @@ fs.copyFileSync(path.join(PROJEKT, "index.html"), path.join(ZIEL, "index.html"))
 ["js", "css", "assets"].forEach(ordner => {
     fs.cpSync(path.join(PROJEKT, ordner), path.join(ZIEL, ordner), {
         recursive: true,
-        // ohne Test-Dateien und ohne Arbeitsdateien der Grafikprogramme (.psd usw.)
         filter: quelle => !path.basename(quelle).startsWith("_") && !/\.(psd|kra|aseprite|ase|xcf)$/i.test(quelle)
     });
 });

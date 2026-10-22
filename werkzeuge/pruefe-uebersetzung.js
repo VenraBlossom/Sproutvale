@@ -1,15 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Prueft die Uebersetzungen (Test-Werkzeug, wird nicht mitgeliefert)
-// Sucht alle Texte im Code (t("...") und tf("...")) und in index.html und meldet,
-// welche in den Sprachdateien (sprache-en.js, sprache-es.js, ...) fehlen.
-// Ausserdem: Eintraege, die im Code gar nicht mehr vorkommen (veraltet), und Platzhalter {0}, die nicht passen.
-// Start (im Projektordner):  node werkzeuge/pruefe-uebersetzung.js
-// Mit "--alle" werden auch alle veralteten Eintraege einzeln aufgelistet.
-// Mit "--aufraeumen" werden veraltete Eintraege aus den Sprachdateien geloescht.
-// Mit "--sprache=ja" wird nur eine Sprache geprueft.
-// ============================================================
 
 const fs = require("fs");
 const path = require("path");
@@ -24,7 +14,6 @@ const SPRACHEN = fs.readdirSync(JS).map(n => (n.match(/^sprache-([a-z]{2})\.js$/
     .sort((a, b) => (a === "en" ? -1 : b === "en" ? 1 : a.localeCompare(b)))
     .filter(s => !NUR || s === NUR);
 
-// Uebersetzungen einer Sprache laden (die Dateien fuellen UEBERSETZUNG, alle ausser Englisch nur bei passender SPRACHE)
 function ladeSprache(sprache) {
     const kontext = { SPRACHE: sprache, UEBERSETZUNG: {} };
     vm.createContext(kontext);
@@ -34,7 +23,6 @@ function ladeSprache(sprache) {
     return kontext.UEBERSETZUNG;
 }
 
-// Alle Text-Schluessel aus dem Code
 function sammleCodeTexte() {
     const texte = new Map();
     const dateien = fs.readdirSync(JS).filter(n => n.endsWith(".js") && !n.startsWith("sprache-") && n !== "i18n.js");
@@ -55,12 +43,10 @@ function sammleCodeTexte() {
     return texte;
 }
 
-// Feste Texte aus index.html (so wie uebersetzeDokument sie sieht: Leerraum zusammengefasst)
 function sammleHtmlTexte() {
     const texte = new Map();
     let html = fs.readFileSync(path.join(ORDNER, "index.html"), "utf8");
     html = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "");
-    // Bereiche mit data-kein-i18n auslassen
     html = html.replace(/<(\w+)[^>]*data-kein-i18n[^>]*>[\s\S]*?<\/\1>/g, "");
     const ent = s => s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"');
     const body = html.slice(html.indexOf("<body"));
@@ -83,11 +69,9 @@ const platzhalter = text => (text.match(/\{\d+\}/g) || []).sort().join(",");
 const code = sammleCodeTexte();
 const html = sammleHtmlTexte();
 const alle = new Map([...html, ...code]);
-// Texte, die gleich bleiben duerfen (Namen, Zahlen, Symbole)
 const GLEICH_OK = /^[\s\d.,:;!?+\-x×%/()·…|#=<>*★☆✔✕✓❓🔒]*$|^Sproutvale$|^VenraBlossom$|^BETA$/u;
 
 let fehler = 0;
-// Veraltete Eintraege (eine Zeile pro Eintrag) aus einer Sprachdatei loeschen
 function raeumeAuf(sprache, veraltet) {
     const datei = path.join(JS, "sprache-" + sprache + ".js");
     const weg = new Set(veraltet);
@@ -96,7 +80,6 @@ function raeumeAuf(sprache, veraltet) {
         const m = zeile.match(/^\s*("(?:[^"\\]|\\.)*"):\s/);
         return !(m && weg.has(JSON.parse(m[1])));
     });
-    // Komma vor dem schliessenden "});" entfernen
     for (let i = neu.length - 1; i > 0; i--) {
         if (/^\}\);/.test(neu[i].trim())) { neu[i - 1] = neu[i - 1].replace(/,(\s*)$/, "$1"); break; }
     }
@@ -114,7 +97,6 @@ SPRACHEN.forEach(sprache => {
         if (GLEICH_OK.test(text)) return;
         if (!(text in tabelle)) { fehlt.push([text, ort]); return; }
         if (platzhalter(text) !== platzhalter(tabelle[text])) falscheZeichen.push([text, tabelle[text]]);
-        // Spanisch/Franzoesisch: Wert ist wortgleich mit Englisch (vermutlich vergessen), nur bei laengeren Texten
         if (enTabelle && tabelle[text] === enTabelle[text] && text.length > 12 && /[a-z]{4}/.test(tabelle[text])) englisch.push([text, ort]);
     });
     const veraltet = Object.keys(tabelle).filter(k => !alle.has(k));

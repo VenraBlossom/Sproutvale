@@ -1,32 +1,14 @@
 "use strict";
 
-// ============================================================
-// DATEN: alle Zahlen, Listen und Texte fuers Balancing an einem Ort.
-// Spiellogik: script.js (+ haus.js, glueck.js, mondteich.js, ereignisse.js, kodex.js), Grafiken: sprites.js,
-// Klaenge: audio.js. Funktionen wie level() oder kuschel() stehen in script.js und werden hier nur in
-// "() => ..." benutzt, also erst wenn das Spiel laeuft.
-//
-// Waehrungen:
-//   Gold             -> Markt (nur in diesem Run)
-//   Sternensamen     -> Stellarium (nur in diesem Run, intern "skillpunkte"), bei jeder Ernte und jedem Klick auf den Samenladen
-//   Mondblueten      -> Mondteich (dauerhaft), gibt es am Ende eines Runs fuer bezahlte Rechnungen
-//   Kuschel-Gutscheine -> 1 Gratis-Zug am Kuschel-Automaten, 1 Stueck pro geschaffter Erfolg-Stufe
-//   Sternensplitter  -> Sternenfall-Shop (zweite Prestige-Ebene, ganz dauerhaft)
-// ============================================================
 
-// ---------- HILFSFUNKTIONEN ----------
 
 function aufrunden(wert) {
-    // kleiner Abzug gleicht Kommazahl-Ungenauigkeiten aus (0.1 * 3 = 0.30000000000000004 wuerde sonst 31% ergeben)
-    // "|| 0" macht aus einer "minus Null" eine normale 0 (sonst wird "+-0" angezeigt)
     return Math.ceil(wert - 1e-9) || 0;
 }
 
-// Grosse Zahlen lesbar machen: 12.345 / 123,4 Tsd. / 5,67 Mio. / ...
 function zahl(wert) {
     const n = Math.round(wert) || 0;
     if (Math.abs(n) < 100000) return n.toLocaleString(SPRACH_LOCALE);
-    // deutsche Namen: Tsd., Mio., Mrd. (10^9), Bio. (10^12), Brd. (10^15), Trio. (10^18), Trd. (10^21)
     const namen = [[1e21, t("Trd.")], [1e18, t("Trio.")], [1e15, t("Brd.")], [1e12, t("Bio.")], [1e9, t("Mrd.")], [1e6, t("Mio.")], [1e3, t("Tsd.")]];
     for (const [grenze, name] of namen) {
         if (Math.abs(n) >= grenze && Math.abs(n) < grenze * 1000) {
@@ -34,7 +16,6 @@ function zahl(wert) {
         }
     }
     const exp = n.toExponential(2).replace("e+", "e");
-    // Dezimaltrennzeichen der Sprache ("1.5" oder "1,5")
     return exp.replace(".", (1.5).toLocaleString(SPRACH_LOCALE).charAt(1));
 }
 
@@ -58,7 +39,6 @@ function zufall(liste) {
     return liste[Math.floor(Math.random() * liste.length)];
 }
 
-// Zufall nach Gewichten: liste = [{ gewicht, ... }]
 function gewichteterZufall(liste, gewichtVon = e => e.gewicht) {
     const summe = liste.reduce((s, e) => s + gewichtVon(e), 0);
     let wurf = Math.random() * summe;
@@ -82,16 +62,11 @@ function klemme(wert, min, max) {
     return Math.max(min, Math.min(max, wert));
 }
 
-// ---------- KONFIGURATION ----------
 
-// Versionsnummer (unten rechts im Hauptmenue). Bei jedem Update erhoehen, gleich wie das Tag auf GitHub/itch.io.
 const SPIEL_VERSION = "Beta 0.4.2";
 
-// Debug-Fenster (Einstellungen > Klang, Strg+F12) und die Konsolen-Befehle debug.xyz.
-// Im fertigen Spiel AUS. Zum Testen voruebergehend auf true setzen (und vor dem Veroeffentlichen wieder auf false).
 const DEBUG_ERLAUBT = false;
 
-// Patch Notes (Klick auf die Versionsnummer im Hauptmenue, nach einem Update einmal von selbst). Neueste Version zuerst.
 const NEUIGKEITEN = [
     { version: "Beta 0.4.2", punkte: [
         t("Balancing: Gold- und Sternensamen-Boni werden jetzt zusammengezählt statt malgenommen (wie die +%-Texte es sagen). Goldmarie und Sternenflut geben +100% pro Stufe. Das späte Spiel explodiert nicht mehr."),
@@ -282,27 +257,27 @@ const NEUIGKEITEN = [
 ];
 
 const KONFIG = {
-    klickGrenzeProSek: 10,            // ab so vielen Klicks pro Sekunde laeuft der Samenladen heiss: jeder weitere Klick zaehlt weniger
-    klickUeberGrenze: 0.75,           // (Autoklicker bleiben staerker, aber man muss keinen benutzen; die Sense ist ausgenommen)
-    startKlicksProSamen: 30,          // weniger Klicks pro Samen: langsame Klicker fuellen ihre Felder auch, schnelles Klicken bringt weniger Vorsprung
-    minKlicksProSamen: 10,            // nur erreichbar mit allem: Stellarium (13), Segen Flinke Haende (2), Mondteich Geschickte Haende (3), Tarot Kraft (2)
-    klickWachstum: 0.04,              // ein Klick auf eine wachsende Pflanze: +4% ihrer ganzen Wachstumszeit (keine Boni darauf)
+    klickGrenzeProSek: 10,
+    klickUeberGrenze: 0.75,
+    startKlicksProSamen: 30,
+    minKlicksProSamen: 10,
+    klickWachstum: 0.04,
     startEnergie: 160,
     energieProSek: 5,
     tageProRechnung: 5,
     rechnungBasis: 30,
-    rechnungFaktor: 26,               // ab der 4. Rechnung wird jede x26 teurer
-    rechnungFaktorenStart: [5, 40, 12], // 30, 150, 6.000, 72.000 (vorher 150.000: dort blieb man mehrere Runs haengen), danach x26
-    sternensamenProErnte: 6,          // jede Ernte laesst Sternensaat mit 5 Sternensamen fallen (Weizen) ...
-    sternensamenSpaetFaktor: 1.4,     // ab der 6. Pflanze je +40% Sternensaat (damit Sternensamen mit dem Gold mitwachsen)
-    sternensamenPflanzenFaktor: 1.14, // ... und jede hoehere Pflanze gibt 14% mehr (Kuerbis ~15, Mondlilie ~37): neue Pflanzen lohnen sich
-    sternensamenProKlick: 1,          // jeder Klick auf den Samenladen, der einen Samen wirft, gibt Sternensamen (Bruchteile aus Upgrades werden gesammelt)
-    basisSammelRadius: 9.2,           // Radius um den Mauszeiger in Pixeln (8 + 15%)
-    sammelRadiusFaktor: 1.10,         // jede Stufe "Breiter Cursor" = +10%
+    rechnungFaktor: 26,
+    rechnungFaktorenStart: [5, 40, 12],
+    sternensamenProErnte: 6,
+    sternensamenSpaetFaktor: 1.4,
+    sternensamenPflanzenFaktor: 1.14,
+    sternensamenProKlick: 1,
+    basisSammelRadius: 9.2,
+    sammelRadiusFaktor: 1.10,
     kugelRadius: 16,
-    rasterSpalten: 12,                // 6 Spalten links, 6 rechts, dazwischen der Weg mit dem Samenladen
+    rasterSpalten: 12,
     rasterZeilen: 5,
-    ladenBreite: 1.5,                 // Samenladen = 1,5 Felder breit und hoch
+    ladenBreite: 1.5,
     basisKomboFensterMs: 600,
     komboStufen: [
         { ab: 0, multi: 1 },
@@ -311,40 +286,35 @@ const KONFIG = {
         { ab: 80, multi: 4 },
         { ab: 150, multi: 5 }
     ],
-    feldKostenFaktor: 1.9,            // jedes weitere Feld kostet x1,9
-    sternschnuppeMinSek: 70,          // etwa eine Sternschnuppe pro Tag
+    feldKostenFaktor: 1.9,
+    sternschnuppeMinSek: 70,
     sternschnuppeMaxSek: 130,
     sternschnuppeBuffSek: 10,
-    gluehwuermchenAbTageszeit: 0.55,  // ab diesem Anteil des Tages (0 = Morgen, 1 = Nacht) kommen Gluehwuermchen
+    gluehwuermchenAbTageszeit: 0.55,
     gluehwuermchenMinSek: 2,
     gluehwuermchenMaxSek: 5,
-    gluehwuermchenEnergie: 15,        // ein gefangenes Gluehwuermchen verlaengert den Abend
-    bonusEnergieDeckel: 0.6,          // Extra-Energie (Blitzpflanzen, Kaffee, Gluehwuermchen) hoechstens 60% der Tagesenergie, sonst endet der Tag nie
-    streichelnFuerGold: 3,            // jedes 3. Streicheln laesst eine Saat fallen (nur waehrend eines Tages)
-    streichelSperreMs: 350,           // schneller gestreichelt zaehlt nicht (gegen Autoklicker)
-    streichelAnteile: [0.0008, 0.0016, 0.0024, 0.0032, 0.004], // Wert einer Streichel-Saat je Farbe: 0,08% bis 0,4% der Rechnung (20% weniger als vorher)
-    streichelMindestGold: [1, 2, 3, 4, 5],                 // ... aber mindestens so viel Gold
-    streichelMaxProTag: 40,           // hoechstens so viele Streichel-Saaten pro Tag: nur Streicheln reicht nie fuer eine Rechnung
-    streichelHerzAb: 33333,           // Easteregg: ab dem 33.333. Streicheln (fuer immer) steht dort "<3" und es gibt 3-fache Saat
+    gluehwuermchenEnergie: 15,
+    bonusEnergieDeckel: 0.6,
+    streichelnFuerGold: 3,
+    streichelSperreMs: 350,
+    streichelAnteile: [0.0008, 0.0016, 0.0024, 0.0032, 0.004],
+    streichelMindestGold: [1, 2, 3, 4, 5],
+    streichelMaxProTag: 40,
+    streichelHerzAb: 33333,
     streichelHerzFaktor: 3,
-    gluehwuermchenSterne: 10,         // ein Gluehwuermchen gibt auch Sternensamen (so viel wie 2 Ernten)
-    haustierHilfeSek: 14,             // so oft schaut das Haustier, ob es helfen kann
-    haustierHilfeChance: 0.3,         // Grundchance, dass es dann eine liegende Muenze einsammelt
+    gluehwuermchenSterne: 10,
+    haustierHilfeSek: 14,
+    haustierHilfeChance: 0.3,
     turmIntervall: 8,
     tarotSlots: 3,
     tarotVerstaerkung: 1.5,
-    tarotPreis: 10,                   // erste Karte, danach jede weitere x1,2
+    tarotPreis: 10,
     tarotPreisFaktor: 1.2,
     tarotVerbessernPreis: 100,
-    werkzeugPlaetze: 1,               // Grundzahl, die Tarotkarte "Der Gehaengte" gibt +1 (verbessert +2)
-    zinsDeckel: 0.5                   // Zinsen hoechstens 50% der naechsten Rechnung (sonst zu leicht)
+    werkzeugPlaetze: 1,
+    zinsDeckel: 0.5
 };
 
-// ---------- PFLANZEN ----------
-// Reihenfolge = Freischalt-Reihenfolge. Neue Pflanze = neue Zeile + Sprite mit gleicher id in sprites.js
-// (ihr Ast im Stellarium entsteht automatisch, bonusName/bonusText = eigener Bonus-Stern).
-// Jede Stufe ist ungefaehr 2,5-mal so viel wert: spaeter im Run werden die Zahlen richtig gross.
-// unlockKosten in Sternensamen. "eigenschaft" = kleine Besonderheit dieser Pflanze (Wirkung in script.js).
 
 const PFLANZEN_VORLAGEN = [
     { id: "weizen", name: t("Weizen"), emoji: "🌾", sekProStufe: 1.6, verkaufswert: 1, unlockKosten: 0, bonusName: t("Goldene Garbe"), bonusText: t("Jede Weizen-Ernte gibt 10 Sternensamen extra.") },
@@ -369,7 +339,6 @@ const PFLANZEN_VORLAGEN = [
         eigenschaft: "eis", eigenschaftText: t("Kristallkälte: ihre Saaten sind mindestens ungewöhnlich.") },
     { id: "mondlilie", name: t("Mondlilie"), emoji: "🌸", sekProStufe: 10, verkaufswert: 740000, unlockKosten: 170000, bonusName: t("Vollmond"), bonusText: t("Mondlilien geben am Abend und in der Nacht doppeltes Gold."),
         eigenschaft: "mond", eigenschaftText: t("Blüht im Mondlicht: wächst tagsüber halb so schnell, nachts 3-mal so schnell.") },
-    // Spaetes Spiel: drei neue Pflanzen mit eigener Art
     { id: "kristallrose", name: t("Kristallrose"), emoji: "🌹", sekProStufe: 11, verkaufswert: 1850000, unlockKosten: 290000,
         bonusName: t("Kristallglanz"), bonusText: t("Kristallrosen lassen dreifache Sternensaat fallen."),
         eigenschaft: "kristall", eigenschaftText: t("Funkelnde Blüten: die Hälfte ihrer Saaten ist mindestens selten.") },
@@ -381,12 +350,8 @@ const PFLANZEN_VORLAGEN = [
         eigenschaft: "wurzeln", eigenschaftText: t("Uralt und mächtig: zählt für die Artenvielfalt doppelt.") }
 ];
 
-// Sprites fuer Samen, kleine Pflanze, grosse Pflanze. Die fertige Stufe nutzt das Sprite der Pflanze.
 const STUFEN_SPRITES = ["samen", "keimling", "jungpflanze"];
 
-// Grundchancen stehen in raritaetsChancen() in script.js. Selten (blau) gibt es nur ueber den Ast "Ernte" im Stellarium.
-// Mythisch (rosa) gibt es NUR bei den Kuscheltieren im Mondteich, nie als Saat.
-// symbol = Form fuer den Farbenblind-Modus (steht auf der Muenze und im Text)
 const RARITAETEN = [
     { name: t("Gewöhnlich"), multi: 1, farbe: "#e8e8e8", rand: "#8a8a8a", symbol: "●" },
     { name: t("Ungewöhnlich"), multi: 2.5, farbe: "#5fd15f", rand: "#2e9e2e", symbol: "▲" },
@@ -396,10 +361,6 @@ const RARITAETEN = [
 ];
 const JACKPOT_INDEX = RARITAETEN.length - 1;
 
-// ---------- SPEZIALPFLANZEN ----------
-// Jeder Samen kann mit etwas Glueck eine Spezialpflanze werden (hoechstens eine Variante pro Samen).
-// Moegliche Effekte: tempo, goldKugeln, goldMulti, raritaetsWuerfe, jackpot, ernteKlicks,
-// energieBonus, sporen, funken, magnet, sterne, kombo. Neue Variante = neuer Eintrag (ihr Stern entsteht automatisch).
 
 const VARIANTEN = [
     { id: "geist", titel: t("Geisterpflanze"), praefix: t("Geister"), badge: "👻",
@@ -438,10 +399,6 @@ const VARIANTEN = [
 ];
 const VARIANTE_NACH_ID = Object.fromEntries(VARIANTEN.map(v => [v.id, v]));
 
-// ---------- SHOP: PFLANZEN-UPGRADES (Gold, ein Reiter pro Pflanze) ----------
-// Die Kosten wachsen mit dem Wert der Pflanze (wertvollere Pflanze = teurere Upgrades).
-// "Ertrag" gibt es von Anfang an. Die anderen schaltet der Ast der Pflanze im Stellarium frei
-// (knoten + Pflanzen-id, z.B. "pw_karotte").
 
 const PFLANZEN_UPGRADES = [
     { id: "ertrag", name: t("Ertrag"), basiskosten: 3, faktor: 1.65, max: Infinity, knoten: null,
@@ -459,13 +416,8 @@ const PFLANZEN_UPGRADES = [
 ];
 const PFLANZEN_UPGRADE_NACH_ID = Object.fromEntries(PFLANZEN_UPGRADES.map(u => [u.id, u]));
 
-// ---------- SHOP: ALLGEMEINE UPGRADES (Gold) ----------
-// Am Anfang gibt es auf dem Markt nur neue Felder und "Ertrag". Diese Upgrades erscheinen erst,
-// wenn ihr Stern im Stellarium gekauft ist (knoten).
 
 const SHOP_UPGRADES = [
-    // Einmalig und dauerhaft: am Anfang gibt es nur Klicken, Warten und den Markt. Das Stellarium kommt danach.
-    // Von Anfang an: mehr Gold fuer jede Ernte (frueh stark, spaeter bei teuren Pflanzen kaum noch spuerbar)
     { id: "erntekorb", knoten: null, icon: "🧺", name: t("Erntekorb"), basiskosten: 8, faktor: 1.7, max: 10,
         beschreibung: t("+1 Gold für jede Ernte."),
         info: () => tf("+{0} Gold pro Ernte", level("erntekorb")) },
@@ -513,18 +465,7 @@ const SHOP_UPGRADES = [
         info: () => tf("+{0}% Spezialpflanzen", 10 * level("saatsortiment")) }
 ];
 
-// ---------- STERNENBAUM (kostet Sternensamen) ----------
-// Ein grosser Baum, den man mit der Maus verschieben und mit dem Mausrad zoomen kann.
-// In der Mitte steht der Weizen (von Anfang an da). Von dort gehen 4 Aeste ab:
-//   oben: Pflanzen (jede Pflanze mit eigenem kleinen Ast), rechts: Ernte (+ Spezialpflanzen),
-//   unten: Hof (schaltet die Markt-Upgrades frei), links: Helfer (+ Glueck).
-// pos = [x, y] in Pixeln, [0, 0] = Mitte. vor = Stern, der vorher mindestens 1x gekauft sein muss.
-// vorMax: true = der Vorgaenger muss komplett ausgebaut sein ("Stufe 2"-Sterne: viel teurer, viel besser).
-// erledigt: gibt einen Namen zurueck, wenn ein dauerhafter Fortschritt (Tarot, Mondteich) denselben Nachteil schon loest.
-//           Der Stern ist dann in jedem Run von Anfang an voll.
-// art: "pflanze" (schaltet eine Pflanze frei), "shop" (schaltet ein Markt-Upgrade frei), sonst ein normaler Stern.
 
-// Sprungziele im Baum (z.B. fuer den Knopf "Zur Mitte")
 const BAUM_ZIELE = [
     { id: "mitte", name: t("Mitte"), icon: "🌾", pos: [0, -60] },
     { id: "pflanzen", name: t("Pflanzen"), icon: "🌱", pos: [0, -1400] },
@@ -535,8 +476,6 @@ const BAUM_ZIELE = [
     { id: "glueck", name: t("Glück"), icon: "🎲", pos: [-1400, -110] }
 ];
 
-// Alle normalen Sterne kosten STERN_PREIS_FAKTOR mal so viel wie eingetragen (Balancing an einer Stelle)
-// Erbsorte: wie viele Pflanzen weiter man sein muss, und wie viel vom Wert der spaeteren Pflanze Stufe 3 erreicht
 const ERBSORTE_ABSTAND = 3;
 const ERBSORTE_ANTEIL = 0.4;
 function erbsortenFaktor(pflanzenId, stufe) {
@@ -553,7 +492,6 @@ function stern(id, ast, icon, pos, vor, name, basiskosten, faktor, max, beschrei
     return { id, ast, icon, pos, vor, name, basiskosten: rundePreis(basiskosten * STERN_PREIS_FAKTOR), faktor, max, beschreibung, info, ...extra };
 }
 
-// Stern, der ein Markt-Upgrade freischaltet
 function shopStern(id, ast, pos, vor, kosten) {
     const u = SHOP_UPGRADES.find(s => s.knoten === id);
     return { id, ast, icon: u.icon, pos, vor, name: u.name, basiskosten: kosten, faktor: 1, max: 1, art: "shop", markt: u,
@@ -561,14 +499,12 @@ function shopStern(id, ast, pos, vor, kosten) {
         info: () => (level(id) > 0 ? t("Auf dem Markt freigeschaltet") : t("Noch nicht auf dem Markt")) };
 }
 
-// Stern, der ein Gluecksspiel freischaltet (einmal kaufen)
 function spielStern(id, icon, pos, vor, name, kosten, beschreibung) {
     return { id, ast: "glueck", icon, pos, vor, name, basiskosten: kosten, faktor: 1, max: 1, beschreibung,
         info: () => (level(id) > 0 ? t("Freigeschaltet: auf dem Markt unter Glücksspiel") : t("Gesperrt")) };
 }
 
 const SKILLS = [
-    // ----- Ernte (rechts): Münz-Farben, jede erst, wenn die vorige komplett ausgebaut ist -----
     stern("gruen", "ernte", "🟢", [300, 0], "p_weizen", t("Grüner Daumen"), 30, 1.8, 6,
         t("Stufe 1 schaltet ungewöhnliche Saaten frei (grün, x2,5 Gold, 15% Chance). Jede weitere Stufe: +3% Chance."),
         () => tf("{0} Chance auf Ungewöhnlich", prozentText(raritaetsChancen()[1]))),
@@ -624,7 +560,6 @@ const SKILLS = [
         t("Jede legendäre Saat lässt zusätzlich eine Sternensaat mit 50 Sternensamen fallen."),
         () => (level("midas") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
-    // ----- Neue Sterne am Rand der Aeste -----
     stern("jackpotjaeger", "ernte", "🎰", [1620, -220], "midas", t("Goldgräber"), 25000, 4, 3,
         t("Legendäre Saaten sind pro Stufe noch einmal so viel wert (Stufe 1 = doppelt, Stufe 3 = vierfach)."),
         () => tf("x{0} Wert der legendären Saat", (1 + level("jackpotjaeger")))),
@@ -638,7 +573,6 @@ const SKILLS = [
         t("Auf der höchsten Kombo-Stufe (ab 150) zählt jeder Klick pro Stufe einmal mehr (x5 wird x6, dann x7)."),
         () => tf("Höchste Kombo: x{0}", (5 + level("kombovirtuose")))),
 
-    // ----- Himmel (oben rechts): Sterne rund um Sternensamen -----
     stern("sternbild", "ernte", "✴️", [960, -880], "sternenquelle", t("Sternbild"), 2000, 1, 1,
         t("Für je 10 gekaufte Sterne im Stellarium gibt es +1% Gold aus allen Ernten."),
         () => tf("+{0}% Gold", Math.floor(gekaufteSterne() / 10))),
@@ -662,7 +596,6 @@ const SKILLS = [
         t("+4% Glück bei allen Glücksspielen pro Stufe."),
         () => tf("+{0}% Glück", 4 * level("spielerglueck"))),
 
-    // ----- Jahreszeiten (unten rechts): jede Jahreszeit bekommt einen eigenen Stern -----
     stern("jahresrad", "jahreszeit", "🎡", [800, 720], "s_kasse", t("Jahresrad"), 300, 2.2, 4,
         t("Alle guten Effekte der Jahreszeiten werden um 25% pro Stufe stärker (z.B. Frühling +20% Wachstum wird zu +25%)."),
         () => tf("+{0}% Jahreszeit-Effekte", 25 * level("jahresrad"))),
@@ -685,7 +618,6 @@ const SKILLS = [
         t("Bei jedem Wechsel der Jahreszeit bekommst du Sternensamen geschenkt (mehr, je besser deine beste Pflanze ist)."),
         () => (level("sternenkalender") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
-    // ----- Helfer (links) -----
     stern("radius", "helfer", "🖐️", [-520, -220], "kombo", t("Breiter Cursor"), 150, 1.35, 29,
         t("+10% Radius um deinen Cursor. Er sammelt Saaten ein und erntet beim Klicken alle fertigen ") +
             t("Pflanzen, die er berührt. Bis Stufe 29."),
@@ -732,7 +664,6 @@ const SKILLS = [
         t("Jeder Klick eines Eichhörnchens zählt doppelt."),
         () => (level("helferlohn") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
-    // ----- Glueck (links aussen, haengt am Helfer-Ast) -----
     spielStern("muenzwurf", "🪙", [-960, 0], "haustiertraining", t("Münzwurf"), 200,
         t("Schaltet den Münzwurf auf dem Markt frei: Setz einen Teil deines Goldes. Kopf = doppelt, Zahl = weg.")),
     spielStern("gacha", "🎰", [-1180, 0], "muenzwurf", t("Slotmaschine"), 500,
@@ -756,7 +687,6 @@ const SKILLS = [
     stern("stammkunde", "glueck", "🎫", [-1400, -220], "rubbellos", t("Stammkunde"), 1500, 2.5, 3,
         t("+1 Spiel pro Pause bei allen Glücksspielen."),
         () => tf("+{0} Spiele pro Pause", level("stammkunde"))),
-    // Nach dem Stammkunden, braucht Blackjack: noch mehr Spiele pro Pause (frueher unbegrenzt, das machte Gold beliebig vermehrbar)
     stern("vipkarte", "glueck", "💳", [-1400, -440], "stammkunde", t("VIP-Karte"), 15000, 1, 1,
         t("+5 Spiele pro Pause bei allen Glücksspielen."),
         () => (level("vipkarte") > 0 ? tf("+{0} Spiele pro Pause", VIP_SPIELE) : t("Noch nicht gekauft")),
@@ -766,7 +696,6 @@ const SKILLS = [
         t("Der Wanderhändler kommt öfter vorbei."),
         () => tf("{0} Chance nach jedem Tag", prozentText(haendlerChance()))),
 
-    // ----- Hof (unten): schaltet die meisten Markt-Upgrades frei -----
     stern("s_aussaat", "hof", "🌰", [0, 300], "p_weizen", t("Schnellere Aussaat"), 8, 1.55, 13,
         t("-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), ") +
             t("Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2)."),
@@ -828,7 +757,6 @@ const SKILLS = [
         t("Am Rechnungstag (jeder 5. Tag) gibt es +100% Gold aus allen Ernten."),
         () => tf("+{0} Gold am Rechnungstag", prozentText(level("erntefest")))),
 
-    // ----- Mechanik-Sterne: neue Spielweisen statt nur Prozente (Platz wird automatisch frei gesucht) -----
     stern("saatkette", "ernte", "🔗", [1180, -660], "doppelernte", t("Saatkette"), 2000, 2.2, 5,
         t("+8% Chance pro Stufe, dass ein abgeerntetes Feld sofort einen neuen Samen bekommt."),
         () => tf("{0} Chance auf Neupflanzung", prozentText(0.08 * level("saatkette"))), { autoPos: true }),
@@ -845,7 +773,6 @@ const SKILLS = [
     stern("feldkunde", "hof", "📚", [440, 1620], "erntefest", t("Feldkunde"), 6000, 1.5, Infinity,
         t("Alle Pflanzen wachsen 2% schneller. Unendlich oft kaufbar."),
         () => tf("+{0}% Wachstum", 2 * level("feldkunde")), { autoPos: true }),
-    // Unendlich kaufbar, darum immer am Ende eines Astes
     stern("grosseernte", "ernte", "🌾", [1620, -540], "goldmarie", t("Große Ernte"), 60000, 2.2, Infinity,
         t("+100% Gold aus allen Ernten. Unendlich oft kaufbar."),
         () => tf("+{0} Gold", prozentText(level("grosseernte"))), { autoPos: true }),
@@ -865,12 +792,10 @@ const SKILLS = [
         () => tf("+{0}% auf alle Grundwerte", 3 * level("g_harmonie")))
 ];
 
-// Grundwert = eigener Stern (+5% pro Stufe) + Harmonie (+3% pro Stufe)
 function grundwert(id) {
     return 0.05 * level(id) + 0.03 * level("g_harmonie");
 }
 
-// ----- Spezialpflanzen: eine Kette rechts unten, jede braucht die vorige (verborgen, bis sie erreichbar ist) -----
 VARIANTEN.forEach((variante, index) => {
     const chanceProStufe = variante.chanceProStufe || 0.05;
     SKILLS.push({
@@ -891,12 +816,7 @@ VARIANTEN.forEach((variante, index) => {
     });
 });
 
-// ----- Pflanzen (oben): der Weizen ist die Mitte des Baums, darueber waechst eine Ranke mit allen Pflanzen.
-// Jede Pflanze hat einen kleinen eigenen Ast: Wachstum, Pracht und Ueberfluss auf dem Markt freischalten und ein eigener Bonus.
-// Kosten der Aeste haengen am Freischaltpreis der Pflanze: Der ganze Ast einer Pflanze kostet etwa so viel
-// wie die naechste Pflanze. So lohnt es sich, erst den Weizen auszubauen, bevor man zur Karotte geht, usw.
 
-// Auf 2 gueltige Stellen runden (1.234 -> 1.200), damit die Preise schoen aussehen
 function rundePreis(wert) {
     if (wert < 10) return Math.max(1, Math.round(wert));
     const stellen = Math.pow(10, Math.floor(Math.log10(wert)) - 1);
@@ -912,7 +832,6 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     const [x, y] = pflanzenAstPos(index);
     const vorige = PFLANZEN_VORLAGEN[index - 1];
     const basis = index === 0 ? 40 : p.unlockKosten;
-    // Der Weizen hat seinen Ast schraeg ueber der Mitte, damit er den anderen Aesten nicht im Weg ist
     const versatz = index === 0
         ? { pw: [-170, -250], pp: [-320, -310], pu: [170, -250], pb: [320, -310], pg: [480, -380], pk: [-470, -420], pr: [-610, -520] }
         : { pw: [x - 190, y + 60], pp: [x - 340, y - 10], pu: [x + 190, y + 60], pb: [x + 340, y - 10], pg: [x + 500, y - 80],
@@ -944,22 +863,18 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
         beschreibung: p.bonusText,
         info: () => (level("pb_" + p.id) > 0 ? t("Aktiv") : t("Nicht aktiv"))
     });
-    // Goldader: Sternensamen direkt in Gold verwandeln (+100% Wert pro Stufe fuer genau diese Pflanze)
     SKILLS.push({
         id: "pg_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "💰", pos: versatz.pg, vor: "pb_" + p.id,
         name: tf("{0}: Goldader", p.name), basiskosten: rundePreis(basis * 3), faktor: 4, max: 3,
         beschreibung: tf("+100% Wert für {0} (jede Stufe noch einmal +100%).", p.name),
         info: () => tf("+{0}% Wert", 100 * level("pg_" + p.id))
     });
-    // Sternenfrucht: mehr Sternensaat von genau dieser Pflanze
     SKILLS.push({
         id: "pk_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "✨", pos: versatz.pk, vor: "pp_" + p.id, autoPos: true,
         name: tf("{0}: Sternenfrucht", p.name), basiskosten: rundePreis(basis * 0.8), faktor: 3, max: 3,
         beschreibung: tf("+50% Sternensaat von {0} (jede Stufe noch einmal +50%).", p.name),
         info: () => tf("+{0}% Sternensaat", 50 * level("pk_" + p.id))
     });
-    // Erbsorte: alte Pflanzen holen auf. Erst frei, wenn die Pflanze 3 Stufen weiter freigeschaltet ist.
-    // Stufe 3 = 40% vom Grundwert dieser spaeteren Pflanze (waechst aber so schnell wie bisher), dazu +100% Sternensaat pro Stufe.
     const spaeter = PFLANZEN_VORLAGEN[index + ERBSORTE_ABSTAND];
     if (spaeter) {
         SKILLS.push({
@@ -972,7 +887,6 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
             info: () => tf("x{0} Wert", zahl(erbsortenFaktor(p.id, level("pe_" + p.id))))
         });
     }
-    // Fruehreife: neue Samen dieser Pflanze starten eine Wachstumsstufe weiter
     SKILLS.push({
         id: "pr_" + p.id, ast: "pflanzen", icon: p.emoji, abzeichen: "🌿", pos: versatz.pr, vor: "pk_" + p.id, autoPos: true,
         name: tf("{0}: Frühreife", p.name), basiskosten: rundePreis(basis * 1.5), faktor: 1, max: 1,
@@ -981,8 +895,6 @@ PFLANZEN_VORLAGEN.forEach((p, index) => {
     });
 });
 
-// Feste Plaetze fuer Sterne, deren Position nicht in ihrer Definition steht (die Sterne bleiben immer an derselben Stelle).
-// Bei neuen Sternen: Platz von Hand waehlen und mit pruefeSternbild() (Konsole) kontrollieren, dass nichts kreuzt.
 const STERN_POSITIONEN = {
     saatkette: [1180, -660], goldenestunde: [-107, 1513], morgenkombo: [-285, -183], bodenkunde: [138, 1287], feldkunde: [440, 1620], grosseernte: [1620, -540],
     sternenschauer: [820, -1100], pk_weizen: [-390, -420], pe_weizen: [375, -185], pr_weizen: [-625, -557], pk_karotte: [-423, -610],
@@ -997,8 +909,6 @@ const STERN_POSITIONEN = {
 };
 SKILLS.forEach(s => { if (STERN_POSITIONEN[s.id]) s.pos = STERN_POSITIONEN[s.id]; });
 
-// Prueft das Stellarium: Sterne zu nah beieinander, Sterne auf fremden Linien, kreuzende Linien. Verschiebt nichts,
-// meldet nur in der Konsole (wird beim Laden einmal aufgerufen, damit Fehler bei Updates sofort auffallen).
 function pruefeSternbild() {
     const nachId = Object.fromEntries(SKILLS.map(s => [s.id, s]));
     const linien = SKILLS.filter(s => s.vor && nachId[s.vor] && s.pos && nachId[s.vor].pos).map(s => [nachId[s.vor], s]);
@@ -1025,7 +935,6 @@ function pruefeSternbild() {
 }
 pruefeSternbild();
 
-// Preise anheben: ein erster Run soll nicht fast das ganze Stellarium freischalten (Ausgleich ueber Mondblueten)
 SKILLS.forEach(def => {
     if (def.id === "p_weizen") return;
     def.basiskosten = rundePreis(def.basiskosten * (def.art === "pflanze" ? 1.0 : 1.8));
@@ -1033,7 +942,6 @@ SKILLS.forEach(def => {
 
 const SKILL_NACH_ID = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 
-// ----- Kurztexte fuer das Stellarium: ein Stichpunkt pro Stern und die Wirkung als Zahl je Stufe ("Jetzt -> Naechste") -----
 const STERN_KURZ = {
     gruen: t("Mehr grüne Saat (x2,5 Gold)"), blau: t("Mehr blaue Saat (x5 Gold)"), lila: t("Mehr lila Saat (x12,5 Gold)"),
     gelb: t("Mehr legendäre Saat (x50 Gold, vor der 2. Rechnung x25)"), edelstein: t("Farben geben mehr Gold"),
@@ -1069,7 +977,6 @@ const STERN_KURZ = {
     bodenkunde: t("Boden wird schneller fruchtbar")
 };
 
-// s = Stufe. Zeigt, was der Stern auf dieser Stufe insgesamt bringt.
 const STERN_WIRKUNG = {
     gruen: s => tf("{0}% grüne Saat", (s > 0 ? 12 + 3 * s : 0)), blau: s => tf("{0}% blaue Saat", 2 * s), lila: s => tf("{0}% lila Saat", (s > 0 ? 2 + s : 0)),
     gelb: s => tf("{0} legendäre Saat", prozentText(s > 0 ? 0.005 + 0.005 * s : 0)), edelstein: s => tf("+{0}% Farb-Bonus", 10 * s),
@@ -1129,17 +1036,9 @@ SKILLS.forEach(def => {
     }
 });
 
-// ---------- GLUECKSSPIELE (auf dem Markt, zwischen den Tagen, mit Gold) ----------
-// proPause = wie oft man zwischen zwei Tagen spielen darf (+ Stern "Stammkunde").
-// einsaetze = Anteile deines aktuellen Goldes, die du setzen kannst.
-// Alle Spiele zahlen im Schnitt etwas weniger aus, als man einsetzt (Glueck macht sie besser).
 
 const GLUECKSSPIEL = {
-    // Ohne Glueck verliert man auf Dauer leicht (45%), mit viel Glueck gewinnt man leicht (hoechstens 55%).
-    // Frueher bis 70%: damit liess sich das Gold pro Tag etwa verdoppeln (so schnell wie die Rechnungen wachsen).
     muenzwurf: { proPause: 3, einsaetze: [0.1, 0.25, 0.5, 1], gewinnChance: 0.45, maxChance: 0.55 },
-    // Rubbellos: Einsatz in Prozent deines Goldes. Gewinn = drei gleiche Symbole (Einsatz x multi).
-    // chance = Wahrscheinlichkeit fuer genau diesen Gewinn, sonst Niete. Erwartungswert ca. 0,85.
     rubbellos: { proPause: 3, einsaetze: [0.05, 0.1, 0.25],
         symbole: [
             { symbol: "🌾", multi: 1, chance: 0.18 },
@@ -1149,7 +1048,6 @@ const GLUECKSSPIEL = {
             { symbol: "🌻", multi: 10, chance: 0.01 },
             { symbol: "🌟", multi: 50, chance: 0.002 }
         ] },
-    // Huehnerrennen: Siegchance ist umgekehrt zur Quote (Erwartungswert ca. 0,83)
     huehnerrennen: { proPause: 1, einsaetze: [0.1, 0.2, 0.4],
         huehner: [
             { name: t("Weißes Huhn"), quote: 2, farbe: "#ffffff" },
@@ -1157,8 +1055,6 @@ const GLUECKSSPIEL = {
             { name: t("Rotes Huhn"), quote: 4, farbe: "#c9661c" },
             { name: t("Braunes Huhn"), quote: 8, farbe: "#6b3f1d" }
         ] },
-    // Slotmaschine: 3 Walzen, nur 3 gleiche Symbole gewinnen (Einsatz x multi). chance = Wahrscheinlichkeit fuer genau
-    // diesen Gewinn, sonst Niete (oft mit 2 gleichen Symbolen, Beinahe-Gewinn). Erwartungswert ca. 0,87, Gewinn in ca. 23% der Drehs.
     slot: { proPause: 3, einsaetze: [0.05, 0.1, 0.25],
         symbole: [
             { symbol: "🌾", multi: 2, chance: 0.12 },
@@ -1168,17 +1064,12 @@ const GLUECKSSPIEL = {
             { symbol: "🌻", multi: 25, chance: 0.004 },
             { symbol: "🌟", multi: 100, chance: 0.0008 }
         ] },
-    // Plinko: 8 Reihen Naegel, der Samen faellt in eines von 9 Faechern (Erwartungswert ca. 0,94)
     plinko: { proPause: 3, einsaetze: [0.05, 0.1, 0.25], reihen: 8,
         faecher: [8, 3, 1.3, 0.6, 0.3, 0.6, 1.3, 3, 8] },
-    // Roulette: 37 Faecher, Rot/Schwarz/Gerade/Ungerade x2, die 0 x36
     roulette: { proPause: 3, einsaetze: [0.05, 0.1, 0.25, 0.5] },
-    // Blackjack gegen den Dealer: Gewinn x2, Blackjack x2,5
     blackjack: { proPause: 3, einsaetze: [0.05, 0.1, 0.25] }
 };
 
-// ---------- SEGEN: nach jeder bezahlten Rechnung 1 von 3 waehlen, gilt fuer den ganzen Run ----------
-// Mehrfach waehlbar, die Wirkung stapelt sich (max = hoechstens so oft). Die Effekte stehen in script.js (segen("id") = Stufe).
 
 const SEGEN = [
     { id: "sparfuchs", badge: "🐷", name: t("Sparfuchs"), text: t("Alle weiteren Rechnungen in diesem Run kosten 8% weniger.") },
@@ -1216,7 +1107,6 @@ const SEGEN = [
     { id: "gluehfreund", badge: "🪲", name: t("Glühwürmchen-Freund"), text: t("Glühwürmchen geben doppelt so viele Sternensamen.") },
     { id: "gutesaat", badge: "🌾", name: t("Gute Saat"), text: t("Gewöhnliche Saat ist 50% mehr wert.") },
     { id: "komborausch", badge: "🎵", name: t("Kombo-Rausch"), text: t("Jeder 4. Klick zählt für die Kombo doppelt.") },
-    // Pakte: stark, aber mit einem Nachteil (erscheinen manchmal als rote Karte in der Auswahl)
     { id: "goldrausch", badge: "🔥", name: t("Goldrausch"), pakt: true, max: 2, text: t("+50% Gold aus allen Ernten, aber -15% Energie an jedem Tag.") },
     { id: "nachtschicht", badge: "🌘", name: t("Nachtschicht"), pakt: true, max: 2, text: t("+25% Energie an jedem Tag, aber alle Pflanzen wachsen 15% langsamer.") },
     { id: "sternentausch", badge: "💫", name: t("Sternentausch"), pakt: true, max: 2, text: t("Sternensaat ist 60% mehr wert, aber du bekommst 15% weniger Gold.") },
@@ -1227,17 +1117,10 @@ const SEGEN = [
 ];
 const SEGEN_NACH_ID = Object.fromEntries(SEGEN.map(s => [s.id, s]));
 
-// ---------- PFLANZEN-MEISTERSCHAFT (dauerhaft) ----------
-// Jede Pflanze sammelt ueber alle Runs Ernten. Bei diesen Zahlen steigt ihre Meisterschaft um 1 Stufe,
-// jede Stufe gibt dauerhaft +8% Verkaufswert fuer genau diese Pflanze.
 
 const MEISTER_SCHWELLEN = [50, 250, 1000, 3000, 8000, 20000, 50000, 120000, 300000, 700000, 1500000, 3000000];
 const MEISTER_BONUS = 0.08;
 
-// ---------- MONDPHASEN (Schwierigkeitsstufen) ----------
-// Im Mondteich waehlbar. Jede Phase ist schwerer als die vorige (Regeln gelten zusammen),
-// gibt dafuer mehr Mondblueten. Die naechste Phase wird frei, wenn man in der hoechsten freien Phase
-// 6 Rechnungen in einem Run bezahlt.
 
 const MONDPHASEN = [
     { symbol: "🌑", name: t("Neumond"), text: t("Die normalen Regeln.") },
@@ -1252,12 +1135,9 @@ const MONDPHASEN = [
     { symbol: "☄️", name: t("Sternenmond V"), text: t("Jede Rechnung steigt um weitere x3.") },
     { symbol: "🌌", name: t("Sternenmond VI"), text: t("Jede Rechnung steigt um weitere x3.") }
 ];
-const MONDPHASE_BONUS = 0.3;          // +30% Mondblueten pro Phase
+const MONDPHASE_BONUS = 0.3;
 const MONDPHASE_FREI_AB_RECHNUNGEN = 6;
 
-// ---------- JAHRESZEITEN ----------
-// Jeder Run beginnt im Fruehling. Alle 5 Tage (ein Rechnungs-Abschnitt) wechselt die Jahreszeit, danach geht es von vorn los.
-// wachstum/energie/gold/sterne = Faktoren, wetter = Gewichte fuer das Wetter (0 = kommt nie), partikel = Stimmung im Hof
 
 const JAHRESZEITEN_KONFIG = { tageProJahreszeit: 5 };
 
@@ -1273,12 +1153,10 @@ const JAHRESZEITEN = [
         wachstum: 0.85, sterne: 1.5, wetter: { hitze: 0, sternennacht: 3, gewitter: 0.3, frost: 2.5, pollenflug: 0 }, partikel: "schnee" }
 ];
 
-// ---------- WETTER (selten: an den meisten Tagen gibt es kein Wetter) ----------
-// gut = angenehmes Wetter (Wetterfrosch/Wetterglueck machen es wahrscheinlicher)
 
 const WETTER_KONFIG = {
-    chance: 0.15,          // Grundchance fuer Wetter an einem Tag
-    abTag: 2               // am ersten Tag nie Wetter
+    chance: 0.15,
+    abTag: 2
 };
 
 const WETTER = [
@@ -1304,33 +1182,26 @@ const WETTER = [
 ];
 const WETTER_NACH_ID = Object.fromEntries(WETTER.map(w => [w.id, w]));
 
-// ---------- KRAEHEN ----------
-// Pro Tag kommen meistens 0 oder 1 Kraehen (hoechstens 3). Eine Kraehe landet auf einer Pflanze
-// und stiehlt sie nach ein paar Sekunden, wenn du sie nicht anklickst.
 
 const KRAEHEN_KONFIG = {
-    anzahlChancen: [0.55, 0.32, 0.10, 0.03],  // 0, 1, 2 oder 3 Kraehen an einem Tag
+    anzahlChancen: [0.55, 0.32, 0.10, 0.03],
     stehlZeitSek: 4,
-    belohnungSternensamen: 10,                 // fuer jede verscheuchte Kraehe
-    federGold: 3                               // Werkzeug "Kraehenfeder": x Wert der besten Pflanze
+    belohnungSternensamen: 10,
+    federGold: 3
 };
 
-// ---------- GOLDREGEN (seltenes Ereignis waehrend eines Tages) ----------
 
 const GOLDREGEN_KONFIG = {
-    chance: 0.05,          // pro Tag
+    chance: 0.05,
     muenzen: 14,
     dauerSek: 5,
-    wertAnteil: 1          // jede Muenze = 1x Wert deiner besten Pflanze (nicht zu stark)
+    wertAnteil: 1
 };
 
-// ---------- KREDITE (intern "Boss-Rechnungen") ----------
-// Jede 3. Rechnung ist ein Kredit, den man abbezahlt: In den 5 Tagen davor gilt eine Kredit-Auflage (Zusatzregel).
-// Wer sie bezahlt, bekommt einen besonderen Segen (4 zur Auswahl) und Bonus-Sternensamen.
 
 const BOSS_KONFIG = {
     alle: 3,
-    bonusSternensamenProRechnung: 150  // x Nummer der Rechnung
+    bonusSternensamenProRechnung: 150
 };
 
 const BOSS_REGELN = [
@@ -1349,25 +1220,17 @@ const BOSS_REGELN = [
 ];
 const BOSS_NACH_ID = Object.fromEntries(BOSS_REGELN.map(b => [b.id, b]));
 
-// ---------- WANDERHAENDLER UND WERKZEUGE ----------
-// Nach manchen Tagen kommt ein Wanderhaendler mit seltenen Angeboten.
-// Werkzeuge sind starke Gegenstaende fuer den laufenden Run (begrenzte Plaetze, wie Joker in Balatro).
-// preis = Anteil der naechsten Rechnung (in Gold). Verkaufen gibt 40% zurueck.
 
 const HAENDLER_KONFIG = {
     chance: 0.15,
     abTag: 3,
-    angebote: 4,                      // immer 4 Angebote, aber nur 1 Kauf pro Besuch
+    angebote: 4,
     verkaufsAnteil: 0.4
 };
 
-// Stufe: Werkzeuge werden staerker, je spaeter (= teurer) man sie kauft. Stufe = 1 + bezahlte Rechnungen beim Kauf
-// (Sandbox: erreichte Meilensteine). Jede Stufe ueber 1 macht "wert" um WERKZEUG_STUFEN_BONUS staerker.
-// text(w) bekommt den Wert fuer die jeweilige Stufe. ganz = Wert wird gerundet (z.B. Anzahl Felder).
 const WERKZEUG_STUFEN_BONUS = 0.25;
 const werkzeugZahl = w => zahl(Math.round(w * 10) / 10);
 
-// Jedes Werkzeug wirkt mit einem Prozentwert (wert = Anteil, 0.03 = 3%). kurz(w) = Effekt in einer Zeile fuer den Kodex.
 const werkzeugProzent = w => prozentText(w);
 
 const WERKZEUGE = [
@@ -1426,8 +1289,6 @@ const WERKZEUGE = [
 ];
 const WERKZEUG_NACH_ID = Object.fromEntries(WERKZEUGE.map(w => [w.id, w]));
 
-// ---------- WERKZEUG-EVOLUTIONEN (wie in Vampire Survivors) ----------
-// Werkzeug + passender Segen im selben Run: das Werkzeug entwickelt sich und wirkt doppelt so stark.
 const WERKZEUG_EVOLUTIONEN = [
     { werkzeug: "giesskanne", segen: "regenwolke", name: t("Regenmacher") },
     { werkzeug: "taschenuhr", segen: "fruehstueck", name: t("Goldene Taschenuhr") },
@@ -1447,7 +1308,6 @@ const WERKZEUG_EVOLUTIONEN = [
 ];
 const EVOLUTION_FAKTOR = 2;
 
-// Weitere Angebote des Haendlers (neben Werkzeugen). menge/preis werden in ereignisse.js berechnet.
 const HAENDLER_WAREN = [
     { id: "sternenbeutel", name: t("Sternensamen-Säckchen"), symbol: "👝", preis: 0.35,
         text: t("+ Sternensamen (20 + doppelt so viele, wie du heute gesammelt hast).") },
@@ -1460,8 +1320,6 @@ const HAENDLER_WAREN = [
     { id: "gluecksklee", name: t("Glücksklee"), symbol: "🍀", preis: 0.3, text: t("Am nächsten Tag ist jede Saat mindestens ungewöhnlich.") }
 ];
 
-// ---------- HERAUSFORDERUNGEN (Mondteich > Spielmodi, ab 3 Runs) ----------
-// Ein Story-Run mit einer Einschraenkung. Wer dabei genug Rechnungen bezahlt, bekommt fuer immer einen Bonus.
 const HERAUSFORDERUNGEN = [
     { id: "nurweizen", symbol: "🌾", ziel: 3, name: t("Nur Weizen"), regel: t("Du kannst keine neuen Pflanzen freischalten."), belohnung: t("Für immer: Weizen ist 50% mehr wert.") },
     { id: "ohnesegen", symbol: "🚫", ziel: 4, name: t("Ohne Segen"), regel: t("Nach Rechnungen gibt es keine Segen."), belohnung: t("Für immer: 1 Segen mehr zur Auswahl.") },
@@ -1472,7 +1330,6 @@ const HERAUSFORDERUNGEN = [
 ];
 const HERAUSFORDERUNG_AB_RUNS = 3;
 
-// ---------- HOF-STILE (ab dem 2. Run waehlt man zu Beginn jedes Story-Runs 1 von 3) ----------
 const HOF_STILE = [
     { id: "weizenbauer", symbol: "🌾", name: t("Weizenbauer"), text: t("Weizen ist 80% mehr wert, alle anderen Pflanzen 10% weniger.") },
     { id: "haendler", symbol: "🧳", name: t("Händlerfreund"), text: t("Der Wanderhändler kommt doppelt so oft und ist 25% billiger.") },
@@ -1484,7 +1341,6 @@ const HOF_STILE = [
     { id: "tierfreund", symbol: "🐾", name: t("Tierflüsterer"), text: t("Streicheln gibt dreimal so viel Gold.") }
 ];
 
-// ---------- DORFZEITUNG (eine Schlagzeile am Feierabend, nur zum Schmunzeln) ----------
 const DORFZEITUNG = [
     () => (typeof aktuellesFest === "function" && aktuellesFest() ? aktuellesFest().zeitung : null),
     () => t("Bürgermeister verwechselt Kürbis mit Hut. Trägt ihn trotzdem weiter."),
@@ -1508,8 +1364,6 @@ const DORFZEITUNG = [
     (m, r) => (m.lebenszeit.streicheln || 0) < 100 ? null : tf("Begleiter wurde schon {0}-mal gestreichelt. Fordert trotzdem mehr.", zahl(m.lebenszeit.streicheln || 0))
 ];
 
-// ---------- FEIERTAGE (nach echtem Datum, nur Deko und Zeitungs-Schlagzeilen) ----------
-// von/bis = [Monat, Tag]. hof = Zusatz fuer die Hof-Landschaft (siehe HOF_FARBEN in sprites.js)
 const FESTE = [
     { id: "halloween", symbol: "🎃", name: t("Halloween"), von: [10, 24], bis: [11, 2], hof: { kuerbisse: true },
         zeitung: t("Kürbisse tauchen über Nacht überall auf. Niemand weiß, wer sie geschnitzt hat.") },
@@ -1531,8 +1385,6 @@ function aktuellesFest(datum = new Date()) {
     }) || null;
 }
 
-// ---------- BRIEFKASTEN (wie die Briefe in Animal Crossing) ----------
-// Ab und zu schreibt jemand aus dem Dorf am Feierabend einen Brief mit einem kleinen Geschenk. Keine Namen, nur wer es ist.
 const BRIEF_CHANCE = 0.1;
 const BRIEFE = [
     { absender: t("Die Bäckerin"), text: t("Danke für den Weizen! Das Brot ist so gut geworden, dass ich dir etwas vom Gewinn abgebe."), geschenk: "gold" },
@@ -1545,14 +1397,6 @@ const BRIEFE = [
     { absender: t("Der Müller"), text: t("Dein Korn mahlt sich wie Butter. Morgen früh bringe ich dir einen Kaffee vorbei."), geschenk: "energie" }
 ];
 
-// ---------- POKALE (Belohnung) ----------
-// Bestimmte Rechnungen (in Endlos: Meilensteine) sind Pokale. Man bezahlt sie wie eine Rechnung und bekommt den Pokal.
-// Jeder Pokal gilt fuer immer (auch nach einem Story-Reset) und vervielfacht Gold, Sternensamen, Mondblueten und
-// Sternensplitter (nicht die Gutscheine). Die Faktoren werden zusammengezaehlt: Holz + Gold = x3,5.
-// Ein gewonnener Pokal ist in spaeteren Runs wieder eine normale Rechnung.
-// nummer = Index der Rechnung (0 = erste), faellt sie auf einen Kredit, eine spaeter. Plaetze: Holz 5., Gold 7., Platin 11.,
-// Kristall 14. Rechnung (seit 22.10.2026, vorher Holz 4. und Platin 10.: beide kamen zu frueh).
-// Ziel: Holz 45-55 Min, Gold ~2,5 Std, Platin ~5,5 Std, Kristall 10-15 Std (Spielzeit mit Neustarts).
 const TROPHAEEN = [
     { id: "holz", nummer: 4, name: t("Holzpokal"), sprite: "sym_pokal_holz", farbe: "#c08a50", faktor: 1.5 },
     { id: "gold", nummer: 5, name: t("Goldpokal"), sprite: "sym_pokal_gold", farbe: "#ffd23a", faktor: 2 },
@@ -1562,40 +1406,27 @@ const TROPHAEEN = [
 function hatPokal(id) {
     return Boolean(meta.trophaeen && meta.trophaeen[id]);
 }
-// Ein Pokal ist nie ein Kredit: faellt seine Rechnung auf einen Kredit, kommt er eine Rechnung spaeter
 function pokalIndex(tr) {
     let index = tr.nummer;
     while (typeof istKreditIndex === "function" && istKreditIndex(index)) index += 1;
     return index;
 }
-// Pokal, der diese Rechnung ersetzt (nur solange man ihn noch nicht hat)
 function trophaeFuer(index) {
     return TROPHAEEN.find(tr => pokalIndex(tr) === index && !hatPokal(tr.id)) || null;
 }
-// Faktor als Text mit Komma (1,5)
 function faktorText(wert) {
     return wert.toLocaleString(SPRACH_LOCALE, { maximumFractionDigits: 2 });
 }
-// Bonus aller gewonnenen Pokale zusammen (ohne Pokal = x1)
-// Die Boni der Pokale addieren sich in Prozent: Holz +50%, Gold +100%, Platin +200%, Kristall +400%
 function pokalFaktor() {
     return 1 + TROPHAEEN.filter(tr => hatPokal(tr.id)).reduce((a, tr) => a + (tr.faktor - 1), 0);
 }
 
-// Faktor als Prozent-Bonus, z.B. 1,5 -> "+50%"
 function pokalProzent(faktor) {
     return "+" + zahl(Math.round((faktor - 1) * 100)) + "%";
 }
 
-// ---------- ERNTEFIEBER (seltenes Ereignis: kurz wachsen alle Pflanzen rasend schnell) ----------
 const ERNTEFIEBER_KONFIG = { chance: 0.07, abTag: 3, dauerMs: 12000, tempo: 6 };
 
-// ---------- ERFOLGE (dauerhaft, je 1x freischaltbar) ----------
-// Jede Kette zeigt immer nur das naechste offene Ziel. Jede Stufe = spaeter ein Steam-Achievement.
-// Belohnung: JEDE Stufe gibt genau 1 Kuschel-Gutschein, den man bei den Erfolgen selbst abholt.
-// Standard und Sandbox haben getrennte Erfolge (eigener Fortschritt, eigene Gutscheine).
-// nurStandard / nurSandbox = Kette gibt es nur in diesem Modus.
-// wert(m, r): m = Meta-Stand des Modus, r = laufender Run dieses Modus (oder null)
 
 const ERFOLG_BELOHNUNG_GUTSCHEINE = 1;
 
@@ -1710,23 +1541,12 @@ const ERFOLG_KETTEN = [
         ziele: [1, 10, 50] }
 ];
 
-// Ketten, die es im jeweiligen Modus gibt
 function erfolgKettenFuer(sandbox) {
     return ERFOLG_KETTEN.filter(k => (sandbox ? !k.nurStandard : !k.nurSandbox));
 }
 
-// ---------- HOF: BEGLEITER (intern "haustier") ----------
-// art = welche Figur gezeichnet wird ("katze", "maedchen", "manta", "pinguin", siehe sprites.js).
-// stil = Extras fuer die Tier-Figur: fuchs, hund, dackel, hase, panda, axolotl, drache, engel, teufel, einhorn (Horn + Maehne),
-//        muetze (Weihnachtsmuetze), kuerbishut, keineStreifen. Kombinationen ergeben neue Wesen (hase + drache = Wolpertinger).
-// farben = Ziffern 1 bis 7: 1 hell, 2 Fell/Haare, 3 dunkel/Kleid, 4 Bauch/Haut, 5 Augen, 6 rosa, 7 Umriss.
-// stimme = Tonhoehe beim Miauen (1 = normal), laut = "miau", "wuff" oder "blubb".
-// quelle: "frei" (von Anfang an), "erspielt" (bedingung erfuellen), "dlc" (spaeter im Steam-Shop, siehe DLC_PAKETE)
-// effekt = kleine Extras beim Laufen (blasen, herzen, funkeln, flammen, sterne, schnee), klasse = CSS-Look der Figur
-// Legendaere Tiere: idle = eigene Animation ab und zu (haus.js, HAUSTIER_IDLE), aura = leuchtender Rand, schwebt = schwebt sanft
 
 const HAUSTIER_SKINS = [
-    // ----- Gewoehnlich / Ungewoehnlich (im Spiel) -----
     { id: "rot", name: t("Rote Katze"), art: "katze", quelle: "frei",
         farben: { 1: "#ffc98a", 2: "#f0923a", 3: "#c0601a", 4: "#fff4e2", 5: "#2e1a09", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "schwarz", name: t("Schwarze Katze"), art: "katze", quelle: "erspielt",
@@ -1739,7 +1559,6 @@ const HAUSTIER_SKINS = [
         quelle: "erspielt", bedingungText: t("Streichle deinen Begleiter 500-mal"), bedingung: () => meta.lebenszeit.streicheln >= 500,
         farben: { 1: "#e8a86a", 2: "#a0562a", 3: "#5a2a10", 4: "#d99060", 5: "#1e1008", 6: "#ff8fa3", 7: "#2e1408" } },
 
-    // ----- Episch (Unterstuetzer-Paket) -----
     { id: "waschbaer", name: t("Waschbär"), art: "katze", stil: { panda: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.1,
         farben: { 1: "#e6e6ea", 2: "#9a9aa6", 3: "#2e2e36", 4: "#f2f2f4", 5: "#f2f2f4", 6: "#ffb3c0", 7: "#1c1c22" } },
     { id: "kitsune", name: t("Kitsune"), art: "katze", stil: { fuchs: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer",
@@ -1779,7 +1598,6 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#ffc98a", 2: "#f0923a", 3: "#c0601a", 4: "#fff4e2", 5: "#2e1a09", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "kuerbiskatze", name: t("Kürbiskatze"), art: "katze", stil: { kuerbishut: true }, quelle: "dlc", paket: "unterstuetzer",
         farben: { 1: "#4a4a5a", 2: "#2e2e38", 3: "#1c1c24", 4: "#55556a", 5: "#f08a24", 6: "#ff9aa8", 7: "#0b0b10" } },
-    // Neue epische Begleiter: jeder mit eigener Kombination aus Form und Zubehoer
     { id: "winterhase", name: t("Winterhase"), art: "katze", stil: { hase: true, muetze: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.35,
         farben: { 1: "#ffffff", 2: "#eef2f8", 3: "#b8c4d6", 4: "#ffffff", 5: "#2a3450", 6: "#ffb3c0", 7: "#7a869a" } },
     { id: "kuerbishund", name: t("Kürbishund"), art: "katze", stil: { hund: true, kuerbishut: true, keineStreifen: true }, laut: "wuff", quelle: "dlc", paket: "unterstuetzer",
@@ -1792,7 +1610,6 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#ffe0ec", 2: "#f5c0d4", 3: "#c87a9a", 4: "#fff4f8", 5: "#4a1a2a", 6: "#ff8fb1", 7: "#8a4a62" } },
     { id: "pandawelpe", name: t("Panda-Welpe"), art: "katze", stil: { hund: true, panda: true, keineStreifen: true }, laut: "wuff", quelle: "dlc", paket: "unterstuetzer", stimme: 1.2,
         farben: { 1: "#ffffff", 2: "#f2f2f2", 3: "#1c1c22", 4: "#ffffff", 5: "#f2f2f2", 6: "#ffb3c0", 7: "#1c1c22" } },
-    // Blockmenschen in den Skins von BastiGHG und Papaplatte (mit Erlaubnis), Kloetzchen-Figuren mit eigenen Animationen
     { id: "basti", name: "787", art: "blockmensch", stil: { anzug: true }, laut: "block", quelle: "dlc", paket: "unterstuetzer",
         idle: "block", effekt: "bloecke",
         farben: { 1: "#16161c", 2: "#1d4f8f", 3: "#22222a", 4: "#c3c3c3", 5: "#99d9ea", 6: "#2c2c36", 7: "#050508", 8: "#1c1c24",
@@ -1802,7 +1619,6 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#fff700", 2: "#332a28", 3: "#ff6a0a", 4: "#0a0808", 5: "#ff2a1a", 6: "#403633", 7: "#140e0c", 8: "#292126",
             h: "#ffd23a", k: "#c8a83e" } },
 
-    // ----- neu: passend zu den Haus-Skins -----
     { id: "lebkuchenkatze", name: t("Lebkuchenkatze"), art: "katze", stil: { keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.15,
         farben: { 1: "#d08a4a", 2: "#a8602a", 3: "#fff6f0", 4: "#e8a868", 5: "#3a1a08", 6: "#ff8fa3", 7: "#4a2410" } },
     { id: "bonbonhase", name: t("Bonbonhase"), art: "katze", stil: { hase: true, keineStreifen: true }, quelle: "dlc", paket: "unterstuetzer", stimme: 1.45,
@@ -1820,14 +1636,12 @@ const HAUSTIER_SKINS = [
     { id: "goldhase", name: t("Goldhase"), art: "katze", stil: { hase: true, keineStreifen: true }, stimme: 1.5, quelle: "dlc", paket: "einzeln", effekt: "funkeln", aura: "#ffd93d", 
         farben: { 1: "#ffe066", 2: "#e0a800", 3: "#8a5a08", 4: "#fff6c0", 5: "#5a3a08", 6: "#ffb3c0", 7: "#6a4a08" } },
 
-    // ----- Mythisch: nur fuer Beta-Tester (sichtbar nur, wenn man ihn hat) -----
     { id: "betatester", name: "Beta Tester", art: "engel", quelle: "beta", seltenheit: 5, laut: "block", stimme: 1.3,
         aura: "#ffffff", schwebt: true, klasse: "haustier-engel", effekt: "funkeln",
         farben: { 7: "#3a3c48", A: "#f4f6fa", a: "#c8ccd6", Q: "#9094a4", k: "#dde0e8", H: "#eceef4", h: "#b4b8c4",
             S: "#f2e8e6", X: "#d8c8c4", E: "#4a4e5a", W: "#ffffff", V: "#c4cad8", v: "#8e96aa", B: "#f8faff", b: "#8e96aa",
             C: "#fafbfd", c: "#d0d4de", G: "#c0c4d0", R: "#ffffff", r: "#c8ccd8", L: "#e8f0ff", w: "#ffffff" } },
 
-    // ----- Legendaer (einzeln, mit Effekten) -----
     { id: "axolotl", name: t("Axolotl"), art: "katze", stil: { axolotl: true, keineStreifen: true }, laut: "blubb",
         quelle: "dlc", paket: "einzeln", effekt: "blasen",
         idle: "blubb", aura: "#ff8fb1",
@@ -1879,7 +1693,6 @@ const HAUSTIER_SKINS = [
         farben: { 1: "#9fd8ff", 2: "#3b6a9e", 3: "#264a75", 4: "#eef6ff", 5: "#0f1a2a", 6: "#ff9aa8", 7: "#122238" } }
 ];
 
-// Aktionen im Rechtsklick-Menue des Haustiers (funktionieren immer, auch zwischen den Tagen)
 const HAUSTIER_AKTIONEN = [
     { id: "winken", name: t("Winken"), symbol: "👋" },
     { id: "kuscheln", name: t("Kuscheln"), symbol: "💕" },
@@ -1891,14 +1704,6 @@ const HAUSTIER_AKTIONEN = [
     { id: "ball", name: t("Ball werfen"), symbol: "🎾" }
 ];
 
-// ---------- HAUS: KOSMETIK (Klick aufs Haus im Hof) ----------
-// Reine Optik, die die Entwicklung unterstuetzt. Alles laesst sich im Haus vorher anprobieren (Musik probehoeren).
-// Seltenheit ergibt sich aus der Quelle:
-//   Gewoehnlich (weiss)    = quelle "frei"
-//   Ungewoehnlich (gruen)  = quelle "erspielt" (bedingung im Spiel erfuellen)
-//   Episch (lila)          = quelle "dlc", paket "unterstuetzer" (Unterstuetzer-Paket inkl. Sandbox)
-//   Legendaer (gelb)       = quelle "dlc", paket "einzeln" (aufwaendig/animiert, einzeln fuer LEGENDAER_KRISTALLE Kristalle)
-// Spaeter auf Steam: Spiel 4,99 €, Unterstuetzer-Paket 4,99 €, Kristalle 100 pro 1 € (nur Kosmetik, kein Pay-to-Win).
 
 const DLC_PAKETE = {
     unterstuetzer: {
@@ -1914,7 +1719,6 @@ function kristallText(menge) {
     return "💎 " + tf("{0} Gems", zahl(menge));
 }
 
-// Seltenheit eines Kosmetik-Eintrags (Index in KUSCHEL_RARITAETEN: 0 gewoehnlich, 1 ungewoehnlich, 3 episch, 4 legendaer)
 function kosmetikSeltenheit(eintrag) {
     if (eintrag.seltenheit !== undefined) return eintrag.seltenheit;
     if (eintrag.quelle === "frei") return 0;
@@ -1926,7 +1730,6 @@ function euro(preis) {
     return preis.toLocaleString(SPRACH_LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
 
-// Text fuer den Preis eines DLC-Inhalts
 function dlcPreisText(eintrag) {
     if (eintrag.paket === "unterstuetzer") return tf("Im {0} enthalten", DLC_PAKETE.unterstuetzer.name);
     return kristallText(eintrag.kristalle || LEGENDAER_KRISTALLE);
@@ -1946,7 +1749,6 @@ const KOSMETIK_KATEGORIEN = [
     { id: "pflanzen", name: t("Pflanzen"), symbol: "🌱" }
 ];
 
-// Hof-Themen: Farben fuer zeichneHof (sprites.js). funkeln = leuchtende Teilchen ueber der Wiese
 const HOF_THEMEN = [
     { id: "standard", name: t("Sproutvale"), quelle: "frei" },
     { id: "tropen", name: t("Tropeninsel"), quelle: "erspielt", bedingungText: t("Erreiche Tag 30 in einem Run"),
@@ -1960,18 +1762,12 @@ const HOF_THEMEN = [
     { id: "lavendel", name: t("Lavendelfeld"), quelle: "dlc", paket: "unterstuetzer", falter: ["#b48cff", "#ffffff", "#fff6a0"] },
     { id: "zauberwald", name: t("Zauberwald"), quelle: "dlc", paket: "einzeln", funkeln: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"],
         irrlichter: ["#9fe8ff", "#c9b0f5", "#b8f07a"], falter: ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#fff6a0"] },
-    // ewigeNacht = kosmischer Sternenhimmel, statt der Sonne zieht ein grosser Stern ueber den Himmel (der Mond kommt wie immer nachts)
     { id: "kosmos", name: t("Kosmische Nacht"), quelle: "dlc", paket: "einzeln", ewigeNacht: true, sternschnuppen: true,
         funkeln: ["#fff6a0", "#9fe8ff", "#c9b0f5", "#ffffff"] },
-    // feuerwerk = Farben der Raketen, die ueber dem Hof in den Himmel steigen und zerplatzen
     { id: "feuerwerk", name: t("Feuerwerksfest"), quelle: "dlc", paket: "einzeln", funkeln: ["#ffd84a", "#ff8a4a"],
         feuerwerk: ["#ff4a4a", "#ffd84a", "#ff8a2a", "#ff6ad0", "#7ad8ff", "#9aff6a"] }
 ];
 
-// Deko: bis zu 3 Objekte stehen auf festen Plaetzen im Hintergrund der Hofwiese (x in Prozent)
-// farben = Farbvariante des Sprites, effekt = CSS-Look (bienen: Bienen summen herum), partikel = aufsteigende Teilchen,
-// fluegel = Windmuehlen-Fluegel drehen sich als eigenes Bild vor dem Turm,
-// ablauf = Bildfolge (ein Zeichen pro Schritt, das Sprite heisst <sprite ohne _0>_<Zeichen>), so bewegt sich nur der animierte Teil
 const DEKO_SLOTS = [{ x: 31 }, { x: 47 }, { x: 69 }];
 const DEKO_MAX = DEKO_SLOTS.length;
 
@@ -2021,7 +1817,6 @@ const DEKO_OBJEKTE = [
         ablauf: "0011223300112233", partikel: ["#fff6a0", "#ffffff", "#8fa2f0"] }
 ];
 
-// Musik: "auto" spielt je nach Tageszeit (nur Lieder, die du hast). Die Noten stehen in audio.js (LIEDER).
 const MUSIK_TITEL = [
     { id: "auto", name: t("Automatisch (nach Tageszeit)"), quelle: "frei" },
     { id: "sproutvale", name: t("Sproutvale"), quelle: "frei" },
@@ -2034,10 +1829,6 @@ const MUSIK_TITEL = [
     { id: "sternenwalzer", name: t("Sternenwalzer"), quelle: "dlc", paket: "unterstuetzer" }
 ];
 
-// Samenladen: Farben der Markise und des Holzes. klasse = zusaetzlicher Look (style.css),
-// funken = Funken beim Samen, wurf = Look der geworfenen Saaten, spur = Funken hinter der Saat.
-// Legendaere Laeden sind eigene Gebaeude: bauweise = Aufbau in haus.js/style.css, bild = Symbol in der Mitte,
-// ankunft = Farben der kleinen Explosion, wenn ein Wurf auf dem Feld landet, drehen = Wurf zeigt in Flugrichtung
 const SAMENLADEN_SKINS = [
     { id: "standard", name: t("Rot-Weiß"), quelle: "frei", markise: ["#d9483f", "#fff1d6"], holz: ["#b87a3e", "#9e6530"] },
     { id: "blau", name: t("Blau-Weiß"), quelle: "erspielt", bedingungText: t("Klicke 50.000-mal auf den Samenladen"),
@@ -2093,9 +1884,6 @@ const SAMENLADEN_SKINS = [
         wurf: "wurf-licht", spur: ["#8dff7a", "#ffffff"], ankunft: ["#8dff7a", "#9fe0ff", "#ffffff", "#5affc8"] }
 ];
 
-// Bauernhaus oben links (Kosmetik "Haus"): farben = neue Farben fuer die Buchstaben im Bauernhaus-Sprite
-// (T Dachkante, U Dach, L/l Dachmuster, W Wand, V Sockel, D Tuer, F Fensterglas), extra = kleine Pixel-Details,
-// fenster = Fenster leuchten immer (Farbe), funken = Funken ums Haus, rauch = Farbe vom Schornstein-Rauch
 const HAUS_SKINS = [
     { id: "standard", name: t("Bauernhaus"), quelle: "frei", farben: {} },
     { id: "blaudach", name: t("Blaues Dach"), quelle: "erspielt", bedingungText: t("Bezahle insgesamt 15 Rechnungen"), bedingung: () => meta.lebenszeit.rechnungen >= 15, farben: { T: "#2a4a7a", U: "#3f6aa8", L: "#35609a", l: "#2a4a7a" } },
@@ -2113,8 +1901,6 @@ const HAUS_SKINS = [
     { id: "goldhaus", name: t("Goldenes Haus"), quelle: "dlc", paket: "einzeln", farben: { W: "#ffd84a", V: "#c89a10", T: "#8a5a08", U: "#e0a800", L: "#ffcf4a", l: "#8a5a08", D: "#8a5a08", F: "#fff6c0" }, extra: "glanz", fenster: "rgba(255, 240, 160, 0.95)", funken: ["#ffd93d", "#fff3b0", "#ffffff"] }
 ];
 
-// Scheune (20x19): K/k Dach, L/l Wandbretter, w Balken und Tor-Rahmen, F Fenster.
-// extra = kleine Pixel-Details (zeichneScheuneExtra in sprites.js), fenster/funken = Leuchten und Funken (legendaer)
 const SCHEUNEN_SKINS = [
     { id: "standard", name: t("Rote Scheune"), quelle: "frei", farben: {} },
     { id: "gruen", name: t("Grüne Scheune"), quelle: "frei", farben: { L: "#4f8a3a", l: "#35652a" } },
@@ -2125,7 +1911,6 @@ const SCHEUNEN_SKINS = [
         fenster: "rgba(255, 246, 160, 0.95)", funken: ["#fff6a0", "#ffffff", "#8fa2f0"] }
 ];
 
-// Felder: Farben der Erde (B hell, b Furche, c Kruemel). klasse = zusaetzlicher Look (style.css)
 const FELD_SKINS = [
     { id: "standard", name: t("Ackerboden"), quelle: "frei", farben: {} },
     { id: "hochbeet", name: t("Hochbeet"), quelle: "erspielt", bedingungText: t("Ernte insgesamt 25.000 Pflanzen"),
@@ -2148,7 +1933,6 @@ const FELD_SKINS = [
         klasse: "felder-regenbogen", teilchen: ["#ff6a6a", "#ffd93d", "#a3dc6f", "#5aa9e6", "#b48cff"] }
 ];
 
-// Muenzen: Farben der Goldmuenze. klasse = zusaetzlicher Look (style.css)
 const KUGEL_SKINS = [
     { id: "standard", name: t("Goldmünzen"), quelle: "frei", farben: {} },
     { id: "bronze", name: t("Bronzemünzen"), quelle: "erspielt", bedingungText: t("Sammle 50 legendäre Saaten"),
@@ -2163,7 +1947,6 @@ const KUGEL_SKINS = [
         klasse: "muenzen-regenbogen", funken: ["#ff6a6a", "#ffd93d", "#a3dc6f", "#5aa9e6", "#b48cff"] },
     { id: "feuer", name: t("Feuermünzen"), quelle: "dlc", paket: "einzeln", farben: { Y: "#ffd060", y: "#ff6a2a", k: "#5a1a08" },
         klasse: "muenzen-feuer", funken: ["#ffd060", "#ff8a2a", "#ff4a1a"] },
-    // Saat in anderen Formen (keine runde Muenze). Die Seltenheit zeigt der farbige Kern (Z), beim Kristall der ganze Stein.
     { id: "blatt", name: t("Blattsaat"), quelle: "dlc", paket: "unterstuetzer", form: "blatt", farben: { Y: "#8fdc5c", y: "#4f9e2c", k: "#1f4a12", w: "#e8ffd0" } },
     { id: "eichel", name: t("Eichelsaat"), quelle: "dlc", paket: "unterstuetzer", form: "eichel", farben: { Y: "#d8a060", y: "#9a6430", k: "#3a2410", w: "#ffe8c8" } },
     { id: "herz", name: t("Herzsaat"), quelle: "dlc", paket: "unterstuetzer", form: "herz",
@@ -2206,7 +1989,6 @@ const KUGEL_SKINS = [
         farben: { Y: "#9ad6ff", y: "#4a9ad0", k: "#143a5a", w: "#ffffff" } }
 ];
 
-// Rahmen der Kuscheltier-Karten im Mondteich
 const RAHMEN_SKINS = [
     { id: "standard", name: t("Schlicht"), quelle: "frei", css: "" },
     { id: "holz", name: t("Holzrahmen"), quelle: "erspielt", bedingungText: t("Sammle 15 verschiedene Kuscheltiere"),
@@ -2226,8 +2008,6 @@ const RAHMEN_SKINS = [
     { id: "aurora", name: t("Polarlicht-Rahmen"), quelle: "dlc", paket: "einzeln", css: "rahmen-aurora" }
 ];
 
-// Pflanzen-Looks: tauschen die Blattfarben (G hell, g mittel, d dunkel) aller Pflanzen-Sprites aus.
-// klasse = zusaetzlicher Look fuer alle Pflanzen auf den Feldern (style.css)
 const PFLANZEN_SKINS = [
     { id: "standard", name: t("Sommergrün"), quelle: "frei", farben: {} },
     { id: "herbst", name: t("Herbstlaub"), quelle: "dlc", paket: "unterstuetzer", farben: { G: "#e0a040", g: "#b8662a", d: "#7a3a1a" } },
@@ -2244,16 +2024,10 @@ const PFLANZEN_SKINS = [
         klasse: "pflanzen-glut", teilchen: ["#ffb060", "#ff6a2a", "#ffd060"], effekt: "glut" }
 ];
 
-// Der Mondteich im Hof (x in Prozent). Klick darauf oeffnet den Mondteich-Shop.
 const TEICH_X = 24;
-// Das Bauernhaus im Hof (x in Prozent, Breite in Prozent). Klick darauf oeffnet das Haus-Inventar.
 const HAUS_BEREICH = { x: 5, breite: 8 };
 
-// ---------- MONDTEICH: DAUERHAFTE UPGRADES (kosten Mondblueten) ----------
-// max: Infinity = unendlich oft kaufbar. Mondblueten gibt es nur noch am Ende eines Runs,
-// darum sind die ersten Stufen guenstig und die starken Upgrades deutlich teurer.
 
-// Mondteich-Werte, die mit jeder Stufe schneller wachsen (Gesamtwert pro Stufe): anfangs klein, spaeter richtig stark
 const META_STUFEN = {
     ertrag: [0, 0.05, 0.10, 0.20, 0.35, 0.50, 0.70, 0.95, 1.25, 1.60, 2.00],
     ausdauer: [0, 0.03, 0.07, 0.12, 0.20, 0.30],
@@ -2307,7 +2081,6 @@ const META_UPGRADES = [
     { id: "meisterhaende", name: t("Meisterhände"), basiskosten: 10, faktor: 2, max: 9,
         beschreibung: t("Jede Ernte zählt für die Pflanzen-Meisterschaft einmal mehr (Stufe 9: jede Ernte zählt 10-mal)."),
         info: lvl => tf("Jede Ernte zählt {0}-mal", (1 + lvl)) },
-    // Tauchen erst mit der Zeit auf (sichtbar), damit es nach jedem Run etwas Neues zu entdecken gibt
     { id: "erbstueck", name: t("Erbstück"), basiskosten: 6, faktor: 1.9, max: 5,
         beschreibung: t("Der Weizen startet jeden Run mit 2 Ertrag-Stufen mehr."), info: lvl => tf("+{0} Ertrag-Stufen für Weizen", 2 * lvl) },
     { id: "sternenkarte", name: t("Sternenkarte"), basiskosten: 20, faktor: 1.7, max: 10,
@@ -2326,12 +2099,6 @@ const META_UPGRADES = [
         info: lvl => tf("+{0} Gold", prozentText(0.25 * lvl)) }
 ];
 
-// ---------- MONDTEICH: TAROTKARTEN ----------
-// Die erste Karte kostet KONFIG.tarotPreis Mondblueten, jede weitere x KONFIG.tarotPreisFaktor.
-// Dauerhaft verbessern kostet immer KONFIG.tarotVerbessernPreis.
-// Verbesserte Karten koennen vor Tag 1 ausgeruestet werden (max. 3): "wert" (und "nachteil") x KONFIG.tarotVerstaerkung.
-// text(f) bekommt den Faktor f (1 = normal, 1.5 = verstaerkt) und beschreibt die aktuelle Staerke.
-// extra = zusaetzlicher Effekt NUR wenn die Karte verbessert und ausgeruestet ist.
 
 const TAROT = [
     { id: "narr", nummer: "0", symbol: "🃏", name: t("Der Narr"), wert: 75,
@@ -2383,14 +2150,9 @@ const TAROT = [
 ];
 const TAROT_NACH_ID = Object.fromEntries(TAROT.map(t => [t.id, t]));
 
-// ---------- MONDTEICH: KUSCHEL-AUTOMAT (Gacha, bleibt fuer immer) ----------
-// Jeder Zug gibt ein Kuscheltier. Ziehen geht mit einem Kuschel-Gutschein (aus Erfolgen, kostenlos)
-// oder mit Mondblueten: der erste Zug kostet "preis", jeder weitere mit Mondblueten x "preisFaktor".
-// Duplikate verbessern das Kuscheltier automatisch: Stufe 1 = 1 Stueck, 2 = 2, 3 = 4, 4 = 8, 5 = 16 Stueck.
-// "Mythisch" (rosa) gibt es nur hier, es ist der super seltene Hauptgewinn.
 
 const KUSCHEL_KONFIG = {
-    preis: 1,                 // erster Zug 1 Mondbluete, jeder bezahlte Zug +1 (mit "Kuschel-Rabatt" nur jeder 2.)
+    preis: 1,
     maxStufe: 5
 };
 
@@ -2403,10 +2165,7 @@ const KUSCHEL_RARITAETEN = [
     { id: "mythisch", name: t("Mythisch"), chance: 0.005, farbe: "#ff9ad5", rand: "#e0409a" }
 ];
 
-// raritaet = Index in KUSCHEL_RARITAETEN. text(stufe) beschreibt den Bonus auf der aktuellen Stufe.
-// Die Wirkung steht in script.js (kuschel("id") = Stufe, 0 = nicht im Besitz).
 const KUSCHELTIERE = [
-    // Gewoehnlich
     { id: "hase", symbol: "🐰", name: t("Stoffhase"), raritaet: 0,
         text: s => tf("+{0} Gold zu Beginn jedes Runs.", 5 * s) },
     { id: "teddy", symbol: "🧸", name: t("Teddy"), raritaet: 0,
@@ -2425,7 +2184,6 @@ const KUSCHELTIERE = [
         text: s => tf("+{0}% Chance auf eine zusätzliche Saat pro Ernte.", s) },
     { id: "schwein", symbol: "🐷", name: t("Schweinchen"), raritaet: 0,
         text: s => tf("Neue Felder kosten {0}% weniger.", 3 * s) },
-    // Ungewoehnlich
     { id: "otter", symbol: "🦦", name: t("Otter"), raritaet: 1,
         text: s => tf("Glühwürmchen geben {0}% mehr Sternensamen.", 10 * s) },
     { id: "biber", symbol: "🦫", name: t("Biber"), raritaet: 1,
@@ -2442,7 +2200,6 @@ const KUSCHELTIERE = [
         text: s => tf("+{0} automatische Klicks pro Sekunde auf den Samenladen.", s * 0.5) },
     { id: "kuh", symbol: "🐮", name: t("Kuh"), raritaet: 1,
         text: s => tf("+{0}% Zinsen bei Feierabend.", 0.5 * s) },
-    // Selten
     { id: "fuechslein", symbol: "🦊", name: t("Füchslein"), raritaet: 2,
         text: s => tf("+{0}% Gold aus allen Ernten.", 6 * s) },
     { id: "pinguin", symbol: "🐧", name: t("Pinguin"), raritaet: 2,
@@ -2459,7 +2216,6 @@ const KUSCHELTIERE = [
         text: s => tf("+{0}% Energie pro Tag.", 3 * s) },
     { id: "flamingo", symbol: "🦩", name: t("Flamingo"), raritaet: 2,
         text: s => tf("+{0}% Gold aus Ernten am Abend und in der Nacht.", 5 * s) },
-    // Episch
     { id: "delfin", symbol: "🐬", name: t("Delfin"), raritaet: 3,
         text: s => (s === 1 ? t("+1 bewässertes Feld pro Tag.") : tf("+{0} bewässerte Felder pro Tag.", s)) },
     { id: "drache", symbol: "🐉", name: t("Drache"), raritaet: 3,
@@ -2472,7 +2228,6 @@ const KUSCHELTIERE = [
         text: s => tf("Jede neue Kombo startet bei {0} statt bei 0.", 10 * s) },
     { id: "oktopus", symbol: "🐙", name: t("Oktopus"), raritaet: 3,
         text: s => tf("Alle Spezialpflanzen kommen {0}% öfter.", 10 * s) },
-    // Legendaer
     { id: "einhorn", symbol: "🦄", name: t("Einhorn"), raritaet: 4,
         text: s => tf("+{0} Chance auf legendäre Saaten.", prozentText(0.003 * s)) },
     { id: "wal", symbol: "🐋", name: t("Wal"), raritaet: 4,
@@ -2483,7 +2238,6 @@ const KUSCHELTIERE = [
         text: s => tf("Alles beim Wanderhändler ist {0}% billiger.", 15 * s) },
     { id: "pfau", symbol: "🦚", name: t("Pfau"), raritaet: 4,
         text: s => tf("Legendäre Saaten sind {0}% mehr wert.", 20 * s) },
-    // Mythisch
     { id: "mondhase", symbol: "🌙", name: t("Mondhase"), raritaet: 5,
         text: s => tf("+{0}% Gold aus allen Ernten und +{1}% Mondblüten am Run-Ende.", 25 * s, 10 * s) },
     { id: "manta", symbol: "🐟", name: t("Mantarochen"), raritaet: 5,
@@ -2491,15 +2245,11 @@ const KUSCHELTIERE = [
 ];
 const KUSCHEL_NACH_ID = Object.fromEntries(KUSCHELTIERE.map(k => [k.id, k]));
 
-// ---------- STERNENFALL (zweite Prestige-Ebene) ----------
-// Setzt Mondblueten und die dauerhaften Mondteich-Upgrades zurueck.
-// Behaelt: Tarotkarten, Kuscheltiere, Gutscheine, Erfolge, Kosmetik, Sandbox.
-// Dafuer: Sternensplitter fuer den Sternenfall-Shop UND jeder Sternenfall verdreifacht alle zukuenftigen Mondblueten (x3, x9, x27 ...).
 
 const STERNENFALL_KONFIG = {
-    mindestMondblueten: 1500,     // so viele Mondblueten muessen seit dem letzten Sternenfall verdient worden sein
-    splitterTeiler: 40,           // Sternensplitter = Wurzel(verdiente Mondblueten / 40)
-    mondbluetenFaktor: 3          // jeder Sternenfall: alle zukuenftigen Mondblueten x3
+    mindestMondblueten: 1500,
+    splitterTeiler: 40,
+    mondbluetenFaktor: 3
 };
 
 function sternenfallFaktor() {
@@ -2536,23 +2286,12 @@ const STERNENFALL_UPGRADES = [
         beschreibung: t("Jede Meisterschafts-Stufe einer Pflanze gibt +2% mehr Wert (sonst +8%)."), info: lvl => tf("+{0}% pro Meisterschafts-Stufe", (8 + 2 * lvl)) }
 ];
 
-// ---------- SPIELMODI ----------
-// Sandbox: keine Rechnungen, keine Energie, unendliche Entwicklung, keine Erfolge.
-// Statt Rechnungen gibt es Meilensteine fuer verdientes Gold (je 1 Segen). Mit dem Sandbox-Prestige faengt man neu an
-// und bekommt Mondblueten fuer die Meilensteine, aber nur einen Teil davon (sonst waere die Sandbox besser als ein Run).
-// Kaufbar im Mondteich (spaeter mit dem Unterstuetzer-Paket frueher freigeschaltet).
 
 const SANDBOX_KONFIG = {
     preis: 500,
-    mondbluetenAnteil: 0.5    // Meilenstein n zaehlt wie bezahlte Rechnung n, davon gibt es die Haelfte
+    mondbluetenAnteil: 0.5
 };
 
-// ---------- PROFIL: EIGENE FIGUR (Charakter-Editor im Hauptmenue) ----------
-// Die Figur laeuft wie der Begleiter ueber den Hof (etwas groesser, etwas weiter hinten). Sie droppt nichts und hat
-// keine Spiel-Effekte, nur Aussehen. Gewoehnlich = frei, episch = Unterstuetzer-Paket, legendaer = einzeln (50 Kristalle).
-// fx (nur Aussehen): rgb (Farben laufen durch), geist (durchsichtig, schwebt), glow (leuchtet, fxFarbe),
-//     funkeln (kleine Sterne), flamme (flackert und gluet), schweben (wippt sanft auf und ab)
-// Farb-Buchstaben: Haut 4/s/r/m, Augen 5, Haare 2/h, Oberteil 6/8/k, Hose 3/9, Schuhe 1/l, Hut a/b/c
 
 const FIGUR_KATEGORIEN = [
     { id: "haut", name: t("Haut"), symbol: "✋" },
@@ -2567,11 +2306,8 @@ const FIGUR_KATEGORIEN = [
     { id: "gesicht", name: t("Gesicht"), symbol: "🙂" }
 ];
 
-// Eigene Farben fuer Kleidung und Augen (gilt nicht fuer legendaere Teile, die haben ihre eigenen Farben)
 const FIGUR_FARBBAR = ["oberteil", "hose", "schuhe", "kopf", "accessoire", "augen"];
-// Diese Kategorien haben zusaetzlich eine Zweitfarbe (z.B. die Streifen beim Ringelshirt, das Band am Hut)
 const FIGUR_ZWEITFARBE = ["oberteil", "hose", "schuhe", "kopf", "accessoire"];
-// Entfernte reine Farb-Varianten: wer sie trug, bekommt das Grundteil in dieser Farbe
 const FIGUR_UMZUG = {
     oberteil: { shirt_rot: ["shirt_weiss", "#d9483f"], shirt_gruen: ["shirt_weiss", "#5fb03c"], shirt_schwarz: ["shirt_weiss", "#2e2e36"],
         shirt_blau: ["shirt_weiss", "#3a6ad0"], shirt_gelb: ["shirt_weiss", "#f0d040"], shirt_rosa: ["shirt_weiss", "#ff9ac0"],
@@ -2587,7 +2323,6 @@ const FIGUR_UMZUG = {
 const FIGUR_PALETTE = ["#e8434a", "#f08a24", "#f5d547", "#8fcf5c", "#3f8a32", "#5aa9e6", "#2f6fb8", "#1b3f73",
     "#a877e0", "#6b3fa0", "#ff8fb1", "#8f6139", "#5c5c66", "#1c1b24", "#f4f4f4", "#d9b56a"];
 
-// Auren um Namen und Figur: alle 5 Level eine neue (Level 1 grau). Hohe Auren leuchten staerker oder wechseln die Farbe.
 const FIGUR_AUREN = [
     { level: 1, id: "grau", name: t("Grau"), farbe: "#9a9aa8" },
     { level: 5, id: "gruen", name: t("Wiesengrün"), farbe: "#7ed957" },
@@ -2693,7 +2428,6 @@ const FIGUR_TEILE = {
     oberteil: [
         { id: "latz", name: t("Latzhose"), quelle: "frei", form: "latz", farben: { 6: "#4a7ad0", 8: "#3a5ea8", k: "#f4ead4" } },
         { id: "shirt_weiss", name: t("T-Shirt"), quelle: "frei", farben: { 6: "#f4f4f4", 8: "#cfcfd8", k: "#cfcfd8" } },
-        // Mythisch: nur fuer Beta-Tester (wie der Begleiter "Beta Tester"), bleibt nach dem Release
         { id: "beta_shirt", name: "BETA Shirt", quelle: "beta", seltenheit: 5, form: "beta", farben: { 6: "#1a1a1e", 8: "#0a0a0c", k: "#ffffff" } },
         { id: "pulli", name: t("Pulli"), quelle: "frei", form: "pulli", farben: { 6: "#f0c83a", 8: "#c89a1a", k: "#c89a1a" } },
         { id: "karo", name: t("Karohemd"), quelle: "frei", form: "karo", farben: { 6: "#c8302a", 8: "#8a1a18", k: "#f4e4d0" } },
@@ -2743,7 +2477,6 @@ const FIGUR_TEILE = {
         { id: "wolken", name: t("Wolkenschuhe"), ...LEGENDAER, form: "wolke", anim: true, fx: "schweben", farben: { 1: "#ffffff", l: "#d8e4f4" } },
         { id: "raketen", name: t("Raketenschuhe"), ...LEGENDAER, form: "rakete", anim: true, fx: "glow", fxFarbe: "#ff8a2a", farben: { 1: "#d0d4dc", l: "#ff4a3a" } }
     ],
-    // Gesicht: Kleinigkeiten, mit denen man sich selbst beschreiben kann (G/H = eigene Farben)
     gesicht: [
         { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
         { id: "sommersprossen", name: t("Sommersprossen"), quelle: "frei", form: "sommersprossen", farben: { G: "#b0643a" } },
@@ -2784,7 +2517,6 @@ const FIGUR_TEILE = {
         { id: "regenwolke", name: t("Regenwolke"), ...LEGENDAER, form: "regenwolke", anim: true, fx: "schweben",
             farben: { a: "#f4f6fa", b: "#b8c4d8", c: "#5ab8f0" } }
     ],
-    // Farben: x Rahmen/Hauptfarbe, y Glas/Zweitfarbe, z Glanz/Akzent
     accessoire: [
         { id: "keins", name: t("Nichts"), quelle: "frei", form: "keins" },
         { id: "brille", name: t("Brille"), quelle: "frei", form: "brille", farben: { x: "#3a2a1a", y: "#cfe8ff", z: "#ffffff" } },
@@ -2817,7 +2549,6 @@ const FIGUR_TEILE = {
     ]
 };
 
-// Reihenfolge immer nach Seltenheit: gewoehnlich, dann episch, dann legendaer, dann mythisch (innerhalb gleich wie oben)
 Object.values(FIGUR_TEILE).forEach(liste => {
     const rang = e => (e.quelle === "beta" ? 3 : e.paket === "einzeln" ? 2 : e.quelle === "dlc" ? 1 : 0);
     liste.sort((a, b) => rang(a) - rang(b));
@@ -2826,7 +2557,6 @@ Object.values(FIGUR_TEILE).forEach(liste => {
 const FIGUR_STANDARD = { haut: "hell", augen: "braun", frisur: "kurz", haarfarbe: "braun", oberteil: "latz", hose: "jeans", schuhe: "braun", kopf: "strohhut",
     accessoire: "keins", gesicht: "keins" };
 
-// Emotes mit Rechtsklick auf die eigene Figur
 const FIGUR_EMOTES = [
     { id: "winken", symbol: "👋", name: t("Winken"), pose: "winken" },
     { id: "jubeln", symbol: "🎉", name: t("Jubeln"), pose: "jubeln" },

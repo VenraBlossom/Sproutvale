@@ -1,13 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Sprachen
-// Wird direkt nach speicher.js geladen, noch vor allen Spieldaten.
-// Jeder Text im Spiel laeuft durch t("deutscher Text"). Die Uebersetzungen stehen in sprache-xx.js (eine Datei pro Sprache).
-// Fehlt eine Uebersetzung, kommt der englische Text, sonst bleibt der deutsche stehen.
-// Beim allerersten Start wird die Sprache des Systems genommen (sonst Englisch), bestehende Spieler behalten ihre Sprache.
-// Umschalten in den Einstellungen (Reiter "Sprache"), danach laedt das Spiel neu.
-// ============================================================
 
 const SPRACHEN = [
     { id: "en", name: "English" },
@@ -25,18 +17,16 @@ const SPRACHEN = [
     { id: "zh", name: "简体中文" },
     { id: "ko", name: "한국어" }
 ];
-// Kommen spaeter: nur als Karte sichtbar, noch nicht waehlbar (gerade keine)
 const SPRACHEN_BALD = [];
 
 const SPRACHE = (() => {
     try {
         const gespeichert = JSON.parse(localStorage.getItem("sproutvale_einstellungen"));
         if (gespeichert && SPRACHEN.some(s => s.id === gespeichert.sprache)) return gespeichert.sprache;
-        if (gespeichert) return "de"; // Spielstand von vor den Sprachen: bleibt Deutsch
+        if (gespeichert) return "de";
     } catch (fehler) {
         console.warn("Sprache nicht lesbar", fehler);
     }
-    // Allererster Start: Sprache des Systems, wenn es sie gibt
     const system = (navigator.languages || [navigator.language || ""]).map(l => String(l).toLowerCase().slice(0, 2));
     return system.find(id => SPRACHEN.some(s => s.id === id)) || "en";
 })();
@@ -45,10 +35,8 @@ const SPRACH_LOCALE = { en: "en-US", de: "de-DE", es: "es-ES", fr: "fr-FR", it: 
     tr: "tr-TR", ru: "ru-RU", uk: "uk-UA", ja: "ja-JP", zh: "zh-CN", ko: "ko-KR" }[SPRACHE] || "en-US";
 document.documentElement.lang = SPRACHE;
 
-// wird von sprache-en.js gefuellt (bei anderen Sprachen danach von ihrer sprache-xx.js ueberschrieben)
 const UEBERSETZUNG = {};
 
-// Handy und Tablet (Finger statt Maus): Texte sagen "lange tippen" statt "Rechtsklick"
 const TOUCH_GERAET = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 document.documentElement.classList.toggle("touch", TOUCH_GERAET);
 const TOUCH_WOERTER = {
@@ -94,12 +82,10 @@ function t(text) {
     return touchText(uebersetzt !== undefined ? uebersetzt : text);
 }
 
-// Text mit Platzhaltern: tf("Tag {0} starten", 5) -> "Start day 5" (die Wortstellung darf sich je Sprache unterscheiden)
 function tf(text, ...werte) {
     return t(text).replace(/\{(\d+)\}/g, (_, i) => werte[Number(i)]);
 }
 
-// Feste Texte in index.html (Knoepfe, Ueberschriften, Tooltips, Platzhalter) einmal beim Start uebersetzen
 function uebersetzeDokument(wurzel) {
     if (SPRACHE === "de" && !TOUCH_GERAET) return;
     const laeufer = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT);

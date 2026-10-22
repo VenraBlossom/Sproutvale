@@ -1,5 +1,3 @@
-/* ---------- Schriften (lokal, aus assets/fonts) ---------- */
-/* Schriften lokal (OFL-Lizenz, von Google Fonts), damit das Spiel auch ohne Internet gleich aussieht */
 @font-face {
     font-family: "Jersey 15";
     font-style: normal;
@@ -32,7 +30,6 @@
     src: url("../assets/fonts/pixelify-latin-ext.woff2") format("woff2");
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-/* Ziffern aus Pixelify Sans: in Jersey 15 sehen 6 und 8 fast gleich aus. Die 5 bleibt aus Jersey (in Pixelify sieht sie wie ein S aus). */
 @font-face {
     font-family: "Sproutvale Ziffern";
     font-style: normal;
@@ -42,7 +39,6 @@
     unicode-range: U+0030-0034, U+0036-0039;
 }
 
-/* Fredoka: weiche, runde Schrift fuer Text und Zahlen (gemuetlich, aber nicht pixelig; 6 und 8 klar verschieden) */
 @font-face {
     font-family: "Fredoka";
     font-style: normal;
@@ -60,11 +56,6 @@
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* ============================================================
-   SPROUTVALE: Stil
-   Holz + Pergament wie im Logo, Pixel-Schrift, Pixel-Grafiken ohne Weichzeichnen.
-   Pixel-Groessen: Icons x2, grosse Icons x3, Muenzen x3, Hof x5 (siehe setzeSpriteBild in script.js)
-   ============================================================ */
 
 * {
     margin: 0;
@@ -76,7 +67,6 @@
     --kopf-hoehe: 33vh;
     --luecke: 8px;
     --rand: 12px;
-    /* Feldgroesse: passt 2x6 Felder + den 1,5 Felder breiten Weg in die Breite und 5 Reihen in die Hoehe */
     --zelle: min(
         calc((100vh - var(--kopf-hoehe) - 2 * var(--rand) - (var(--zeilen) - 1) * var(--luecke)) / var(--zeilen)),
         calc((100vw - 2 * var(--rand) - 2 * var(--halb) * var(--luecke)) / (2 * var(--halb) + var(--laden)))
@@ -95,13 +85,10 @@
     --gruen: #5f9e3c;
     --gruen-dunkel: #2f5a1a;
 
-    /* Schriften: Titel im Pixel-Stil, Text und Zahlen gut lesbar */
     --schrift-titel: "Fredoka", "Pixelify Sans", sans-serif;
     --schrift-text: "Fredoka", "Jersey 15", sans-serif;
 }
 
-/* Schriften fuer Sprachen mit anderen Zeichen: die Pixel-Schriften haben nur lateinische Buchstaben,
-   darum hier passende Systemschriften als Ersatz (Windows, macOS, Android) */
 html[lang="ru"], html[lang="uk"] {
     --schrift-titel: "Fredoka", "Pixelify Sans", "Segoe UI", "Roboto", "Noto Sans", sans-serif;
     --schrift-text: "Fredoka", "Jersey 15", "Segoe UI", "Roboto", "Noto Sans", sans-serif;
@@ -153,7 +140,6 @@ img.icon {
     display: none !important;
 }
 
-/* ---------- BAUSTEINE: Holz-Knopf, Pergament ---------- */
 
 .knopf {
     font-size: 1em;
@@ -213,7 +199,6 @@ img.icon {
     animation: puls 0.5s ease-in-out infinite;
 }
 
-/* Unauffaelliger Text-Knopf (z.B. Run beenden, Inventar schliessen) */
 .knopf-leise {
     border: none;
     background: none;
@@ -249,9 +234,6 @@ img.icon {
     justify-content: center;
 }
 
-/* ---------- KOPFBEREICH: Himmel, Sonne, Mond, Wolken, Hof ---------- */
-/* Ebenen von hinten nach vorne: Himmel 0, Sterne/Sonne/Mond 1, Wolken 2, Landschaft 3, Hof 4,
-   Nacht-Schleier 5, Fensterlicht 6, Holzleiste 7 */
 
 #top-bar {
     height: var(--kopf-hoehe);
@@ -349,7 +331,6 @@ img.icon {
     50% { filter: brightness(0.85); }
 }
 
-/* Nacht: verdunkelt Himmel, Hof und Acker (Multiplizieren), die Leisten und Fenster bleiben hell */
 #nacht-schleier {
     position: fixed;
     inset: 0;
@@ -360,7 +341,6 @@ img.icon {
     pointer-events: none;
 }
 
-/* Hof-Ebene: Haustier, Deko und Mondteich stehen auf der Hofwiese knapp ueber dem Zaun */
 #hof-ebene {
     z-index: 4;
 }
@@ -523,7 +503,6 @@ img.icon {
     padding: 4px 11px;
 }
 
-/* ---------- ACKER-RASTER auf der Wiese ---------- */
 
 #field-grid {
     height: calc(100% - var(--kopf-hoehe));
@@ -543,7 +522,6 @@ img.icon {
     position: relative;
 }
 
-/* Erdweg in der Mitte, auf dem der Samenladen steht */
 #weg {
     margin: calc(var(--rand) * -1 - var(--luecke)) 12% calc(var(--rand) * -1);
     background:
@@ -577,7 +555,6 @@ img.icon {
         0 0 0 3px var(--feld-rahmen, transparent);
 }
 
-/* Pflanzen in ganzen Vielfachen ihrer 16 Pixel, damit alle Felder gleich grosse Pixel zeigen */
 .feld-sprite {
     width: calc(var(--zelle) * 0.6);
     width: round(down, calc(var(--zelle) * 0.62), 16px);
@@ -628,7 +605,6 @@ img.icon {
     background: linear-gradient(#ffe98a, #f0b82e);
 }
 
-/* Ebenen ueber der Erde: feld-marker zeigt Wasser und Duenger, feld-variante die Spezialpflanze (ohne Symbole) */
 .feld-variante,
 .feld-marker {
     position: absolute;
@@ -649,7 +625,6 @@ img.icon {
     pointer-events: none;
 }
 
-/* Bewaessert: dunklere, nasse Erde mit glaenzenden Pfuetzen */
 .feld-bewaessert {
     background-image: var(--erde-nass);
 }
@@ -668,7 +643,6 @@ img.icon {
     50% { filter: brightness(1.35); }
 }
 
-/* Geduengt: dunkle Kruemel und kleine goldene Naehrstoff-Funken */
 .feld-geduengt .feld-marker::after {
     opacity: 1;
     background:
@@ -688,7 +662,6 @@ img.icon {
     50% { filter: brightness(1.4) saturate(1.3); }
 }
 
-/* Feld, das gerade vom Samenladen bepflanzt wird */
 .feld-ziel {
     outline: 3px dashed #ffe98a;
     outline-offset: -2px;
@@ -729,7 +702,6 @@ img.icon {
     75% { transform: rotate(4deg) scale(0.96); }
 }
 
-/* Spezialpflanzen: Farbfilter auf dem Sprite und eine eigene Animation im Feld (feld-variante, ohne Symbol) */
 .v-geist .feld-sprite { opacity: 0.6; filter: hue-rotate(180deg) brightness(1.3); }
 .v-blitz .feld-sprite { filter: drop-shadow(0 0 4px #ffe066) brightness(1.15); }
 .v-pilz .feld-sprite { filter: hue-rotate(250deg) saturate(0.8); }
@@ -745,7 +717,6 @@ img.icon {
     to { filter: hue-rotate(360deg) saturate(1.5); }
 }
 
-/* Naechstes kaufbares Feld: Holzschild auf der Wiese */
 .kauf-kachel {
     background: none;
     box-shadow: none;
@@ -782,7 +753,6 @@ img.icon {
     font-size: 0.9em;
 }
 
-/* ---------- MARKTSTAND (Samenladen auf dem Weg, 1,5 Felder gross) ---------- */
 
 #marktstand {
     position: relative;
@@ -879,7 +849,6 @@ img.icon {
     cursor: default;
 }
 
-/* ---------- KOMBO ---------- */
 
 #kombo-anzeige {
     position: absolute;
@@ -896,7 +865,7 @@ img.icon {
     border: 3px solid var(--holz-dunkel);
     border-radius: 6px;
     pointer-events: none;
-    font-variant-numeric: tabular-nums; /* Ziffern gleich breit: das Schild wackelt nicht, wenn die Zahl steigt */
+    font-variant-numeric: tabular-nums;
     transform-origin: 50% 100%;
 }
 
@@ -918,7 +887,6 @@ img.icon {
 #kombo-anzeige[data-stufe="3"] { color: #7c2fc2; font-size: 1.1em; }
 #kombo-anzeige[data-stufe="4"] { color: #d97a00; font-size: 1.2em; animation: kombo-puls 0.4s ease-in-out infinite; }
 #kombo-anzeige[data-stufe="5"] { color: #d9452c; font-size: 1.3em; animation: kombo-puls 0.3s ease-in-out infinite; }
-/* Puls, der die Mitte behaelt (sonst ueberschreibt scale das translateX und das Schild springt links/rechts) */
 @keyframes kombo-puls {
     0%, 100% { transform: translateX(-50%) scale(1); }
     50% { transform: translateX(-50%) scale(1.06); }
@@ -927,7 +895,6 @@ img.icon {
 #kombo-anzeige[data-stufe="4"] #kombo-fuellung { background-color: #d97a00; }
 #kombo-anzeige[data-stufe="5"] #kombo-fuellung { background-color: #d9452c; }
 
-/* ---------- TAGES-KARTE (oben verankert, einklappbar bis auf den Pfeil) ---------- */
 
 #karten-halter {
     position: fixed;
@@ -948,7 +915,6 @@ img.icon {
     display: none;
 }
 
-/* Der Pfeil sitzt immer an derselben Stelle (oben rechts), auch wenn die Karte eingeklappt ist */
 #karte-pfeil {
     position: absolute;
     top: 14px;
@@ -1087,7 +1053,6 @@ img.icon {
     text-decoration: underline;
 }
 
-/* ---------- SEITEN-PANELS (Shop, Erfolge, Statistik) ---------- */
 
 .panel {
     position: fixed;
@@ -1207,7 +1172,6 @@ img.icon {
     padding: 4px 12px;
 }
 
-/* ---------- GACHA ---------- */
 
 .gacha-ergebnis {
     background-color: #fbf1d6;
@@ -1231,7 +1195,6 @@ img.icon {
     line-height: 1.6;
 }
 
-/* ---------- ERFOLGE + STATISTIK ---------- */
 
 .erfolg {
     background-color: #fbf1d6;
@@ -1318,7 +1281,6 @@ img.icon {
     margin: 6px 0;
 }
 
-/* ---------- SEGEN (Pflicht-Auswahl) ---------- */
 
 #segen-fenster {
     z-index: 30;
@@ -1345,7 +1307,6 @@ img.icon {
     justify-content: center;
 }
 
-/* Alle Segen-Karten gleich gross */
 .segen-karte {
     width: 220px;
     height: 250px;
@@ -1389,7 +1350,6 @@ img.icon {
     color: var(--text-leise);
 }
 
-/* ---------- EINSTELLUNGEN ---------- */
 
 #einstellungen-fenster {
     z-index: 50;
@@ -1455,7 +1415,6 @@ img.icon {
     gap: 10px;
 }
 
-/* ---------- HAUPTMENUE ---------- */
 
 #hauptmenue {
     position: fixed;
@@ -1500,7 +1459,6 @@ img.icon {
     padding: 10px 20px;
 }
 
-/* ---------- STERNENBILDER: STERNENHIMMEL ---------- */
 
 #skilltree-fenster {
     position: fixed;
@@ -1551,7 +1509,6 @@ img.icon {
     min-height: 0;
 }
 
-/* Der Baum liegt in einer verschiebbaren "Welt" (Pixel-Koordinaten, 0/0 = Weizen in der Mitte) */
 #sternbild-himmel {
     flex: 1;
     position: relative;
@@ -1634,13 +1591,11 @@ img.icon {
     user-select: none;
 }
 
-/* Die Mitte des Baums (Weizen) ist groesser */
 .stern.wurzel {
     width: 88px;
     height: 88px;
 }
 
-/* Ein Schritt hinter dem Erreichbaren: nur ein Schatten */
 .stern.schatten {
     width: 44px;
     height: 44px;
@@ -1666,7 +1621,6 @@ img.icon {
     box-sizing: content-box;
 }
 
-/* Farbe der Aeste */
 .stern.gekauft.ast-pflanzen { border-color: #a3dc6f; }
 .stern.gekauft.ast-hof { border-color: #f0b86a; }
 .stern.gekauft.ast-helfer { border-color: #8fd8ff; }
@@ -1767,7 +1721,6 @@ img.icon {
     justify-content: center;
 }
 
-/* ---------- MONDTEICH ---------- */
 
 #prestige-shop {
     position: fixed;
@@ -1843,7 +1796,6 @@ img.icon {
     background-color: var(--pergament-dunkel);
 }
 
-/* ---------- FX-EBENE: KUGELN, LOOT, PARTIKEL, TEXTE ---------- */
 
 #fx-layer {
     position: fixed;
@@ -1878,7 +1830,6 @@ img.icon {
     box-shadow: 0 0 0 2px #4a2f15, 0 0 10px rgba(255, 224, 102, 0.9);
 }
 
-/* Muenzen: 12 Pixel x3 = 36px, Jackpot x4 = 48px */
 .loot-kugel {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -1943,9 +1894,7 @@ img.icon {
     border-radius: 50%;
 }
 
-/* ---------- STERNSCHNUPPE ---------- */
 
-/* Kopf vorne, Schweif dahinter. Das Element dreht sich um den Kopf in Flugrichtung (--winkel). */
 .sternschnuppe {
     position: absolute;
     width: 190px;
@@ -1999,7 +1948,6 @@ img.icon {
     to { transform: rotate(360deg); }
 }
 
-/* ---------- GLUEHWUERMCHEN ---------- */
 
 .gluehwuermchen {
     position: absolute;
@@ -2032,7 +1980,6 @@ img.icon {
     100% { opacity: 0; }
 }
 
-/* ---------- TOASTS (kurze Meldungen) ---------- */
 
 #toasts {
     position: fixed;
@@ -2067,7 +2014,6 @@ img.icon {
     to { opacity: 0; transform: translateY(-10px); }
 }
 
-/* ---------- GLUECKSSPIELE (Shop-Reiter "Glücksspiel") ---------- */
 
 .spiel-karte {
     position: relative;
@@ -2172,7 +2118,6 @@ img.icon {
     border-bottom: none;
 }
 
-/* Ziellinie */
 .renn-spur::after {
     content: "";
     position: absolute;
@@ -2194,7 +2139,6 @@ img.icon {
     padding: 3px 6px;
 }
 
-/* ---------- MONDTEICH: KUSCHELTIERE ---------- */
 
 #prestige-inhalt[data-ansicht="kuschel"],
 #prestige-inhalt[data-ansicht="tarot"] {
@@ -2251,7 +2195,6 @@ img.icon {
     50% { box-shadow: 0 0 26px rgba(255, 154, 213, 1), 0 0 8px #ffffff; }
 }
 
-/* Alle Kuscheltier-Karten gleich gross */
 .kuschel-karte {
     height: 270px;
     display: flex;
@@ -2301,12 +2244,7 @@ img.icon {
     color: var(--text-leise);
 }
 
-/* ============================================================
-   NEUE OBERFLAECHEN: Popups, Banner, Tooltips, Haus, Kodex, Wetter, Kraehen, Haendler, Werkzeuge,
-   Plinko, Kuschel-Kapsel, Tarot-Details, Sternenfall
-   ============================================================ */
 
-/* ---------- PIXEL-ICONS (Emojis als 16x16-Pixelbild) ---------- */
 
 .pixel-icon {
     image-rendering: pixelated;
@@ -2315,7 +2253,6 @@ img.icon {
     display: inline-block;
 }
 
-/* ---------- POPUPS ---------- */
 
 .popup-huelle {
     position: fixed;
@@ -2413,7 +2350,6 @@ img.icon {
     background-color: var(--pergament-dunkel);
 }
 
-/* ---------- BANNER (kurze Einblendung oben) ---------- */
 
 #banner-box {
     position: fixed;
@@ -2472,7 +2408,6 @@ img.icon {
     to { transform: translateY(-20px); opacity: 0; }
 }
 
-/* ---------- TOOLTIPS ---------- */
 
 #tooltip {
     position: fixed;
@@ -2504,7 +2439,6 @@ img.icon {
     opacity: 0;
 }
 
-/* ---------- KOPFLEISTE: Wetter, Boss ---------- */
 
 #rechnung-display.boss {
     background-color: rgba(143, 42, 26, 0.75);
@@ -2541,7 +2475,6 @@ img.icon {
     padding: 7px 10px;
 }
 
-/* ---------- HOF: Haus-Klickflaeche, Haustier-Menue, Emotes ---------- */
 
 #haus-klickflaeche,
 #scheune-klickflaeche {
@@ -2552,7 +2485,6 @@ img.icon {
 #scheune-klickflaeche.drueber {
     cursor: pointer;
 }
-/* Aura: Pixel-Rand genau um das Gebaeude, beim Drueberfahren heller */
 .gebaeude-aura {
     position: absolute;
     image-rendering: pixelated;
@@ -2643,7 +2575,6 @@ img.icon {
     transform: translate(-50%, -50%);
 }
 
-/* ---------- HAUS (Kosmetik) ---------- */
 
 .haus-reiter {
     display: flex;
@@ -2754,7 +2685,6 @@ img.icon {
     margin-bottom: 0;
 }
 
-/* Kuschel-Rahmen (Kosmetik) */
 .rahmen-holz {
     border-style: double !important;
     border-width: 6px !important;
@@ -2773,13 +2703,11 @@ img.icon {
         linear-gradient(135deg, #ff5a5a, #ffa84a, #ffe066, #7ad06a, #5aa9e6, #8a6ad6) border-box !important;
 }
 
-/* ---------- WERKZEUG-LEISTE ---------- */
 
 #werkzeug-bereich {
     position: relative;
 }
 
-/* Die Werkzeug-Plaetze klappen unter dem Knopf auf */
 #werkzeug-leiste {
     position: absolute;
     top: calc(100% + 8px);
@@ -2813,7 +2741,6 @@ img.icon {
     cursor: default;
 }
 
-/* ---------- WANDERHAENDLER ---------- */
 
 .haendler-gruss {
     display: flex;
@@ -2862,7 +2789,6 @@ img.icon {
     flex: 1;
 }
 
-/* ---------- KODEX ---------- */
 
 .kodex-raster {
     display: grid;
@@ -2916,7 +2842,6 @@ img.icon {
     color: var(--gruen-dunkel);
 }
 
-/* ---------- WETTER ---------- */
 
 #wetter-ebene {
     position: absolute;
@@ -2983,7 +2908,6 @@ body.wetter-hitze #wetter-schleier {
     animation: funkeln 3s ease-in-out infinite;
 }
 
-/* ---------- KRAEHEN UND GOLDREGEN ---------- */
 
 .kraehe {
     position: absolute;
@@ -3013,7 +2937,6 @@ body.wetter-hitze #wetter-schleier {
     filter: drop-shadow(0 0 6px #ffd93d);
 }
 
-/* ---------- SAMEN-PLINKO ---------- */
 
 .plinko-brett {
     position: relative;
@@ -3072,7 +2995,6 @@ body.wetter-hitze #wetter-schleier {
     z-index: 1;
 }
 
-/* ---------- MONDTEICH: Guthaben, Tarot, Kapsel, Sternenfall ---------- */
 
 #prestige-guthaben {
     gap: 18px;
@@ -3155,7 +3077,6 @@ body.wetter-hitze #wetter-schleier {
     font-size: 1.05em;
 }
 
-/* Text wird nach 4 Zeilen abgeschnitten, der volle Text steht im Detail-Fenster */
 .tarot-effekt {
     font-size: 0.88em;
     line-height: 1.25;
@@ -3379,7 +3300,6 @@ body.wetter-hitze #wetter-schleier {
     margin-bottom: 8px;
 }
 
-/* ---------- EINSTELLUNGEN: Reiter, Schalter, Tasten ---------- */
 
 .einstellungen-rahmen {
     width: 560px;
@@ -3439,9 +3359,7 @@ kbd {
 }
 
 
-/* ---------- STERNENBAUM: Sandbox, Hauptmenue ---------- */
 
-/* In der Sandbox automatisch volle Energie-Sterne */
 .stern.sandbox-aus {
     opacity: 0.55;
     filter: grayscale(0.7);
@@ -3460,11 +3378,7 @@ kbd {
     padding: 4px 12px;
 }
 
-/* ============================================================
-   SKINS: Deko-Plaetze, Samenladen-Looks, Felder, Muenzen, Rahmen, Haustier-Effekte, Anprobieren im Haus
-   ============================================================ */
 
-/* Deko steht im Hintergrund der Hofwiese, hinter Teich und Haustier */
 .deko {
     bottom: 27%;
     z-index: 0;
@@ -3509,9 +3423,7 @@ kbd {
     50% { transform: translateX(-50%) rotate(1.5deg); }
 }
 
-/* ---------- SAMENLADEN-LOOKS ---------- */
 
-/* Goldstand: ein Glanz laeuft ueber den Laden */
 .laden-gold #plant-button::after {
     content: "";
     position: absolute;
@@ -3536,7 +3448,6 @@ kbd {
     box-shadow: inset 0 0 0 3px #ffc2da, 0 6px 0 #6a3a3a, 0 10px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* Feuerwerksladen: Sterne funkeln auf der Markise, tagsueber steigen Raketen auf (haus.js) */
 .laden-feuerwerk #plant-button {
     box-shadow: inset 0 0 0 3px #ffd93d, 0 6px 0 #140a24, 0 0 20px rgba(255, 217, 61, 0.45);
 }
@@ -3553,7 +3464,6 @@ kbd {
     animation: funkeln 1.4s ease-in-out infinite;
 }
 
-/* Zirkuszelt: Fahne auf dem Dach */
 #marktstand.laden-zirkus::before {
     content: "";
     position: absolute;
@@ -3584,7 +3494,6 @@ kbd {
     to { transform: skewY(8deg) scaleX(1); }
 }
 
-/* Lebkuchenhaus: Zuckerguss am Rand */
 .laden-lebkuchen #plant-button {
     outline: 3px dashed #fff6f0;
     outline-offset: -9px;
@@ -3600,7 +3509,6 @@ kbd {
     border-radius: 2px;
 }
 
-/* ---------- FELDER ---------- */
 
 body.felder-kristall .feld:not(.kauf-kachel)::after {
     content: "";
@@ -3631,7 +3539,6 @@ body.felder-blumen .feld:not(.kauf-kachel)::after {
     pointer-events: none;
 }
 
-/* ---------- MUENZEN ---------- */
 
 body.muenzen-regenbogen .loot-kugel.raritaet-0 {
     animation: regenbogen 1.6s linear infinite;
@@ -3645,7 +3552,6 @@ body.muenzen-mond .loot-kugel.raritaet-0 {
     filter: drop-shadow(0 0 6px #8fa2f0) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3));
 }
 
-/* ---------- KUSCHEL-RAHMEN ---------- */
 
 .rahmen-sterne {
     border-color: #8fa2f0 !important;
@@ -3662,7 +3568,6 @@ body.muenzen-mond .loot-kugel.raritaet-0 {
     background-color: #fff6fa !important;
 }
 
-/* ---------- HAUSTIER-EFFEKTE ---------- */
 
 .effekt-blase {
     position: absolute;
@@ -3684,7 +3589,6 @@ body.muenzen-mond .loot-kugel.raritaet-0 {
     100% { transform: translate(-50%, -50px) scale(1.1); opacity: 0; }
 }
 
-/* ---------- HAUS: ANPROBIEREN ---------- */
 
 .haus-kachel.vorschau {
     border-color: #a877e0;
@@ -3737,7 +3641,6 @@ body.muenzen-mond .loot-kugel.raritaet-0 {
     box-shadow: 0 0 12px rgba(168, 119, 224, 0.8);
 }
 
-/* "Ansehen" beim Anprobieren: das Haus-Fenster verschwindet kurz */
 .popup-huelle.kurz-weg {
     opacity: 0;
     pointer-events: none;
@@ -3760,7 +3663,6 @@ body.vorschau-ansicht #plant-button {
     filter: none !important;
 }
 
-/* ---------- JAHRESZEITEN ---------- */
 
 .uhr-scheibe {
     position: relative;
@@ -3796,13 +3698,11 @@ body.vorschau-ansicht #plant-button {
     padding: 7px 10px;
 }
 
-/* Unreife Pflanze (Wachstumsstufe 2) ist etwas kleiner */
 .feld-sprite.unreif {
     scale: 0.82;
     translate: 0 6%;
 }
 
-/* Rauch aus dem Schornstein des Bauernhauses */
 .rauch {
     position: absolute;
     width: calc(var(--hof-px) * 2);
@@ -3820,11 +3720,7 @@ body.vorschau-ansicht #plant-button {
     100% { transform: translate(var(--drift, 30px), calc(var(--hof-px) * -14)) scale(1.8); opacity: 0; }
 }
 
-/* ============================================================
-   SKIN-SELTENHEITEN UND NEUE EFFEKTE
-   ============================================================ */
 
-/* Seltenheit im Haus: farbiger Rand und kleines Schild */
 .haus-kachel {
     border-color: var(--seltenheit, var(--pergament-rand));
     position: relative;
@@ -3856,7 +3752,6 @@ body.vorschau-ansicht #plant-button {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
 }
 
-/* ---------- Geworfene Kugeln je Samenladen ---------- */
 
 .wurf-kugel.wurf-rakete {
     width: 6px;
@@ -3887,7 +3782,6 @@ body.vorschau-ansicht #plant-button {
     box-shadow: 0 0 0 2px #8a4a22;
 }
 
-/* ---------- Samenladen: Sternenstand ---------- */
 
 .laden-sterne #plant-button {
     box-shadow: inset 0 0 0 3px #ffe89a, 0 6px 0 #140a24, 0 0 22px rgba(143, 162, 240, 0.6);
@@ -3904,7 +3798,6 @@ body.vorschau-ansicht #plant-button {
     animation: funkeln 2s ease-in-out infinite;
 }
 
-/* ---------- Felder ---------- */
 
 body.felder-lava .feld:not(.kauf-kachel) {
     animation: lava-gluehen 2.4s ease-in-out infinite;
@@ -3933,7 +3826,6 @@ body.felder-sterne .feld:not(.kauf-kachel)::after {
     pointer-events: none;
 }
 
-/* ---------- Muenzen ---------- */
 
 body.muenzen-feuer .loot-kugel.raritaet-0 {
     animation: feuer-muenze 0.5s steps(2) infinite;
@@ -3952,7 +3844,6 @@ body.muenzen-feuer .loot-kugel.raritaet-0.loot-gelandet {
     animation: feuer-muenze 0.5s steps(2) infinite;
 }
 
-/* ---------- Kuschel-Rahmen ---------- */
 
 .rahmen-eis {
     border-style: double !important;
@@ -3975,7 +3866,6 @@ body.muenzen-feuer .loot-kugel.raritaet-0.loot-gelandet {
     animation: regenbogen 3s linear infinite !important;
 }
 
-/* ---------- Pflanzen-Looks ---------- */
 
 body.pflanzen-sterne .feld-sprite:not([hidden]) {
     filter: drop-shadow(0 0 4px #9fb0ff) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3));
@@ -3993,7 +3883,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     filter: drop-shadow(0 0 5px #9fe8ff) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.08);
 }
 
-/* ---------- Haustier: Geisterkatze ---------- */
 
 .haustier.haustier-geist img {
     opacity: 0.72;
@@ -4004,7 +3893,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { translate: 0 -6px; }
 }
 
-/* ---------- Deko und Landschaft: Teilchen ---------- */
 
 .deko-leuchten-blau {
     animation: deko-leuchten-blau 2.2s ease-in-out infinite;
@@ -4046,7 +3934,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { opacity: 0; transform: translate(12px, -26px); }
 }
 
-/* ---------- MONDPHASEN (Mondteich > Spielmodi) ---------- */
 
 .mondphasen-kasten {
     grid-column: 1 / -1;
@@ -4130,7 +4017,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     color: #b07a00;
 }
 
-/* ---------- SEGEN: kurze Sperre nach dem Oeffnen (kein Versehens-Klick) ---------- */
 
 #segen-karten.gesperrt {
     position: relative;
@@ -4160,7 +4046,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { background-position: 0 0; }
 }
 
-/* ---------- SANDBOX: Neuanfang statt Energie ---------- */
 
 #energie-box.sandbox-box > .icon,
 #energie-box.sandbox-box > #energie-balken,
@@ -4203,7 +4088,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     opacity: 0.8;
 }
 
-/* ---------- HAUPTMENUE: Wolken, Teilchen, Modus-Auswahl ---------- */
 
 #hauptmenue {
     overflow: hidden;
@@ -4455,7 +4339,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     filter: brightness(1.15);
 }
 
-/* ---------- WERKZEUG-STUFE und reichere Tooltips ---------- */
 
 .werkzeug-platz {
     position: relative;
@@ -4498,7 +4381,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     margin: 1px -5px;
 }
 
-/* ---------- TUTORIAL (Sprechblase fuer den ersten Run) ---------- */
 
 .tutorial-blase {
     position: fixed;
@@ -4554,7 +4436,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     box-shadow: inset 0 2px 0 #c8baa8, inset 0 -3px 0 #5a4c3c, 0 3px 0 #2e1a09;
 }
 
-/* Das Element, auf das das Tutorial zeigt, pulsiert leicht */
 .tutorial-ziel {
     animation: tutorial-puls 1.2s ease-in-out infinite !important;
 }
@@ -4564,7 +4445,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { box-shadow: 0 0 0 6px rgba(255, 233, 138, 0.5), 0 0 26px rgba(255, 217, 61, 0.9); }
 }
 
-/* Sternschnuppe: liegende Muenzen werden verdoppelt */
 .loot-kugel.loot-verdoppelt {
     animation: loot-verdoppelt 0.7s ease-out;
 }
@@ -4583,9 +4463,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     color: #7c4fb3;
 }
 
-/* ============================================================
-   LEGENDAERE SAMENLAEDEN: Feuerwerksstand, Zirkuszelt, Sternwarte (Aufbau in haus.js, baueLaden)
-   ============================================================ */
 
 #plant-button-bild {
     image-rendering: pixelated;
@@ -4618,10 +4495,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     bottom: calc(160% + 10px);
 }
 
-/* ============================================================
-   LEGENDAERE GEBAEUDE: statt eines Samenladens steht dort etwas ganz anderes
-   (Teile in haus.js, LADEN_BAUTEILE). Der Knopf selbst ist durchsichtig, das Gebaeude liegt dahinter.
-   ============================================================ */
 
 #marktstand[data-bauweise] #plant-button {
     z-index: 1;
@@ -4647,7 +4520,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     z-index: 1;
 }
 
-/* ---------- Raketen-Startrampe ---------- */
 
 [data-bauweise="feuerwerk"] .bau-turm {
     left: 0;
@@ -4661,7 +4533,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border-right: 5px solid #8a2a20;
 }
 
-/* Warnlicht oben am Turm */
 [data-bauweise="feuerwerk"] .bau-turm::before {
     content: "";
     position: absolute;
@@ -4691,7 +4562,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     box-shadow: 0 4px 0 #0e0e14;
 }
 
-/* Rauchwolken an der Rampe */
 [data-bauweise="feuerwerk"] .bau-rauch {
     left: 50%;
     bottom: 12%;
@@ -4720,7 +4590,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { transform: translate(var(--weg), -14px) scale(1.7); opacity: 0; }
 }
 
-/* Flamme unter der Rakete, beim Klick kurz gross */
 [data-bauweise="feuerwerk"] .bau-flamme {
     left: 50%;
     bottom: 20%;
@@ -4768,7 +4637,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     box-shadow: 9px -4px 0 #5aa9e6, 18px 2px 0 #ffd93d, 27px -2px 0 #a3dc6f;
 }
 
-/* Die grosse Rakete steht senkrecht auf der Rampe */
 #marktstand[data-bauweise="feuerwerk"] #plant-button-bild {
     height: calc(var(--zelle) * 0.78);
     rotate: -45deg;
@@ -4804,7 +4672,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     letter-spacing: 1px;
 }
 
-/* Der Fortschrittsbalken ist eine brennende Zuendschnur */
 #marktstand[data-bauweise="feuerwerk"] #plant-button-fortschritt {
     z-index: 1;
     height: 5px;
@@ -4830,9 +4697,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { transform: scale(1.4); }
 }
 
-/* ---------- Zirkusmanege ---------- */
 
-/* Ein Scheinwerfer schwenkt ueber die Manege */
 [data-bauweise="zirkus"] .bau-spot {
     left: 50%;
     top: -60%;
@@ -4878,7 +4743,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 70% 55%);
 }
 
-/* Runder Manegen-Boden mit rotem Rand */
 [data-bauweise="zirkus"] .bau-manege {
     left: 6%;
     right: 6%;
@@ -4916,7 +4780,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { transform: rotate(8deg); }
 }
 
-/* Der Ball auf der Nase der Robbe */
 [data-bauweise="zirkus"] .bau-seeball {
     left: 50%;
     top: 12%;
@@ -4982,7 +4845,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border-radius: 3px;
 }
 
-/* ---------- Sternwarte ---------- */
 
 [data-bauweise="sternwarte"] .bau-turmhaus {
     left: 10%;
@@ -4997,7 +4859,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border-radius: 6px 6px 0 0;
 }
 
-/* Tuer unten am Turm */
 [data-bauweise="sternwarte"] .bau-turmhaus::after {
     content: "";
     position: absolute;
@@ -5081,7 +4942,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { transform: translate(-70px, 0) scale(0.8); }
 }
 
-/* Rundes Fenster: darin der Planet, den das Teleskop gerade sieht */
 #marktstand[data-bauweise="sternwarte"] #plant-button-bild {
     height: calc(var(--zelle) * 0.5);
     padding: 6px;
@@ -5108,7 +4968,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border-radius: 3px;
 }
 
-/* ---------- Geworfene Raketen, Effekte ---------- */
 
 .wurf-kugel.wurf-samen.wurf-rakete {
     width: 8px;
@@ -5127,7 +4986,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     pointer-events: none;
 }
 
-/* Vorschau im Haus */
 .laden-vorschau {
     position: relative;
     display: flex;
@@ -5159,7 +5017,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { box-shadow: 0 0 14px var(--leuchten); }
 }
 
-/* ---------- Legendaere Haustiere: Aura und Schweben ---------- */
 
 .haustier.haustier-aura img {
     animation: aura 2.4s ease-in-out infinite;
@@ -5175,7 +5032,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { filter: drop-shadow(0 0 10px var(--aura, #ffe89a)) brightness(1.08); }
 }
 
-/* ---------- Zauberwald: Irrlichter ---------- */
 
 .irrlicht {
     position: absolute;
@@ -5197,9 +5053,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { opacity: 0; transform: translate(var(--weg-x), 0); }
 }
 
-/* ---------- Runde 1: Kaufkachel, Segen gross, Run beenden, Gluehwuermchen, Ball ---------- */
 
-/* Das naechste Feld leuchtet, sobald man es sich leisten kann */
 .kauf-kachel.leistbar {
     border-color: #ffe98a;
     animation: kauf-leuchten 1.3s ease-in-out infinite;
@@ -5215,7 +5069,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { box-shadow: 0 0 0 5px rgba(255, 233, 138, 0.8), 0 0 26px rgba(255, 217, 61, 0.85); }
 }
 
-/* Segen-Fenster: groesser und besser lesbar */
 .segen-rahmen {
     padding: 28px 34px;
 }
@@ -5246,7 +5099,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     font-size: 1em;
 }
 
-/* Run beenden: links unten, rot als Warnung (weit weg vom Knopf "Tag starten") */
 #karte-fuss {
     text-align: left;
     margin-top: 16px;
@@ -5273,7 +5125,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     color: #7c4fb3;
 }
 
-/* Gluehwuermchen: groesser und heller, damit man sie gut sieht */
 .gluehwuermchen {
     width: 44px;
     height: 44px;
@@ -5293,7 +5144,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     transition: none;
 }
 
-/* ---------- TAGESKARTE ALS BESTELLZETTEL (faehrt aus dem Kopfbereich herunter und wieder hoch) ---------- */
 
 #karten-halter {
     top: calc(var(--kopf-hoehe) - 4px);
@@ -5330,7 +5180,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     padding-right: 0;
 }
 
-/* Die Lasche unten am Zettel: ziehen oder hochschieben */
 #karte-pfeil {
     position: static;
     width: auto;
@@ -5358,7 +5207,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { transform: translateY(4px); }
 }
 
-/* Ueberspringen bei Gluecksspielen und im Kuschel-Automaten */
 .knopf.spiel-skip {
     margin-top: 8px;
     font-size: 0.9em;
@@ -5367,15 +5215,12 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     box-shadow: inset 0 2px 0 #c8baa8, inset 0 -3px 0 #5a4c3c, 0 3px 0 #2e1a09;
 }
 
-/* ---------- STELLARIUM: fluessiger und aufgeraeumter ---------- */
 
-/* Eigene Ebenen fuer den Grafikchip: Verschieben zeichnet nichts neu */
 #baum-welt,
 #himmel-punkte {
     will-change: transform;
 }
 
-/* Namen nur bei Pflanzen, der Mitte, beim Drueberfahren und beim ausgewaehlten Stern (weniger Text auf der Karte) */
 .stern .stern-name {
     opacity: 0;
     transition: opacity 0.15s;
@@ -5397,7 +5242,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     border-radius: 4px;
 }
 
-/* Kaufbar: ein leuchtender Ring, der nur seine Deckkraft aendert (guenstig zu zeichnen) */
 .stern.leistbar {
     animation: none;
 }
@@ -5440,7 +5284,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     opacity: 0.75;
 }
 
-/* Detail-Karte rechts */
 #sternbild-details {
     width: 320px;
     background: linear-gradient(rgba(20, 26, 66, 0.6), rgba(10, 14, 40, 0.8));
@@ -5520,7 +5363,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     padding: 8px 14px;
 }
 
-/* ---------- Ebenen: Fenster liegen ueber fliegenden Baellen, Muenzen und Teilchen (#fx-layer = 20) ---------- */
 #skilltree-fenster,
 #prestige-shop {
     z-index: 22;
@@ -5530,7 +5372,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     z-index: 21;
 }
 
-/* Fortschrittsbalken bleibt bei Manege und Sternwarte innerhalb des Gebaeudes */
 #marktstand[data-bauweise="zirkus"] #plant-button-fortschritt,
 #marktstand[data-bauweise="sternwarte"] #plant-button-fortschritt {
     z-index: 1;
@@ -5546,7 +5387,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     overflow-wrap: anywhere;
 }
 
-/* Spielstand loeschen: kleines rotes Schild unter der Modus-Karte */
 .knopf.modus-reset {
     width: 240px;
     margin-top: 6px;
@@ -5563,7 +5403,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     visibility: hidden;
 }
 
-/* Einstellungen > Spielstand: klar abgesetzte Gefahrenzone */
 .gefahren-zone {
     display: flex;
     flex-direction: column;
@@ -5596,7 +5435,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     margin-top: 4px;
 }
 
-/* ---------- Wichtiges groesser: Waehrungen, Belohnungen, Meldungen ---------- */
 
 #top-leiste {
     height: 62px;
@@ -5646,7 +5484,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     font-size: 1.9em;
 }
 
-/* Tageskarte nach Feierabend: die Zahlen des Tages gross */
 .karte-statistik b {
     font-size: 1.7em;
 }
@@ -5660,7 +5497,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     font-size: 1.8em;
 }
 
-/* Stellarium und Mondteich: wie viel man hat */
 #sternbild-sp {
     font-size: 1.6em;
 }
@@ -5674,13 +5510,11 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     font-size: 1.5em;
 }
 
-/* Waehrend der Segen-Auswahl erscheinen Meldungen unten, damit sie die Ueberschrift nicht verdecken */
 #segen-fenster:not(.versteckt) ~ #banner-box {
     top: auto;
     bottom: 24px;
 }
 
-/* ---------- JAHRESZEITEN-TEILCHEN (ganzer Bildschirm, ueber Hof und Acker, unter Fenstern) ---------- */
 
 #jahreszeit-ebene {
     position: fixed;
@@ -5690,7 +5524,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     overflow: hidden;
 }
 
-/* Aussen: faellt von oben nach unten */
 .jz-teilchen {
     position: absolute;
     top: -40px;
@@ -5707,7 +5540,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
 
 
 
-/* Innen: wiegt hin und her und dreht sich */
 .jz-wiegen {
     animation: jz-wiegen ease-in-out infinite alternate;
 }
@@ -5721,7 +5553,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     --groesse: 1;
 }
 
-/* Kirschbluetenblatt: rund mit einer Spitze */
 .jz-bluete {
     width: calc(17px * var(--groesse));
     height: calc(12px * var(--groesse));
@@ -5730,7 +5561,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     animation: jz-flattern 1.1s ease-in-out infinite alternate;
 }
 
-/* Laubblatt: spitz mit Mittelrippe */
 .jz-blatt {
     width: calc(22px * var(--groesse));
     height: calc(15px * var(--groesse));
@@ -5740,7 +5570,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     animation: jz-flattern 0.8s ease-in-out infinite alternate;
 }
 
-/* Schneeflocke: weicher runder Punkt */
 .jz-schnee {
     width: calc(9px * var(--groesse));
     height: calc(9px * var(--groesse));
@@ -5748,7 +5577,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     box-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
 }
 
-/* Blaetter und Blueten drehen sich beim Fallen um die eigene Achse */
 @keyframes jz-flattern {
     from { transform: rotateY(0deg) rotateX(20deg); }
     to { transform: rotateY(160deg) rotateX(-20deg); }
@@ -5759,7 +5587,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
 }
 
-/* Schmetterling im Sommer */
 .jz-schmetterling {
     position: absolute;
     left: -60px;
@@ -5801,7 +5628,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { transform: scaleY(0.45); }
 }
 
-/* Werkzeug-Plaetze in der Kopfleiste */
 #werkzeug-leiste .werkzeug-platz {
     width: 42px;
     height: 42px;
@@ -5816,18 +5642,14 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     bottom: -5px;
 }
 
-/* Haendler: nach dem einen Kauf sind die anderen Angebote weg */
 .haendler-karte.weg {
     opacity: 0.45;
     filter: grayscale(0.8);
 }
 
-/* ---------- NEUE DEKO: Windmuehle (legendaer), Bienen, Schneemann, Wetterhahn ---------- */
 
-/* Die Fluegel sitzen mit ihrer Nabe vorn am Dach des Turms und drehen sich */
 .deko.muehlen-fluegel {
     bottom: calc(27% + var(--hof-px) * 2);
-    /* ohne translateX: sonst dreht sich das Bild nicht um die Nabe, sondern schlingert */
     transform: none;
     margin-left: calc(var(--hof-px) * -8.5);
     transform-origin: 50% 50%;
@@ -5874,7 +5696,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { transform: translate(calc(var(--bx) * 0.2), 0); opacity: 0; }
 }
 
-/* Schneemann wackelt ganz leicht */
 .deko-wackeln {
     transform-origin: 50% 100%;
     animation: deko-wackeln 3.6s ease-in-out infinite;
@@ -5885,9 +5706,7 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     50% { rotate: 2deg; }
 }
 
-/* Kraehe: wird ueber Bildwechsel in haus.js animiert, der Pfahl bleibt ruhig */
 
-/* ---------- HELFER-FIGUREN (helfer.js): Eichhoernchen, Igel, Bienen, Spatz, Hase ---------- */
 
 .helfer-figur {
     position: absolute;
@@ -5897,7 +5716,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     z-index: 1;
 }
 
-/* Laufen: kleine Hopser */
 .helfer-figur.laeuft {
     animation: helfer-hopsen 0.28s ease-in-out infinite alternate;
 }
@@ -5907,7 +5725,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { translate: -50% -95%; }
 }
 
-/* Bienen und Spatzen fliegen: sanftes Auf und Ab statt Hopsen */
 .helfer-biene.laeuft,
 .helfer-spatz.laeuft {
     animation: helfer-flattern 0.16s ease-in-out infinite alternate;
@@ -5922,7 +5739,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { translate: -50% -80%; }
 }
 
-/* Helfer-Klick oder Ernte: ein froehlicher Sprung */
 .helfer-figur.huepft {
     animation: helfer-sprung 0.3s ease-out;
 }
@@ -5933,9 +5749,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     100% { translate: -50% -70%; }
 }
 
-/* ============================================================
-   SPEKTAKEL (effekte.js): Kombo-Fieber, Ringe, Gold-Ticker, Jackpot, Titel, Funkeln, Voegel
-   ============================================================ */
 
 .effekt-ring {
     position: absolute;
@@ -5953,7 +5766,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     to { transform: scale(1); opacity: 0; }
 }
 
-/* Kombo-Fieber: der Bildschirmrand leuchtet (x3 lila, x4 orange, x5 bunt) */
 #fieber-rahmen {
     position: fixed;
     inset: 0;
@@ -6005,7 +5817,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translateY(-70px) scale(0.3); opacity: 0; }
 }
 
-/* Gold: Anzeige leuchtet auf, darunter zaehlt "+X" zusammen */
 #money-display.gold-glanz {
     animation: gold-glanz 0.5s ease-out;
 }
@@ -6040,7 +5851,6 @@ body[data-fieber="5"] #fieber-rahmen {
     50% { scale: 1.25; }
 }
 
-/* Jackpot: riesiger Schriftzug und Konfetti */
 .jackpot-schrift {
     position: fixed;
     left: 50%;
@@ -6076,7 +5886,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translate(var(--drift, 0px), 105vh) rotate(720deg); opacity: 0.8; }
 }
 
-/* Grosse Titel bei Tagesstart und Feierabend */
 .gross-titel {
     position: fixed;
     left: 50%;
@@ -6102,7 +5911,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translate(-50%, -70%) scale(1); opacity: 0; }
 }
 
-/* Reife Pflanzen funkeln */
 .reif-funkeln {
     position: absolute;
     width: 12px;
@@ -6120,7 +5928,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: scale(0) rotate(90deg); opacity: 0; }
 }
 
-/* Vogelschwaerme ziehen ueber den Himmel des Hofs */
 .vogel-schwarm {
     position: absolute;
     left: -160px;
@@ -6157,7 +5964,6 @@ body[data-fieber="5"] #fieber-rahmen {
     to { transform: scaleY(-0.6); }
 }
 
-/* Stellarium: Rechnung gross, Hilfe hinter "?" */
 .stern-karte-text {
     font-size: 1.15em;
     color: #c3cbf5;
@@ -6198,7 +6004,6 @@ body[data-fieber="5"] #fieber-rahmen {
     line-height: 1.35;
 }
 
-/* ---------- MEHR DOPAMIN: Sammel-Kette, Lichtsaeulen, Stern-Aufstieg, Bezahlt-Stempel, neue Pflanze ---------- */
 
 .sammel-kette {
     --kette: 0;
@@ -6347,9 +6152,7 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translate(-50%, -60%) scale(0.95); opacity: 0; }
 }
 
-/* ---------- SPEZIALPFLANZEN SIEHT MAN AM FELD ---------- */
 
-/* Geist: Nebelschwaden steigen auf, die Pflanze schwebt */
 .v-geist .feld-variante::before {
     opacity: 1;
     background:
@@ -6368,7 +6171,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translateY(-25%); opacity: 0; }
 }
 
-/* Blitz: kleine Blitze zucken ueber das Feld */
 .v-blitz .feld-variante::before,
 .v-blitz .feld-variante::after {
     inset: auto;
@@ -6398,7 +6200,6 @@ body[data-fieber="5"] #fieber-rahmen {
 }
 
 
-/* Sporen: lila Punkte steigen auf */
 .v-pilz .feld-variante::before {
     opacity: 1;
     background:
@@ -6415,7 +6216,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translateY(-45%); opacity: 0; }
 }
 
-/* Magnet: rot-blaue Feldlinien pulsieren */
 .v-magnet .feld-variante::before {
     opacity: 1;
     inset: 12%;
@@ -6436,7 +6236,6 @@ body[data-fieber="5"] #fieber-rahmen {
     to { transform: rotate(360deg); }
 }
 
-/* Glut: glimmender Boden und aufsteigende Funken */
 .v-feuer .feld-variante::before {
     opacity: 1;
     background: radial-gradient(ellipse 70% 35% at 50% 100%, rgba(255, 110, 30, 0.55), transparent);
@@ -6456,7 +6255,6 @@ body[data-fieber="5"] #fieber-rahmen {
     50% { opacity: 0.6; }
 }
 
-/* Honig: goldene Tropfen laufen vom oberen Rand */
 .v-honig .feld-sprite {
     filter: sepia(0.6) saturate(1.6) hue-rotate(-10deg) drop-shadow(0 0 3px #f0b82e);
 }
@@ -6488,7 +6286,6 @@ body[data-fieber="5"] #fieber-rahmen {
     100% { transform: translateY(300%); opacity: 0; }
 }
 
-/* Kristall: ein Glanz laeuft schraeg ueber das Feld */
 .v-kristall .feld-variante::before {
     opacity: 1;
     background: linear-gradient(115deg, transparent 35%, rgba(200, 240, 255, 0.6) 50%, transparent 65%);
@@ -6501,7 +6298,6 @@ body[data-fieber="5"] #fieber-rahmen {
     box-shadow: inset 0 0 0 3px rgba(159, 232, 255, 0.8), inset 0 0 14px rgba(159, 232, 255, 0.5);
 }
 
-/* Frost: Eisrand und Glitzern */
 .v-frost .feld-variante::before {
     opacity: 1;
     box-shadow: inset 0 0 0 4px rgba(230, 245, 255, 0.85), inset 0 0 18px rgba(200, 235, 255, 0.7);
@@ -6517,7 +6313,6 @@ body[data-fieber="5"] #fieber-rahmen {
     animation: funkeln 1.6s ease-in-out infinite;
 }
 
-/* Sternenpflanze: Sterne funkeln um die Pflanze */
 .v-sternpflanze .feld-sprite {
     filter: drop-shadow(0 0 5px #8fa2f0) brightness(1.1);
 }
@@ -6533,7 +6328,6 @@ body[data-fieber="5"] #fieber-rahmen {
     animation: funkeln 1.3s ease-in-out infinite;
 }
 
-/* Regenbogen: bunter Rand, der seine Farben wechselt */
 .v-regenbogen .feld-variante::before {
     opacity: 1;
     box-shadow: inset 0 0 0 4px #ff6a6a;
@@ -6545,7 +6339,6 @@ body[data-fieber="5"] #fieber-rahmen {
     to { filter: hue-rotate(360deg); }
 }
 
-/* Gold: goldener Schimmer und Glanz */
 .v-golden .feld-variante::before {
     opacity: 1;
     background: radial-gradient(ellipse at 50% 55%, rgba(255, 217, 61, 0.35), transparent 70%);
@@ -6560,26 +6353,22 @@ body[data-fieber="5"] #fieber-rahmen {
     animation: glanz 2s linear infinite;
 }
 
-/* Werkzeug-Plaetze in der Klappe: gross genug zum Ansehen */
 #werkzeug-leiste .werkzeug-platz {
     width: 62px;
     height: 62px;
     border-width: 3px;
 }
 
-/* Tageskarte: faehrt direkt unter der Holzleiste ganz oben heraus (nicht erst am Zaun) */
 #karten-halter {
     top: 58px;
 }
 
-/* Statistik in den Einstellungen */
 .statistik-rahmen {
     max-height: 52vh;
     overflow-y: auto;
     padding-right: 6px;
 }
 
-/* Segen-Liste (Knopf oben) */
 .segen-liste {
     display: flex;
     flex-direction: column;
@@ -6603,7 +6392,6 @@ body[data-fieber="5"] #fieber-rahmen {
     font-size: 1.1em;
 }
 
-/* Kopfleiste: passt auch auf kleinere Fenster (1280 bis 1600 breit), nichts ragt mehr rechts heraus */
 #top-leiste {
     gap: clamp(6px, 0.75vw, 14px);
     padding: 0 clamp(8px, 0.9vw, 16px);
@@ -6619,7 +6407,6 @@ body[data-fieber="5"] #fieber-rahmen {
 }
 
 @media (max-width: 1760px) {
-    /* Marktplatz und Stellarium nur als Bild (Name steht im Tooltip) */
     #shop-button span,
     #skilltree-button span {
         display: none;
@@ -6638,7 +6425,6 @@ body[data-fieber="5"] #fieber-rahmen {
     }
 }
 
-/* ---------- Einstellungen mit Erfolgen, Kodex und Statistik ---------- */
 
 .einstellungen-rahmen {
     transition: width 0.2s ease;
@@ -6656,7 +6442,6 @@ body[data-fieber="5"] #fieber-rahmen {
     max-height: none;
 }
 
-/* Rotes Ausrufezeichen: es gibt einen neuen Erfolg oder Kodex-Eintrag */
 #einstellungen-button {
     position: relative;
 }
@@ -6709,7 +6494,6 @@ body[data-fieber="5"] #fieber-rahmen {
     animation: neu-huepfen 1.4s ease-in-out infinite;
 }
 
-/* ---------- Cursor-Kreis: weicher Lichtschein, fester Rand und ein langsam drehender Punkt-Ring ---------- */
 #sammel-ring {
     border: none;
     box-shadow: none;
@@ -6739,7 +6523,6 @@ body[data-fieber="5"] #fieber-rahmen {
     to { transform: rotate(360deg); }
 }
 
-/* ---------- Stellarium: kaufbare Sterne springen ins Auge ---------- */
 .stern.leistbar {
     border-color: #8dffb8;
     background: radial-gradient(circle, #4fd08a 0%, #1f5c49 75%);
@@ -6762,7 +6545,6 @@ body[data-fieber="5"] #fieber-rahmen {
     font-weight: 700;
 }
 
-/* kleines gruenes Plus oben rechts: "hier kannst du kaufen" */
 .stern.leistbar::before {
     content: "+";
     position: absolute;
@@ -6784,18 +6566,15 @@ body[data-fieber="5"] #fieber-rahmen {
     animation: neu-huepfen 1.4s ease-in-out infinite;
 }
 
-/* Kopfleiste liegt ueber der Tageskarte: die Karte faehrt unter dem Holz heraus, und die Werkzeug-Klappe ist nicht verdeckt */
 #top-leiste {
     z-index: 9;
 }
 
-/* Meldungen (Erfolg, Banner) erscheinen unter der ausgeklappten Tageskarte statt darueber */
 body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     top: auto;
     bottom: 24px;
 }
 
-/* Stellarium-Details: Erklaerung und Marktplatz-Kasten */
 .stern-karte-text {
     font-size: 1.05em;
     line-height: 1.35;
@@ -6833,9 +6612,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     font-size: 1.2em;
 }
 
-/* ============================================================
-   STERNWARTE (neu): Nachthimmel dahinter, Steinsockel, Turm mit Fenstern, gerippte Kuppel, Messing-Teleskop
-   ============================================================ */
 
 [data-bauweise="sternwarte"] .bau-nachthimmel {
     left: -28%;
@@ -6853,7 +6629,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
         radial-gradient(ellipse at 50% 46%, rgba(34, 40, 110, 0.85) 0%, rgba(30, 36, 100, 0.55) 45%, rgba(30, 36, 100, 0) 70%);
 }
 
-/* zweite Sternenschicht, die langsam funkelt */
 [data-bauweise="sternwarte"] .bau-nachthimmel::before {
     content: "";
     position: absolute;
@@ -6886,7 +6661,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border-radius: 4px 4px 0 0;
 }
 
-/* zwei warm leuchtende Bogenfenster links und rechts */
 [data-bauweise="sternwarte"] .bau-turmhaus::before {
     content: "";
     position: absolute;
@@ -6917,7 +6691,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     box-shadow: inset 0 3px 0 #8088ac;
 }
 
-/* Stufe vor der Tuer */
 [data-bauweise="sternwarte"] .bau-sockel::before {
     content: "";
     position: absolute;
@@ -6945,7 +6718,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
         radial-gradient(circle at 32% 28%, #c3ceff 0%, #6a7ee0 30%, #34439a 70%, #1e2868 100%);
 }
 
-/* Sterne im offenen Schlitz */
 [data-bauweise="sternwarte"] .bau-kuppel::before {
     content: "";
     position: absolute;
@@ -6960,7 +6732,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: himmel-funkeln 1.8s ease-in-out infinite;
 }
 
-/* goldener Ring am Fuss der Kuppel */
 [data-bauweise="sternwarte"] .bau-kuppel::after {
     content: "";
     position: absolute;
@@ -6985,7 +6756,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border-radius: 4px 4px 1px 1px;
 }
 
-/* Linse vorn mit Glanz und ein Messingring */
 [data-bauweise="sternwarte"] .bau-teleskop::before {
     content: "";
     position: absolute;
@@ -7025,9 +6795,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     bottom: calc(165% + 10px);
 }
 
-/* ============================================================
-   HEXENHUETTE: schiefe Huette mit Hexenhut-Dach, daneben ein brodelnder Kessel
-   ============================================================ */
 
 [data-bauweise="hexe"] .bau-huette {
     left: 10%;
@@ -7043,7 +6810,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     transform: skewX(-2deg);
 }
 
-/* Tuer mit gruenem Schimmer von innen */
 [data-bauweise="hexe"] .bau-huette::after {
     content: "";
     position: absolute;
@@ -7070,7 +6836,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: hut-wiegen 4s ease-in-out infinite;
 }
 
-/* Hutspitze mit gruenem Band */
 [data-bauweise="hexe"] .bau-dach::before {
     content: "";
     position: absolute;
@@ -7084,7 +6849,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     clip-path: polygon(60% 0, 68% 7%, 100% 100%, 0 100%);
 }
 
-/* Hutkrempe */
 [data-bauweise="hexe"] .bau-dach::after {
     content: "";
     position: absolute;
@@ -7121,7 +6885,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border: 3px solid #0a0a10;
 }
 
-/* gruener Trank oben im Kessel */
 [data-bauweise="hexe"] .bau-kessel::before {
     content: "";
     position: absolute;
@@ -7136,7 +6899,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: brodeln 1.1s ease-in-out infinite;
 }
 
-/* kleines Feuer darunter */
 [data-bauweise="hexe"] .bau-kessel::after {
     content: "";
     position: absolute;
@@ -7217,9 +6979,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     bottom: calc(170% + 10px);
 }
 
-/* ============================================================
-   LEUCHTTURM: rot-weisser Turm auf Felsen, kreisender Lichtstrahl, eine Moewe
-   ============================================================ */
 
 [data-bauweise="leuchtturm"] .bau-fels {
     left: -8%;
@@ -7235,7 +6994,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border-radius: 40% 40% 4px 4px / 70% 70% 4px 4px;
 }
 
-/* Schaum der Wellen am Fels */
 [data-bauweise="leuchtturm"] .bau-fels::before {
     content: "";
     position: absolute;
@@ -7292,7 +7050,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border-radius: 2px;
 }
 
-/* Gelaender */
 [data-bauweise="leuchtturm"] .bau-galerie::before {
     content: "";
     position: absolute;
@@ -7319,7 +7076,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: laterne-leuchten 2s ease-in-out infinite;
 }
 
-/* rotes Dach der Laterne */
 [data-bauweise="leuchtturm"] .bau-laterne::before {
     content: "";
     position: absolute;
@@ -7344,7 +7100,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     30% { filter: brightness(1.4); box-shadow: 0 0 40px 18px rgba(255, 246, 200, 1); }
 }
 
-/* Lichtstrahl: zwei Kegel, die abwechselnd auf- und zuklappen (sieht aus wie ein drehendes Licht) */
 [data-bauweise="leuchtturm"] .bau-strahl {
     left: 50%;
     top: -23%;
@@ -7401,7 +7156,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: moewe-kreisen 8s linear infinite;
 }
 
-/* zwei Boegen = eine Moewe, die mit den Fluegeln schlaegt */
 [data-bauweise="leuchtturm"] .bau-moewe span::before,
 [data-bauweise="leuchtturm"] .bau-moewe span::after {
     content: "";
@@ -7454,7 +7208,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     bottom: calc(160% + 10px);
 }
 
-/* Fortschritt bleibt im Gebaeude */
 #marktstand[data-bauweise="hexe"] #plant-button-fortschritt,
 #marktstand[data-bauweise="leuchtturm"] #plant-button-fortschritt {
     z-index: 1;
@@ -7465,7 +7218,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     border-radius: 3px;
 }
 
-/* Wuerfe */
 .wurf-kugel.wurf-blase {
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffffff 0 15%, #c9ffb0 28%, #4fbf3a 85%);
@@ -7478,7 +7230,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     box-shadow: 0 0 10px 3px rgba(255, 243, 176, 0.9);
 }
 
-/* Vorschau im Haus */
 .laden-vorschau.vorschau-bau-hexe {
     background: linear-gradient(170deg, #5a3680 0 34%, transparent 34%),
         repeating-linear-gradient(90deg, #5a3a5a 0 12px, #432a45 12px 14px);
@@ -7492,7 +7243,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     --leuchten: #fff3b0;
 }
 
-/* Stellarium: Namen nie mitten im Wort umbrechen oder abschneiden */
 .stern-name,
 .stern-karte-name {
     word-break: normal;
@@ -7505,7 +7255,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     min-width: 0;
 }
 
-/* Kalender: rotes "!" ab dem Feierabend vor dem letzten Tag vor der Rechnung */
 #kalender-display {
     position: relative;
 }
@@ -7529,7 +7278,6 @@ body:has(#karten-halter:not(.versteckt):not(.eingeklappt)) #banner-box {
     animation: neu-huepfen 1.4s ease-in-out infinite;
 }
 
-/* Ueberschriften etwas kraeftiger */
 h1, h2, h3,
 .segen-name,
 #plant-button-label,
@@ -7537,7 +7285,6 @@ h1, h2, h3,
     font-weight: 600;
 }
 
-/* Versionsnummer unten rechts im Hauptmenue */
 #menue-version {
     position: absolute;
     right: 16px;
@@ -7563,7 +7310,6 @@ h1, h2, h3,
     margin-bottom: 4px;
 }
 
-/* Feedback-Formular in den Einstellungen */
 .feedback-form {
     display: flex;
     flex-direction: column;
@@ -7599,9 +7345,6 @@ h1, h2, h3,
     gap: 8px;
 }
 
-/* ============================================================
-   MARKT: grosses Fenster mit Markise, Holzschildern als Reiter und Stand-Karten
-   ============================================================ */
 
 .panel.markt-fenster {
     top: 50%;
@@ -7638,7 +7381,6 @@ h1, h2, h3,
     position: relative;
 }
 
-/* gewellter Rand der Markise */
 .markt-markise::after {
     content: "";
     position: absolute;
@@ -7694,7 +7436,6 @@ h1, h2, h3,
     padding: 6px 20px 20px;
 }
 
-/* Holzschilder als Reiter */
 .markt-reiter {
     flex: 0 0 210px;
     display: flex;
@@ -7744,7 +7485,6 @@ h1, h2, h3,
     gap: 16px;
 }
 
-/* Stand-Karte */
 .markt-karte {
     position: relative;
     display: flex;
@@ -7759,7 +7499,6 @@ h1, h2, h3,
     transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-/* kleine Markise oben auf jeder Karte */
 .markt-karte::before {
     content: "";
     position: absolute;
@@ -7901,7 +7640,6 @@ h1, h2, h3,
     border-color: #2f5a1a;
 }
 
-/* Kopf im Pflanzen-Reiter */
 .markt-pflanze-kopf {
     display: flex;
     align-items: center;
@@ -7938,10 +7676,8 @@ h1, h2, h3,
     margin-bottom: 12px;
 }
 
-/* Jahreszeiten-Ast im Stellarium */
 .stern.gekauft.ast-jahreszeit { border-color: #ff9ad5; }
 
-/* Kodex: Fortschritt und Belohnungen */
 .kodex-belohnung {
     display: flex;
     flex-direction: column;
@@ -7979,7 +7715,6 @@ h1, h2, h3,
     transition: width 0.3s;
 }
 
-/* Legendaere Kristallsaat: schimmert und funkelt */
 body.muenzen-kristall .loot-kugel:not(.loot-stern) {
     animation: kristall-schimmer 2.2s ease-in-out infinite;
 }
@@ -7997,12 +7732,10 @@ body.muenzen-kristall .loot-kugel.loot-gelandet:not(.loot-stern) {
     animation: kristall-schimmer 2.2s ease-in-out infinite;
 }
 
-/* Markt geschlossen: wirklich weg (sonst gewinnt display: flex) */
 .panel.markt-fenster.hidden {
     display: none;
 }
 
-/* Pilzbeet: kleine Pilze in den Ecken */
 body.felder-pilze .feld:not(.kauf-kachel)::after {
     content: "";
     position: absolute;
@@ -8017,7 +7750,6 @@ body.felder-pilze .feld:not(.kauf-kachel)::after {
     pointer-events: none;
 }
 
-/* Regenbogenbeet (legendaer): der Rand wandert durch alle Farben */
 body.felder-regenbogen .feld:not(.kauf-kachel)::after {
     content: "";
     position: absolute;
@@ -8049,7 +7781,6 @@ body.felder-regenbogen .feld:not(.kauf-kachel)::after {
     to { filter: hue-rotate(360deg); }
 }
 
-/* ---------- Neue Kuschel-Rahmen ---------- */
 .rahmen-blaetter {
     border-color: #5f9e3c !important;
     border-style: dashed !important;
@@ -8061,7 +7792,6 @@ body.felder-regenbogen .feld:not(.kauf-kachel)::after {
     box-shadow: inset 0 0 0 2px #ffd6ea, 0 0 10px rgba(255, 143, 177, 0.7) !important;
 }
 
-/* legendaer: ein langsam drehender Sternennebel */
 .rahmen-kosmos {
     border-color: #8fa2f0 !important;
     background-image: radial-gradient(circle at 20% 30%, rgba(255, 246, 160, 0.9) 0 1px, transparent 2px),
@@ -8075,7 +7805,6 @@ body.felder-regenbogen .feld:not(.kauf-kachel)::after {
     50% { box-shadow: 0 0 18px rgba(200, 176, 245, 1), inset 0 0 12px rgba(143, 162, 240, 0.9); }
 }
 
-/* ---------- Glutblaetter (legendaerer Pflanzen-Look): glimmen und flackern ---------- */
 body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: glut-glimmen 1.8s ease-in-out infinite;
 }
@@ -8085,7 +7814,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     50% { filter: drop-shadow(0 0 8px #ffb060) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.15); }
 }
 
-/* Feedback per Discord */
 .feedback-discord {
     display: flex;
     flex-direction: column;
@@ -8136,7 +7864,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     font-size: 1.1em;
 }
 
-/* Vogelscheuche verjagt die erste Kraehe: sie wackelt kraeftig */
 .deko.scheuche-buh {
     animation: scheuche-buh 0.7s ease-in-out;
     transform-origin: 50% 100%;
@@ -8150,9 +7877,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     80% { rotate: 6deg; }
 }
 
-/* ============================================================
-   HAUPTMENUE (neu): Lichtstrahlen, leuchtendes Logo mit Glanz, federnde Knoepfe, Tiefe mit der Maus
-   ============================================================ */
 
 #hauptmenue {
     --mx: 0;
@@ -8161,7 +7885,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background-position: calc(50% + var(--mx) * 12px) calc(50% + var(--my) * 8px);
 }
 
-/* warmer Morgenschein oben, dunkler Rand unten */
 #hauptmenue::before {
     content: "";
     position: absolute;
@@ -8231,7 +7954,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     50% { opacity: 0.55; transform: scale(1.06); }
 }
 
-/* Glanzstreifen, der alle paar Sekunden ueber das Logo laeuft */
 .logo-glanz {
     position: absolute;
     inset: 0;
@@ -8277,7 +7999,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 2px 0 rgba(46, 26, 9, 0.8), 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
-/* Glanz, der beim Drueberfahren ueber den Knopf wischt */
 #hauptmenue .menue-knopf::after {
     content: "";
     position: absolute;
@@ -8309,7 +8030,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     padding: 14px 24px;
 }
 
-/* goldene, leuchtende Funken */
 .menue-funke {
     position: absolute;
     bottom: -10px;
@@ -8329,9 +8049,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     100% { transform: translate(var(--drift, 0), -80vh) scale(1.1); opacity: 0; }
 }
 
-/* ============================================================
-   RAKETEN-STARTRAMPE (neu): Abendhimmel, Stahlturm mit Arm, gezeichnete Rakete, Scheinwerfer, Betonplattform
-   ============================================================ */
 
 #marktstand[data-bauweise="feuerwerk"] #plant-button-bild {
     visibility: hidden;
@@ -8364,7 +8081,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 3px 0 0 rgba(0, 0, 0, 0.15);
 }
 
-/* Verbindungsarm vom Turm zur Rakete */
 [data-bauweise="feuerwerk"] .bau-arm {
     left: 19%;
     top: 8%;
@@ -8400,7 +8116,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     position: absolute;
 }
 
-/* rote Spitze */
 [data-bauweise="feuerwerk"] .rakete-spitze {
     left: -3px;
     right: -3px;
@@ -8412,7 +8127,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-bottom: none;
 }
 
-/* roter Streifen in der Mitte */
 [data-bauweise="feuerwerk"] .rakete-streifen {
     left: 0;
     right: 0;
@@ -8421,7 +8135,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background: #e8434a;
 }
 
-/* Bullauge mit Glanz */
 [data-bauweise="feuerwerk"] .rakete-fenster {
     left: 50%;
     top: 34%;
@@ -8434,7 +8147,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 0 6px rgba(159, 224, 255, 0.8);
 }
 
-/* Flossen */
 [data-bauweise="feuerwerk"] .rakete-flosse {
     bottom: -4%;
     width: 42%;
@@ -8455,7 +8167,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border: none;
 }
 
-/* Triebwerk unter der Rakete */
 [data-bauweise="feuerwerk"] .bau-flamme {
     left: 50%;
     bottom: 5%;
@@ -8473,7 +8184,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     z-index: 3;
 }
 
-/* Betonplattform mit Warnstreifen */
 [data-bauweise="feuerwerk"] .bau-rampe {
     left: -6%;
     right: -6%;
@@ -8488,7 +8198,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* zwei Scheinwerfer, die langsam hin und her schwenken */
 [data-bauweise="feuerwerk"] .bau-scheinwerfer {
     bottom: 12%;
     width: 0;
@@ -8525,7 +8234,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     bottom: calc(150% + 10px);
 }
 
-/* ---------- Alle legendaeren Gebaeude: weicher Schatten am Boden ---------- */
 #marktstand[data-bauweise] .laden-bau::after {
     content: "";
     position: absolute;
@@ -8538,12 +8246,10 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background: radial-gradient(ellipse, rgba(20, 40, 10, 0.4), transparent 70%);
 }
 
-/* ---------- Manege: Scheinwerferkegel von oben und Glitzer ---------- */
 [data-bauweise="zirkus"] .bau-spot {
     filter: drop-shadow(0 0 10px rgba(255, 246, 180, 0.8));
 }
 
-/* ---------- Hexenhuette: leuchtendes Fenster im Dach ---------- */
 [data-bauweise="hexe"] .bau-huette::before {
     content: "";
     position: absolute;
@@ -8558,7 +8264,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: trank-leuchten 3s ease-in-out infinite;
 }
 
-/* ---------- Leuchtturm: ein Stueck Meer am Fels ---------- */
 [data-bauweise="leuchtturm"] .bau-fels::after {
     content: "";
     position: absolute;
@@ -8572,7 +8277,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 0 0 2px #1b3f73;
 }
 
-/* Startrampe: Schild und Zaehler stehen unten auf der Plattform, damit die Rakete frei bleibt */
 #marktstand[data-bauweise="feuerwerk"] #plant-button-bild {
     display: none;
 }
@@ -8611,7 +8315,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         radial-gradient(ellipse at 50% 88%, rgba(255, 196, 120, 0.6) 0%, rgba(255, 150, 170, 0.35) 42%, transparent 70%);
 }
 
-/* Rakete steht hoeher, damit die Flossen ueber dem Schild zu sehen sind */
 [data-bauweise="feuerwerk"] .bau-rakete {
     bottom: 40%;
     height: 72%;
@@ -8626,9 +8329,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     top: 2%;
 }
 
-/* ============================================================
-   HAUPTMENUE (ruhig): gemalter Hintergrund, sanftes Logo, wenig Bewegung
-   ============================================================ */
 
 #hauptmenue {
 }
@@ -8658,7 +8358,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 0 0 4px var(--holz-dunkel), 0 16px 40px rgba(40, 60, 30, 0.35);
 }
 
-/* weiche, langsame Wolken */
 .menue-wolke-weich {
     position: absolute;
     left: -30%;
@@ -8692,12 +8391,10 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     height: 90%;
 }
 
-/* Knoepfe: kein Glanzwischer mehr */
 #hauptmenue .menue-knopf::after {
     display: none;
 }
 
-/* Hauptmenue: Glanz auf den Knoepfen wieder an (nur das Mitbewegen mit der Maus bleibt aus) */
 #hauptmenue .menue-knopf::after {
     display: block;
 }
@@ -8706,7 +8403,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: logo-einflug 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, logo-schweben 4.5s ease-in-out 0.9s infinite;
 }
 
-/* Hauptmenue: Pixel-Welt aus dem Spiel statt gemaltem Bild */
 #hauptmenue {
     background-color: #86c457;
     background-size: 100% 100%;
@@ -8719,7 +8415,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.18), transparent 55%);
 }
 
-/* ---------- Hauptmenue-Knoepfe als Holzschilder (passend zum Pixel-Look) ---------- */
 #hauptmenue .menue-knopf {
     padding: 13px 26px;
     font-size: 1.4em;
@@ -8785,9 +8480,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         0 0 24px 4px rgba(184, 240, 122, 0.6);
 }
 
-/* ============================================================
-   EPISCHE SAMENLAEDEN: eigene Gebaeude, ruhig (keine Leerlauf-Animationen)
-   ============================================================ */
 
 #marktstand.bau-ruhig #plant-button-bild {
     display: none;
@@ -8799,7 +8491,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     gap: 2px;
 }
 
-/* Schild und Zaehler gut lesbar auf jedem Gebaeude (legendaere Laeden haben eigene, staerkere Regeln) */
 [data-bauweise] #plant-button-label,
 [data-bauweise] #plant-button-counter {
     padding: 0 8px;
@@ -8809,7 +8500,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-radius: 4px;
 }
 
-/* ---------- Bauernmarkt: Gemuesekisten mit Tafel ---------- */
 [data-bauweise="kisten"] .bau-kisten {
     left: 2%;
     right: 2%;
@@ -8861,7 +8551,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* ---------- Beerenbusch ---------- */
 [data-bauweise="beerenbusch"] .bau-busch {
     left: -8%;
     right: -8%;
@@ -8904,7 +8593,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         radial-gradient(circle at 76% 72%, #ffffff 0 1.5%, #e8434a 2% 5.5%, transparent 6%);
 }
 
-/* ---------- Meeresbrise: Strandbude ---------- */
 [data-bauweise="strandbude"] .bau-sand {
     left: -10%;
     right: -10%;
@@ -8948,7 +8636,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     transform: rotate(6deg);
 }
 
-/* ---------- Goldstand: Schatztruhe ---------- */
 [data-bauweise="truhe"] .bau-truhe {
     left: 6%;
     right: 6%;
@@ -8962,7 +8649,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Schloss */
 [data-bauweise="truhe"] .bau-truhe::after {
     content: "";
     position: absolute;
@@ -9004,7 +8690,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         radial-gradient(ellipse at 50% 100%, #d9a82a 0 60%, transparent 62%);
 }
 
-/* ---------- Kirschbluete: Kirschbaum ---------- */
 [data-bauweise="kirschbaum"] .bau-stamm {
     left: 40%;
     width: 20%;
@@ -9042,7 +8727,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         radial-gradient(circle at 90% 70%, #ff9ac0 0 3%, transparent 4%);
 }
 
-/* ---------- Honigstand: grosser Bienenkorb ---------- */
 [data-bauweise="bienenkorb"] .bau-korb {
     left: 6%;
     right: 6%;
@@ -9054,7 +8738,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     box-shadow: inset -8px 0 0 rgba(90, 50, 10, 0.2);
 }
 
-/* Flugloch */
 [data-bauweise="bienenkorb"] .bau-korb::after {
     content: "";
     position: absolute;
@@ -9077,7 +8760,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-radius: 30% 30% 40% 40%;
 }
 
-/* ---------- Eisdiele: Eiswagen mit Schirm ---------- */
 [data-bauweise="eiswagen"] .bau-schirm {
     left: -4%;
     right: -4%;
@@ -9110,7 +8792,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-radius: 8px;
 }
 
-/* Fenster mit drei Eiskugeln */
 [data-bauweise="eiswagen"] .bau-wagen::after {
     content: "";
     position: absolute;
@@ -9137,7 +8818,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         radial-gradient(circle at 82% 50%, #d8d8e0 0 12%, #2a2a34 13% 30%, transparent 31%);
 }
 
-/* ---------- Mitternacht: Nachtzelt mit Laternen ---------- */
 [data-bauweise="nachtzelt"] .bau-nachtzelt {
     left: 2%;
     right: 2%;
@@ -9173,7 +8853,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         linear-gradient(-8deg, transparent 48%, #2a1d3a 48% 52%, transparent 52%) 100% 0 / 50% 100% no-repeat;
 }
 
-/* ---------- Lebkuchenhaus ---------- */
 [data-bauweise="lebkuchenhaus"] .bau-lebkuchen {
     left: 8%;
     right: 8%;
@@ -9188,7 +8867,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-radius: 3px;
 }
 
-/* Tuer mit Zuckerguss-Rand */
 [data-bauweise="lebkuchenhaus"] .bau-lebkuchen::after {
     content: "";
     position: absolute;
@@ -9233,9 +8911,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         repeating-linear-gradient(135deg, #ffffff 0 5px, #e8434a 5px 10px) 100% 0 / 8% 100% no-repeat;
 }
 
-/* ============================================================
-   LEGENDAER: KLEINER MONDTEICH (Schimmer, blaue Blasen, Wasserringe)
-   ============================================================ */
 
 [data-bauweise="mondteich"] .bau-mondlicht {
     left: -24%;
@@ -9268,7 +8943,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     overflow: hidden;
 }
 
-/* Wasserringe beim Klicken */
 [data-bauweise="mondteich"] .bau-wasser::after {
     content: "";
     position: absolute;
@@ -9319,7 +8993,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background-color: #6cb448;
 }
 
-/* Schimmer, der ab und zu ueber das Wasser laeuft */
 [data-bauweise="mondteich"] .bau-schimmer {
     left: 2%;
     right: 2%;
@@ -9360,7 +9033,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     border-radius: 4px;
 }
 
-/* blaue Blasen als Wurf und Wasserringe auf dem Feld */
 .wurf-kugel.wurf-blase-blau {
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffffff 0 16%, #bfeaff 30%, #5aa9e6 70%, #2f6fb8);
@@ -9387,7 +9059,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     100% { transform: scale(3.2); opacity: 0; }
 }
 
-/* Vorschau im Haus */
 .laden-vorschau.vorschau-bau-mondteich {
     background: radial-gradient(ellipse at 50% 60%, #7a9ae8, #1d2e6a 70%);
     animation: vorschau-leuchten 1.6s ease-in-out infinite;
@@ -9404,7 +9075,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
 .laden-vorschau.vorschau-bau-nachtzelt { background: repeating-linear-gradient(90deg, #3a2a7a 0 10px, #2a1d5a 10px 20px); }
 .laden-vorschau.vorschau-bau-lebkuchenhaus { background: linear-gradient(#fff6f0 0 18%, #b8702f 18%); }
 
-/* ---------- Hauptmenue-Knoepfe im Pixel-Stil: flache Farben, harte Kanten, abgestufte Ecken ---------- */
 #hauptmenue .menue-knopf,
 #hauptmenue .menue-haupt {
     margin: 4px;
@@ -9486,9 +9156,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
         0 6px 0 0 rgba(30, 16, 6, 0.45);
 }
 
-/* ============================================================
-   BESONDERE SAMENLAEDEN ALS PIXEL-GRAFIK (laeden-pixel.js)
-   ============================================================ */
 
 #marktstand[data-bauweise] .laden-bau > *:not(.laden-pixelbild) {
     display: none;
@@ -9506,7 +9173,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     filter: drop-shadow(0 4px 0 rgba(20, 40, 10, 0.25));
 }
 
-/* kurzer Hopser beim Klicken */
 #marktstand.bau-klick .laden-pixelbild {
     animation: laden-hopser 0.18s ease-out;
 }
@@ -9515,7 +9181,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     40% { transform: translateX(-50%) scale(1.03, 0.97); }
 }
 
-/* Schild und Zaehler stehen bei allen besonderen Laeden unten, das Gebaeude bleibt frei */
 #marktstand[data-bauweise] #plant-button-bild {
     display: none;
 }
@@ -9530,8 +9195,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     bottom: calc(175% + 10px);
 }
 
-/* Vorschau im Haus */
-/* passt immer in die Box: hohe Gebaeude richten sich nach der Hoehe, breite nach der Breite */
 .laden-vorschau-pixel {
     width: auto;
     height: 94%;
@@ -9545,11 +9208,7 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: none;
 }
 
-/* ============================================================
-   LANDSCHAFTEN: Feuerwerksfest und Zauberwald
-   ============================================================ */
 
-/* Schein ueber Laternen und Pilzen (Positionen kommen aus zeichneHof) */
 .hof-leuchten {
     position: absolute;
     pointer-events: none;
@@ -9564,7 +9223,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     to { opacity: 0.75; }
 }
 
-/* Feuerwerk: Rakete steigt, zerplatzt in Pixel-Funken */
 .feuerwerk-rakete {
     position: absolute;
     top: 55%;
@@ -9619,7 +9277,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     to { opacity: 0; transform: scale(1.6); }
 }
 
-/* Zauberfalter: fliegt quer ueber den Hof und flattert dabei */
 .zauber-falter {
     position: absolute;
     width: 18px;
@@ -9672,7 +9329,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     to { scale: 0.25 1; }
 }
 
-/* ---------- Legendaere Saat: Laterne (warmes Flackern) und Planet (Sternenschein, leichtes Kippen) ---------- */
 
 body.muenzen-laterne .loot-kugel:not(.loot-stern),
 .vorschau-muenzen-laterne {
@@ -9703,7 +9359,6 @@ body.muenzen-planet .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { filter: drop-shadow(0 0 10px rgba(200, 190, 255, 1)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); rotate: 8deg; }
 }
 
-/* ---------- Legendaere Pflanzen-Looks: Ernte- und Reife-Effekte (haus.js PFLANZEN_EFFEKTE) ---------- */
 
 .fx-stern,
 .fx-splitter,
@@ -9713,7 +9368,6 @@ body.muenzen-planet .loot-kugel.loot-gelandet:not(.loot-stern) {
     pointer-events: none;
 }
 
-/* Pixel-Stern: ein Punkt mit vier Armen */
 .fx-stern {
     width: 5px;
     height: 5px;
@@ -9762,7 +9416,6 @@ body.muenzen-planet .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: -9px 0 0 -4px;
 }
 
-/* Reife Kristallpflanzen schimmern, reife Glutpflanzen flackern schneller */
 body.pflanzen-kristall .feld-fertig .feld-sprite {
     animation: wippen 1.2s ease-in-out infinite, kristall-schimmer 2.2s ease-in-out infinite;
 }
@@ -9772,7 +9425,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
 }
 
 
-/* ---------- Belohnung mit Pixel-Symbolen (Gluehwuermchen) ---------- */
 .belohnung-schild {
     position: absolute;
     display: flex;
@@ -9809,7 +9461,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     100% { transform: translateY(-40px) scale(1); opacity: 0; }
 }
 
-/* ---------- Erfolge: abholbare Belohnung leuchtet, rotes Ausrufezeichen ---------- */
 .erfolg {
     position: relative;
 }
@@ -9850,7 +9501,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     margin-bottom: 8px;
 }
 
-/* Kuschel-Automat: Hinweis, wenn die Gutscheine aufgebraucht sind */
 .kuschel-sperre {
     width: 100%;
     text-align: center;
@@ -9859,7 +9509,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     margin-top: 6px;
 }
 
-/* Sandbox: Haendler-Symbol blinkt, wenn er kommt */
 #haendler-button.blinkt {
     animation: haendler-blinken 0.5s steps(2) 20;
 }
@@ -9869,7 +9518,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     100% { filter: none; transform: none; }
 }
 
-/* Kodex: Werkzeug anklicken zeigt die Steigerung pro Stufe */
 .kodex-karte.klickbar {
     cursor: pointer;
 }
@@ -9883,7 +9531,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     color: #6b4220;
 }
 
-/* ---------- Slotmaschine ---------- */
 .slot-maschine {
     display: flex;
     justify-content: center;
@@ -9921,7 +9568,6 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     100% { box-shadow: inset 0 0 0 3px #fff6d8, 0 4px 0 rgba(0, 0, 0, 0.3); }
 }
 
-/* Sternwarte und Rakete: groessere, gut sichtbare Wuerfe */
 .wurf-kugel.wurf-stern {
     width: 20px;
     height: 20px;
@@ -9948,11 +9594,7 @@ body.pflanzen-glut .feld-fertig .feld-sprite {
     margin: -11px 0 0 -5px;
 }
 
-/* ============================================================
-   0.6: ANIMIERTE LEGENDAERE LOOKS
-   ============================================================ */
 
-/* Kristallpflanzen: ein Glasglanz wandert ueber die Pflanze (wie beim Kristallboden) */
 body.pflanzen-kristall .feld-sprite:not([hidden]) {
     -webkit-mask-image: linear-gradient(115deg, #000 40%, rgba(0, 0, 0, 0.45) 48%, #000 52%, rgba(0, 0, 0, 0.7) 56%, #000 60%);
     mask-image: linear-gradient(115deg, #000 40%, rgba(0, 0, 0, 0.45) 48%, #000 52%, rgba(0, 0, 0, 0.7) 56%, #000 60%);
@@ -9974,7 +9616,6 @@ body.pflanzen-kristall .feld.feld-fertig .feld-sprite:not([hidden]) {
     to { -webkit-mask-position: -150% 0; mask-position: -150% 0; }
 }
 
-/* Glutblaetter: brennen ein wenig (flackern und zucken in der Hitze) */
 body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: glut-glimmen 1.8s ease-in-out infinite, glut-flackern 0.24s steps(2) infinite;
 }
@@ -9992,7 +9633,6 @@ body.pflanzen-glut .feld.feld-fertig .feld-sprite:not([hidden]) {
     to { scale: 1.02 1.05; }
 }
 
-/* Sternenpflanzen: sanftes Sternenlicht, das zwischen Gold und Blau wechselt */
 body.pflanzen-sterne .feld-sprite:not([hidden]) {
     animation: sterne-pflanze-licht 2.4s ease-in-out infinite;
 }
@@ -10010,7 +9650,6 @@ body.pflanzen-sterne .feld.feld-fertig .feld-sprite:not([hidden]) {
     50% { filter: drop-shadow(0 0 8px #fff6a0) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3)) brightness(1.12); }
 }
 
-/* Sternenboden: ab und zu zieht eine Sternschnuppe ueber jedes Feld */
 body.felder-sterne .feld:not(.kauf-kachel)::before {
     content: "";
     position: absolute;
@@ -10039,7 +9678,6 @@ body.felder-sterne .feld:nth-child(5n)::before { animation-duration: 9s; }
     100% { translate: 190% 60%; opacity: 0; }
 }
 
-/* Sternenboden: die Sterne funkeln versetzt und wandern ganz langsam */
 body.felder-sterne .feld:not(.kauf-kachel)::after {
     animation: funkeln 1.8s ease-in-out infinite, sterne-wandern 12s linear infinite;
 }
@@ -10049,7 +9687,6 @@ body.felder-sterne .feld:not(.kauf-kachel)::after {
     50% { background-position: 3px -2px, -2px 3px, 2px 2px, -3px -1px; }
 }
 
-/* Legendaere Saat: Mondsichel (sanftes Mondlicht) und Blitz (zuckt) */
 body.muenzen-mondsichel .loot-kugel:not(.loot-stern),
 .vorschau-muenzen-mondsichel {
     animation: mondsichel-licht 2.4s ease-in-out infinite;
@@ -10078,7 +9715,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     72%, 78% { filter: drop-shadow(0 0 14px #9fe8ff) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)) brightness(1.6); }
 }
 
-/* Neue Kuschel-Rahmen */
 .rahmen-wolken {
     border-color: #9fd8ff !important;
     background-image:
@@ -10131,12 +9767,10 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: 0 auto 8px;
 }
 
-/* Kosmische Nacht: grosser Stern statt Sonne */
 #sonne.grosser-stern {
     filter: drop-shadow(0 0 12px rgba(159, 216, 255, 0.95)) drop-shadow(0 0 4px #ffffff);
 }
 
-/* ---------- Endlos: Speicherstaende ---------- */
 .endlos-slots-hinweis {
     margin: 0 0 10px;
 }
@@ -10173,7 +9807,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 6px 10px;
 }
 
-/* ---------- Rechnung faellig ---------- */
 .rechnung-frage .rechnung-betrag {
     font-size: 1.8em;
     font-weight: 700;
@@ -10187,7 +9820,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.8;
 }
 
-/* Knopf kurz gesperrt: ein Balken fuellt sich, dann ist er klickbar */
 .knopf.knopf-gesperrt-zeit {
     position: relative;
     overflow: hidden;
@@ -10210,7 +9842,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     to { transform: scaleX(1); }
 }
 
-/* Endlos: Knopf "Speicherstaende" in Holzfarbe (nicht rot wie Loeschen) */
 .knopf.modus-reset.modus-slots {
     color: #fff6dc;
     background: linear-gradient(#b87a3e, #8a5a2c);
@@ -10219,12 +9850,10 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     text-shadow: 1px 1px 0 #3e2412;
 }
 
-/* Rechnung faellig: "Run beenden" links in die Ecke, "Bezahlen" rechts */
 .rechnung-frage .popup-knoepfe .knopf-rot {
     margin-right: auto;
 }
 
-/* Stats auf den Modus-Karten und bei den Endlos-Speicherstaenden */
 .modus-stats {
     font-size: 0.85em;
     opacity: 0.85;
@@ -10236,7 +9865,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.8;
 }
 
-/* ---------- Obere Leiste: Anzeigen sind Knoepfe mit Infokarte ---------- */
 .info-knopf {
     cursor: pointer;
     transition: transform 0.08s, filter 0.08s;
@@ -10251,7 +9879,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     transform: translateY(1px);
 }
 
-/* Infokarte: Pergament mit Holzkopf, grosser Wert, Punkte */
 #tooltip.tipp-karte {
     max-width: 360px;
     min-width: 220px;
@@ -10306,14 +9933,10 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     box-shadow: 0 0 0 1px #3f7020;
 }
 
-/* Festgehalten (angeklickt): kleiner Rahmen, damit man sieht, dass sie offen bleibt */
 #tooltip.tipp-fest {
     box-shadow: 0 0 0 2px var(--holz-dunkel), 0 0 0 5px #ffd93d, 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
-/* ============================================================
-   KOOP (Duo): Lobby, Pause-Schild, fremde Seite
-   ============================================================ */
 .art-karte .modus-bild {
     display: flex;
     justify-content: center;
@@ -10462,7 +10085,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.8;
 }
 
-/* Pause-Schild, wenn der andere Spieler pausiert */
 .koop-pause-schild {
     position: fixed;
     left: 50%;
@@ -10481,14 +10103,12 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     pointer-events: none;
 }
 
-/* Kaufkachel des Mitspielers: nur ansehen */
 .kauf-kachel.fremd {
     opacity: 0.55;
     filter: grayscale(0.5);
     cursor: default;
 }
 
-/* Kraehe auf einem Feld (beim Gast als Markierung) */
 .feld.koop-kraehe::before {
     content: "🐦";
     position: absolute;
@@ -10498,7 +10118,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     z-index: 3;
 }
 
-/* Koop: Felder des Mitspielers (nur ansehen) */
 .feld.partner-feld {
     cursor: default;
     filter: saturate(0.85);
@@ -10508,7 +10127,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     pointer-events: none;
 }
 
-/* Koop: warten auf den Mitspieler (Feierabend, naechster Tag) */
 .koop-warte-schild {
     position: fixed;
     left: 50%;
@@ -10528,7 +10146,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     animation: funkeln 2s ease-in-out infinite;
 }
 
-/* Aufgehobene Saat und Sternensamen: Zahlen 1,8-mal so gross */
 .schwebe-text.schwebe-aufheben {
     font-size: 2.52em;
 }
@@ -10536,7 +10153,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 3.42em;
 }
 
-/* ---------- Markt: Umschalter Markt / Gluecksspiel ---------- */
 .markt-modus {
     display: flex;
     gap: 6px;
@@ -10553,7 +10169,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     box-shadow: 0 0 0 3px #ffd93d inset;
 }
 
-/* ---------- Markt: Kaufmenge x1 / x10 / Max ---------- */
 .markt-menge {
     display: flex;
     gap: 4px;
@@ -10575,7 +10190,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     box-shadow: 0 0 0 3px #ffd93d inset;
 }
 
-/* Stellarium: mehrere Stufen auf einmal */
 .stern-karte-max {
     display: flex;
     align-items: center;
@@ -10586,7 +10200,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 0.9em;
 }
 
-/* ---------- Roulette ---------- */
 .roulette-wetten .roulette-wette.aktiv {
     box-shadow: 0 0 0 3px #ffd93d inset;
 }
@@ -10637,7 +10250,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .roulette-schwarz { background: #1e1e24; }
 .roulette-gruen { background: #2e9e2e; }
 
-/* ---------- Blackjack ---------- */
 .bj-dealer {
     display: flex;
     align-items: center;
@@ -10711,7 +10323,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     to { transform: none; opacity: 1; }
 }
 
-/* Einstellungen: alle Reiter gleich gross (das Fenster springt nicht mehr), die Seite scrollt innen */
 .einstellungen-rahmen,
 .einstellungen-rahmen.breit {
     width: min(1000px, calc(100% - 40px));
@@ -10730,7 +10341,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     max-height: none;
 }
 
-/* ---------- Mondphase oben und Ausrufezeichen fuer Neues ---------- */
 #mondphase-display span {
     font-size: 1.25em;
 }
@@ -10778,7 +10388,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border: 2px solid #fff6dc;
 }
 
-/* ---------- Mondteich: naechtlicher Teich (Sternenhimmel, Mondlicht, Wasser) ---------- */
 #prestige-shop {
     background:
         radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
@@ -10865,7 +10474,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-top: 3px solid #4a3f9a;
 }
 
-/* ---------- Einstellungen: Sprache ---------- */
 .sprach-karten {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -10896,7 +10504,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-weight: 900;
 }
 
-/* ---------- Feedback: Discord-Server ---------- */
 .discord-server {
     margin-top: 16px;
     padding: 14px 16px;
@@ -10935,7 +10542,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
         #012169;
 }
 
-/* ---------- Eigene Figur auf dem Hof ---------- */
 .hof-figur {
     pointer-events: auto;
     cursor: pointer;
@@ -10978,7 +10584,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .figur-partner .figur-name {
     background: rgba(90, 60, 170, 0.7);
 }
-/* Legendaere Effekte (nur Aussehen) */
 .figur-schicht.figfx-rgb {
     animation: fx-rgb 3s linear infinite;
 }
@@ -11015,7 +10620,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { translate: 0 -5px; }
 }
 
-/* ---------- Emote-Menue (Rechtsklick auf die Figur) ---------- */
 .emote-menue {
     position: fixed;
     z-index: 60;
@@ -11038,7 +10642,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     justify-content: flex-start;
 }
 
-/* ---------- Profil-Knopf und Profil-Fenster ---------- */
 .profil-knopf {
     position: absolute;
     top: 14px;
@@ -11204,7 +10807,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-radius: 6px;
 }
 
-/* Reihenfolge auf dem Hof: Deko hinten, dann die Figur, ganz vorne die Begleiter */
 .figur-mensch {
     z-index: 1;
 }
@@ -11213,7 +10815,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     z-index: 2;
 }
 
-/* Emote-Menue: nur Symbole */
 .emote-menue {
     grid-template-columns: repeat(4, 44px);
     width: auto;
@@ -11225,7 +10826,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     height: 44px;
 }
 
-/* Charakter-Editor: Ausschnitte der eigenen Figur als Symbole */
 .figur-ausschnitt {
     width: 28px;
     height: 28px;
@@ -11241,7 +10841,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin: 2px;
 }
 
-/* Duo-Knopf oben und Code-Fenster */
 #koop-knopf {
     cursor: pointer;
     font: inherit;
@@ -11266,7 +10865,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-weight: 700;
 }
 
-/* Samenladen laeuft heiss (zu schnell geklickt): gluehender Rand, leichtes Zittern, Dampf steigt auf */
 #plant-button.laden-heiss {
     filter: drop-shadow(0 0 6px #ff7a3a) saturate(1.2);
     animation: laden-zittern 0.12s steps(2) infinite;
@@ -11291,7 +10889,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     to { transform: translateY(-40px) scale(1.4); opacity: 0; }
 }
 
-/* ---------- DEBUG-FENSTER (debug.help) UND TEST-BOT ---------- */
 .debug-fenster .popup-inhalt {
     max-height: 70vh;
     overflow-y: auto;
@@ -11331,8 +10928,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 2px 10px;
     min-width: 0;
 }
-/* Der Bot spielt in einem zweiten Spiel, fast unsichtbar ueber dem Bild. Nicht ausserhalb des Bildschirms:
-   dort bremst der Browser den Rahmen so stark, dass der Bot nichts mehr tut */
 .debug-bot-rahmen {
     position: fixed;
     left: 0;
@@ -11363,8 +10958,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     min-width: 0;
 }
 
-/* Kleine Aura um die eigene Figur (und die des Mitspielers) auf dem Hof */
-/* ohne Animation: ein pulsierender Schatten muss jedes Bild neu berechnet werden (kostet im Duo spuerbar Leistung) */
 .figur-bild.figur-aura {
     filter: drop-shadow(0 0 3px var(--aura, #fff3c4));
 }
@@ -11374,7 +10967,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     max-width: 100%;
     margin: 6px auto 0;
     font-size: 15px;
-    /* lange Texte (Franzoesisch, Spanisch) brechen um, statt die Tageskarte seitlich scrollen zu lassen */
     white-space: normal;
     line-height: 1.25;
 }
@@ -11416,7 +11008,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 24px;
     line-height: 32px;
 }
-/* Patch Notes: alle Versionen, das Fenster scrollt */
 .patchnotes-fenster .popup-inhalt {
     max-height: 60vh;
     overflow-y: auto;
@@ -11437,7 +11028,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .patchnotes-version.neueste {
     color: #2e9e2e;
 }
-/* Bauernrang am Profil-Knopf */
 .profil-knopf-text {
     display: flex;
     flex-direction: column;
@@ -11448,7 +11038,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     color: #ffe89a;
 }
 
-/* Fruchtbarer Boden: kleine Punkte oben links am Feld (1 bis 5), volles Feld glueht leicht */
 .feld-boden {
     position: absolute;
     left: 4px;
@@ -11464,12 +11053,10 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     box-shadow: inset 0 0 10px rgba(255, 210, 58, 0.45);
 }
 
-/* Stellarium noch nicht freigeschaltet (im Markt fuer 1.000 Gold) */
 #skilltree-button.gesperrt {
     filter: grayscale(0.9) brightness(0.8);
 }
 
-/* Sprachen, die bald kommen (noch nicht waehlbar) */
 .sprach-karte.bald {
     opacity: 0.6;
     cursor: default;
@@ -11521,7 +11108,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding: 1px 8px;
 }
 
-/* Profil: eigene Farben und Titel */
 .profil-farben {
     display: flex;
     flex-wrap: wrap;
@@ -11563,7 +11149,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     background: #fff6dc;
 }
 
-/* Level, Erfahrungsleiste und Auren */
 .xp-leiste {
     display: block;
     width: 100%;
@@ -11656,7 +11241,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0.85;
 }
 
-/* Aura v2: Dicke waechst alle 10 Level (--aura-g), Regenbogen wechselt nur die Leuchtfarbe, nicht die Figur */
 .figur-bild.figur-aura,
 .profil-buehne-aura > .figur-bild {
     filter: drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 var(--aura-g2, 0px) var(--aura));
@@ -11689,7 +11273,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     83% { filter: drop-shadow(0 0 var(--aura-g, 2px) #b05aff) drop-shadow(0 0 var(--aura-g2, 0px) #b05aff); }
     100% { filter: drop-shadow(0 0 var(--aura-g, 2px) #ff4a4a) drop-shadow(0 0 var(--aura-g2, 0px) #ff4a4a); }
 }
-/* Namensschild und Knoepfe: kein filter-Regenbogen, sonst faerbt sich die Schrift */
 .figur-name.aura-regenbogen, .profil-knopf-name.aura-regenbogen, .profil-aura.aura-regenbogen {
     animation: none;
     filter: none;
@@ -11707,7 +11290,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     padding-left: 14px;
 }
 
-/* ---------- Intro: Arcade-Halle (Pixel-Canvas) ---------- */
 #intro {
     position: fixed;
     inset: 0;
@@ -11721,7 +11303,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     opacity: 0;
     pointer-events: none;
 }
-/* Buehne immer 16:9 und bildschirmfuellend, damit Logo und Text genau auf dem Automaten-Bildschirm liegen */
 #intro-buehne {
     position: absolute;
     left: 50%;
@@ -11736,7 +11317,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     image-rendering: pixelated;
     display: block;
 }
-/* Bildschirm: 160/62/320/206 von 640x360 */
 .intro-schirm {
     position: absolute;
     left: 25%;
@@ -11754,7 +11334,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .intro-schirm {
     background: radial-gradient(ellipse at 50% 45%, #121210 0%, #0a0a09 55%, #060605 100%);
 }
-/* Glas der Roehre: Scanlines, dunkle Ecken und eine leichte Spiegelung oben links */
 .intro-schirm::after {
     content: "";
     position: absolute;
@@ -11768,7 +11347,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
 .intro-schirm.flimmert {
     filter: brightness(1.3);
 }
-/* Logo-Raender weich auslaufen lassen, damit kein Kasten zu sehen ist */
 .intro-logo {
     height: 60%;
     -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 58%, transparent 71%);
@@ -11795,7 +11373,6 @@ body.muenzen-blitz .loot-kugel.loot-gelandet:not(.loot-stern) {
     color: #ffcf4a;
     text-shadow: 0 0 6px rgba(255, 176, 58, 0.9), 0 0 18px rgba(255, 176, 58, 0.4);
 }
-/* ---------- CRT-Filter (Einstellungen) ---------- */
 #crt-filter {
     display: none;
     position: fixed;
@@ -11819,7 +11396,6 @@ body.crt #crt-filter::after {
     from { opacity: 0.94; }
     to { opacity: 1; }
 }
-/* Aura praesenter: fester Rand (zwei kleine Schatten) plus Leuchten, das mit dem Level waechst */
 .figur-bild.figur-aura {
     filter: drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 var(--aura-g2, 0px) var(--aura));
 }
@@ -11827,7 +11403,6 @@ body.crt #crt-filter::after {
     filter: drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 1px var(--aura)) drop-shadow(0 0 var(--aura-g, 2px) var(--aura)) drop-shadow(0 0 calc(var(--aura-g2, 0px) + 3px) var(--aura));
 }
 
-/* Pakt-Segen: rote Karte mit Warnschild */
 .segen-karte.segen-pakt {
     border-color: #b8232a;
     background: linear-gradient(#fff0ea, #ffd6cc);
@@ -11843,7 +11418,6 @@ body.crt #crt-filter::after {
     margin-bottom: 2px;
 }
 
-/* Hof-Stile */
 .stil-hinweis {
     text-align: center;
     margin: 0 0 10px;
@@ -11886,7 +11460,6 @@ body.crt #crt-filter::after {
     font-style: italic;
     opacity: 0.85;
 }
-/* Erntefieber: warmer, pulsierender Rand */
 body.erntefieber::after {
     content: "";
     position: fixed;
@@ -11901,7 +11474,6 @@ body.erntefieber::after {
     to { opacity: 1; }
 }
 
-/* Herausforderungen im Mondteich */
 .mondphase.herausforderung.geschafft {
     border-color: #3f8a32;
 }
@@ -11909,7 +11481,6 @@ body.erntefieber::after {
     font-size: 0.75em;
 }
 
-/* Neue legendaere Saat: Komet (leuchtet und zieht), Diamant (funkelt), Drachenei (wackelt, gluehende Adern) */
 body.muenzen-komet .loot-kugel:not(.loot-stern),
 .vorschau-muenzen-komet {
     animation: komet-schein 1.8s ease-in-out infinite;
@@ -11948,7 +11519,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     90% { rotate: -6deg; }
 }
 
-/* ---------- Neuigkeiten als Dorfzeitung ---------- */
 .menue-zeitung {
     position: absolute;
     left: 50%;
@@ -12091,7 +11661,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     cursor: default;
 }
 
-/* Zeitung unten links statt Schriftzug, Version rechts nur als Text */
 .menue-zeitung {
     left: 14px;
     bottom: 12px;
@@ -12107,7 +11676,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     text-decoration: none;
     opacity: 0.85;
 }
-/* Ungelesen: der Knopf wackelt ab und zu (in Pixel-Schritten, wie in Hay Day) */
 .menue-zeitung.ungelesen {
     animation: zeitung-wackeln 2.4s steps(1) infinite;
 }
@@ -12119,7 +11687,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     86% { transform: rotate(6deg); }
     90% { transform: rotate(0deg); }
 }
-/* Beim Oeffnen wirbelt die Zeitung heran wie in alten Filmen (ruckelig in festen Schritten = Pixel-Look) */
 .popup.zeitung-fenster {
     animation: zeitung-wirbel 0.8s steps(12) both;
     image-rendering: pixelated;
@@ -12136,7 +11703,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 @keyframes zeitung-weg {
     to { transform: scale(0.1) rotate(180deg); opacity: 0; }
 }
-/* Umblaettern: die Seite klappt kurz in Pixel-Schritten auf */
 .zeitung-blatt.umblaettern {
     animation: zeitung-seite 0.3s steps(4);
 }
@@ -12145,7 +11711,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     to { transform: rotate(-0.4deg) scaleX(1); opacity: 1; }
 }
 
-/* Beta Tester (mythisch): dickere, pulsierende Aura */
 .haustier.haustier-aura.haustier-engel img {
     animation: engel-aura 2.2s ease-in-out infinite, geist-schweben 3s ease-in-out infinite;
 }
@@ -12154,7 +11719,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 16px var(--aura, #fff3a0)) drop-shadow(0 0 6px var(--aura, #fff3a0)) brightness(1.1); }
 }
 
-/* Emojis im Text: als Pixel-Bild (der echte Buchstabe bleibt unsichtbar darunter) */
 .px-emoji {
     display: inline-block;
     width: 1.15em;
@@ -12172,7 +11736,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     letter-spacing: 0;
 }
 
-/* Haus-Skins: Funken am legendaeren Haus, farbiger Rauch */
 .haus-funke {
     position: absolute;
     width: 4px;
@@ -12202,7 +11765,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin-bottom: 2px;
 }
 
-/* Brief aus dem Dorf */
 .brief {
     background: #fffaf0;
     background-image: repeating-linear-gradient(0deg, transparent 0 21px, rgba(90, 140, 200, 0.18) 21px 22px);
@@ -12234,7 +11796,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     100% { transform: none; opacity: 1; }
 }
 
-/* Regenbogen-Aura: Farbe kommt per Code (--aura), keine eigene Animation mehr */
 .aura-regenbogen {
     animation: none;
 }
@@ -12252,9 +11813,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { filter: drop-shadow(0 0 10px var(--leuchten)) brightness(1.08); }
 }
 
-/* ---------- Hauptmenue-Knoepfe im Pixel-Stil ----------
-   Gestufte Ecken (clip-path), dunkler Rand aussen, innen Licht oben und Schatten unten als harte Kanten,
-   Pixel-Schrift, beim Drueberfahren und Druecken in ganzen Pixel-Schritten */
 #hauptmenue .menue-knopf {
     --stufe: 4px;
     --rand: #2e1a09;
@@ -12330,7 +11888,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
 }
 
-/* ---------- Intro: kleiner CRT-Filter nur ueber dem Automaten (112..528 von 640) ---------- */
 .intro-crt {
     position: absolute;
     left: 17.5%;
@@ -12349,7 +11906,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 
-/* Mondteich im Hof leuchtet etwas staerker, wenn man hinein kann */
 .teich.leuchtet {
     filter: drop-shadow(0 0 8px #e0d0ff) drop-shadow(0 0 18px #a877e0) drop-shadow(0 0 3px #ffffff);
     animation: teich-leuchten-stark 1.6s ease-in-out infinite;
@@ -12358,7 +11914,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { filter: drop-shadow(0 0 14px #f4eeff) drop-shadow(0 0 30px #b98cf0) drop-shadow(0 0 5px #ffffff) brightness(1.1); }
 }
 
-/* ---------- Pokale ---------- */
 #rechnung-display.pokal {
     box-shadow: 0 0 0 2px var(--pokal), 0 0 12px var(--pokal);
 }
@@ -12393,7 +11948,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin-top: 4px;
 }
 
-/* Pokal-Knopf oben und Vitrine */
 #pokal-knopf {
     cursor: pointer;
     padding-left: 6px;
@@ -12456,7 +12010,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     color: #3f8a32;
 }
 
-/* Copyright auf dem zweiten Automaten von rechts (Bildschirm 550/129, 46x37 von 640x360), scharfe Pixel-Schrift */
 #intro-buehne {
     container-type: size;
 }
@@ -12489,7 +12042,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     93%, 100% { opacity: 1; }
 }
 
-/* Intro: Joystick-Ebene ueber dem Bildschirm */
 #intro-vorne {
     position: absolute;
     inset: 0;
@@ -12500,7 +12052,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     z-index: 1;
 }
 
-/* Kombo-Boni unter dem Kombo-Balken */
 .kombo-bonus {
     display: block;
     font-size: 0.75em;
@@ -12518,7 +12069,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     margin-right: 2px;
 }
 
-/* Kristalle, Fragezeichen und DLC im Bauernhaus (oben rechts neben dem X) und im Profil (unten links) */
 .haus-shop-leiste {
     position: absolute;
     top: 8px;
@@ -12596,7 +12146,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     font-size: 0.8em;
 }
 
-/* Promocode */
 .code-knopf {
     font-weight: 900;
     padding: 4px 12px;
@@ -12618,7 +12167,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     border-radius: 6px;
 }
 
-/* Debug: Liste der Promocodes */
 .debug-promo-liste {
     display: flex;
     flex-direction: column;
@@ -12642,8 +12190,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
 }
 
 
-/* Einstellung "Weniger Partikel und Animationen": alle CSS-Animationen und Uebergaenge aus,
-   reine Deko und die Helfer-Figuren verschwinden (die Helfer arbeiten weiter, man sieht sie nur nicht) */
 body.ohne-effekte *,
 body.ohne-effekte *::before,
 body.ohne-effekte *::after {
@@ -12658,11 +12204,9 @@ body.ohne-effekte #jahreszeit-ebene > * {
     display: none !important;
 }
 
-/* Duo: der Host hat eine gelbe Namensschrift (auf dem Hof und in der Lobby) */
 .figur-name.host-name {
     color: #ffd93d !important;
 }
-/* in der Lobby (heller Hintergrund) ein dunkleres Gelb mit Schatten, damit es lesbar bleibt */
 .koop-host-name {
     color: #e0a800;
     text-shadow: 1px 1px 0 #4a2f15;
@@ -12682,8 +12226,6 @@ body.ohne-effekte #jahreszeit-ebene > * {
     margin-top: 4px;
 }
 
-/* ---------- KLEINE BILDSCHIRME (Handy quer, kleine Fenster) ----------
-   Die Kopfleiste wird kompakter, damit alles in eine Zeile passt und nichts rechts herausragt. */
 @media (max-width: 1100px), (max-height: 560px) {
     #top-leiste {
         height: 42px;
@@ -12731,7 +12273,6 @@ body.ohne-effekte #jahreszeit-ebene > * {
     }
 }
 
-/* Finger-Bedienung: kein Text markieren, kein Lupen-Menue beim langen Antippen, kein Doppeltipp-Zoom */
 html.touch,
 html.touch body {
     -webkit-touch-callout: none;
@@ -12746,7 +12287,6 @@ html.touch .slot {
     touch-action: manipulation;
 }
 
-/* ---------- GEM-SHOP und freiwillige Werbung ---------- */
 .gem-pakete {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -12773,7 +12313,6 @@ html.touch .slot {
     display: block;
     margin: 8px auto 0;
 }
-/* Auf dem Feld wischt man zum Einsammeln: der Browser soll dabei nicht scrollen oder zoomen */
 html.touch #field-grid,
 html.touch #fx-layer {
     touch-action: none;

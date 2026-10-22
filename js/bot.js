@@ -1,30 +1,20 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Test-Bot fuer das Duo (debug.bot("CODE"))
-// Laeuft in einem unsichtbaren zweiten Spiel (index.html?bot=CODE) und tritt deiner Lobby als Gast bei.
-// Er spielt wie ein durchschnittlicher Spieler: klickt nicht zu schnell, reagiert mit etwas Verzoegerung,
-// erntet, sammelt ein, verjagt Kraehen, kauft zwischen den Tagen sinnvoll ein und bezahlt Rechnungen.
-// Sein Spielstand liegt nur im Speicher (speicher.js), dein eigener Spielstand wird nie angefasst.
-// Wird als letzte Datei geladen.
-// ============================================================
-
 const BOT = {
     tickMs: 100,
-    klicksProSek: 5,          // durchschnittlicher Spieler, kein Autoklicker
-    reaktionMs: [400, 1400],  // so lange dauert es, bis er etwas bemerkt (Ernte, Saaten, Kraehen)
-    pausenChance: 0.004,      // pro Tick: kurz nicht klicken (trinkt was, schaut aufs Handy)
-    emoteChance: 0.0015,      // pro Tick: ab und zu ein Emote
-    rechnungWarteMs: 3000,    // so lange laesst er dir den Vortritt bei der Rechnung
-    tagWarteMs: 2500          // nach dem Einkaufen so lange warten, dann "bereit"
+    klicksProSek: 5,
+    reaktionMs: [400, 1400],
+    pausenChance: 0.004,
+    emoteChance: 0.0015,
+    rechnungWarteMs: 3000,
+    tagWarteMs: 2500
 };
 
 (function starteBot() {
     if (typeof BOT_CODE !== "string" || !BOT_CODE || !DEBUG_ERLAUBT) return;
 
-    // Der Bot hat einen eigenen Namen im Duo
     profil().name = "Bot";
-    const bemerkt = new Map(); // Ding -> Zeitpunkt, ab dem er reagiert
+    const bemerkt = new Map();
     let pauseBis = 0;
     let klickRest = 0;
     let vorTagSeit = 0;
@@ -37,7 +27,6 @@ const BOT = {
         return jetzt >= bemerkt.get(ding);
     };
 
-    // Einkaufen wie der Balancing-Bot: Sternensamen zuerst in neue Pflanzen, Gold erst nach der Ruecklage fuer die Rechnung
     function kaufeEin() {
         const fehlgeschlagen = new Set();
         const naechste = naechsteRechnung();
@@ -73,7 +62,6 @@ const BOT = {
         }
     }
 
-    // Fenster wegklicken, die ein echter Spieler auch wegklicken wuerde (Tutorial, Hinweise), aber nicht die Rechnung
     function schliesseHinweise() {
         document.querySelectorAll(".popup-huelle").forEach(h => {
             if (!h.querySelector(".rechnung-frage")) h.remove();
@@ -87,7 +75,6 @@ const BOT = {
             pauseBis = jetzt + zufallZwischen(1500, 5000);
             return;
         }
-        // Klicken mit etwas Schwankung (mal schneller, mal langsamer)
         klickRest += BOT.klicksProSek * zufallZwischen(0.6, 1.4) * BOT.tickMs / 1000;
         while (klickRest >= 1) {
             klickSamenladen(false, 0, 0);
@@ -119,7 +106,6 @@ const BOT = {
     }
 
     function spieleZwischenDenTagen(jetzt) {
-        // Rechnung: dir den Vortritt lassen, dann bezahlen
         if (run.rechnungOffen) {
             if (!rechnungSeit) rechnungSeit = jetzt;
             if (jetzt - rechnungSeit > BOT.rechnungWarteMs) {
@@ -145,14 +131,13 @@ const BOT = {
         }
     }
 
-    // Stand an das Hauptspiel melden (unten links im Bot-Schild), damit man sieht, was er gerade tut
     function meldeStand() {
         let text;
         if (!koop.verbunden) text = "🤖 verbindet … " + (koop.status || "");
         else if (!koopAktiv()) text = "🤖 in der Lobby, wartet auf den Start";
         else text = "🤖 Tag " + run.tag + " · " + (run.phase === "tag" ? "spielt" : run.koopFertig ? "Feierabend" : koop.ichBereit ? "bereit" : "kauft ein") +
             " · " + zahl(run.gold) + " Gold · " + run.felder.length + " Felder · " + run.gesamt.klicks + " Klicks";
-        try { window.parent.postMessage({ sproutvaleBot: text }, "*"); } catch (fehler) { /* kein Hauptspiel */ }
+        try { window.parent.postMessage({ sproutvaleBot: text }, "*"); } catch (fehler) {  }
     }
     setInterval(meldeStand, 1000);
 

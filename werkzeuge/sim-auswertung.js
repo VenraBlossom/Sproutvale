@@ -1,19 +1,11 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Wertet ein Log des Balancing-Simulators aus (Test-Werkzeug, wird nicht mitgeliefert)
-// Zeigt pro Run: Tage, bezahlte Rechnungen, Spielzeit, und wann (Spielzeit inklusive aller Neustarts)
-// zum ersten Mal der Holz-, Gold-, Platin- und Kristallpokal bezahlt wurde.
-// Start:  node werkzeuge/sim-auswertung.js _sim-log.txt
-// ============================================================
 
 const fs = require("fs");
 
 const datei = process.argv[2] || "_sim-log.txt";
 const zeilen = fs.readFileSync(datei, "utf8").split(/\r?\n/);
 
-// Rechnung (1 = erste), mit der ein Pokal kommt. Aus daten.js (TROPHAEEN.nummer + Kredit-Verschiebung)
-// Andere Plaetze testen (z.B. mit einem PATCH): POKALE=4,7,10,14 node werkzeuge/sim-auswertung.js _sim-x-log.txt
 const PLAETZE = (process.env.POKALE || "5,7,11,14").split(",").map(Number);
 const POKALE = [["Holz", PLAETZE[0]], ["Gold", PLAETZE[1]], ["Platin", PLAETZE[2]], ["Kristall", PLAETZE[3]]];
 const ZIELE = { Holz: "45-55 Min", Gold: "ca. 2,5 Std", Platin: "ca. 5,5 Std", Kristall: "10-15 Std" };
@@ -29,12 +21,12 @@ zeilen.forEach(zeile => {
     }
     const tag = zeile.match(/ TAG (\{.*\})$/);
     if (tag && aktuell) {
-        try { aktuell.tage.push(JSON.parse(tag[1])); } catch (fehler) { /* halbe Zeile am Ende */ }
+        try { aktuell.tage.push(JSON.parse(tag[1])); } catch (fehler) {  }
     }
 });
 
 const zeit = min => (min >= 60 ? Math.floor(min / 60) + " Std " + String(Math.round(min % 60)).padStart(2, "0") + " Min" : Math.round(min) + " Min");
-let vorher = 0; // Spielzeit aller vorigen Runs
+let vorher = 0;
 const erreicht = {};
 console.log("Run | Tage | Rechnungen | Spielzeit Run | gesamt | Goldmulti | Felder | beste Pflanze");
 runs.forEach(r => {

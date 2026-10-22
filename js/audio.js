@@ -1,14 +1,5 @@
 "use strict";
 
-// ============================================================
-// AUDIO: Soundeffekte und Hintergrundmusik, komplett im Code erzeugt (Web Audio API).
-// Spaeter koennen hier echte Sound-Dateien (.ogg/.mp3) eingebunden werden.
-// Browser erlauben Ton erst nach dem ersten Klick, darum startet Klang.start() beim ersten Klick.
-//
-// Aufbau: Instrumente (Zupfen, Glocke, Flaeche, Bass, Kick, Rauschen) -> Musik- bzw. SFX-Bus
-//         -> Hall (Convolver) + Echo -> Kompressor -> Lautsprecher
-// Musik: LIEDER (unten) sind kleine Stuecke aus Akkorden und Melodie-Takten. Gewechselt wird am Taktende.
-// ============================================================
 
 const EINSTELLUNGEN_KEY = "sproutvale_einstellungen";
 
@@ -40,14 +31,6 @@ function midiZuFrequenz(note) {
     return 440 * Math.pow(2, (note - 69) / 12);
 }
 
-// ---------- DIE LIEDER ----------
-// akkorde: Name -> { bass: MIDI-Ton, toene: [MIDI-Toene] }
-// takte: [Akkordname, Melodie als [[Note, Laenge in Achteln], ...]], Note 0 = Pause
-// taktAchtel: 8 = 4/4-Takt, 6 = 3/4-Takt (Walzer)
-// bass: "normal" | "walking" | "oompah" | "walzer" | "lang"
-// schlagzeug: "sanft" | "hell" | "swing" | "oompah" | "schlitten" | "keins"
-// begleitung: "zupfen" | "arpeggio" | "stabs" | "walzer" | "keine"
-// melodie: "zupfen" | "glocke", swing: 0 = gerade, 0.15 = leicht geswingt
 
 const PAUSE = akkorde => akkorde.map(a => [a, [[0, 8]]]);
 
@@ -257,15 +240,12 @@ const LIEDER = {
     }
 };
 
-// Alle Takte eines Liedes hintereinander (aus dem Ablauf der Teile)
 function liedTakte(lied) {
     if (!lied.alleTakte) lied.alleTakte = lied.ablauf.flatMap(teil => lied.teile[teil]);
     return lied.alleTakte;
 }
 
-// Tonleiter fuer die Klick-Toene: je hoeher die Kombo, desto hoeher der Ton
 const KLICK_TONLEITER = [72, 74, 77, 79, 81, 84, 86, 89, 91, 93, 96];
-// Pentatonik fuer die Ernte-Toene: jede Pflanze klingt etwas hoeher als die vorige
 const ERNTE_TONLEITER = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103, 105];
 
 const Klang = {
@@ -297,7 +277,6 @@ const Klang = {
         kompressor.ratio.value = 4;
         kompressor.connect(ctx.destination);
 
-        // Hall: kuenstliche Raumantwort aus abklingendem Rauschen
         const hall = ctx.createConvolver();
         hall.buffer = this.erzeugeHall(2.6);
         const hallLautstaerke = ctx.createGain();
@@ -306,7 +285,6 @@ const Klang = {
         hallLautstaerke.connect(kompressor);
         this.hallEingang = hall;
 
-        // Echo mit Rueckkopplung, leicht gedaempft
         const echo = ctx.createDelay(1);
         echo.delayTime.value = 0.54;
         const rueckkopplung = ctx.createGain();
@@ -354,13 +332,11 @@ const Klang = {
 
     setzeLautstaerken() {
         if (!this.ctx) return;
-        // "Im Hintergrund stumm": ist das Fenster nicht vorne, bleibt es leise
         const stumm = einstellungen.hintergrundStumm && (document.hidden || !document.hasFocus());
         this.musikBus.gain.value = stumm ? 0 : einstellungen.musik * 0.5;
         this.sfxBus.gain.value = stumm ? 0 : einstellungen.sfx * 0.55;
     },
 
-    // Verbindet eine Stimme mit dem Bus und optional mit Hall/Echo
     verbinde(knoten, bus, hallAnteil, echoAnteil) {
         knoten.connect(bus);
         if (hallAnteil > 0) {
@@ -377,9 +353,7 @@ const Klang = {
         }
     },
 
-    // ---------- Instrumente ----------
 
-    // Weiches Zupfen (Melodie, Muenzen): Dreieck + Sinus eine Oktave hoeher, schnell ansteigend, langsam abklingend
     zupfen(zeit, frequenz, dauer, lautstaerke, bus, hall = 0.4, echo = 0) {
         const ctx = this.ctx;
         const huelle = ctx.createGain();
@@ -406,7 +380,6 @@ const Klang = {
         this.verbinde(huelle, bus, hall, echo);
     },
 
-    // Glocke / Spieluhr: Sinus mit nicht-harmonischem Oberton, langer Nachklang
     glocke(zeit, frequenz, dauer, lautstaerke, bus, hall = 0.5, echo = 0.3) {
         const ctx = this.ctx;
         const huelle = ctx.createGain();
@@ -427,7 +400,6 @@ const Klang = {
         this.verbinde(huelle, bus, hall, echo);
     },
 
-    // Flaeche: zwei leicht verstimmte Saegezaehne, stark gefiltert, langsam ein- und ausblendend
     flaeche(zeit, toene, dauer, lautstaerke) {
         const ctx = this.ctx;
         const huelle = ctx.createGain();
@@ -501,7 +473,6 @@ const Klang = {
         this.verbinde(huelle, bus, hall, 0);
     },
 
-    // Kurzer Ton mit Tonhoehen-Verlauf (fuer Plopp-Geraeusche)
     plopp(zeit, von, bis, dauer, lautstaerke, typ = "sine") {
         const ctx = this.ctx;
         const osz = ctx.createOscillator();
@@ -518,7 +489,6 @@ const Klang = {
         this.verbinde(huelle, this.sfxBus, 0.15, 0);
     },
 
-    // Arpeggio aus MIDI-Noten mit festem Abstand
     arpeggio(noten, abstand, dauer, lautstaerke, hall = 0.35, echo = 0) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -535,7 +505,6 @@ const Klang = {
         return this.ctx && einstellungen.sfx > 0;
     },
 
-    // ---------- Soundeffekte ----------
     klick(komboZaehler) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -549,7 +518,6 @@ const Klang = {
         this.plopp(jetzt, 180, 90, 0.12, 0.35);
         this.rauschStoss(jetzt, 0.06, 0.06, 800, this.sfxBus, 0.05);
     },
-    // Jede Pflanze hat ihren eigenen Ernte-Ton (je wertvoller, desto hoeher und heller)
     ernte(pflanzenIndex = 0) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -582,13 +550,11 @@ const Klang = {
     erfolg() { this.glockenspiel([79, 83, 86, 91], 0.08, 0.7, 0.09); },
     gluehwuermchen() { this.glockenspiel([96, 100, 103], 0.04, 0.5, 0.06); },
     banner() { this.glockenspiel([84, 91], 0.1, 0.6, 0.06); },
-    // tonhoehe: 1 = normale Katze, hoeher = Fuchs/Katzenmaedchen, tiefer = Teufelskatze
     miau(tonhoehe = 1) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
         const hoehe = (0.9 + Math.random() * 0.25) * tonhoehe;
         const ctx = this.ctx;
-        // Miau: Tonhoehe steigt und faellt, ein Bandpass macht den "Mund" auf und zu
         const osz = ctx.createOscillator();
         osz.type = "sawtooth";
         osz.frequency.setValueAtTime(520 * hoehe, jetzt);
@@ -611,7 +577,6 @@ const Klang = {
         osz.stop(jetzt + 0.5);
         this.verbinde(huelle, this.sfxBus, 0.2, 0);
     },
-    // Hund: kurzes "Wuff" (Rauschen und tiefer Ton mit schnellem Abfall)
     wuff(tonhoehe = 1) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -621,7 +586,6 @@ const Klang = {
             this.rauschStoss(jetzt + versatz, 0.07, 0.08, 900, this.sfxBus, 0.05, "bandpass");
         });
     },
-    // Blockmensch: dumpfes "Tock" wie ein Block, der abgebaut wird (gross = der Block bricht)
     blockLaut(gross = false) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -630,7 +594,6 @@ const Klang = {
         this.rauschStoss(jetzt, 0.05, gross ? 0.1 : 0.06, 1200, this.sfxBus, 0.04, "bandpass");
         if (gross) this.plopp(jetzt + 0.08, 160 * h, 90 * h, 0.1, 0.25, "square");
     },
-    // Mantarochen/Axolotl/Pinguin: weiches, blubberndes Glucksen
     blubb() {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -639,7 +602,6 @@ const Klang = {
         this.plopp(jetzt + 0.1, 330 * hoehe, 700 * hoehe, 0.1, 0.25);
         this.plopp(jetzt + 0.19, 420 * hoehe, 900 * hoehe, 0.09, 0.2);
     },
-    // Leises Schnurren: tiefes Brummen, das schnell pulsiert
     schnurren() {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -660,7 +622,6 @@ const Klang = {
     geschenk() { this.arpeggio([84, 88, 91, 96, 91, 96], 0.06, 0.5, 0.09, 0.45, 0.2); },
     reset() { this.arpeggio([77, 72, 67, 60], 0.12, 0.8, 0.1, 0.5); },
 
-    // Kraehe: heiseres "Kraah" (Saegezahn durch Bandpass)
     kraehe() {
         if (!this.bereit()) return;
         const ctx = this.ctx;
@@ -691,7 +652,6 @@ const Klang = {
         const jetzt = this.ctx.currentTime;
         for (let i = 0; i < 5; i++) this.rauschStoss(jetzt + i * 0.07, 0.05, 0.1, 500, this.sfxBus, 0.05, "lowpass");
     },
-    // Gewitter: grollendes, tiefes Rauschen
     donner() {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -699,7 +659,6 @@ const Klang = {
         this.rauschStoss(jetzt + 0.08, 2.2, 0.3, 180, this.sfxBus, 0.6, "lowpass");
         this.plopp(jetzt, 70, 40, 1.6, 0.25, "triangle");
     },
-    // Regen: leises, gleichmaessiges Rauschen im Hintergrund (an/aus)
     regen(an) {
         if (!this.ctx) return;
         if (an && !this.regenQuelle) {
@@ -721,7 +680,6 @@ const Klang = {
             this.regenQuelle = { quelle, g };
         } else if (!an && this.regenQuelle) {
             const { quelle, g } = this.regenQuelle;
-            // vom aktuellen Wert aus leiser werden (sonst springt die Lautstaerke und es knackt)
             g.gain.cancelScheduledValues(this.ctx.currentTime);
             g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), this.ctx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1);
@@ -765,7 +723,6 @@ const Klang = {
         if (!this.bereit()) return;
         this.plopp(this.ctx.currentTime, 300, 360, 0.08, 0.12, "triangle");
     },
-    // Kapsel geht auf: je seltener, desto groesser der Klang
     kapselAuf(raritaet) {
         if (!this.bereit()) return;
         const jetzt = this.ctx.currentTime;
@@ -776,19 +733,16 @@ const Klang = {
         if (raritaet >= 4) this.rauschStoss(jetzt + 0.4, 1.2, 0.05, 6000, this.sfxBus, 0.7);
     },
 
-    // ---------- Hintergrundmusik ----------
     starteMusik() {
         this.naechsterTaktZeit = this.ctx.currentTime + 0.3;
         this.taktNummer = 0;
         setInterval(() => this.planeMusik(), 100);
     },
 
-    // Wechselt zum Lied, sobald der aktuelle Takt vorbei ist
     waehleLied(id) {
         if (LIEDER[id]) this.naechstesLiedId = id;
     },
 
-    // Schnellere Musik bei hoher Kombo (1 = normal)
     setzeTempoFaktor(faktor) {
         this.tempoFaktor = faktor;
     },
@@ -813,12 +767,10 @@ const Klang = {
         const akkord = lied.akkorde[akkordName];
         const bus = this.musikBus;
         const n = lied.taktAchtel;
-        // Swing: jede zweite Achtel kommt etwas spaeter
         const zeitVon = i => start + achtel * i + (i % 2 === 1 ? achtel * lied.swing : 0);
 
         if (lied.flaeche > 0) this.flaeche(start, akkord.toene, achtel * n, lied.flaeche);
 
-        // Bass
         switch (lied.bass) {
             case "walking":
                 [0, 4, 7, 9].forEach((stufe, i) => this.bass(zeitVon(i * 2), akkord.bass + stufe, achtel * 1.8, 0.26));
@@ -839,7 +791,6 @@ const Klang = {
                 this.bass(zeitVon(6), akkord.bass, achtel * 2, 0.24);
         }
 
-        // Schlagzeug
         switch (lied.schlagzeug) {
             case "sanft":
                 this.kick(zeitVon(0), 0.28);
@@ -868,7 +819,6 @@ const Klang = {
                 break;
         }
 
-        // Begleitung
         switch (lied.begleitung) {
             case "zupfen":
                 [0, 2, 4, 6].forEach((i, k) => {
@@ -892,7 +842,6 @@ const Klang = {
                 break;
         }
 
-        // Melodie
         let position = 0;
         melodie.forEach(([note, laenge]) => {
             if (note) {
@@ -905,11 +854,8 @@ const Klang = {
     }
 };
 
-// Ton startet beim allerersten Klick irgendwo auf der Seite
 document.addEventListener("pointerdown", () => Klang.start(), { once: true });
 
-// Autoklicker sind erlaubt, sollen aber nicht laggen oder den Ton uebersteuern:
-// derselbe Effekt-Ton hoechstens alle 45 ms, insgesamt hoechstens 30 Effekt-Toene pro Sekunde.
 (function drossleToene() {
     const intern = new Set(["start", "erzeugeHall", "erzeugeRauschen", "setzeLautstaerken", "verbinde", "zupfen", "glocke", "flaeche",
         "bass", "kick", "rauschStoss", "plopp", "arpeggio", "glockenspiel", "bereit", "regen", "starteMusik", "waehleLied",
@@ -934,6 +880,5 @@ document.addEventListener("pointerdown", () => Klang.start(), { once: true });
     });
 })();
 
-// Fenster kommt nach vorne oder geht in den Hintergrund: Lautstaerke neu setzen (Einstellung "Im Hintergrund stumm")
 ["blur", "focus"].forEach(ereignis => window.addEventListener(ereignis, () => Klang.setzeLautstaerken()));
 document.addEventListener("visibilitychange", () => Klang.setzeLautstaerken());

@@ -1,16 +1,8 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Helfer als echte Figuren
-// Eichhoernchen wuseln um den Samenladen (und huepfen bei jedem Helfer-Klick), Igel laufen zur Saat und sammeln sie ein,
-// Bienen fliegen zu dem Feld, das sie wachsen lassen, der Saat-Spatz fliegt vom Himmel zum freien Feld,
-// der Erntehase hoppelt zur reifen Pflanze. Die Arbeit passiert erst, wenn die Figur angekommen ist.
-// Gehoert zu script.js (Klicks der Eichhoernchen und die Timer stehen dort in aktualisiereHelfer).
-// ============================================================
 
 const helferFiguren = [];
 
-// Figur erzeugen: ein Pixel-Symbol auf der Effekt-Ebene
 function neueHelferFigur(typ, symbol, groesse, x, y) {
     const bild = pixelIcon(symbol, groesse, "helfer-figur");
     bild.classList.add("helfer-" + typ);
@@ -33,7 +25,6 @@ function entferneFigur(figur) {
     if (index >= 0) helferFiguren.splice(index, 1);
 }
 
-// Einen Schritt Richtung Ziel. Gibt true zurueck, wenn die Figur angekommen ist.
 function bewegeFigur(figur, tempo, dtMs) {
     if (!figur.ziel) return true;
     const dx = figur.ziel.x - figur.x;
@@ -49,7 +40,6 @@ function bewegeFigur(figur, tempo, dtMs) {
     }
     figur.x += (dx / abstand) * schritt;
     figur.y += (dy / abstand) * schritt;
-    // Die Emojis schauen nach links: nach rechts laufend wird gespiegelt
     if (Math.abs(dx) > 1) figur.richtung = dx > 0 ? -1 : 1;
     setzeFigur(figur);
     return false;
@@ -59,7 +49,6 @@ function figurenVom(typ) {
     return helferFiguren.filter(f => f.typ === typ);
 }
 
-// Anzahl Figuren eines Typs an die Stufe anpassen
 function passeAnzahlAn(typ, soll, erzeuge) {
     const figuren = figurenVom(typ);
     for (let i = figuren.length; i < soll; i++) erzeuge(i);
@@ -76,14 +65,12 @@ function zufallsPunktIn(rect, rand = 0) {
     };
 }
 
-// ---------- EICHHOERNCHEN: wuseln um den Samenladen ----------
 
 function eichhoernchenAnzahl() {
     if (helferKlicksProSek() <= 0) return 0;
     return Math.min(5, 1 + Math.floor((level("eichhoernchen") - 1) / 5) + (level("eichhoernchen2") > 0 ? 1 : 0));
 }
 
-// Ziel irgendwo am Rand des Samenladens
 function punktAmLaden() {
     const rect = marktstand.getBoundingClientRect();
     const seite = Math.floor(Math.random() * 3);
@@ -111,7 +98,6 @@ function aktualisiereEichhoernchen(dtMs) {
     });
 }
 
-// Wird bei jedem Helfer-Klick aufgerufen: ein Eichhoernchen huepft auf den Knopf
 function eichhoernchenKlickt() {
     const figuren = figurenVom("eichhoernchen");
     if (figuren.length === 0) return;
@@ -121,7 +107,6 @@ function eichhoernchenKlickt() {
     f.el.classList.add("huepft");
 }
 
-// ---------- IGEL: laufen zur gelandeten Saat ----------
 
 function igelAnzahl() {
     return level("igel") > 0 ? Math.min(4, 1 + Math.floor((level("igel") - 1) / 5)) : 0;
@@ -137,7 +122,6 @@ function aktualisiereIgel(dtMs) {
         neueHelferFigur("igel", "🦔", 40, rect.left + rect.width / 2, rect.bottom + 20);
     });
     figurenVom("igel").forEach(f => {
-        // Ziel verschwunden (anders eingesammelt)? Neues suchen
         if (f.auftrag && f.auftrag.loot && f.auftrag.loot.weg) f.auftrag = null;
         if (!f.auftrag) {
             const vergeben = new Set(figurenVom("igel").map(i => i.auftrag && i.auftrag.loot).filter(Boolean));
@@ -151,7 +135,6 @@ function aktualisiereIgel(dtMs) {
         if (f.auftrag) {
             f.ziel = { x: f.auftrag.loot.x, y: f.auftrag.loot.y };
             if (bewegeFigur(f, igelTempo(), dtMs)) {
-                // Angekommen: diese Saat und alles in der Naehe einsammeln
                 lootKugeln.filter(l => l.gelandet && !l.weg && Math.hypot(l.x - f.x, l.y - f.y) < 45).forEach(sammleEin);
                 f.auftrag = null;
                 f.el.classList.remove("huepft");
@@ -159,7 +142,6 @@ function aktualisiereIgel(dtMs) {
                 f.el.classList.add("huepft");
             }
         } else {
-            // Nichts zu tun: gemuetlich herumschnueffeln
             if (!f.ziel || f.wartenMs <= 0) {
                 f.ziel = zufallsPunktIn(fieldGrid.getBoundingClientRect(), 40);
                 f.wartenMs = 2000 + Math.random() * 2000;
@@ -170,7 +152,6 @@ function aktualisiereIgel(dtMs) {
     });
 }
 
-// ---------- BIENEN: fliegen zum Feld, das sie wachsen lassen ----------
 
 function bienenHeimat() {
     const korb = hofEbene.querySelector(".deko-bienen");
@@ -186,7 +167,6 @@ function aktualisiereBienen(dtMs) {
     const bienen = figurenVom("biene");
     if (bienen.length === 0) return;
 
-    // Neuer Auftrag im alten Takt: eine freie Biene fliegt zu einem wachsenden Feld
     run.bienenMs += dtMs;
     if (run.bienenMs >= bienenIntervallSek() * 1000) {
         const frei = bienen.find(b => !b.auftrag);
@@ -202,7 +182,6 @@ function aktualisiereBienen(dtMs) {
     bienen.forEach(b => {
         if (b.auftrag) {
             if (!bewegeFigur(b, 160, dtMs)) return;
-            // Kurz ueber der Pflanze summen, dann waechst sie ein Drittel weiter
             b.auftrag.schwebenMs -= dtMs;
             if (b.auftrag.schwebenMs > 0) return;
             const feld = b.auftrag.feld;
@@ -214,7 +193,6 @@ function aktualisiereBienen(dtMs) {
             b.ziel = null;
             return;
         }
-        // Ohne Auftrag: um die Heimat herumsummen
         if (!b.ziel || bewegeFigur(b, 70, dtMs)) {
             const heim = bienenHeimat();
             b.ziel = { x: heim.x + (Math.random() - 0.5) * 70, y: heim.y + (Math.random() - 0.5) * 40 };
@@ -222,7 +200,6 @@ function aktualisiereBienen(dtMs) {
     });
 }
 
-// ---------- SAAT-SPATZ: fliegt vom Himmel auf ein freies Feld ----------
 
 function aktualisiereSpatzen(dtMs) {
     if (level("saatspatz") > 0) {
@@ -252,7 +229,6 @@ function aktualisiereSpatzen(dtMs) {
                 partikel(s.x, s.y + 12, ["#8f6139", "#5b3a22", "#c89b6a"], 8, 35);
             }
             s.auftrag = null;
-            // Wieder davonfliegen
             s.ziel = { x: s.x < window.innerWidth / 2 ? -60 : window.innerWidth + 60, y: -40 };
             return;
         }
@@ -260,7 +236,6 @@ function aktualisiereSpatzen(dtMs) {
     });
 }
 
-// ---------- ERNTEHASE: hoppelt zur reifen Pflanze ----------
 
 function aktualisiereHasen(dtMs) {
     passeAnzahlAn("hase", level("erntehase") > 0 ? 1 : 0, () => {
@@ -296,7 +271,6 @@ function aktualisiereHasen(dtMs) {
     }
 }
 
-// ---------- IM SPIEL-TAKT ----------
 
 function aktualisiereHelferFiguren(dtMs) {
     aktualisiereEichhoernchen(dtMs);
@@ -306,7 +280,6 @@ function aktualisiereHelferFiguren(dtMs) {
     aktualisiereHasen(dtMs);
 }
 
-// Feierabend und Run-Ende: alle Helfer gehen nach Hause (reservierte Felder werden wieder frei)
 function schickeHelferHeim() {
     [...helferFiguren].forEach(f => {
         if (f.auftrag && f.auftrag.feld) f.auftrag.feld.reserviert = false;

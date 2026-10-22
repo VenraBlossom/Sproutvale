@@ -1,18 +1,9 @@
 "use strict";
 
-// ============================================================
-// SPRITES: Platzhalter-Pixelart, direkt im Code gezeichnet.
-//
-// Austauschen gegen echte Grafiken: PNG in einen Ordner "assets" legen
-// und hier in SPRITE_DATEIEN eintragen, z.B.  weizen: "assets/weizen.png"
-// Dann wird die Datei statt der gezeichneten Version benutzt.
-// ============================================================
 
 const SPRITE_DATEIEN = {
-    // weizen: "assets/weizen.png",
 };
 
-// Jeder Buchstabe in den Pixel-Zeilen steht fuer eine Farbe, "." ist durchsichtig
 const SPRITE_FARBEN = {
     b: "#5b3a22", B: "#7a5230", c: "#8f6139",
     g: "#3f8a32", G: "#6cc24a", d: "#2f6b24",
@@ -33,7 +24,6 @@ const SPRITE_FARBEN = {
     i: "#1d2a5a", I: "#4a5fc0", N: "#8fa2f0",
     C: "#efe6ff", f: "#cbb2f5", S: "#8d6bd6", t: "#ffd6f0",
     Z: "#d9a82a", 0: "#5c5c66", X: "#1c1b24"
-    // Ziffern 1 bis 7 sind fuer die Haustiere reserviert (Farben kommen aus HAUSTIER_SKINS in daten.js)
 };
 
 const SPRITE_PIXEL = {
@@ -271,7 +261,6 @@ const SPRITE_PIXEL = {
         ".......dd.......",
         "......kkkk......"
     ],
-    // Goldmuenze. "Z" ist das Zeichen in der Mitte, die Raritaeten faerben nur dieses Zeichen um.
     blaubeere: [
         "................",
         "......GGG.......",
@@ -466,7 +455,6 @@ const SPRITE_PIXEL = {
         "..kkyyyykk..",
         "....kkkk...."
     ],
-    // Muenzwurf: Kopf-Seite (Gesicht) und Zahl-Seite (eine 1)
     muenze_kopf: [
         "....kkkk....",
         "..kkYYYYkk..",
@@ -495,7 +483,6 @@ const SPRITE_PIXEL = {
         "..kkyyyykk..",
         "....kkkk...."
     ],
-    // Jackpot-Muenze mit funkelndem Stern
     muenze_stern: [
         "....kkkk....",
         "..kkYYYYkk..",
@@ -510,7 +497,6 @@ const SPRITE_PIXEL = {
         "..kkyyyykk..",
         "....kkkk...."
     ],
-    // Sternensamen: ein Samenkorn aus Nachthimmel mit kleinen Sternen darin und einem Funkeln
     sternensamen: [
         "........v...",
         ".....i.vwv..",
@@ -525,8 +511,6 @@ const SPRITE_PIXEL = {
         "..iIIIIIi...",
         "...iiiii...."
     ],
-    // mondbluete wird weiter unten als Kirschbluete berechnet
-    // ---------- Icons fuer Knoepfe und Anzeigen ----------
     beutel: [
         "...kAAAAk...",
         "....kaak....",
@@ -684,7 +668,6 @@ const SPRITE_PIXEL = {
         ".....k.P.k..P...",
         "................"
     ],
-    // Huhn fuer das Huehnerrennen, "C" ist die Gefiederfarbe (wird je Huhn umgefaerbt)
     huhn: [
         "......R...",
         ".....RR...",
@@ -697,7 +680,6 @@ const SPRITE_PIXEL = {
         "..kCCCCk..",
         "...kYkY..."
     ],
-    // ---------- Deko fuer den Hof ----------
     blumenkuebel: [
         "..R..Y...M..",
         ".RwR.YwY.MwM",
@@ -757,7 +739,6 @@ const SPRITE_PIXEL = {
         "....WWDDWWW.....",
         "...kkkkkkkkk...."
     ],
-    // Legendaere Windmuehle: Turm ohne Fluegel (die Fluegel drehen sich als eigenes Bild, siehe muehlenfluegel)
     muehle: [
         "......TTTT......",
         ".....TUUUUT.....",
@@ -775,7 +756,6 @@ const SPRITE_PIXEL = {
         "..kWWWWDDWWWWk..",
         ".kkkkkkkkkkkkkk."
     ],
-    // Bienenkorb aus Stroh auf einem kleinen Holzbock
     bienenstock: [
         "....yyyy....",
         "...yYYYYy...",
@@ -790,7 +770,6 @@ const SPRITE_PIXEL = {
         ".KKKKKKKKKK.",
         ".K........K."
     ],
-    // Vogeltraenke aus Stein mit Wasser
     vogeltraenke: [
         "............",
         "..........kk",
@@ -805,7 +784,6 @@ const SPRITE_PIXEL = {
         "..99999999..",
         "............"
     ],
-    // Schneemann mit Hut, Karottennase und Schal
     schneemann: [
         "....kkkk....",
         "....kkkk....",
@@ -823,7 +801,6 @@ const SPRITE_PIXEL = {
         "..wwwwwwww..",
         "...zzzzzz..."
     ],
-    // Kraehe auf einem Zaunpfahl: 5 Bilder, nur der Vogel bewegt sich (0 sitzt, 1 kraechzt, 2 flattert, 3 schaut links, 4 nickt)
     kraehe_0: [
         "............",
         "......XXX...",
@@ -914,7 +891,6 @@ const SPRITE_PIXEL = {
         "....KKKK....",
         "..gKKKKKKg.."
     ],
-    // Neue Deko: Heuwagen, Briefkasten, Steinlaterne (episch), Gluecksdrache mit 4 Bildern (legendaer)
     heuwagen: [
         "....yYYyY.......",
         "..yYYYyYYYy.....",
@@ -1079,7 +1055,6 @@ const SPRITE_PIXEL = {
         ".yyYyyYyyYyyYyyYy.",
         "..yyyyyyyyyyyyyy.."
     ],
-    // Deko (episch): Schubkarre mit Blumen, Wegweiser, Sonnenschirm
     schubkarre: [
         "...R..Y..t..R...",
         "..gGgGgGgGgGgG..",
@@ -1125,7 +1100,6 @@ const SPRITE_PIXEL = {
         "......DD......",
         "....DDDDDD...."
     ],
-    // Kuerbislaterne mit leuchtendem Gesicht
     kuerbislaterne: [
         ".....Gg.....",
         "....gG......",
@@ -1155,7 +1129,6 @@ const SPRITE_PIXEL = {
         "....KK....",
         "...kkkk..."
     ],
-    // ---------- Kraehe (sitzend und zwei Flug-Bilder) ----------
     kraehe: [
         "........XXX...",
         ".......XXXXX..",
@@ -1186,8 +1159,6 @@ const SPRITE_PIXEL = {
         ".XX.......XX..",
         ".............."
     ],
-    // Kodex-Buch fuer die Knopfleiste
-    // Deko: Kuerbisstapel
     kuerbisstapel: [
         "......gG......",
         ".....oOOo.....",
@@ -1199,7 +1170,6 @@ const SPRITE_PIXEL = {
         "oOOOOOooOOOOOo",
         ".ooooo..ooooo."
     ],
-    // Deko: Lagerfeuer (die Flammen flackern per CSS)
     lagerfeuer: [
         "......Y.....",
         ".....YO.....",
@@ -1212,7 +1182,6 @@ const SPRITE_PIXEL = {
         ".kKKkkkkKKk.",
         "..k......k.."
     ],
-    // Deko: Rosenbogen aus Ranken
     blumenbogen: [
         "....GGGGGG....",
         "..GGtGGRGGGG..",
@@ -1231,7 +1200,6 @@ const SPRITE_PIXEL = {
         ".GpG......GpG.",
         "GGkGG....GGkGG"
     ],
-    // Deko: Pilzhaeuschen mit Fenster und Tuer
     pilzhaus: [
         "....RRRR....",
         "..RRwRRRRR..",
@@ -1396,16 +1364,13 @@ const SPRITE_PIXEL = {
     ]
 };
 
-// Abwandlungen eines Sprites mit anderen Farben
 const SPRITE_ABWANDLUNGEN = {
     erde_nass: { basis: "erde", farben: { B: "#5e3d24", b: "#43291a", c: "#6f4a2c" } },
-    // Alle Muenzen sind aus Gold, die Raritaet zeigt ein farbiger Edelstein in der Mitte (plus Leuchten per CSS)
     muenze_0: { basis: "muenze", farben: {} },
     muenze_1: { basis: "muenze", farben: { Z: "#3fbf3f" } },
     muenze_2: { basis: "muenze", farben: { Z: "#2f8fe0" } },
     muenze_3: { basis: "muenze", farben: { Z: "#9a4fe0" } },
     muenze_4: { basis: "muenze_stern", farben: {} },
-    // Baeume, Buesche und Gras fuer die Hof-Themen
     baum_herbst: { basis: "baum", farben: { G: "#f0a030", g: "#d0602a", d: "#8f3326" } },
     busch_herbst: { basis: "busch", farben: { G: "#e8902a", g: "#c0602a", d: "#7a3a1a" } },
     baum_fruehling: { basis: "baum", farben: { G: "#ffc2da", g: "#ff94be", d: "#e06a9a" } },
@@ -1441,7 +1406,6 @@ const SPRITE_ABWANDLUNGEN = {
     gras_feuerwerk: { basis: "gras", farben: { h: "#6aae4a", H: "#7cbf58", j: "#5a9a3e", J: "#e8434a" } }
 };
 
-// Muenzen mit unterschiedlicher Form in der Mitte (Farbenblind-Modus): Dreieck, Raute, Quadrat
 (() => {
     const formen = {
         1: [".ZZ.", ".ZZ.", "ZZZZ", "ZZZZ"],
@@ -1455,11 +1419,9 @@ const SPRITE_ABWANDLUNGEN = {
             return zeile.slice(0, 4) + mitte + zeile.slice(8);
         });
     });
-    // gewoehnlich im Farbenblind-Modus: ohne Zeichen in der Mitte
     SPRITE_PIXEL.muenze_form_0 = SPRITE_PIXEL.muenze.map(zeile => zeile.replace(/Z/g, "Y"));
 })();
 
-// Unreife Stufe einer Pflanze: gleiche Form, aber Fruechte und Blueten sind noch gruen (Blaetter und Stiele bleiben)
 const BLATT_BUCHSTABEN = new Set(["G", "g", "d", "h", "H", "j", "J", "k", "K", "n", "."]);
 
 function mischeHex(a, b, anteil) {
@@ -1485,18 +1447,15 @@ function unreifSprite(name) {
     return schluessel;
 }
 
-// Legt bei Bedarf eine Farbvariante an und gibt ihren Namen zurueck (fuer Kosmetik: Muenzen, Felder ...)
 function spriteVariante(name, basis, farben) {
     if (!SPRITE_ABWANDLUNGEN[name]) SPRITE_ABWANDLUNGEN[name] = { basis, farben };
     return name;
 }
 
-// Sonne und Mond fuer den Himmel ueber dem Hof, aus Kreisen berechnet
 SPRITE_PIXEL.sonne = Array.from({ length: 15 }, (_, y) => Array.from({ length: 15 }, (_, x) => {
     const d = Math.hypot(x - 7, y - 7);
     return d <= 4.6 ? "w" : d <= 6.1 ? "v" : d <= 7.3 ? "Y" : ".";
 }).join(""));
-// Grosser Stern (statt der Sonne in der Kosmischen Nacht): heller Kern, vier lange Strahlen, kurze Strahlen dazwischen
 SPRITE_PIXEL.grosserstern = Array.from({ length: 15 }, (_, y) => Array.from({ length: 15 }, (_, x) => {
     const dx = Math.abs(x - 7);
     const dy = Math.abs(y - 7);
@@ -1507,7 +1466,6 @@ SPRITE_PIXEL.grosserstern = Array.from({ length: 15 }, (_, y) => Array.from({ le
     if (dx === dy && dx <= 4) return "F";
     return ".";
 }).join(""));
-// Sense (Sternenfall-Shop "Sense"): gebogenes Stahlblatt am Holzstiel
 SPRITE_PIXEL.sense_basis = [
     "................",
     "......111111....",
@@ -1528,7 +1486,6 @@ SPRITE_PIXEL.sense_basis = [
 ];
 SPRITE_ABWANDLUNGEN.sense = { basis: "sense_basis", farben: { 1: "#4f5866", 2: "#dfe6ef", 3: "#9a6634", 4: "#5b3a22" } };
 
-// Mondbluete: eine einzelne Kirschbluete in Lavendel (5 Bluetenblaetter mit Kerbe, gelbe Staubblaetter)
 SPRITE_PIXEL.mondbluete = (() => {
     const g = 15;
     const m = 7.5;
@@ -1554,7 +1511,6 @@ SPRITE_PIXEL.mondbluete = (() => {
     }).join(""));
 })();
 
-// Windmuehlen-Fluegel: vier Arme aus Holz (D) mit Segeltuch (w), die Nabe (k) ist genau in der Mitte
 SPRITE_PIXEL.muehlenfluegel = (() => {
     const n = 17;
     const c = 8;
@@ -1566,7 +1522,6 @@ SPRITE_PIXEL.muehlenfluegel = (() => {
     }).join(""));
 })();
 
-// Koi-Teich (legendaere Deko): 8 Bilder. Zwei Koi schwimmen im Kreis, das Schilf wiegt sich, der Rand bleibt stehen
 for (let n = 0; n < 8; n++) {
     const B = 22;
     const H = 12;
@@ -1578,7 +1533,6 @@ for (let n = 0; n < 8; n++) {
         if (nurWasser && !"qQx".includes(raster[py][px])) return;
         raster[py][px] = c;
     };
-    // Steinrand und Wasser (innen tiefer)
     for (let y = 0; y < H; y++) {
         for (let x = 0; x < B; x++) {
             const d = Math.hypot((x - 10.5) / 10.6, (y - 7) / 4.7);
@@ -1587,17 +1541,14 @@ for (let n = 0; n < 8; n++) {
             else raster[y][x] = d > 0.64 ? "q" : "Q";
         }
     }
-    // Schilf links und rechts, die Spitzen wiegen sich
     const wiegen = n % 4 < 2 ? 0 : 1;
     [[1, 1], [3, 0], [20, 2]].forEach(([x, oben]) => {
         for (let y = oben + 2; y < 8; y++) setze(x, y, "g");
         setze(x + wiegen, oben, "k");
         setze(x + wiegen, oben + 1, "k");
     });
-    // Seerose
     setze(15, 5, "g", true); setze(16, 5, "G", true); setze(17, 6, "g", true); setze(15, 6, "G", true); setze(16, 6, "g", true);
     setze(16, 5, "t");
-    // Zwei Koi: Kopf, Koerper, Fleck, Schwanz
     const winkel = (n / 8) * Math.PI * 2;
     [[0, ["O", "O", "w", "o"]], [Math.PI, ["w", "w", "R", "w"]]].forEach(([versatz, farben]) => {
         farben.forEach((farbe, i) => {
@@ -1605,13 +1556,11 @@ for (let n = 0; n < 8; n++) {
             setze(10.5 + Math.cos(a) * 6.4, 7 + Math.sin(a) * 2.4, farbe, true);
         });
     });
-    // Lichtfunkeln auf dem Wasser
     setze(6 + ((n * 3) % 9), 5, "z", true);
     setze(14 - ((n * 2) % 7), 9, "z", true);
     SPRITE_PIXEL["koiteich_" + n] = raster.map(z => z.join(""));
 }
 
-// Windspiel (legendaere Deko): Pfosten mit Arm, drei Klangstaebe schwingen hin und her
 for (let n = 0; n < 4; n++) {
     const B = 12;
     const H = 16;
@@ -1629,19 +1578,16 @@ for (let n = 0; n < 4; n++) {
         for (let y = 4; y < 4 + laenge; y++) setze(x + (y > 5 ? s : 0), y, farbe);
         setze(x + s, 4 + laenge, "8");
     });
-    // Kleines Glitzern am unteren Ende, wenn die Staebe aneinanderstossen
     if (n === 1) setze(8, 10, "w");
     if (n === 3) setze(6, 9, "w");
     SPRITE_PIXEL["windspiel_" + n] = r.map(z => z.join(""));
 }
 
-// Sternenteleskop (legendaere Deko): Fernrohr auf einem Dreibein, darueber funkeln Sterne
 for (let n = 0; n < 4; n++) {
     const B = 14;
     const H = 16;
     const r = Array.from({ length: H }, () => Array(B).fill("."));
     const setze = (x, y, c) => { if (x >= 0 && x < B && y >= 0 && y < H) r[y][x] = c; };
-    // Rohr schraeg nach oben rechts
     for (let i = 0; i < 9; i++) {
         const x = 2 + i;
         const y = 11 - Math.round(i * 0.7);
@@ -1650,13 +1596,11 @@ for (let n = 0; n < 4; n++) {
     }
     setze(6, 8, "Y"); setze(6, 9, "Y");
     setze(11, 4, "z"); setze(11, 5, "w");
-    // Dreibein
     for (let i = 0; i < 4; i++) {
         setze(6 - i, 11 + i, "D");
         setze(6, 11 + i, "D");
         setze(6 + i, 11 + i, "D");
     }
-    // Funkelnde Sterne (wechseln je Bild)
     [[[12, 1], [9, 0]], [[13, 3], [10, 1]], [[12, 0], [8, 2]], [[13, 2], [11, 0]]][n].forEach(([x, y], i) => {
         setze(x, y, i === 0 ? "v" : "w");
     });
@@ -1694,12 +1638,10 @@ function zeichneSprite(zeilen, farbenExtra) {
     return leinwand;
 }
 
-// Pflanzen (auch ihre Farbvarianten) bekommen automatisch eine dunkle Kontur wie Deko und Haustiere
 const KONTUR_SPRITES = new Set(["samen", "keimling", "jungpflanze", "weizen", "karotte", "kartoffel", "erdbeere", "tomate",
     "mais", "kuerbis", "sonnenblume", "blaubeere", "melone", "reis", "kaffee", "riesenpilz", "eisblume", "mondlilie",
     "kristallrose", "sonnenfrucht", "weltenbaum"]);
 
-// Jedes leere Pixel neben einer Farbe wird zur Kontur: eine stark abgedunkelte Version der Nachbarfarbe
 function zeichneKontur(leinwand) {
     const stift = leinwand.getContext("2d");
     const b = leinwand.width;
@@ -1746,13 +1688,6 @@ function spriteUrl(name) {
     return spriteUrlCache[name];
 }
 
-// ============================================================
-// HAUSTIERE: aus einfachen Formen Pixel fuer Pixel berechnet, damit alle Posen zusammenpassen.
-// Katze von der Seite mit 4 Beinen, Mantarochen schwebt knapp ueber dem Boden. Beide schauen nach rechts,
-// nach links wird das Bild im Spiel gespiegelt.
-// Posen (Anzahl Bilder): stehen 2, laufen 4, sitzen 2, liegen 2, schlafen 2.
-// Ziffern: 1 hell, 2 Fell/Haut, 3 dunkel, 4 Bauch/Pfoten, 5 Augen, 6 rosa, 7 Umriss, w Glanz, s Schatten
-// ============================================================
 
 const HAUSTIER_BILDER = { stehen: 2, laufen: 4, sitzen: 2, liegen: 2, schlafen: 2 };
 const HAUSTIER_BREITE = 22;
@@ -1785,7 +1720,6 @@ function pixelRaster() {
                 if (dx * dx + dy * dy <= 1 && (!nurWenn || nurWenn(x, y))) raster[y][x] = farbe;
             });
         },
-        // Dicke Linie entlang einer Kurve (quadratische Bezierkurve), farbe(t) mit t von 0 bis 1
         kurve(p0, p1, p2, radius, farbe) {
             for (let t = 0; t <= 1.0001; t += 0.02) {
                 const u = 1 - t;
@@ -1811,7 +1745,6 @@ function pixelRaster() {
                 if (innen) raster[y][x] = farbe;
             });
         },
-        // Unterkante jeder Form hell faerben (Bauch-Rand)
         unterkante(farbe, nurWenn) {
             const kopie = raster.map(zeile => [...zeile]);
             jedesPixel((x, y) => {
@@ -1820,7 +1753,6 @@ function pixelRaster() {
                 if (hier && hier !== "s" && (!drunter || drunter === "s") && (!nurWenn || nurWenn(x, y))) raster[y][x] = farbe;
             });
         },
-        // Umriss um alle gefuellten Pixel (Schatten zaehlt nicht)
         umriss(farbe) {
             const kopie = raster.map(zeile => [...zeile]);
             const voll = (x, y) => x >= 0 && y >= 0 && x < HAUSTIER_BREITE && y < HAUSTIER_HOEHE &&
@@ -1833,14 +1765,10 @@ function pixelRaster() {
     };
 }
 
-// Kopf der Tier-Figur im Profil (Katze und alle Stile): Ohren, runder Kopf, Auge, Schnauze, Baeckchen.
-// cx/cy = Mitte des Kopfes. Grosser runder Kopf (Chibi-Stil), Auge vorne.
-// stil: fuchs, hund, hase, panda, axolotl, drache, teufel, engel, muetze, kuerbishut, keineStreifen
 function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
     const mx = Math.round(cx);
     const oben = Math.round(cy - 3.1);
 
-    // Ohren (vor dem Kopf zeichnen, der Kopf ueberdeckt den Ansatz)
     if (stil.hase) {
         [mx - 2, mx + 1].forEach(x0 => {
             p.rechteck(x0, oben - 3, 2, 4, "2");
@@ -1863,7 +1791,6 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         });
     }
 
-    // Axolotl: drei rosa Kiemen-Wedel hinten am Kopf
     if (stil.axolotl) {
         const wedel = (x1, y1, x2, y2) => p.kurve([x1, y1], [(x1 + x2) / 2, (y1 + y2) / 2 - 0.4], [x2, y2], 0.55, () => "3");
         wedel(cx - 1.6, cy - 2.6, cx - 3.2, cy - 4.4);
@@ -1878,9 +1805,7 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         p.punkt(mx - 3, oben + 2, "3");
     }
 
-    // Hund: haengendes Schlappohr an der Seite des Kopfes
     if (stil.hund && !stil.einhorn) p.ellipse(cx - 1.6, cy - 0.2, stil.dackel ? 1.3 : 1.2, stil.dackel ? 2.6 : 2.2, "3");
-    // Einhorn: bunte Maehne am Hinterkopf
     if (stil.einhorn) {
         ["R", "Y", "Q", "M"].forEach((farbe, i) => p.punkt(mx - 3, oben + 1 + i, farbe));
         p.punkt(mx - 2, oben, "R");
@@ -1900,7 +1825,6 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
     }
 
     if (stil.fuchs) {
-        // spitze, helle Schnauze mit dunkler Nase
         p.punkt(ax + 1, ay + 1, "4");
         p.punkt(ax + 2, ay + 1, "4");
         p.punkt(ax + 3, ay + 1, "4");
@@ -1908,7 +1832,6 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         p.punkt(ax + 3, ay, "3");
         p.punkt(ax - 1, ay + 1, "4");
     } else if (stil.hund) {
-        // runde Hundeschnauze, dunkle Nase, rosa Zunge
         p.rechteck(ax + 1, ay, 2, 2, "4");
         p.punkt(ax + 3, ay, "7");
         p.punkt(ax + 3, ay + 1, "4");
@@ -1929,23 +1852,19 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
         p.punkt(ax - 1, ay + 1, "6");
     }
 
-    // Weihnachtsmuetze und Kuerbishut sitzen auf dem Kopf (bekommen den Umriss mit)
     if (stil.muetze) {
         p.rechteck(mx - 3, oben, 6, 1, "w");
         p.rechteck(mx - 2, oben - 1, 4, 1, "R");
         p.rechteck(mx - 1, oben - 2, 3, 1, "R");
         p.punkt(mx + 2, oben - 2, "w");
     }
-    // Einhorn: goldenes Horn auf der Stirn (schraeg nach vorn)
     if (stil.einhorn) {
         p.punkt(mx + 1, oben, "y");
         p.punkt(mx + 1, oben - 1, "Y");
         p.punkt(mx + 2, oben - 2, "Y");
         p.punkt(mx + 2, oben - 3, "v");
-        // Glanz wandert am Horn hoch
         p.punkt(katzenAnim % 4 < 2 ? mx + 1 : mx + 2, oben - (katzenAnim % 4), "w");
     }
-    // Rote Schleife am vorderen Ohr (Kitty)
     if (stil.schleife) {
         p.punkt(mx + 1, oben - 3, "R");
         p.punkt(mx + 1, oben - 2, "R");
@@ -1961,7 +1880,6 @@ function katzenKopf(p, cx, cy, blinzelt, schlaeft, stil = {}) {
     }
 }
 
-// Extras, die nach dem Umriss gezeichnet werden (ohne eigenen Umriss): Heiligenschein
 function katzenExtrasOben(p, kopfX, kopfY, stil) {
     if (!stil.engel) return;
     const mx = Math.round(kopfX);
@@ -1971,12 +1889,9 @@ function katzenExtrasOben(p, kopfX, kopfY, stil) {
     p.punkt(mx + 2, y + 1, "y");
 }
 
-// Kleine Fluegel auf dem Ruecken: Engel hellblau, Drache gruen
-// Animationsbild fuer legendaere Begleiter (0 bis 3), wird von haustierUrl gesetzt
 let katzenAnim = 0;
 
 function katzenFluegel(p, x, y, stil) {
-    // Fluegelschlag: die Spitzen gehen hoch und runter
     const hub = [0, -0.8, -1.6, -0.8][katzenAnim % 4];
     if (stil.engel) {
         p.ellipse(x, y - 0.6 + hub * 0.6, 2.6, 1.8 - hub * 0.3, "z");
@@ -1990,14 +1905,11 @@ function katzenFluegel(p, x, y, stil) {
     }
 }
 
-// Rueckenstacheln (Drache)
 function katzenStacheln(p, xs, y, stil) {
     if (!stil.drache) return;
     xs.forEach(x => p.punkt(x, y, "3"));
 }
 
-// Schwanz: normal, buschig mit weisser Spitze (Fuchs), Pfeilspitze (Teufel/Drache), Puschel (Hase),
-// dick und nach oben (Hund), lang und flach (Axolotl), kurz (Panda)
 function katzenSchwanz(p, p0, p1, p2, stil) {
     if (stil.hase) {
         p.ellipse(p0[0] - 0.6, p0[1] - 0.4, 1.4, 1.3, "4");
@@ -2012,7 +1924,6 @@ function katzenSchwanz(p, p0, p1, p2, stil) {
         return;
     }
     if (stil.fuchs) {
-        // Flammenschwanz: die Spitze flackert
         if (stil.flammen) {
             p.kurve(p0, p1, p2, 1.35, t => (t > 0.72 ? (katzenAnim % 2 ? "Y" : "4") : t > 0.55 ? "3" : "2"));
             p.punkt(p2[0] + (katzenAnim % 2 ? 0 : -1), p2[1] - 1 - (katzenAnim % 3 ? 1 : 0), "Y");
@@ -2038,19 +1949,16 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     const dunkleBeine = stil.fuchs || stil.panda;
     const beinFarbe = dunkleBeine ? "3" : "2";
     const pfotenFarbe = dunkleBeine ? "3" : "4";
-    // Dackel: laenger und tiefer, Hase: Kopf etwas tiefer (lange Ohren), Axolotl: kurze Beine
     const tief = stil.dackel ? 1.4 : stil.axolotl ? 1.6 : 0;
     const kopfTiefer = stil.hase ? 1.4 : 0;
     const lang = stil.dackel ? 1.4 : stil.axolotl ? 1 : 0;
     let kopf;
 
     if (pose === "stehen" || pose === "laufen") {
-        // Trab: vorne-nah + hinten-fern bewegen sich zusammen (A), die anderen beiden gegengleich (B)
         const schritt = pose === "laufen" ? bild : -1;
         const versatzA = schritt < 0 ? 0 : [1, 0, -1, 0][schritt];
         const hebenA = schritt === 1 ? 1 : 0;
         const hebenB = schritt === 3 ? 1 : 0;
-        // Hasen huepfen staerker
         const wippen = schritt === 1 || schritt === 3 ? (stil.hase ? -2 : -1) : 0;
         const beinOben = 10 + tief;
         const bein = (x, farbe, heben, pfote) => {
@@ -2099,7 +2007,6 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
         if (stil.hund) p.rechteck(11, 6.8, 3, 1, "R");
         kopf = [12.8, 6.1 + kopfTiefer];
     } else {
-        // liegen und schlafen: gemuetlich zusammengerollt ("Brotlaib"), beim Schlafen atmet sie
         const schlaeft = pose === "schlafen";
         const atmen = schlaeft ? bild * 0.3 : 0;
         katzenSchwanz(p, [4.5, 13.4], [1, 15], [1.4 + (schlaeft ? 0 : bild * 0.8), 11.6 + (schlaeft ? 1.5 : 0)], stil);
@@ -2113,13 +2020,11 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     }
 
     katzenKopf(p, kopf[0], kopf[1], blinzelt, pose === "schlafen", stil);
-    // Dalmatiner: feste dunkle Flecken im Fell
     if (stil.flecken) {
         p.raster.forEach((zeile, y) => zeile.forEach((farbe, x) => {
             if ((farbe === "2" || farbe === "1") && (x * 5 + y * 7) % 9 === 0) zeile[x] = "3";
         }));
     }
-    // Sternenfell: einzelne Sterne im Fell funkeln im Takt
     if (stil.sterne) {
         p.raster.forEach((zeile, y) => zeile.forEach((farbe, x) => {
             if ((farbe === "2" || farbe === "3") && (x * 7 + y * 3 + katzenAnim * 5) % 13 === 0) zeile[x] = "w";
@@ -2127,7 +2032,6 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     }
     p.umriss("7");
     katzenExtrasOben(p, kopf[0], kopf[1], stil);
-    // Hoellenhund: kleine Flammen ueber dem Kopf
     if (stil.flammen && stil.hund) {
         const x = Math.round(kopf[0]) - 1 + (katzenAnim % 2);
         const y = Math.round(kopf[1]) - 5;
@@ -2137,14 +2041,11 @@ function katzenRaster(pose, bild, blinzelt, stil = {}) {
     return p.raster;
 }
 
-// Pinguin von der Seite: aufrecht, watschelt beim Laufen, rutscht zum Liegen auf dem Bauch.
-// Farben: 2 schwarz, 3 dunkel (Fluegel), 4 weisser Bauch, 5 Auge, 6 orange (Schnabel, Fuesse), 7 Umriss
 function pinguinRaster(pose, bild, blinzelt) {
     const p = pixelRaster();
     const geschlossen = blinzelt || pose === "schlafen";
 
     if (pose === "liegen") {
-        // Bauchrutscher
         p.ellipse(10.5, 12.2, 6.8, 2.6, "2");
         p.ellipse(11, 13, 6, 1.6, "4", (x, y) => y >= 12);
         p.ellipse(8, 11.4, 2.4, 0.9, "3");
@@ -2161,19 +2062,15 @@ function pinguinRaster(pose, bild, blinzelt) {
     const neigen = schritt < 0 ? 0 : [0.6, 0, -0.6, 0][schritt];
     const cy = sitzt ? 10 : 8.8;
     const oben = cy - 5.2;
-    // Koerper: oben leicht zur Seite geneigt (Watscheln)
     p.ellipse(11 + neigen, cy, 3.9, 5.2, "2");
     p.ellipse(12.3 + neigen, cy + 1, 2.6, 4, "4", (x, y) => x >= 11 + neigen);
-    // Fluegel schlagen beim Stehen leicht
     const fluegel = pose === "stehen" ? bild * 0.6 : 0;
     p.ellipse(9.6 + neigen, cy + 0.6 - fluegel, 1.1, 2.6, "3");
-    // Kopf: Auge mit weissem Fleck, Schnabel
     const ay = Math.round(oben + 2.6);
     p.rechteck(Math.round(12.6 + neigen), ay - 1, 2, 2, "4");
     if (geschlossen) p.punkt(Math.round(13 + neigen), ay, "7");
     else p.punkt(Math.round(13 + neigen), ay - 1, "5");
     p.rechteck(Math.round(15 + neigen), ay, 2, 1, "6");
-    // Fuesse
     if (sitzt) {
         p.rechteck(12, 14, 3, 1, "6");
     } else {
@@ -2186,20 +2083,15 @@ function pinguinRaster(pose, bild, blinzelt) {
     return p.raster;
 }
 
-// Katzenmaedchen (Chibi-Stil, von der Seite): Katzenohren, lange Haare, Kleid mit Schuerze, Glocke, Schwanz.
-// Farben: 1 Schuerze, 2 Haare/Ohren/Schwanz, 3 Kleid/Schuhe, 4 Haut, 5 Augen, 6 rosa, 7 Umriss
 function maedchenKopf(p, cx, cy, geschlossen) {
     const mx = Math.round(cx);
     const oben = Math.round(cy - 3.2);
-    // lange Haare hinten
     p.ellipse(cx - 2.2, cy + 1.6, 2.4, 3.4, "2");
-    // Katzenohren
     [mx - 3, mx + 1].forEach(x0 => {
         p.rechteck(x0, oben - 1, 3, 2, "2");
         p.punkt(x0 + 1, oben - 2, "2");
         p.punkt(x0 + 1, oben - 1, "6");
     });
-    // Gesicht, darueber Haare (oben und hinten), vorne ein Pony
     p.ellipse(cx, cy, 3.5, 3.2, "4");
     p.ellipse(cx, cy, 3.6, 3.3, "2", (x, y) => y + 0.5 < cy - 0.6 || x + 0.5 < cx - 1.2);
     p.punkt(mx + 2, Math.round(cy - 1), "2");
@@ -2209,7 +2101,6 @@ function maedchenKopf(p, cx, cy, geschlossen) {
         p.punkt(ax, ay, "7");
         p.punkt(ax + 1, ay, "7");
     } else {
-        // grosse Anime-Augen mit Glanzpunkt
         p.punkt(ax, ay - 1, "w");
         p.punkt(ax + 1, ay - 1, "5");
         p.punkt(ax, ay, "5");
@@ -2230,13 +2121,11 @@ function maedchenRaster(pose, bild, blinzelt) {
         const wippen = schritt === 1 || schritt === 3 ? -1 : 0;
         const wedeln = pose === "stehen" ? bild : bild % 2;
         schwanz([8.5, 11.5], [4, 12], [4.5 + wedeln, 7 + wippen]);
-        // Beine mit Schuhen
         [[10 + versatz, schritt === 1], [12 - versatz, schritt === 3]].forEach(([x, gehoben]) => {
             p.rechteck(x, 12 + wippen, 1, gehoben ? 2 : 3 - wippen, "4");
             p.punkt(x, gehoben ? 13 : 14, "3");
             p.punkt(x + 1, gehoben ? 13 : 14, "3");
         });
-        // Kleid mit Schuerze und Glocke
         p.vieleck([[9.2, 8.6 + wippen], [13.6, 8.6 + wippen], [15.2, 12.6 + wippen], [7.8, 12.6 + wippen]], "3");
         p.vieleck([[12, 9.6 + wippen], [14.1, 9.6 + wippen], [14.9, 12.4 + wippen], [12.3, 12.4 + wippen]], "1");
         p.punkt(13, 9 + wippen, "Y");
@@ -2246,14 +2135,12 @@ function maedchenRaster(pose, bild, blinzelt) {
         schwanz([8, 13.5], [3.5, 15], [3.2 + bild, 10.5]);
         p.vieleck([[9, 9.8], [13.2, 9.8], [15, 13.6], [7.4, 13.6]], "3");
         p.vieleck([[11.8, 10.6], [13.6, 10.6], [14.4, 13.4], [12, 13.4]], "1");
-        // Beine nach vorne ausgestreckt
         p.rechteck(13, 14, 4, 1, "4");
         p.rechteck(17, 13, 1, 2, "3");
         p.punkt(13, 10.2, "Y");
         p.punkt(14.6, 12, "4");
         kopf = [11.6, 6.6];
     } else {
-        // auf dem Bauch liegen und mit den Fuessen wackeln, beim Schlafen liegt sie ruhig
         const schlaeft = pose === "schlafen";
         schwanz([7, 12.5], [4, 12], [3.4 + (schlaeft ? 0 : bild), 9.4 + (schlaeft ? 3 : 0)]);
         p.ellipse(10, 13.2, 4.6, 1.8, "3");
@@ -2273,8 +2160,6 @@ function maedchenRaster(pose, bild, blinzelt) {
     return p.raster;
 }
 
-// Mantarochen von vorne: breite Fluegel, heller Bauch, zwei Augen und ein Laecheln.
-// Er schwebt ueber dem Boden (Schatten) und schlaegt mit den Fluegeln, zum Schlafen legt er sich flach hin.
 function mantaRaster(pose, bild, blinzelt) {
     const p = pixelRaster();
     const liegt = pose === "liegen" || pose === "schlafen";
@@ -2288,13 +2173,10 @@ function mantaRaster(pose, bild, blinzelt) {
         [18, cy - 2.4 + schlag * 0.5], [21.6, cy - 1.6 + schlag], [17, cy + 0.8], [14, cy + 2.6],
         [8, cy + 2.6], [5, cy + 0.8]
     ], "2");
-    // Bauch und Unterseite der Fluegel hell
     p.vieleck([[4, cy + 0.2], [8, cy + 1.2], [14, cy + 1.2], [18, cy + 0.2], [14, cy + 2.6], [8, cy + 2.6]], "4");
     p.unterkante("4");
-    // Kopfflossen links und rechts vom Maul
     p.punkt(8, cy + 2.8, "3");
     p.punkt(14, cy + 2.8, "3");
-    // helle Punkte auf dem Ruecken
     [[5, cy - 1], [9, cy - 2.6], [13, cy - 2.6], [17, cy - 1]].forEach(([x, y]) => p.punkt(x, y, "1"));
     const ay = Math.round(cy - 1);
     if (pose === "schlafen" || blinzelt) {
@@ -2308,7 +2190,6 @@ function mantaRaster(pose, bild, blinzelt) {
     }
     p.punkt(7, ay + 1, "6");
     p.punkt(15, ay + 1, "6");
-    // Laecheln
     p.punkt(10, ay + 1, "7");
     p.punkt(11, ay + 2, "7");
     p.punkt(12, ay + 1, "7");
@@ -2316,12 +2197,8 @@ function mantaRaster(pose, bild, blinzelt) {
     return p.raster;
 }
 
-// Blockmensch (Kloetzchen-Stil, von der Seite): eckiger Kopf, Oberteil, Hose, Schuhe. Arme und Beine schwingen beim Laufen.
-// Farben: 1 Schuhe, 2 Haare/Kapuze, 3 Hose, 4 Haut, 5 Augen, 6 Oberteil, 7 Umriss, 8 Oberteil dunkel (hinten),
-//         h Haende, k Kragen/Borte. stil: anzug (Kragen + Krawatte), kapuze (Kapuze mit Borte, Gesicht im Schatten)
 function blockKopf(p, x, y, geschlossen, stil) {
     if (stil.kapuze) {
-        // Kapuze ganz um den Kopf, vorne eine goldene Borte, das Gesicht liegt im Schatten, die Augen leuchten
         p.rechteck(x, y, 6, 6, "2");
         p.rechteck(x + 2, y + 2, 4, 4, "4");
         p.rechteck(x + 1, y + 1, 5, 1, "k");
@@ -2329,7 +2206,6 @@ function blockKopf(p, x, y, geschlossen, stil) {
         if (!geschlossen) p.punkt(x + 4, y + 3, "5");
         return;
     }
-    // 6x6 Wuerfel: Haare oben und hinten, Gesicht nach rechts
     p.rechteck(x, y, 6, 6, "4");
     p.rechteck(x, y, 6, 2, "2");
     p.rechteck(x, y, 2, 4, "2");
@@ -2344,7 +2220,6 @@ function blockKopf(p, x, y, geschlossen, stil) {
     p.punkt(x + 5, y + 5, "7");
 }
 
-// Vorderseite des Oberteils: Bauchtasche (Hoodie), Kragen mit Krawatte (Anzug) oder Borte (Kapuzenmantel)
 function blockOberteil(p, y, stil) {
     if (stil.anzug) {
         p.punkt(12, y, "k");
@@ -2365,22 +2240,17 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
         const schritt = pose === "laufen" ? bild : -1;
         const schwung = schritt < 0 ? 0 : [2, 0, -2, 0][schritt];
         const wippen = schritt === 1 || schritt === 3 ? -1 : 0;
-        // hinteres Bein und hinterer Arm (dunkler)
         p.rechteck(11 - schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
         p.rechteck(11 - schwung / 2, 14, 2, 1, "1");
         p.rechteck(11 - schwung, 7 + wippen, 2, 4, "8");
-        // Koerper
         p.rechteck(10, 7 + wippen, 4, 4, "6");
         blockOberteil(p, 7 + wippen, stil);
-        // vorderes Bein
         p.rechteck(11 + schwung / 2, 11 + wippen, 2, 3 - wippen, "3");
         p.rechteck(11 + schwung / 2, 14, 2, 1, "1");
-        // vorderer Arm mit Hand
         p.rechteck(11 + schwung, 7 + wippen, 2, 3, "6");
         p.rechteck(11 + schwung, 10 + wippen, 2, 1, "h");
         blockKopf(p, 9, 1 + wippen, geschlossen, stil);
     } else if (pose === "sitzen") {
-        // Beine nach vorne, Haende auf den Knien
         p.rechteck(10, 9, 4, 4, "6");
         blockOberteil(p, 9, stil);
         p.rechteck(12, 13, 5, 2, "3");
@@ -2389,7 +2259,6 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
         p.rechteck(15, 12, 2, 1, "h");
         blockKopf(p, 9, 3, geschlossen, stil);
     } else {
-        // liegt auf dem Ruecken, beim Liegen wippt ein Fuss
         const schlaeft = pose === "schlafen";
         p.rechteck(2, 11, 6, 2, "3");
         p.rechteck(1, schlaeft ? 11 : 10 - bild, 1, 2, "1");
@@ -2402,15 +2271,10 @@ function blockmenschRaster(pose, bild, blinzelt, stil = {}) {
     return p.raster;
 }
 
-// Engel (Beta Tester, mythisch): von vorne, ganz in Weiss und Grau. Silbernes Haar, weisse Ruestung mit grauen Kanten,
-// zwei grosse Federfluegel links und rechts (schlagen), heller Heiligenschein-Ring und ein aufrechtes Schwert in der Hand.
-// Doppelt so feines Raster wie die anderen Begleiter (44x32 statt 22x16, gleiche Groesse im Spiel).
 const ENGEL_B = 44, ENGEL_H = 32;
 function engelRaster(pose, bild, blinzelt) {
     const leer = () => Array.from({ length: ENGEL_H }, () => Array(ENGEL_B).fill(null));
     const raster = leer();
-    // Jedes Teil (Fluegel, Koerper, Schwert) wird auf eine eigene Ebene gemalt und bekommt seinen eigenen Umriss,
-    // damit sich weiss auf weiss trotzdem klar abhebt
     let ebene = leer();
     const punkt = (x, y, f) => {
         x = Math.round(x); y = Math.round(y);
@@ -2442,11 +2306,9 @@ function engelRaster(pose, bild, blinzelt) {
     const sitzt = pose === "sitzen" || pose === "liegen" || pose === "schlafen";
     const bob = pose === "laufen" ? [0, -1, 0, 1][bild % 4] : [0, 0, -1, -1][katzenAnim % 4];
     const y0 = (sitzt ? 1 : 0) + bob;
-    // Fluegelschlag: 0 = ausgebreitet, 3 = hochgeschlagen (im Sitzen nur leicht)
     const flap = sitzt ? [0, 2, 1, 2][katzenAnim % 4] : [0, 3, 5, 2][katzenAnim % 4];
     const cx = 22;
 
-    // ---- Fluegel links und rechts (gespiegelt), Federreihen mit grauen Kanten ----
     const spitzen = [[2, 5], [1, 10], [2, 15], [4, 20], [8, 24]];
     [-1, 1].forEach(seite => {
         const wx = cx + seite * 4, wy = 13 + y0;
@@ -2464,7 +2326,6 @@ function engelRaster(pose, bild, blinzelt) {
 
     ebeneFertig();
 
-    // ---- Robe: weit, weiss mit grauen Falten, darunter graue Stiefel ----
     for (let y = 0; y < 8; y++) {
         const halb = 3 + Math.floor(y / 2);
         rechteck(cx - halb, 20 + y + y0, halb * 2 + 1, 1, "C");
@@ -2475,23 +2336,19 @@ function engelRaster(pose, bild, blinzelt) {
     rechteck(cx - 6, 27 + y0, 13, 1, "a");
     if (!sitzt) { rechteck(cx - 3, 28 + y0, 3, 2, "Q"); rechteck(cx + 1, 28 + y0, 3, 2, "Q"); }
 
-    // ---- Brustpanzer: weiss, graue Kanten und Mittelnaht, leuchtender Kristall in der Mitte ----
     rechteck(cx - 3, 12 + y0, 7, 8, "A");
     rechteck(cx - 3, 12 + y0, 1, 8, "a"); rechteck(cx + 3, 12 + y0, 1, 8, "a");
     rechteck(cx - 3, 12 + y0, 7, 1, "k"); rechteck(cx - 3, 19 + y0, 7, 1, "Q");
     punkt(cx, 17 + y0, "a"); punkt(cx, 18 + y0, "a");
     const glut = katzenAnim % 2 ? "L" : "w";
     punkt(cx, 15 + y0, glut); punkt(cx - 1, 15 + y0, "L"); punkt(cx + 1, 15 + y0, "L"); punkt(cx, 14 + y0, "L"); punkt(cx, 16 + y0, "L");
-    // Schulterpanzer
     ellipse(cx - 4.5, 13 + y0, 2.3, 1.8, "A"); ellipse(cx + 4.5, 13 + y0, 2.3, 1.8, "A");
     punkt(cx - 5, 12 + y0, "w"); punkt(cx + 4, 12 + y0, "w");
-    // Arme: links haengt, rechts haelt das Schwert
     rechteck(cx - 6, 14 + y0, 2, 5, "A"); rechteck(cx - 6, 19 + y0, 2, 2, "a");
     rechteck(cx + 5, 14 + y0, 2, 4, "A"); rechteck(cx + 5, 18 + y0, 3, 2, "a");
 
     ebeneFertig();
 
-    // ---- Schwert aufrecht rechts neben dem Koerper: Klinge nach oben, Parierstange, Griff ----
     const sx = cx + 8;
     rechteck(sx, 3 + y0, 2, 14, "B");
     rechteck(sx + 1, 3 + y0, 1, 14, "b");
@@ -2504,7 +2361,6 @@ function engelRaster(pose, bild, blinzelt) {
 
     ebeneFertig();
 
-    // ---- Kopf: silbernes Haar, Pony, lange Straehnen seitlich ----
     const ky = 7 + y0;
     ellipse(cx, ky, 3.8, 4, "H");
     rechteck(cx - 4, ky, 1, 6, "h"); rechteck(cx + 4, ky, 1, 6, "h");
@@ -2523,7 +2379,6 @@ function engelRaster(pose, bild, blinzelt) {
 
     ebeneFertig();
 
-    // ---- Heiligenschein: heller Ring ueber dem Kopf, ein Glanz laeuft herum ----
     for (let w = 0; w < 36; w++) {
         const winkel = (w / 36) * Math.PI * 2;
         punkt(cx + Math.cos(winkel) * 4.6, ky - 5.6 + Math.sin(winkel) * 1.2, w < 18 ? "r" : "R");
@@ -2536,7 +2391,6 @@ function engelRaster(pose, bild, blinzelt) {
 
 const haustierUrlCache = {};
 
-// anim = Animationsbild fuer legendaere Begleiter (Fluegelschlag, Funkeln ...), unabhaengig von der Pose
 function haustierUrl(skin, pose, bild, blinzelt, anim = 0) {
     const anzahl = HAUSTIER_BILDER[pose] || 1;
     const nummer = bild % anzahl;
@@ -2555,10 +2409,6 @@ function haustierUrl(skin, pose, bild, blinzelt, anim = 0) {
     return haustierUrlCache[schluessel];
 }
 
-// ============================================================
-// TAL-LANDSCHAFT: prozedural gezeichnete Pixel-Szene (Himmel, Berge, Huegel, Fluss, Wiese, Hof)
-// breite/hoehe in Pixeln der Szene (wird spaeter mit image-rendering: pixelated hochskaliert)
-// ============================================================
 
 function zufallsGenerator(startwert) {
     let zustand = startwert;
@@ -2583,19 +2433,16 @@ function zeichneTal(breite, hoehe) {
         stift.fillRect(Math.round(x), Math.round(y), b, h);
     };
 
-    // Talform: 0 in der Mitte, 1 am Rand -> Berge links und rechts hoch, in der Mitte offen
     const tal = x => Math.pow(Math.abs((x - W / 2) / (W / 2)), 1.25);
     const wellen = (x, staerke, versatz) =>
         (Math.sin(x * 0.07 + versatz) + Math.sin(x * 0.023 + versatz * 2.1) * 1.6 + Math.sin(x * 0.19 + versatz * 0.7) * 0.4) * staerke;
 
-    // Himmel in Streifen (Pixel-Look)
     const himmel = ["#62b6ea", "#72bfee", "#83c8f1", "#95d1f3", "#a8daf5", "#bce3f8", "#d0ecfa"];
     const horizont = Math.round(H * 0.7);
     for (let y = 0; y < horizont; y++) {
         pixel(0, y, himmel[Math.min(himmel.length - 1, Math.floor((y / horizont) * himmel.length))], W, 1);
     }
 
-    // Sonne
     const sonneX = Math.round(W * 0.84);
     const sonneY = Math.round(H * 0.3);
     for (let dy = -6; dy <= 6; dy++) {
@@ -2606,7 +2453,6 @@ function zeichneTal(breite, hoehe) {
         }
     }
 
-    // Wolken
     for (let i = 0; i < Math.max(3, Math.round(W / 90)); i++) {
         const wx = zufallsZahl() * W;
         const wy = H * 0.2 + zufallsZahl() * H * 0.25;
@@ -2621,12 +2467,10 @@ function zeichneTal(breite, hoehe) {
         }
     }
 
-    // Ferne Berge mit Schneekappen
     const bergRoh = [];
     for (let x = 0; x < W; x++) {
         bergRoh.push(H * 0.62 - H * 0.42 * (0.22 + 0.78 * tal(x)) + wellen(x, H * 0.035, 1.3));
     }
-    // geglaettet, damit die Silhouette ruhig wirkt und keine Streifen entstehen
     const bergHoehe = bergRoh.map((_, x) => {
         let summe = 0;
         let anzahl = 0;
@@ -2638,13 +2482,11 @@ function zeichneTal(breite, hoehe) {
     });
     for (let x = 0; x < W; x++) {
         const y = bergHoehe[x];
-        // Haenge, die nach rechts ansteigen, zeigen von der Sonne (rechts oben) weg und liegen im Schatten
         const schatten = bergHoehe[Math.min(W - 1, x + 6)] < bergHoehe[Math.max(0, x - 6)];
         pixel(x, y, schatten ? "#8294c2" : "#9aabd4", 1, H - y);
         if (y < H * 0.36) pixel(x, y, "#f4f8ff", 1, Math.max(1, Math.round((H * 0.36 - y) * 0.45)));
     }
 
-    // Huegel mit Nadelbaeumen
     const huegelHoehe = [];
     for (let x = 0; x < W; x++) {
         huegelHoehe.push(Math.round(H * 0.8 - H * 0.3 * Math.pow(tal(x), 1.1) + wellen(x, H * 0.02, 4.2)));
@@ -2665,7 +2507,6 @@ function zeichneTal(breite, hoehe) {
         pixel(x, basis, "#5b3a22");
     }
 
-    // Wiese vorne
     const wiesenHoehe = [];
     for (let x = 0; x < W; x++) {
         wiesenHoehe.push(Math.round(H * 0.9 - H * 0.12 * tal(x) + wellen(x, H * 0.01, 7.7)));
@@ -2676,7 +2517,6 @@ function zeichneTal(breite, hoehe) {
         pixel(x, y, "#9bd66a", 1, 1);
     }
 
-    // Fluss: kommt aus dem Tal zwischen den Bergen und schlaengelt sich nach vorne
     const flussStart = huegelHoehe[Math.round(W / 2)];
     for (let y = flussStart; y < H; y++) {
         const fortschritt = (y - flussStart) / (H - flussStart);
@@ -2689,7 +2529,6 @@ function zeichneTal(breite, hoehe) {
         if (zufallsZahl() < 0.25) pixel(mitte + (zufallsZahl() - 0.5) * halbeBreite, y, "#cdefff");
     }
 
-    // Blumen und Grasbueschel auf der Wiese
     const blumen = ["#ffffff", "#ffd84a", "#ff8fb1", "#b48cff", "#ff6a5a"];
     for (let i = 0; i < W * 0.6; i++) {
         const x = Math.floor(zufallsZahl() * W);
@@ -2701,7 +2540,6 @@ function zeichneTal(breite, hoehe) {
         else pixel(x, y, "#6fae45", 1, 2);
     }
 
-    // Bauernhaus links, Baeume daneben
     const haus = spriteLeinwand("haus");
     const hausX = Math.round(W * 0.2);
     stift.drawImage(haus, hausX, wiesenHoehe[hausX + 8] - haus.height + 3);
@@ -2714,13 +2552,7 @@ function zeichneTal(breite, hoehe) {
     return leinwand.toDataURL();
 }
 
-// ============================================================
-// HOF-SZENE: Kopfbereich im Spiel. Himmel, Sonne, Wolken und Tag/Nacht kommen aus script.js,
-// darum ist der Himmel hier durchsichtig. Gezeichnet werden Tal, Wiese, Gebaeude, Weg und Zaun.
-// Rueckgabe: Bild + Positionen der Fenster (fuer das Nachtlicht), in Szenen-Pixeln.
-// ============================================================
 
-// Farben der Hof-Themen (Kosmetik im Haus). baum/busch = Sprite-Namen.
 const HOF_FARBEN = {
     standard: {
         berge: ["#8294c2", "#9aabd4"], schnee: "#f4f8ff", huegel: ["#4f8f3e", "#63a64b"], nadel: ["#2f6b3a", "#3b7d44"],
@@ -2787,20 +2619,16 @@ const HOF_FARBEN = {
     }
 };
 
-// Kleine Pixel-Details fuer Scheunen-Skins (Koordinaten in der 20x19-Scheune: Dachspitze bei x 9-10, y 0)
 function zeichneScheuneExtra(art, pixel) {
     if (art === "wetterhahn") {
-        // Wetterhahn auf der Dachspitze
         [[9, -1], [9, -2], [9, -3], [10, -3], [8, -4], [9, -4], [10, -4], [11, -3], [9, -5]].forEach(([x, y]) => pixel(x, y, "#3a2a1a"));
         pixel(8, -5, "#e0402a");
     } else if (art === "sterne") {
-        // Sterne auf dem Dach und am Tor
         [[5, 4], [14, 3], [9, 2], [3, 11], [16, 14]].forEach(([x, y]) => pixel(x, y, "#fff6a0"));
         [[7, 3], [12, 4]].forEach(([x, y]) => pixel(x, y, "#8fa2f0"));
     }
 }
 
-// Kleine Pixel-Details fuer Haus-Skins (Koordinaten im 24x18-Bauernhaus: Dach Zeilen 0-8, Wand 9-16, Fenster 4-5 und 18-19)
 function zeichneHausExtra(extra, p) {
     const punkte = (liste, farbe) => liste.forEach(([x, y]) => p(x, y, farbe));
     if (extra === "efeu") {
@@ -2840,7 +2668,6 @@ function zeichneHausExtra(extra, p) {
 }
 
 function zeichneHof(breite, hoehe, thema = "standard") {
-    // Feiertage (echtes Datum) legen etwas Deko ueber jede Landschaft: Kuerbisse an Halloween, Schnee zu Weihnachten
     const fest = typeof aktuellesFest === "function" ? aktuellesFest() : null;
     const F = { ...(HOF_FARBEN[thema] || HOF_FARBEN.standard), ...(fest ? fest.hof : {}) };
     const W = Math.max(64, Math.round(breite));
@@ -2868,7 +2695,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     const bodenY = Math.round(H * 0.5);
     const zaunOben = H - 7;
 
-    // Tal im Hintergrund: Berge an den Seiten mit Schnee, Huegel mit Nadelbaeumen davor
     for (let x = 0; x < W; x++) {
         const y = Math.round(bodenY - 3 - H * 0.17 * tal(x) + wellen(x, H * 0.01, 1.3));
         pixel(x, y, x < W / 2 ? F.berge[0] : F.berge[1], 1, H - y);
@@ -2891,14 +2717,12 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         if (thema === "winter") pixel(x, basis - hoeheBaum, "#ffffff");
     }
 
-    // Grosse Hofwiese mit leichten Maehstreifen
     pixel(0, bodenY, F.wiese[0], W, H - bodenY);
     pixel(0, bodenY, F.wiese[1], W, 1);
     for (let y = bodenY + 3; y < zaunOben; y += 4) pixel(0, y, F.wiese[2], W, 2);
 
     const hausX = Math.round(W * 0.05);
 
-    // Sommerhof: goldene Weizenfelder auf den Huegeln hinter der Wiese
     if (F.weizenfeld) {
         [[0.34, 0.5], [0.6, 0.9]].forEach(([a, b]) => {
             for (let x = Math.round(W * a); x < Math.round(W * b); x++) {
@@ -2908,7 +2732,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         });
     }
 
-    // Blumen und Grasbueschel (im Winter Schneeglitzer)
     for (let i = 0; i < W * 0.6; i++) {
         const x = Math.floor(zufallsZahl() * W);
         const y = bodenY + 2 + Math.floor(zufallsZahl() * (zaunOben - bodenY - 3));
@@ -2916,10 +2739,8 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         else pixel(x, y, F.halm, 1, 2);
     }
 
-    // Leuchtende Stellen (Laternen, Pilze): werden im Spiel als sanft pulsierender Schein darueber gelegt
     const leuchten = [];
 
-    // Feuerwerksfest: Pagode mit geschwungenen Daechern am Wiesenrand
     if (F.chinesisch) {
         const cx = Math.round(W * 0.41);
         let y = bodenY + 3;
@@ -2932,7 +2753,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
             pixel(links, y + 3, "#8f1f2a", bw, 1);
             pixel(cx, y + 1, "#ffd84a", 1, 2);
             leuchten.push({ x: cx, y: y + 1, b: 1, h: 2, farbe: "rgba(255, 210, 90, 0.9)" });
-            // Dach mit hochgezogenen Ecken
             const rw = bw + 6;
             const rl = cx - Math.floor(rw / 2);
             y -= 2;
@@ -2946,7 +2766,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         pixel(cx - 1, y - 1, "#ffd84a", 3, 1);
     }
 
-    // Kosmische Nacht: Planet mit Ring am Himmel
     if (F.kosmos) {
         const px = Math.round(W * 0.86);
         const py = Math.round(bodenY * 0.62);
@@ -2964,11 +2783,9 @@ function zeichneHof(breite, hoehe, thema = "standard") {
 
     }
 
-    // Hintere Reihe: Baeume und Buesche am Wiesenrand
     [0.17, 0.3, 0.52, 0.64, 0.73, 0.93].forEach(bx => bild(F.baum, W * bx, bodenY + 6));
     [0.12, 0.25, 0.36, 0.47, 0.58, 0.69, 0.88, 0.98].forEach(bx => bild(F.busch, W * bx, bodenY + 8));
 
-    // Gebaeude (das Bauernhaus kann einen Haus-Skin haben)
     const hausSkin = typeof gewaehlteKosmetik === "function" && typeof HAUS_SKINS !== "undefined" ? gewaehlteKosmetik("haus") : null;
     const hausSprite = hausSkin && Object.keys(hausSkin.farben || {}).length
         ? spriteVariante("bauernhaus_" + hausSkin.id, "bauernhaus", hausSkin.farben) : "bauernhaus";
@@ -2985,7 +2802,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         bild("kuerbis", hausX + 25, H - 6);
         bild("kuerbis", hausX + 33, H - 7);
     }
-    // Scheune (kann einen Scheunen-Skin haben)
     const scheunenSkin = typeof gewaehlteKosmetik === "function" && typeof SCHEUNEN_SKINS !== "undefined" ? gewaehlteKosmetik("scheune") : null;
     const scheunenSprite = scheunenSkin && Object.keys(scheunenSkin.farben || {}).length
         ? spriteVariante("scheune_" + scheunenSkin.id, "scheune", scheunenSkin.farben) : "scheune";
@@ -2998,12 +2814,10 @@ function zeichneHof(breite, hoehe, thema = "standard") {
     bild(F.busch, W * 0.46, H - 7);
     bild(F.busch, W * 0.55, H - 7);
     if (F.schneeDaecher) {
-        // Schnee auf den Daechern
         for (let x = 1; x < 23; x++) pixel(haus.x + x, haus.y + Math.max(1, 8 - Math.min(x, 22 - x)) - 1, "#ffffff");
         for (let x = 0; x < 20; x++) pixel(scheune.x + x, scheune.y + Math.max(0, 5 - Math.min(x, 19 - x) / 2), "#ffffff");
     }
 
-    // Feuerwerksfest: rote Laternen an Schnueren zwischen roten Pfaehlen
     if (F.chinesisch) {
         [[0.29, 0.45], [0.55, 0.73]].forEach(([a, b]) => {
             const x1 = Math.round(W * a);
@@ -3029,7 +2843,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
                 leuchten.push({ x: x - 1, y: ly + 1, b: 3, h: 3, farbe: "rgba(255, 90, 60, 0.85)" });
             }
         });
-        // Boellerketten am Bauernhaus
         for (let i = 0; i < 6; i++) {
             pixel(haus.x - 1, haus.y + 9 + i, i % 2 ? "#e8342a" : "#b8232a");
             pixel(haus.x + haus.sprite.width, haus.y + 9 + i, i % 2 ? "#b8232a" : "#e8342a");
@@ -3038,7 +2851,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         pixel(haus.x + haus.sprite.width, haus.y + 8, "#ffd84a");
     }
 
-    // Zauberwald: leuchtende Pilze auf der Wiese
     if (F.pilze) {
         const hut = ["#9fe8ff", "#ff9ad5", "#c9b0f5", "#b8f07a"];
         [0.08, 0.34, 0.39, 0.61, 0.67, 0.86, 0.95].forEach((px, i) => {
@@ -3053,7 +2865,6 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         });
     }
 
-    // Zaun unten als Grenze zu den Feldern (beim Feuerwerksfest rot mit goldenen Kappen)
     const zaunDunkel = F.chinesisch ? "#7a1a1f" : "#6b3f1d";
     const zaunHell = F.chinesisch ? "#b8232a" : "#9a6a3a";
     pixel(0, H - 5, zaunDunkel, W, 1);
@@ -3068,24 +2879,18 @@ function zeichneHof(breite, hoehe, thema = "standard") {
         url: leinwand.toDataURL(),
         breite: W,
         hoehe: H,
-        // Oberkante des Schornsteins (Spalten 16-17 im Bauernhaus-Sprite), dort steigt Rauch auf
         schornstein: { x: haus.x + 17, y: haus.y },
-        // Fensterglas im Bauernhaus-Sprite (Spalten 4-5 und 18-19, Zeilen 11-12) und das Scheunenfenster
         lichter: [
             { x: haus.x + 4, y: haus.y + 11, b: 2, h: 2 },
             { x: haus.x + 18, y: haus.y + 11, b: 2, h: 2 },
             { x: scheune.x + 9, y: scheune.y + 7, b: 2, h: 1 }
         ],
-        // Klickbereich des Hauses (fuer das Haus-Inventar), in Szenen-Pixeln
         haus: { x: haus.x, y: haus.y, b: haus.sprite.width, h: haus.sprite.height, sprite: haus.sprite },
         scheune: { x: scheune.x, y: scheune.y, b: scheune.sprite.width, h: scheune.sprite.height, sprite: scheune.sprite },
         leuchten
     };
 }
 
-// ---------- SAAT IN ANDEREN FORMEN (Kosmetik "Saat") ----------
-// k = Rand, Y = Farbe, y = Schatten, w = Glanz, Z = Kern in der Farbe der Seltenheit
-// Neue Formen: Klee, Pilz (Punkte in der Farbe der Seltenheit), Muschel, Laterne (E = Gold), Planet (E/e = Ring)
 SPRITE_PIXEL.form_klee = [
     "..kkk..kkk..",
     ".kYwYkkYYyk.",
@@ -3353,9 +3158,6 @@ SPRITE_PIXEL.form_kristall = [
     "............"
 ];
 
-// ---------- PIXEL-SYMBOLE (statt Emojis) ----------
-// Eigene Pixel-Symbole im Spielstil. pixelIcon("❤️") nimmt automatisch das Pixel-Symbol, wenn es eins gibt.
-// o = Umriss, weitere Buchstaben je Symbol eigene Farben.
 const PIXEL_SYMBOL_DATEN = {
     herz: [{ o: "#5a1a24", R: "#ff4a6a", r: "#c8243a", w: "#ffffff" }, [
         ".oo...oo..",
@@ -3419,7 +3221,6 @@ const PIXEL_SYMBOL_DATEN = {
         ".obbdbbbo.",
         ".odbbbdbo.",
         ".oooooooo."]],
-    // Hauptmenue-Knoepfe
     spielen: [{ o: "#1f4a12", W: "#ffffff", w: "#d8f0c8" }, [
         "..oo......",
         "..oWo.....",
@@ -3464,7 +3265,6 @@ const PIXEL_SYMBOL_DATEN = {
         "...owo....",
         "....oo....",
         ".........."]],
-    // Pokale (Rechnungen, mit denen man gewinnt)
     pokal_holz: [{ o: "#3a2412", G: "#c08a50", g: "#8a5a2c", W: "#e8c090" }, [
         ".oooooooo.",
         "oGWGGGGGgo",
@@ -3520,7 +3320,6 @@ const PIXEL_SYMBOL_DATEN = {
         "...oGGo...",
         "..oggggo..",
         "..oooooo.."]],
-    // Kristall (Premium-Waehrung)
     kristall: [{ o: "#6a1d4a", C: "#ff9ad5", c: "#e0409a", W: "#ffffff" }, [
         "..oooooo..",
         ".oWCcCCco.",
@@ -3530,7 +3329,6 @@ const PIXEL_SYMBOL_DATEN = {
         "..oCcCco..",
         "...oCco...",
         "....oo...."]],
-    // Gepfluegtes Beet mit Keimling (Reiter "Felder" im Haus)
     beet: [{ o: "#3a2412", B: "#9a6634", b: "#6b4a2a", g: "#3f8a32", G: "#7ed957" }, [
         "...Gg.gG..",
         "....gGg...",
@@ -3752,7 +3550,6 @@ const PIXEL_SYMBOL_DATEN = {
         "....oo...."]]
 };
 
-// Welche Emojis durch Pixel-Symbole ersetzt werden
 const PIXEL_SYMBOLE = {
     "💗": "herz", "❤️": "herz", "💛": "herz", "✨": "funkeln", "🔥": "flamme", "⭐": "stern", "🌟": "stern",
     "❄️": "schnee", "🟫": "block", "👋": "hand", "✋": "hand", "🎉": "party", "💃": "note", "🎵": "note", "⛏️": "hacke",

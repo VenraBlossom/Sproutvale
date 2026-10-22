@@ -1,18 +1,10 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Mehr Spektakel (reine Optik)
-// Kombo-Fieber am Bildschirmrand, Ringe beim Klicken und Ernten, Gold-Ticker, Jackpot-Feier mit Konfetti,
-// grosse Titel bei Tagesstart und Feierabend, federnde Felder, Funken beim Kaufen, funkelnde reife Pflanzen,
-// Vogelschwaerme am Himmel. Alles abschaltbar ueber "Wackeln/Blitze" bleibt wie gehabt in ui.js.
-// Gehoert zu script.js (wird ueber Haken und kleine Aufrufe angestossen).
-// ============================================================
 
 const fieberRahmen = el("div");
 fieberRahmen.id = "fieber-rahmen";
 document.body.appendChild(fieberRahmen);
 
-// ---------- Ring an einer Stelle (Klick, Ernte, Kauf) ----------
 
 function zeigeRing(x, y, groesse, farbe, dauerMs = 450) {
     const ring = el("div", "effekt-ring");
@@ -25,7 +17,6 @@ function zeigeRing(x, y, groesse, farbe, dauerMs = 450) {
     setTimeout(() => ring.remove(), dauerMs + 50);
 }
 
-// ---------- KOMBO-FIEBER: Bildschirmrand leuchtet, ab x4 steigen Flammen am Laden auf ----------
 
 let fieberFlammenMs = 0;
 
@@ -48,7 +39,6 @@ registriereHaken("tagTick", dtMs => {
 
 registriereHaken("tagEnde", () => { document.body.dataset.fieber = 0; });
 
-// ---------- Klick auf den Samenladen: Ring ----------
 
 function klickRing() {
     const rect = plantButton.getBoundingClientRect();
@@ -57,7 +47,6 @@ function klickRing() {
         KOMBO_FARBEN[multi] || "#ffe89a", 380);
 }
 
-// ---------- ERNTE: Druckwelle und Blattwirbel ----------
 
 registriereHaken("ernte", feld => {
     if (run.phase !== "tag") return;
@@ -66,7 +55,6 @@ registriereHaken("ernte", feld => {
     partikel(x, y, ["#a3dc6f", "#6cc24a", "#ffe89a"], 6, 70);
 });
 
-// Viele Pflanzen auf einmal geerntet: grosse Welle (aus script.js, ernteMitCursor)
 function grosseErnteWelle(x, y, anzahl) {
     zeigeRing(x, y, 120 + anzahl * 25, "#ffd93d", 600);
     if (anzahl >= 6) {
@@ -75,14 +63,13 @@ function grosseErnteWelle(x, y, anzahl) {
     }
 }
 
-// ---------- GOLD: Anzeige leuchtet, darunter zaehlt ein "+X" zusammen ----------
 
 let tickerSumme = 0;
 let tickerEl = null;
 let tickerTimer = null;
 
 function goldTicker(wert) {
-    if (einstellungen.ohneTexte) return; // kein Aufleuchten und keine "+..."-Zahl unter dem Gold
+    if (einstellungen.ohneTexte) return;
     moneyDisplay.classList.remove("gold-glanz");
     void moneyDisplay.offsetWidth;
     moneyDisplay.classList.add("gold-glanz");
@@ -106,14 +93,12 @@ function goldTicker(wert) {
     }, 900);
 }
 
-// ---------- JACKPOT: riesiger Schriftzug und Konfetti ueber den ganzen Bildschirm ----------
 
 let letzteJackpotFeier = 0;
 
 function jackpotFeier(x, y) {
     if (performance.now() - letzteJackpotFeier < 1500) return;
     letzteJackpotFeier = performance.now();
-    // grosse Schrift nur ohne "Unnötige Texte entfernen", Ring und Konfetti nur ohne "Weniger Partikel"
     if (!einstellungen.ohneTexte) {
         const schrift = el("div", "jackpot-schrift", t("JACKPOT!"));
         document.body.appendChild(schrift);
@@ -134,7 +119,6 @@ function jackpotFeier(x, y) {
     }
 }
 
-// ---------- GROSSE TITEL: Tagesstart und Feierabend ----------
 
 function zeigeTitel(text, klasse) {
     document.querySelectorAll(".gross-titel").forEach(t => t.remove());
@@ -144,7 +128,7 @@ function zeigeTitel(text, klasse) {
 }
 
 registriereHaken("tagStart", () => {
-    if (imHauptmenue()) return; // Spielstart: der Tag laeuft hinter dem Hauptmenue an, kein grosser Titel
+    if (imHauptmenue()) return;
     const z = jahreszeit();
     zeigeTitel(tf("☀️ Tag {0}", run.tag), "titel-tag");
     setTimeout(() => {
@@ -156,13 +140,11 @@ registriereHaken("tagEnde", () => {
     if (!run.sandbox) zeigeTitel(t("🌙 Feierabend!"), "titel-abend");
 });
 
-// ---------- SAMEN: das Feld federt beim Landen ----------
 
 registriereHaken("samen", feld => {
     feld.el.feldDiv.animate([{ scale: "1" }, { scale: "0.9" }, { scale: "1.06" }, { scale: "1" }], { duration: 320, easing: "ease-out" });
 });
 
-// ---------- KAUFEN: Funken am Knopf ----------
 
 document.addEventListener("click", event => {
     const knopf = event.target.closest && event.target.closest(".upgrade-buy-button, .stern-karte-kaufen, .kauf-kachel");
@@ -172,7 +154,6 @@ document.addEventListener("click", event => {
     zeigeRing(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width * 1.2, "#ffe89a", 400);
 }, true);
 
-// ---------- REIFE PFLANZEN FUNKELN, VOEGEL AM HIMMEL ----------
 
 setInterval(() => {
     if (!run || run.phase !== "tag" || document.hidden || spielPausiert()) return;
@@ -188,7 +169,7 @@ setInterval(() => {
 
 setInterval(() => {
     if (document.hidden || !hauptmenue.classList.contains("versteckt") || Math.random() < 0.6) return;
-    if (tageszeit > 0.8) return; // nachts schlafen die Voegel
+    if (tageszeit > 0.8) return;
     const schwarm = el("div", "vogel-schwarm" + (Math.random() < 0.5 ? " links" : ""));
     const anzahl = 3 + Math.floor(Math.random() * 4);
     for (let i = 0; i < anzahl; i++) {
@@ -204,7 +185,6 @@ setInterval(() => {
     setTimeout(() => schwarm.remove(), 23000);
 }, 9000);
 
-// ---------- SAMMEL-KETTE: viel Saat schnell hintereinander einsammeln ----------
 
 const KETTE_FENSTER_MS = 700;
 let kette = { anzahl: 0, bis: 0, el: null };
@@ -234,7 +214,6 @@ function sammelKette(x, y) {
     }
 }
 
-// ---------- LICHTSAEULE: epische und legendaere Saat leuchten beim Landen ----------
 
 function lichtsaeule(x, y, farbe) {
     const saeule = el("div", "lichtsaeule");
@@ -245,7 +224,6 @@ function lichtsaeule(x, y, farbe) {
     setTimeout(() => saeule.remove(), 1300);
 }
 
-// ---------- STELLARIUM: gekaufter Stern blitzt auf ----------
 
 function sternGekauft(def) {
     const stern = document.querySelector('.stern[data-id="' + def.id + '"]');
@@ -263,7 +241,6 @@ function sternGekauft(def) {
     setTimeout(() => text.remove(), 1200);
 }
 
-// ---------- RECHNUNG BEZAHLT: Stempel und goldener Regen ----------
 
 registriereHaken("rechnungBezahlt", (nummer, warBoss) => {
     const stempel = el("div", "bezahlt-stempel" + (warBoss ? " kredit" : ""), warBoss ? t("✔ KREDIT ABBEZAHLT") : t("✔ BEZAHLT"));
@@ -281,7 +258,6 @@ registriereHaken("rechnungBezahlt", (nummer, warBoss) => {
     }
 });
 
-// ---------- NEUE PFLANZE: gross in der Mitte mit Lichtstrahlen ----------
 
 function neuePflanzeFeier(pflanze) {
     const buehne = el("div", "neue-pflanze");
@@ -293,10 +269,6 @@ function neuePflanzeFeier(pflanze) {
     setTimeout(() => buehne.remove(), 2400);
 }
 
-// ---------- GLEICHTAKT: alle Dauer-Animationen auf den Feldern laufen synchron ----------
-// Felder werden zu verschiedenen Zeiten gekauft, ihre Animationen (Kristall-Glanz, Lava, Sterne, reife Pflanzen ...)
-// starten also versetzt. Hier bekommen alle endlosen Animationen denselben Startpunkt (0 = Seitenstart).
-// Einmal-Effekte (Ernte-Hopser usw.) bleiben unberuehrt, sonst waeren sie sofort vorbei.
 
 const feldRasterFuerTakt = document.getElementById("field-grid");
 

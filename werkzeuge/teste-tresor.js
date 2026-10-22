@@ -1,11 +1,5 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Test fuer den Tresor (Kaeufe, Gems, Codes), laeuft in normalem Node, ohne Electron (wird nicht mitgeliefert)
-// Start (im Projektordner):  node werkzeuge/teste-tresor.js
-// Benutzt einen leeren Ordner im Temp-Verzeichnis, echte Spielstaende werden nicht angefasst.
-// Braucht desktop-app/geheim.txt (wird sonst wie in der App angelegt).
-// ============================================================
 
 const fs = require("fs");
 const os = require("os");
@@ -20,7 +14,6 @@ function pruefe(name, bedingung) {
     else { fehler++; console.log("FEHLER: " + name); }
 }
 
-// Wie ein Neustart der App: Modul frisch laden und starten
 function neustart() {
     delete require.cache[require.resolve(MODUL)];
     const tresor = require(MODUL);
@@ -28,7 +21,6 @@ function neustart() {
     return tresor;
 }
 
-// Alte Pruefsumme (bis Beta 0.4.x), nur um alte Daten fuer den Test zu erzeugen
 function altePruefsumme(text) {
     const salz = "sv-" + text.length + "-bl00m";
     let h1 = 0xdeadbeef ^ 0x5eed, h2 = 0x41c6ce57 ^ 0x5eed;
@@ -42,7 +34,6 @@ function altePruefsumme(text) {
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
-// So hat das alte Spiel gespeichert: Inhalt als JSON, Base64-kodiert, dazu die Pruefsumme
 const altSigniert = wert => { const daten = Buffer.from(JSON.stringify(wert)).toString("base64"); return JSON.stringify({ daten, sig: altePruefsumme(daten) }); };
 
 try {
@@ -66,21 +57,18 @@ try {
     t = neustart();
     pruefe("bleibt nach Neustart", t.lesen().gems === 50 && t.lesen().dlc && t.lesen().beta && t.lesen().gekauft.length === 2);
 
-    // Datei von Hand aendern: dann gilt die Sicherung
     const dat = path.join(ordner, "tresor.dat"), bak = path.join(ordner, "tresor.bak");
     const inhalt = fs.readFileSync(dat, "utf8");
     fs.writeFileSync(dat, inhalt.slice(0, 20) + (inhalt[20] === "A" ? "B" : "A") + inhalt.slice(21));
     t = neustart();
     pruefe("kaputte Datei: Sicherung greift", t.lesen().gems === 50 && t.lesen().dlc);
 
-    // Beide Dateien kaputt: leer anfangen, kaputte Datei aufheben
     fs.writeFileSync(dat, "SVT1.dGVzdA==");
     fs.writeFileSync(bak, "Unsinn");
     t = neustart();
     pruefe("beide kaputt: leer", t.lesen().gems === 0 && !t.lesen().dlc);
     pruefe("kaputte Datei aufgehoben", fs.existsSync(dat + ".ungueltig"));
 
-    // Uebernahme aus dem alten Browser-Speicher: begrenzt und nur einmal
     const alt = { gems: altSigniert(5000), gekauft: altSigniert(["dlc", "haustier:a", "haustier:b"]), beta: altSigniert({ beta: true }) };
     let stand = t.uebernimmAlt(alt);
     pruefe("alt: Gems begrenzt", stand.gems === 50);
@@ -97,7 +85,6 @@ try {
     fs.rmSync(ordner, { recursive: true, force: true });
 }
 
-// ---------- Browser- und Handy-Tresor (js/tresor.js) mit nachgebautem localStorage ----------
 try {
     const vm = require("vm");
     const code = fs.readFileSync(path.join(__dirname, "..", "js", "tresor.js"), "utf8") + "\n;globalThis.Tresor = Tresor;";
@@ -121,7 +108,6 @@ try {
     pruefe("Browser: Code", b.code("betavale").ok && b.stand().beta && b.stand().endlos && b.code("BETAVALE").grund === "schon");
     b = neuerBrowser();
     pruefe("Browser: bleibt nach Neustart", b.stand().gems === 70 && b.stand().gekauft.length === 1);
-    // von Hand geaendert: Pruefsumme passt nicht mehr, dann leer
     const roh = JSON.parse(speicher.sproutvale_tresor);
     roh.daten = btoa(JSON.stringify({ gems: 99999 }));
     speicher.sproutvale_tresor = JSON.stringify(roh);

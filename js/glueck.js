@@ -1,16 +1,9 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Gluecksspiele auf dem Markt (Muenzwurf, Slotmaschine, Rubbellose, Huehnerrennen, Samen-Plinko, Roulette, Blackjack)
-// Werden im Stellarium (Ast "Glueck") freigeschaltet. Jedes Spiel darf zwischen zwei Tagen nur ein paar Mal gespielt
-// werden (GLUECKSSPIEL.xyz.proPause + Stammkunde). Glueck (glueckBonus() in script.js) verbessert alle Chancen.
-// Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
-// ============================================================
 
 let glueckAnimation = false;
-let glueckUeberspringen = null; // beendet die laufende Animation sofort (Knopf "Ueberspringen")
+let glueckUeberspringen = null;
 
-// Ueberspringen-Knopf unter einem laufenden Spiel
 function zeigeUeberspringen(element) {
     const karte = element.closest(".spiel-karte");
     if (!karte) return;
@@ -29,7 +22,6 @@ function neuerGlueckZustand() {
     };
 }
 
-// Alle Gluecksspiele: Stern im Stellarium, Name im Reiter, Aufbau
 const GLUECK_SPIELE = [
     { id: "muenzwurf", text: () => t("🪙 Münzwurf"), render: () => renderMuenzwurf() },
     { id: "gacha", text: () => t("🎰 Slotmaschine"), render: () => renderSlot() },
@@ -48,7 +40,6 @@ function hatGluecksspiel() {
     return freieGluecksspiele().length > 0;
 }
 
-// Stern "VIP-Karte": so viele Spiele pro Pause mehr
 const VIP_SPIELE = 5;
 
 function spieleProPause(id) {
@@ -64,7 +55,6 @@ function zaehleSieg() {
     meta.lebenszeit.gluecksspielSiege += 1;
 }
 
-// Ein Spiel (der gewaehlte Reiter im Gluecksspiel-Markt)
 function renderGluecksspiele(id) {
     const glueck = glueckBonus();
     shopContent.appendChild(erstelleHinweis(tf("🍀 Dein Glück: +{0}{1}", prozentText(glueck), (glueck > 0 ? t(" (bessere Gewinnchancen)") : t(" (Glück bekommst du im Stellarium (Ast \"Glück\"), im Mondteich und von Kuscheltieren)")))));
@@ -91,7 +81,6 @@ function kleinerKnopf(text, aktiv, onKlick, klasse) {
     return knopf;
 }
 
-// Knoepfe fuer die Einsaetze (Anteile deines Goldes)
 function einsatzKnoepfe(id, onWahl, rotAb = 1) {
     const leiste = el("div", "spiel-knoepfe");
     const rest = restSpiele(id);
@@ -108,13 +97,10 @@ function restText(id) {
     return tf("Noch {0} von {1} Spielen bis zum nächsten Tag", restSpiele(id), spieleProPause(id));
 }
 
-// Boni aus dem alten Gacha-Automaten (nur noch in alten Run-Spielstaenden vorhanden)
 function gachaBonus(id) {
     return (run.gachaBoni && run.gachaBoni[id]) || 0;
 }
 
-// ---------- SLOTMASCHINE: 3 Walzen, 3 gleiche Symbole gewinnen ----------
-// Das Ergebnis steht beim Drehen schon fest (wie beim Rubbellos), die Walzen halten nacheinander an.
 
 function setzeWalze(walze, symbol) {
     walze.innerHTML = "";
@@ -166,7 +152,6 @@ function dreheSlot(anteil, maschine, walzenEls) {
     if (gewinn) {
         walzen = [gewinn.symbol, gewinn.symbol, gewinn.symbol];
     } else {
-        // Niete: oft zwei gleiche (Beinahe-Gewinn), nie drei gleiche
         const a = zufall(alle);
         const anders = zufall(alle.filter(s => s !== a));
         walzen = Math.random() < 0.45 ? mische([a, a, anders]) : [a, anders, zufall(alle.filter(s => s !== a))];
@@ -222,7 +207,6 @@ function dreheSlot(anteil, maschine, walzenEls) {
     dreh();
 }
 
-// ---------- MUENZWURF: Kopf = Einsatz verdoppelt, Zahl = Einsatz weg ----------
 
 function muenzwurfChance() {
     const k = GLUECKSSPIEL.muenzwurf;
@@ -255,13 +239,11 @@ function wirfMuenze(anteil, muenzeEl) {
         { duration: 900, easing: "ease-in-out" }
     );
     let fertig = false;
-    // Waehrend die Muenze fliegt, wechseln sich Kopf und Zahl ab
     let seite = 0;
     const wechsel = setInterval(() => {
         seite = 1 - seite;
         muenzeEl.src = spriteUrl(seite ? "muenze_zahl" : "muenze_kopf");
     }, 100);
-    // setTimeout statt onfinish: laeuft auch, wenn der Browser Animationen im Hintergrund anhaelt
     const beende = () => {
         if (fertig) return;
         fertig = true;
@@ -289,9 +271,6 @@ function wirfMuenze(anteil, muenzeEl) {
     setTimeout(beende, 900);
 }
 
-// ---------- RUBBELLOSE: 9 Felder aufrubbeln, 3 gleiche Symbole gewinnen ----------
-// Der Preis ist ein Anteil deines Goldes. Das Ergebnis steht beim Kauf schon fest,
-// die anderen Symbole kommen hoechstens 2-mal vor (Beinahe-Gewinne!).
 
 function kaufeLos(anteil) {
     const k = GLUECKSSPIEL.rubbellos;
@@ -377,7 +356,7 @@ function renderRubbellos() {
             if (offen) feld.appendChild(pixelIcon(symbol, 32));
             else feld.textContent = "?";
             feld.addEventListener("pointerenter", event => {
-                if (event.buttons === 1) rubbleFeld(i, feld); // mit gedrueckter Maustaste drueberwischen
+                if (event.buttons === 1) rubbleFeld(i, feld);
             });
             feld.addEventListener("pointerdown", () => rubbleFeld(i, feld));
             raster.appendChild(feld);
@@ -393,7 +372,6 @@ function renderRubbellos() {
     if (los && los.fertig) spielErgebnis(karte, los.text, Boolean(los.gewinn));
 }
 
-// ---------- HUEHNERRENNEN: auf ein Huhn setzen, Gewinn = Einsatz x Quote ----------
 
 GLUECKSSPIEL.huehnerrennen.huehner.forEach((huhn, i) => {
     SPRITE_ABWANDLUNGEN["huhn_" + i] = { basis: "huhn", farben: { C: huhn.farbe } };
@@ -446,7 +424,6 @@ function starteRennen(wahl, huhnBilder) {
     glueckAnimation = true;
     shopContent.querySelectorAll(".spiel-knopf").forEach(knopf => { knopf.disabled = true; });
 
-    // Sieger nach Chance 1/Quote (Glueck hilft deinem Huhn), er kommt als Erstes ins Ziel
     const sieger = gewichteterZufall(k.huehner.map((h, i) => i), i => (1 / k.huehner[i].quote) * (i === wahl ? 1 + glueckBonus() : 1));
     const zeiten = k.huehner.map((_, i) => (i === sieger ? 2600 : 2800 + Math.random() * 900));
     const strecke = huhnBilder[0].parentElement.clientWidth - huhnBilder[0].offsetWidth - 150;
@@ -486,8 +463,6 @@ function starteRennen(wahl, huhnBilder) {
     animiere();
 }
 
-// ---------- SAMEN-PLINKO: Ein Samen hüpft durch Naegel in ein Gewinnfach ----------
-// Jede Reihe: 50% links, 50% rechts. Glueck: mit dieser Chance faellt ein zweiter Samen, das bessere Fach zaehlt.
 
 function plinkoWeg() {
     const k = GLUECKSSPIEL.plinko;
@@ -551,7 +526,6 @@ function lassePlinkoFallen(anteil, brett, samen) {
         if (k.faecher[zweiter.fach] > k.faecher[wurf.fach]) wurf = zweiter;
     }
 
-    // Position: x in Faechern (0 = ganz links), y in Reihen
     const reihen = brett.querySelectorAll(".plinko-reihe");
     const faecherEl = brett.querySelector(".plinko-faecher");
     const brettRect = brett.getBoundingClientRect();
@@ -572,7 +546,6 @@ function lassePlinkoFallen(anteil, brett, samen) {
 
     function naechsterSchritt() {
         if (schnell && schritt < k.reihen) {
-            // Ueberspringen: alle Reihen auf einmal
             while (schritt < k.reihen) {
                 x += (wurf.weg[schritt] ? 0.5 : -0.5) * fachBreite;
                 schritt += 1;
@@ -613,9 +586,6 @@ function lassePlinkoFallen(anteil, brett, samen) {
     setTimeout(naechsterSchritt, 150);
 }
 
-// ---------- ROULETTE: eine Kugel, 37 Faecher (0 ist gruen) ----------
-// Rot/Schwarz und Gerade/Ungerade zahlen x2, die gruene 0 zahlt x36. Glueck: verliert man, rollt die Kugel mit
-// dieser Chance ein zweites Mal.
 
 const ROULETTE_ROT = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
 const ROULETTE_WETTEN = [
@@ -675,7 +645,6 @@ function dreheRoulette(anteil, feld) {
     let ergebnis = Math.floor(Math.random() * 37);
     if (!wette.trifft(ergebnis) && Math.random() < glueckBonus()) ergebnis = Math.floor(Math.random() * 37);
 
-    // Die Kugel laeuft ueber die Zahlen und wird langsamer
     let schritt = 0;
     const schritte = 22;
     let fertig = false;
@@ -717,9 +686,6 @@ function dreheRoulette(anteil, feld) {
     tick();
 }
 
-// ---------- BLACKJACK: gegen den Dealer, wer naeher an 21 ist ----------
-// Gewinn x2, Blackjack (21 mit 2 Karten) x2,5, Gleichstand = Einsatz zurueck. Der Dealer zieht bis 17.
-// Glueck: wuerde eine gezogene Karte dich ueber 21 bringen, wird mit dieser Chance eine andere Karte gezogen.
 
 const BJ_WERTE = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 const BJ_FARBEN = ["♠", "♥", "♦", "♣"];
@@ -768,7 +734,6 @@ function renderBlackjack() {
     const hand = run.glueck.bj;
     const imSpiel = hand && !hand.fertig;
 
-    // Der Dealer mit Sprechblase
     const spruch = !hand ? t("Setz dich, gleich gibt es Karten.")
         : imSpiel ? (hand.dealerZieht ? t("Ich ziehe …") : t("Dein Zug. Ziehen oder halten?"))
         : hand.spruch;
@@ -814,7 +779,6 @@ function bjAusteilen(anteil) {
     aktualisiereAlles();
 }
 
-// Glueck: eine Karte, die dich ueber 21 bringen wuerde, wird mit dieser Chance noch einmal gezogen
 function bjZieheFuerSpieler(hand) {
     let karte = bjKarte();
     if (bjSumme([...hand.spieler, karte]) > 21 && Math.random() < glueckBonus()) karte = bjKarte();
@@ -842,7 +806,6 @@ function bjVerdoppeln() {
     bjHalten();
 }
 
-// Der Dealer deckt auf und zieht Karte fuer Karte bis mindestens 17
 function bjHalten() {
     const hand = run.glueck.bj;
     if (!hand || hand.fertig || hand.dealerZieht) return;
@@ -910,7 +873,6 @@ function bjAuswerten() {
     aktualisiereAlles();
 }
 
-// Ein offenes Blatt, wenn die Pause vorbei ist: der Dealer spielt es sofort zu Ende (du haeltst)
 function bjSchliesseOffeneHand() {
     const hand = run && run.glueck && run.glueck.bj;
     if (!hand || hand.fertig) return;

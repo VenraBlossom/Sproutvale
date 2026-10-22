@@ -1,12 +1,6 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Tastenkuerzel, Test-Befehle und Spielstart (wird als letzte Datei geladen)
-// Gehoert zu script.js (gemeinsame Funktionen und Zustand stehen dort).
-// ============================================================
 
-// ---------- TASTENKUERZEL ----------
-// Gibt eine Aktion false zurueck, bekommt der Browser die Taste normal (z.B. Leertaste in Knoepfen).
 
 function imSpiel() {
     return hauptmenue.classList.contains("versteckt") && einstellungenFenster.classList.contains("versteckt") &&
@@ -52,7 +46,7 @@ registriereTaste("space", t("Tag starten"), () => {
     starteTag();
 }, t("Leertaste"));
 registriereTaste("f11", t("Vollbild an/aus"), () => {
-    if (window.sproutvaleDesktop) return false; // die Desktop-App kuemmert sich selbst um F11
+    if (window.sproutvaleDesktop) return false;
     wechsleVollbild();
 }, "F11");
 registriereTaste("escape", t("Fenster schließen / Einstellungen"), () => {
@@ -71,9 +65,7 @@ registriereTaste("escape", t("Fenster schließen / Einstellungen"), () => {
     else oeffneEinstellungen(false);
 }, "Esc");
 
-// ---------- TEST-BEFEHLE (Browser-Konsole, F12) ----------
 
-// Debug: Bezahltes kommt in den Tresor (geht nur in der Entwickler-Version), Erspielbares in den Spielstand
 function debugFreischalten(kategorie, eintrag) {
     if (eintrag.quelle === "dlc") Tresor.entwickler("gekauft", kategorie + ":" + eintrag.id);
     else meta.freigeschaltet[kategorie + ":" + eintrag.id] = true;
@@ -88,9 +80,7 @@ const debug = {
     energie(wert) { run.energie = wert; },
     tag(nummer) { run.tag = nummer; aktualisiereAlles(); },
     stern() { spawnSternschnuppe(); },
-    // Alle Sterne im Stellarium auf die hoechste Stufe (unendliche Sterne auf die angegebene Stufe): debug.alleSterne(10)
     alleSterne(unendlich = 10) {
-        // Auch Sterne mit Bedingungen (Pflanzen, Erbsorten ...): alles wird gesetzt, Pflanzen gleich freigeschaltet
         SKILLS.forEach(st => { run.level[st.id] = Number.isFinite(st.max) ? st.max : unendlich; });
         const bisher = Math.max(0, ...run.pflanzen.filter(p => p.freigeschaltet).map(p => p.level.ertrag));
         SKILLS.filter(st => st.art === "pflanze").forEach(st => {
@@ -103,17 +93,14 @@ const debug = {
         if (typeof renderSkilltree === "function") renderSkilltree();
         zeigeToast("🌟 Alle Sterne auf der höchsten Stufe.");
     },
-    // Alle Markt-Upgrades auf die hoechste Stufe (unendliche auf die angegebene Stufe): debug.alleMarkt(10)
     alleMarkt(unendlich = 10) {
         SHOP_UPGRADES.forEach(u => { run.level[u.id] = Number.isFinite(u.max) ? u.max : unendlich; });
         meta.stellariumFrei = true;
-        // Alle Felder, die noch Platz haben
         for (let i = 0; i < 200 && run.felder.length < maxEigeneFelder(); i++) {
             const slot = naechsterSlot(eigeneSeite());
             if (slot < 0) break;
             erstelleFeld(slot);
         }
-        // Pflanzen-Upgrades (Unter-Reiter) fuer alle freigeschalteten Pflanzen, soweit ihr Stern gekauft ist
         run.pflanzen.filter(p => p.freigeschaltet).forEach(pflanze => PFLANZEN_UPGRADES.forEach(u => {
             if (!pflanzenUpgradeFrei(pflanze, u)) return;
             const ziel = Number.isFinite(u.max) ? u.max : Math.max(pflanze.level[u.id] || 0, unendlich);
@@ -126,26 +113,18 @@ const debug = {
     },
     gluehwuermchen() { spawnGluehwuermchen(); },
     segen() { zeigeSegenAuswahl(); },
-    // Tageszeit erzwingen (0 = Morgen, 1 = Nacht), debug.tageszeit(null) zum Ausschalten
     tageszeit(wert) { debugTageszeit = wert; },
-    // Haustier-Zustand testen: debug.pose("schlafen")
     pose(zustand) { wechsleHaustierZustand(zustand, 8000); },
-    // z.B. debug.variante("kristall"), alle neuen Pflanzen werden diese Variante. debug.variante(null) zum Ausschalten
     variante(id) { debugVariante = id; },
-    // Unterstuetzer-Paket (4,99 €, alle epischen Inhalte + Sandbox) an/aus: debug.dlc(true)
     dlc(an = true) { Tresor.entwickler("dlc", an); wendeKosmetikAn(); },
-    // Kristalle geben (zum Testen der Kaeufe): debug.kristalle(500)
     kristalle(menge = 500) { Tresor.entwickler("gems", kristallStand() + menge); aktualisiereKristallAnzeigen(); },
-    // Beta-Tester (Code BETAVALE) und Endless im Tresor an/aus: debug.beta(true)
     beta(an = true) { Tresor.entwickler("beta", an); Tresor.entwickler("endlos", an); wendeKosmetikAn(); },
-    // Alle legendaeren Einzel-Inhalte freischalten: debug.einzelDlc()
     einzelDlc() {
         Object.entries(KOSMETIK_LISTEN).forEach(([kategorie, liste]) => liste.filter(e => e.paket === "einzeln")
             .forEach(e => debugFreischalten(kategorie, e)));
         speichereMeta();
         wendeKosmetikAn();
     },
-    // ALLES freischalten: Unterstuetzer-Paket, alle legendaeren und alle erspielbaren Skins, Sandbox
     alles() {
         Tresor.entwickler("dlc", true);
         meta.sandbox = true;
@@ -156,7 +135,6 @@ const debug = {
         wendeKosmetikAn();
         zeigeToast("🎁 Alle Skins, DLCs und Endlos sind freigeschaltet.");
     },
-    // Alle Skins wieder sperren (zum Testen des Anprobierens)
     allesWeg() {
         Tresor.entwickler("dlc", false);
         Object.keys(meta.freigeschaltet).forEach(schluessel => { delete meta.freigeschaltet[schluessel]; });
@@ -164,7 +142,6 @@ const debug = {
         speichereMeta();
         wendeKosmetikAn();
     },
-    // Einen Skin freischalten und direkt auswaehlen: debug.kosmetik("samenladen", "feuerwerk")
     kosmetik(kategorie, id) {
         const eintrag = (KOSMETIK_LISTEN[kategorie] || []).find(e => e.id === id);
         if (eintrag) debugFreischalten(kategorie, eintrag);
@@ -177,32 +154,23 @@ const debug = {
         speichereMeta();
         wendeKosmetikAn();
     },
-    // Kurzformen fuer Haustier und Deko: debug.skin("manta"), debug.deko("lagerfeuer")
     skin(id) { debug.kosmetik("haustier", id); },
     deko(id) { debug.kosmetik("deko", id); },
-    // Alle Namen einer Kategorie anzeigen: debug.liste("haustier")
     liste(kategorie) {
         console.table((KOSMETIK_LISTEN[kategorie] || []).map(e => ({ id: e.id, name: e.name, seltenheit: KUSCHEL_RARITAETEN[kosmetikSeltenheit(e)].name })));
     },
-    // Mondphasen bis n freischalten: debug.mondphase(5)
     mondphase(n) { meta.mondphaseFrei = Math.min(n, MONDPHASEN.length - 1); speichereMeta(); },
-    // Meisterschaft testen: debug.meister("weizen", 1000) setzt die Ernten dieser Pflanze
     meister(pflanze, ernten) { meta.kodex.pflanzen[pflanze] = ernten; speichereMeta(); aktualisiereAlles(); },
-    // Jahreszeit testen: debug.jahreszeit(2) springt in den Herbst (0 Fruehling, 1 Sommer, 2 Herbst, 3 Winter)
     jahreszeit(index) { run.tag = index * JAHRESZEITEN_KONFIG.tageProJahreszeit + 1; aktualisiereAlles(); },
-    // Waehrung auf einen Wert setzen (statt dazugeben): debug.setze("gold", 500)
     setze(art, wert) {
         const jetzt = { gold: () => run.gold, sternensamen: () => run.skillpunkte, mondblueten: () => meta.mondblueten,
             splitter: () => meta.sternensplitter, gutscheine: () => meta.gutscheine, kristalle: () => kristallStand() }[art];
         if (!jetzt) return;
         debug[art](wert - jetzt());
     },
-    // Level: debug.level(50) setzt das Level, debug.xp(1000) gibt Erfahrung
     level(n) { meta.bauernXp = rangSchwelle(Math.max(1, Math.floor(n))); speichereMeta(); aktualisiereProfilKnopf(); },
     xp(menge) { gibBauernXp(menge); speichereMeta(); },
-    // Fenster mit allen Befehlen, Werte direkt eintragen: debug.help()
     help() { console.log("Debug-Fenster: Einstellungen > Klang, dann Strg+F12."); },
-    // Ein Bot tritt deiner Lobby bei und spielt mit: debug.bot("ABC123") (Code aus dem Duo-Fenster)
     bot(code) {
         debug.botWeg();
         const sauber = String(code || koop.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -222,25 +190,19 @@ const debug = {
     botWeg() {
         document.querySelectorAll(".debug-bot-rahmen, .debug-bot-schild").forEach(e => e.remove());
     },
-    // Waehrend eines Tages: debug.wetter("gewitter"), debug.kraehe(), debug.goldregen()
     wetter(id) { run.wetter = id; if (id) meta.kodex.wetter[id] = (meta.kodex.wetter[id] || 0) + 1; zeigeWetter(); },
     kraehe() { kraeheKommt(); },
     goldregen() { tagesPlan.goldregen = tagesPlan.ms; },
     haendler() { haendlerKommt(); aktualisiereAlles(); },
-    // debug.werkzeug("sanduhr", 5) gibt ein Werkzeug auf Stufe 5
     werkzeug(id, stufe) { gibWerkzeug(id, 10, stufe); aktualisiereAlles(); },
     boss(id) { run.bossRegel = id; aktualisiereAlles(); },
     kuschel(id, anzahl = 1) { meta.kuscheltiere[id] = (meta.kuscheltiere[id] || 0) + anzahl; speichereMeta(); },
     sandbox() { meta.sandbox = true; speichereMeta(); },
     resetMeta() { Object.assign(meta, leererMetaStand()); speichereMeta(); loescheRunSpeicher(); }
 };
-// Nur mit DEBUG_ERLAUBT (daten.js) sind die Befehle in der Konsole erreichbar
 if (DEBUG_ERLAUBT) window.debug = debug;
 
-// Debug-Fenster (Einstellungen > Klang, Strg+F12): jeder Befehl mit Eingaben und einem Knopf zum Ausfuehren.
-// Feldtypen: zahl (min/max, die Grenzen stehen grau im Feld), wahl (oeffnet ein "Inventar" mit allen Moeglichkeiten
-// als Kacheln; optionen kann von den anderen Feldern abhaengen), haken, text
-const WERKZEUG_DEBUG_MAX = 20; // Werkzeuge haben kein festes Maximum (Stufe = 1 + bezahlte Rechnungen), 20 reicht fuer jeden Run
+const WERKZEUG_DEBUG_MAX = 20;
 const DEBUG_AUS = { wert: null, name: "Aus", symbol: "🚫" };
 const DEBUG_POSEN = ["stehen", "laufen", "sitzen", "liegen", "schlafen"];
 
@@ -248,7 +210,6 @@ function debugKosmetikOptionen(kategorie) {
     return (KOSMETIK_LISTEN[kategorie] || []).map(e => ({ wert: e.id, name: e.name, symbol: e.symbol || e.emoji || e.badge }));
 }
 
-// Skin-Kategorien mit ihrem Namen (Haus-Kategorien und Figur-Teile)
 function debugKategorien() {
     return Object.keys(KOSMETIK_LISTEN).map(k => {
         const haus = KOSMETIK_KATEGORIEN.find(x => x.id === k);
@@ -312,7 +273,6 @@ const DEBUG_BEFEHLE = [
     { name: "resetMeta", text: "Gesamten Fortschritt löschen", gefahr: true }
 ];
 
-// "Inventar": alle Moeglichkeiten als Kacheln, Klick waehlt aus
 function zeigeDebugInventar(titel, optionen, gewaehlt, fertig) {
     const raster = el("div", "debug-inventar");
     const kacheln = optionen.map(o => {
@@ -359,7 +319,6 @@ function zeigeDebugFenster() {
                     knopf.appendChild(el("span", null, gewaehlt.name + " ▾"));
                 };
                 zeige();
-                // Haengt ein spaeteres Feld von diesem ab (Skin nach Kategorie), faengt es wieder vorne an
                 zuruecksetzen[index] = () => {
                     gewaehlt = erste();
                     werte[index] = gewaehlt.wert;
@@ -376,7 +335,6 @@ function zeigeDebugFenster() {
             }
             const feld = el("input", "debug-feld" + (f.typ === "haken" ? " debug-haken" : ""));
             feld.type = f.typ === "zahl" ? "number" : f.typ === "haken" ? "checkbox" : "text";
-            // Zahlen ohne Vorschlag: das Feld ist leer, man traegt selbst ein
             if (f.typ === "haken") feld.checked = f.wert;
             else feld.value = f.typ === "zahl" ? "" : f.wert;
             if (f.schritt) feld.step = f.schritt;
@@ -384,7 +342,6 @@ function zeigeDebugFenster() {
             if (f.max !== undefined) feld.max = f.max;
             if (f.typ === "zahl" && f.max !== undefined) feld.placeholder = f.min + "-" + f.max;
             if (f.platzhalter) feld.placeholder = f.platzhalter;
-            // Tasten im Feld nicht als Spiel-Tastenkuerzel werten
             feld.addEventListener("keydown", event => { if (event.key !== "F12") event.stopPropagation(); });
             zeile.appendChild(feld);
             return () => {
@@ -392,7 +349,6 @@ function zeigeDebugFenster() {
                 if (f.leerNull && feld.value === "") return null;
                 if (f.typ !== "zahl") return feld.value;
                 if (feld.value === "") throw new Error(t("Bitte erst eine Zahl eintragen."));
-                // Zahlen bleiben in den Grenzen, die es im Spiel gibt
                 let zahlWert = Number(feld.value) || 0;
                 if (f.min !== undefined) zahlWert = Math.max(f.min, zahlWert);
                 if (f.max !== undefined) zahlWert = Math.min(f.max, zahlWert);
@@ -401,7 +357,6 @@ function zeigeDebugFenster() {
             };
         });
         const ausfuehren = (aktion, name) => {
-            // Debug-Befehle, die aufs Spiel zugreifen, gehen nur mit geladenem Spielstand (ueberall: true = auch im Hauptmenue)
             if (!b.ueberall && !hauptmenue.classList.contains("versteckt")) {
                 Klang.fehler();
                 zeigeToast(t("🛠️ Debug geht nur im Spiel: Lade zuerst einen Spielstand."));
@@ -432,7 +387,6 @@ function zeigeDebugFenster() {
         onSchliessen: () => { debugFensterSchliessen = null; } });
 }
 
-// Lobby-Debug: nur ein Knopf, der einen Test-Bot in die eigene Lobby holt
 function zeigeLobbyDebug() {
     const knopf = el("button", "knopf knopf-gruen", t("🤖 Bot hinzufügen"));
     debugFensterSchliessen = zeigePopup({ titel: t("🛠️ Debug (Strg+F12)"), farbe: "#44506b", breite: 360, klasse: "debug-fenster",
@@ -443,8 +397,6 @@ function zeigeLobbyDebug() {
     });
 }
 
-// Das Debug-Fenster geht NUR mit Strg+F12 in den Einstellungen im Reiter Klang auf (in der Lobby: nur "Bot hinzufügen").
-// Die Einstellungen schliessen sich dabei, das Debug-Fenster liegt dann ganz oben.
 window.addEventListener("keydown", event => {
     if (event.key !== "F12" || !DEBUG_ERLAUBT) return;
     event.preventDefault();
@@ -453,7 +405,6 @@ window.addEventListener("keydown", event => {
         debugFensterSchliessen();
         return;
     }
-    // In der eigenen Duo-Lobby: Strg+F12 oeffnet ein kleines Fenster mit "Bot hinzufügen"
     const inLobby = typeof koop !== "undefined" && koop.code && !koop.imSpiel && !$("menue-koop").classList.contains("versteckt") &&
         !hauptmenue.classList.contains("versteckt");
     if (event.ctrlKey && inLobby) {
@@ -468,18 +419,15 @@ window.addEventListener("keydown", event => {
     zeigeDebugFenster();
 }, true);
 
-// Stand des Test-Bots (bot.js) im Schild unten links anzeigen
 window.addEventListener("message", event => {
     if (!event.data || typeof event.data.sproutvaleBot !== "string") return;
     const status = document.querySelector(".debug-bot-status");
     if (status) status.textContent = event.data.sproutvaleBot;
 });
 
-// ---------- START ----------
 
 erstelleSternenhimmel();
 erstelleHimmel();
-// Den zuletzt gespielten Modus fortsetzen (Standard oder Sandbox), sonst einen neuen Run beginnen
 const startInSandbox = meta.letzterModus === "sandbox" && hatSandbox();
 if (!ladeRun(startInSandbox) && !(startInSandbox && ladeRun(false))) starteNeuenRun(false);
 erstelleTeich();
@@ -489,9 +437,6 @@ aktualisiereAlles();
 zeigeHauptmenue();
 requestAnimationFrame(hauptSchleife);
 
-// Patch Notes: Klick auf die Versionsnummer, und nach einem Update einmal von selbst (nicht beim allerersten Start).
-// Alle Versionen untereinander (neueste oben), das Fenster scrollt.
-// Patch Notes als Dorfzeitung (wie der Newsletter in Hay Day): jede Version ist eine Ausgabe
 function zeigeNeuigkeiten(ausgabe = 0) {
     const blatt = el("div", "zeitung-blatt");
     fuelleZeitung(blatt, ausgabe);
@@ -509,14 +454,12 @@ function zeigeNeuigkeiten(ausgabe = 0) {
     aktualisiereZeitungKnopf();
 }
 
-// Eine Ausgabe auf das Zeitungsblatt schreiben (beim Blaettern wird nur der Inhalt getauscht)
 function fuelleZeitung(blatt, ausgabe) {
     const eintrag = NEUIGKEITEN[ausgabe];
     blatt.innerHTML = "";
     blatt.classList.remove("umblaettern");
     void blatt.offsetWidth;
     blatt.classList.add("umblaettern");
-    // Kopf der Zeitung
     blatt.appendChild(el("div", "zeitung-kopf", null, [
         el("div", "zeitung-name", t("Sproutvale Tagblatt")),
         el("div", "zeitung-zeile", null, [
@@ -525,15 +468,12 @@ function fuelleZeitung(blatt, ausgabe) {
             el("span", null, t("Preis: 1 Weizen"))
         ])
     ]));
-    // Titelgeschichte = erster Punkt, Rest in Spalten
     const [titel, ...rest] = eintrag.punkte;
     blatt.appendChild(el("div", "zeitung-titel", ausgabe === 0 ? tf("Neu in {0}!", eintrag.version) : eintrag.version));
     blatt.appendChild(el("div", "zeitung-aufmacher", titel));
     if (rest.length) blatt.appendChild(el("div", "zeitung-spalten", null, rest.map(punkt => el("div", "zeitung-meldung", punkt))));
-    // Kleine Rubrik mit einer Schlagzeile aus der Dorfzeitung
     const dorf = DORFZEITUNG.map(f => { try { return f(meta, run); } catch (fehler) { return null; } }).filter(Boolean);
     if (dorf.length) blatt.appendChild(el("div", "zeitung-dorf", null, [el("b", null, t("Aus dem Dorf: ")), el("span", null, zufall(dorf))]));
-    // Blaettern durch alte Ausgaben
     const blaettern = el("div", "zeitung-blaettern");
     const knopf = (text, ziel) => {
         const k = el("button", "knopf zeitung-knopf", text);
@@ -558,7 +498,6 @@ $("menue-zeitung").addEventListener("click", () => zeigeNeuigkeiten(0));
 setzeTipp($("menue-zeitung"), t("📰 Neuigkeiten: Was ist neu in Sproutvale?"));
 aktualisiereZeitungKnopf();
 
-// Feiertag: kleines Banner im Hauptmenue (einmal pro Tag)
 (function festAnkuendigen() {
     const fest = aktuellesFest();
     if (!fest) return;
@@ -576,7 +515,6 @@ if (meta.neuigkeitenGesehen !== SPIEL_VERSION) {
     if (schonGespielt && NEUIGKEITEN[0].version === SPIEL_VERSION) setTimeout(() => zeigeNeuigkeiten(0), 600);
 }
 
-// Auto-Patcher (Desktop-App): ein neues Update ist geladen, jetzt neu laden?
 if (window.sproutvaleDesktop && window.sproutvaleDesktop.update) {
     let gefragt = false;
     window.sproutvaleDesktop.update.wennBereit(version => {
@@ -600,17 +538,13 @@ if (window.sproutvaleDesktop && window.sproutvaleDesktop.update) {
     });
 }
 
-// Duo-Knopf in der oberen Leiste
 $("koop-knopf").querySelector("img").src = spriteUrl("sym_duo");
 $("koop-knopf").addEventListener("click", zeigeKoopFenster);
 
-// Profil (oben rechts im Hauptmenue)
 $("profil-knopf").addEventListener("click", oeffneProfil);
 $("profil-schliessen").addEventListener("click", schliesseProfil);
 aktualisiereProfilKnopf();
 
-// Sprache waehlen: speichern und neu laden (alle Texte werden beim Start uebersetzt)
-// Grosse Karten mit Flagge (per CSS gezeichnet, Windows zeigt keine Flaggen-Emojis); die aktive Sprache hat einen Haken
 (function spracheWahl() {
     const wahl = $("sprache-wahl");
     SPRACHEN.forEach(s => {
@@ -630,9 +564,7 @@ aktualisiereProfilKnopf();
         });
         wahl.appendChild(karte);
     });
-    // Weitere Sprachen: schon zu sehen, aber noch gesperrt
     SPRACHEN_BALD.forEach(s => {
-        // Name und "Bald" untereinander, damit lange Namen (Português, Українська) nicht abgeschnitten werden
         const karte = el("button", "knopf sprach-karte bald", null, [
             el("span", "sprach-flagge flagge-" + s.id),
             el("span", "sprach-text", null, [el("span", "sprach-name", s.name), el("span", "sprach-bald", t("Bald"))])
@@ -643,9 +575,6 @@ aktualisiereProfilKnopf();
     });
 })();
 
-// ---------- INTRO: grosser Arcade-Automat, links und rechts etwas Arcade-Halle ----------
-// Automat und Halle sind Pixel-Art (Canvas 640x360, grob hochskaliert). Logo und Text liegen scharf darueber.
-// Die statischen Teile werden nur einmal gemalt, pro Bild kommen nur die bewegten Sachen dazu.
 (function spieleIntro() {
     const intro = document.getElementById("intro");
     const buehne = document.getElementById("intro-buehne");
@@ -653,18 +582,15 @@ aktualisiereProfilKnopf();
     if (!intro || !buehne || !leinwand) return;
     const c = leinwand.getContext("2d");
     const B = 640, H = 360;
-    // Farbe des Logo-Hintergrunds (Venray Studios.png), damit das Bild nicht aufgeklebt wirkt
     const SCHIRM_FARBE = "#0a0a09";
 
     let ctx = c;
     const px = (x, y, w, h, farbe) => { ctx.fillStyle = farbe; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
-    // Schachbrett-Raster aus zwei Farben (weicher Uebergang wie in alten Spielen)
     const raster = (x, y, w, h, a, b) => {
         px(x, y, w, h, a);
         ctx.fillStyle = b;
         for (let yy = 0; yy < h; yy++) for (let xx = (yy % 2); xx < w; xx += 2) ctx.fillRect(x + xx, y + yy, 1, 1);
     };
-    // Senkrechter Verlauf in Stufen, zwischen den Stufen gerastert
     const verlauf = (x, y, w, h, farben) => {
         const stufe = h / farben.length;
         farben.forEach((f, i) => {
@@ -672,13 +598,11 @@ aktualisiereProfilKnopf();
             if (i > 0) raster(x, Math.round(y + i * stufe) - 2, w, 3, f, farben[i - 1]);
         });
     };
-    // Kasten mit abgestuften Pixel-Ecken
     const kasten = (x, y, w, h, farbe, ecke = 3) => {
         for (let i = 0; i < ecke; i++) px(x + ecke - i, y + i, w - 2 * (ecke - i), 1, farbe);
         px(x, y + ecke, w, h - 2 * ecke, farbe);
         for (let i = 0; i < ecke; i++) px(x + i + 1, y + h - ecke + i, w - 2 * (i + 1), 1, farbe);
     };
-    // Pixel-Kugel mit Licht oben links und Schatten unten rechts
     const kugel = (mx, my, r, dunkel, mitte, hell, glanz) => {
         for (let y = -r; y <= r; y++) {
             const b = Math.round(Math.sqrt(r * r - y * y));
@@ -691,14 +615,13 @@ aktualisiereProfilKnopf();
         }
         px(mx - Math.round(r * 0.5), my - Math.round(r * 0.6), Math.max(2, Math.round(r * 0.35)), Math.max(1, Math.round(r * 0.25)), glanz);
     };
-    // Flacher Arcade-Knopf von schraeg oben: Ring, Kappe, Glanz
     const knopf = (mx, my, rx, farbe, hell, dunkel) => {
         const ry = Math.round(rx * 0.55);
         const ellipse = (cx, cy, a, b, f) => { for (let y = -b; y <= b; y++) { const w = Math.round(a * Math.sqrt(1 - (y * y) / (b * b))); px(cx - w, cy + y, w * 2, 1, f); } };
-        ellipse(mx, my + 3, rx + 2, ry + 2, "#140a22");   // Loch/Schatten
-        ellipse(mx, my + 2, rx + 1, ry + 1, "#2a2a30");   // Metallring
-        ellipse(mx, my + 2, rx, ry, dunkel);              // Seite der Kappe
-        ellipse(mx, my, rx, ry, farbe);                    // Kappe
+        ellipse(mx, my + 3, rx + 2, ry + 2, "#140a22");
+        ellipse(mx, my + 2, rx + 1, ry + 1, "#2a2a30");
+        ellipse(mx, my + 2, rx, ry, dunkel);
+        ellipse(mx, my, rx, ry, farbe);
         ellipse(mx - 1, my - 1, rx - 3, ry - 2, hell);
         px(mx - Math.round(rx * 0.5), my - ry + 1, Math.round(rx * 0.4), 1, "#ffffff");
     };
@@ -706,7 +629,6 @@ aktualisiereProfilKnopf();
     let saat = 11;
     const zufall = () => { saat = (saat * 16807) % 2147483647; return saat / 2147483647; };
 
-    // ---------- statischer Teil (einmal malen) ----------
     const vorlage = document.createElement("canvas");
     vorlage.width = B;
     vorlage.height = H;
@@ -715,14 +637,11 @@ aktualisiereProfilKnopf();
     const A = { x: 112, w: 416 };
 
     function maleHalle() {
-        // Wand mit leichtem Verlauf und Tapetenmuster
         verlauf(0, 0, B, 244, ["#0f0820", "#140b28", "#180e30", "#1c1037", "#20133e", "#23153f"]);
         for (let y = 34; y < 236; y += 16) for (let x = (y / 16 % 2) * 8; x < B; x += 16) px(x, y, 1, 1, "#2e1d52");
-        // Neonroehre oben mit Schein
         px(0, 12, B, 7, "rgba(255,90,208,0.10)");
         px(0, 14, B, 3, "rgba(255,90,208,0.25)");
         px(0, 15, B, 1, "#ff8ae0");
-        // Teppich (typischer Arcade-Teppich mit bunten Punkten), nach hinten dunkler
         verlauf(0, 244, B, H - 244, ["#120a20", "#170d28", "#1b1030", "#1e1234"]);
         const konfetti = ["#4ad0ff", "#ff5ad0", "#ffcf4a", "#7ed957", "#a877e0"];
         for (let i = 0; i < 700; i++) {
@@ -731,35 +650,26 @@ aktualisiereProfilKnopf();
             const g = y > 300 ? 2 : 1;
             px(x, y, g, 1, konfetti[i % konfetti.length] + (y > 300 ? "cc" : "77"));
         }
-        // Sockelleiste mit Lichtband
         px(0, 240, B, 4, "#0a0514");
         px(0, 240, B, 1, "#4ad0ff");
         px(0, 241, B, 1, "rgba(74,208,255,0.35)");
     }
 
-    // Kleiner Automat am Rand: seitlich leicht schraeg (Seitenwand sichtbar), mit Details
     function maleNebenAutomat(x, y, s, farbe, hell, dunkel, schild, seiteLinks) {
         const w = 40 * s, h = 90 * s, tiefe = 8 * s;
-        // Schatten auf dem Teppich
         px(x - 4, y + h - 2, w + tiefe + 8, 6, "rgba(0,0,0,0.45)");
-        // Seitenwand
         const sx = seiteLinks ? x - tiefe : x + w;
         px(sx, y + 4, tiefe, h - 4, dunkel);
         px(sx + (seiteLinks ? 0 : tiefe - 1), y + 4, 1, h - 4, "#000");
-        // Front
         kasten(x, y, w, h, "#0c0616", 2);
         verlauf(x + 1, y + 1, w - 2, h - 2, [hell, farbe, farbe, dunkel]);
-        px(x + 1, y + 1, 1, h - 2, "rgba(255,255,255,0.35)");               // Kantenlicht
-        // Leuchtschild
+        px(x + 1, y + 1, 1, h - 2, "rgba(255,255,255,0.35)");
         px(x + 3, y + 3, w - 6, 9 * s, "#0c0616");
         verlauf(x + 4, y + 4, w - 8, 9 * s - 2, [schild + "ff", schild + "cc"]);
         px(x + 4, y + 4, w - 8, 1, "rgba(255,255,255,0.6)");
-        // Bildschirm
         kasten(x + 4, y + 16 * s, w - 8, 28 * s, "#07040c", 2);
-        // Bedienfeld
         px(x - 1, y + 48 * s, w + 2, 3 * s, "#0c0616");
         px(x, y + 48 * s, w, 2 * s, hell);
-        // Muenzschlitze
         px(x + w / 2 - 6, y + 62 * s, 12, 10, "#0c0616");
         px(x + w / 2 - 4, y + 64 * s, 2, 5, "#ff5a3a");
         px(x + w / 2 + 2, y + 64 * s, 2, 5, "#ff5a3a");
@@ -768,12 +678,10 @@ aktualisiereProfilKnopf();
 
     let neben = [];
     function maleNebenAutomaten() {
-        // Der gelbe ganz rechts wird zuerst gemalt, damit der gruene (mit dem Copyright) davor steht
         const gelb = maleNebenAutomat(590, 70, 1.9, "#c89018", "#f0c040", "#6a4a08", "#4ad0ff", true);
         neben = [
             maleNebenAutomat(-26, 70, 1.9, "#2a5ac0", "#5a8ae8", "#142e6a", "#ff8a3a", false),
             maleNebenAutomat(56, 104, 1.45, "#b82a2a", "#e85a4a", "#5a1414", "#5affc8", false),
-            // etwas weiter nach aussen, damit sein Bildschirm (mit dem Copyright) ganz zu sehen ist
             maleNebenAutomat(544, 104, 1.45, "#2f7a2a", "#6ac04a", "#143a12", "#ff5ad0", true),
             gelb
         ];
@@ -781,28 +689,23 @@ aktualisiereProfilKnopf();
 
     function maleHauptAutomat() {
         const { x, w } = A;
-        // Seitenwaende mit T-Leiste (helle Kante)
         px(x - 14, 0, 14, H, "#1c0f30");
         px(x - 14, 0, 3, H, "#2a1846");
         px(x - 2, 0, 2, H, "#c8a0ff");
         px(x + w, 0, 14, H, "#140a24");
         px(x + w + 11, 0, 3, H, "#0a0514");
         px(x + w, 0, 2, H, "#8a60c8");
-        // Front mit Verlauf
         verlauf(x, 0, w, H, ["#7a4ab4", "#6b3fa0", "#63399a", "#5a3290", "#4e2a80"]);
         px(x, 0, 3, H, "rgba(255,255,255,0.18)");
         px(x + w - 3, 0, 3, H, "rgba(0,0,0,0.25)");
 
-        // Leuchtschild (Marquee) mit Rahmen und hinterleuchtetem Verlauf
         kasten(x + 16, 4, w - 32, 50, "#12081e", 3);
         verlauf(x + 21, 8, w - 42, 42, ["#fff0b0", "#ffd060", "#ffb03a", "#f08a24"]);
         px(x + 21, 8, w - 42, 2, "#fffbe0");
         px(x + 21, 48, w - 42, 2, "#b85a10");
 
-        // Lautsprecher-Gitter zwischen Schild und Bildschirm
         for (let i = 0; i < 14; i++) px(x + 150 + i * 9, 57, 5, 1, "#3a2066");
 
-        // Bildschirm-Einfassung: abgestufter, dunkler Rahmen mit Innenkante und Schrauben
         kasten(SCHIRM.x - 26, SCHIRM.y - 6, SCHIRM.w + 52, SCHIRM.h + 14, "#0a0512", 6);
         kasten(SCHIRM.x - 23, SCHIRM.y - 3, SCHIRM.w + 46, SCHIRM.h + 8, "#1a1024", 5);
         verlauf(SCHIRM.x - 20, SCHIRM.y, SCHIRM.w + 40, SCHIRM.h + 2, ["#241834", "#1c122a", "#160e22"]);
@@ -810,20 +713,16 @@ aktualisiereProfilKnopf();
             [SCHIRM.x - 15, SCHIRM.y + SCHIRM.h - 6], [SCHIRM.x + SCHIRM.w + 11, SCHIRM.y + SCHIRM.h - 6]].forEach(([sx, sy]) => {
             px(sx, sy, 4, 4, "#5a5066"); px(sx, sy, 3, 3, "#8a8096"); px(sx + 1, sy + 1, 2, 1, "#3a3046");
         });
-        // Roehre: Glas mit abgestuften Ecken (leicht gewoelbt)
         kasten(SCHIRM.x - 4, SCHIRM.y - 2, SCHIRM.w + 8, SCHIRM.h + 4, "#050404", 8);
 
-        // Bedienfeld: Oberseite (schraeg, heller) und Front
         const by = 282;
         px(x - 14, by - 6, w + 28, 6, "#12081e");
         verlauf(x - 12, by, w + 24, 22, ["#b48ae8", "#9a6ad6", "#8a5ac8"]);
         px(x - 12, by, w + 24, 1, "#e8d4ff");
         px(x - 12, by + 22, w + 24, 3, "#2a1648");
         verlauf(x, by + 25, w, H - by - 25, ["#4a2a7a", "#3e2268", "#341c5a"]);
-        // Aufdruck "1P" und kleine Pfeile beim Stick
         px(x + 88, by + 6, 2, 8, "#e8d4ff"); px(x + 87, by + 7, 1, 1, "#e8d4ff"); px(x + 87, by + 13, 4, 1, "#e8d4ff");
         px(x + 93, by + 6, 3, 8, "#e8d4ff"); px(x + 96, by + 6, 2, 1, "#e8d4ff"); px(x + 96, by + 9, 2, 1, "#e8d4ff"); px(x + 98, by + 7, 1, 2, "#e8d4ff");
-        // Muenztuer
         kasten(x + w / 2 - 30, by + 40, 60, 38, "#1c0f30", 2);
         px(x + w / 2 - 28, by + 42, 56, 34, "#2a1846");
         [-12, 8].forEach(dx => {
@@ -841,32 +740,25 @@ aktualisiereProfilKnopf();
         ctx = c;
     }
 
-    // ---------- bewegte Teile ----------
     const MONSTER = ["00100000100", "00010001000", "00111111100", "01101110110", "11111111111", "10111111101", "10100000101", "00011011000"];
     function monster(x, y, farbe, g) {
         MONSTER.forEach((zeile, yy) => [...zeile].forEach((p, xx) => { if (p === "1") px(x + xx * g, y + yy * g, g, g, farbe); }));
     }
 
     function maleBewegt(zeit) {
-        // Neon flackert manchmal kurz
         if (Math.sin(zeit * 13) < -0.93) {
-            // nur links und rechts vom grossen Automaten (sonst liegt das Flackern ueber ihm)
             px(0, 14, A.x - 14, 3, "rgba(20,8,32,0.8)");
             px(A.x + A.w + 14, 14, B - A.x - A.w - 14, 3, "rgba(20,8,32,0.8)");
         }
-        // Kleine Bildschirme am Rand: Monster laufen hin und her, dazu Scanlines und Schein auf dem Teppich
         const farben = ["#7ed957", "#ffcf4a", "#4ad0ff", "#ff5ad0"];
-        // nur links und rechts neben dem grossen Automaten malen (sonst liegen die Bilder darueber)
         c.save();
         c.beginPath();
         c.rect(0, 0, A.x - 14, H);
         c.rect(A.x + A.w + 14, 0, B - A.x - A.w - 14, H);
         c.clip();
-        // Reihenfolge wie beim Malen: der gelbe (3) zuerst, der gruene (2) davor
         [0, 1, 3, 2].map(i => [neben[i], i]).forEach(([n, i]) => {
             px(n.sx, n.sy, n.sw, n.sh, ["#0c1a3a", "#2a0c1a", "#0c2a14", "#2a1a08"][i]);
             if (i === 2) {
-                // Dieser Automat zeigt kein Spiel: das Copyright liegt als scharfe Schrift darueber (.intro-copyright)
             } else {
                 const schritt = Math.floor(zeit * 3 + i) % 2;
                 const mx = n.sx + 3 + ((zeit * 12 + i * 20) % Math.max(1, n.sw - 16));
@@ -877,13 +769,11 @@ aktualisiereProfilKnopf();
             px(n.sx - 2, n.sy - 2, n.sw + 4, n.sh + 4, farben[i] + "12");
         });
         c.restore();
-        // Leuchtschild pulsiert leicht
         const puls = 0.08 + 0.06 * Math.sin(zeit * 4);
         px(A.x + 21, 8, A.w - 42, 42, "rgba(255,255,255," + puls.toFixed(3) + ")");
     }
 
     function maleSchrift() {
-        // "SPROUTVALE" mit dunkler Kontur und Schatten auf dem Schild
         c.font = "32px 'Jersey 15', monospace";
         c.textBaseline = "middle";
         c.textAlign = "center";
@@ -897,8 +787,6 @@ aktualisiereProfilKnopf();
         c.textAlign = "left";
     }
 
-    // Stick und Knoepfe liegen auf dem Bedienfeld (vorne, darum zuletzt)
-    // Der Joystick liegt auf einer eigenen Ebene ueber dem Bildschirm (mit Logo und "presents"), die Knoepfe darunter
     const vorneLeinwand = document.getElementById("intro-vorne");
     const vorne = vorneLeinwand ? vorneLeinwand.getContext("2d") : null;
     function maleSteuerung(zeit) {
@@ -908,7 +796,6 @@ aktualisiereProfilKnopf();
             vorne.clearRect(0, 0, B, H);
             ctx = vorne;
         }
-        // Staubschutz-Scheibe und Stange
         knopf(x + 124, by + 12, 10, "#1a1a1e", "#2e2e34", "#0a0a0c");
         px(x + 122 + wackeln / 2, by - 6, 4, 18, "#3a3a42");
         px(x + 122 + wackeln / 2, by - 6, 1, 18, "#6a6a72");
@@ -923,13 +810,11 @@ aktualisiereProfilKnopf();
         const { x, y, w, h } = SCHIRM;
         px(x, y, w, h, "#030303");
         if (zeit < 0.8) {
-            // aus: nur eine leichte Spiegelung auf dem Glas
             for (let i = 0; i < 26; i++) px(x + 12 + i, y + 8 + i, 20, 1, "rgba(255,255,255,0.035)");
             return 0;
         }
         const an = Math.min(1, (zeit - 0.8) / 0.45);
         if (an < 1) {
-            // Einschalten: heller Strich, dann oeffnet sich das Bild nach oben und unten
             const lh = Math.max(2, Math.round(h * Math.max(0, an * 2 - 1)));
             const lw = Math.round(w * Math.min(1, an * 2));
             px(x + (w - lw) / 2 - 2, y + (h - lh) / 2 - 2, lw + 4, lh + 4, "rgba(200,220,255,0.35)");
@@ -937,7 +822,6 @@ aktualisiereProfilKnopf();
             return 0;
         }
         px(x, y, w, h, SCHIRM_FARBE);
-        // Schein des Bildschirms auf der Einfassung
         const glimmen = Math.min(1, (zeit - 1.25) / 0.6);
         px(x - 20, y - 2, 16, h + 4, "rgba(181,140,255," + (0.06 * glimmen).toFixed(3) + ")");
         px(x + w + 4, y - 2, 16, h + 4, "rgba(181,140,255," + (0.06 * glimmen).toFixed(3) + ")");
@@ -984,9 +868,7 @@ aktualisiereProfilKnopf();
         .finally(() => requestAnimationFrame(bild));
 })();
 
-// Wer jetzt (vor dem Release) spielt, wird als Beta-Tester gemerkt (eigene Datei, bleibt fuer immer)
 
-// Hauptmenue-Knoepfe: handgezeichnete Pixel-Symbole statt Emojis
 document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, 28));
 });

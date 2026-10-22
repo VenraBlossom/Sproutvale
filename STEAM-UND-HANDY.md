@@ -14,7 +14,7 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder, Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
 8. Steam Cloud einschalten (siehe unten). Unterstützte Sprachen: alle 14.
 9. Beta-Sachen herausnehmen, wenn es keine Beta mehr ist (BETAVALE-Code, "Beta" in der Versionsanzeige).
-10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Version erhöhen und Neuigkeiten eintragen (Liste in `CLAUDE.md`).
+10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Version erhöhen und Neuigkeiten eintragen.
 11. `node werkzeuge/pruefe-uebersetzung.js` und `node werkzeuge/teste-tresor.js` laufen lassen (beide ohne Fehler).
 12. `npm run steam`, den Ordner `desktop-app/dist-steam/Sproutvale` mit SteamPipe hochladen.
 13. Über Steam installieren und testen: Erfolg auslösen, Overlay (Umschalt+Tab), DLC, Steam-Status, Cloud auf zweitem PC.

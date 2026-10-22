@@ -1,31 +1,17 @@
 "use strict";
 
-// ============================================================
-// SPROUTVALE: Balancing-Bot (Test-Datei, wird nicht mit ausgeliefert: Dateien mit "_" bleiben draussen)
-// Im Browser in der Konsole laden:  await import("./_balancing-bot.js")  oder den Inhalt einfuegen,
-// dann:  await sproutvaleBot({ tage: 40, klicksProSek: 6 })
-// Spielt Story im Zeitraffer wie ein durchschnittlicher Spieler: klickt den Samenladen, erntet, sammelt ein,
-// kauft zwischen den Tagen immer das guenstigste sinnvolle Upgrade, bezahlt Rechnungen, nimmt den ersten Segen.
-// Gibt pro Tag Gold, Rechnungen und Einkommen zurueck.
-// ============================================================
 
-// frueh = Rechnungen frueher bezahlen wie ein Spieler, sobald das Gold deutlich reicht (Knopf "Jetzt bezahlen" auf der Tageskarte).
-//         Zahl = so viel mal die Rechnung muss man haben (z.B. 1.5), 0 = nie frueher bezahlen
 window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 6, tickMs = 100, meldung = true, mondphase = 0, sparTage = 2, abgeben = true, frueh = 0 } = {}) {
     speichernGesperrt = true;
     meta.mondphase = mondphase;
-    // schneller: keine Partikel, keine Schwebe-Texte, keine Tageszeit-Deko
     einstellungen.wenigerEffekte = true;
     einstellungen.ohneTexte = true;
     document.body.classList.add("ohne-effekte");
     Klang.reset && Klang.reset();
-    // Eigene Zeit: requestAnimationFrame und Timer laufen im Takt des Bots
     const warteschlange = [];
     window.requestAnimationFrame = cb => { warteschlange.push(cb); return warteschlange.length; };
     let zeit = performance.now();
-    // Die Klick-Obergrenze misst in Spielzeit, nicht in echter Zeit
     window.klickUhr = () => zeit;
-    // Auch alle Animationen laufen in Spielzeit (sonst stauen sich tausende, und jeder Tag wird langsamer)
     performance.now = () => zeit;
     window.sproutvaleBotWarteschlange = () => warteschlange.length;
     const tick = () => {
@@ -33,10 +19,8 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
         const liste = warteschlange.splice(0);
         liste.forEach(cb => cb(zeit));
     };
-    // raus aus dem Hauptmenue (dort ist das Spiel pausiert), dann ein frischer Story-Run
     spieleModus(false);
     starteNeuenRun(false);
-    // Hof-Stil wie ein Spieler waehlen (ab Run 2 kommt die Auswahl)
     if (document.querySelector(".stil-karte")) {
         run.stil = zufall(HOF_STILE).id;
         document.querySelectorAll(".popup-huelle").forEach(h => h.remove());
@@ -50,13 +34,9 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
     let goldAmTagesStart = run.gold;
     const r = () => run;
 
-    // Einkaufen wie ein ueberlegter Spieler:
-    // 1. Sternensamen: zuerst neue Pflanzen, dann das guenstigste. 2. Gold: vor dem Rechnungstag genug zuruecklegen,
-    // sonst Ertrag der besten Pflanze, Felder (bis 6), Wachstum, dann den Rest nach Preis.
     const kaufeEin = () => {
         const fehlgeschlagen = new Set();
         const tageBisRechnung = naechsteRechnung().tageBis;
-        // Ruecklage waechst ueber die 5 Tage bis zur Rechnung (am letzten Tag der ganze Betrag)
         const ruecklage = tageBisRechnung <= sparTage ? naechsteRechnung().betrag : 0;
         for (let i = 0; i < 300; i++) {
             const sterne = SKILLS.filter(d => istKnotenOffen(d) && level(d.id) < d.max && !(d.erledigt && d.erledigt()) &&
@@ -70,7 +50,6 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
                 continue;
             }
             const frei = run.gold - ruecklage;
-            // Wie ein Spieler: das Stellarium sofort kaufen, wenn es sich leisten laesst
             const stern = SHOP_UPGRADES.find(u => u.id === "stellarium");
             if (stern && shopUpgradeFrei(stern) && level("stellarium") < 1 && frei >= stern.basiskosten) { kaufeUpgrade(stern, "gold"); continue; }
             const beste = run.pflanzen.filter(pf => pf.freigeschaltet).sort((x, y) => verkaufswert(y) - verkaufswert(x))[0];
@@ -78,7 +57,6 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
             const ertrag = PFLANZEN_UPGRADES.find(u => u.id === "ertrag");
             const wachstum = PFLANZEN_UPGRADES.find(u => u.id === "wachstum");
             if (beste && pflanzenUpgradeFrei(beste, ertrag)) angebote.push({ id: "ertrag", prio: 0, kosten: pflanzenUpgradeKosten(beste, ertrag), kauf: () => kaufePflanzenUpgrade(beste, ertrag) });
-            // Wie ein Spieler: 3x Ertrag fuer jede neue Pflanze, sonst bleibt die naechste Pflanze im Stellarium gesperrt
             run.pflanzen.filter(pf => pf.freigeschaltet && pf !== beste && (pf.level.ertragEigen || 0) < PFLANZE_ERTRAG_VOR && pflanzenUpgradeFrei(pf, ertrag))
                 .forEach(pf => angebote.push({ id: "ertrag_" + pf.id, prio: 0, kosten: pflanzenUpgradeKosten(pf, ertrag), kauf: () => kaufePflanzenUpgrade(pf, ertrag) }));
             if (run.felder.length < Math.min(6, maxEigeneFelder())) angebote.push({ id: "feld", prio: 1, kosten: feldKosten(), kauf: kaufeFeld });
@@ -97,22 +75,16 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
     };
 
     for (let t = 0; t < tage && run.phase !== "runEnde"; t++) {
-        // nach jedem Tag kurz abgeben, damit der Browser nicht einfriert
-        // (MessageChannel statt setTimeout: wird im versteckten Browser nicht auf 1 Sekunde oder mehr gebremst)
         if (abgeben) await new Promise(ok => { const k = new MessageChannel(); k.port1.onmessage = () => ok(); k.port2.postMessage(0); });
         window.sproutvaleBotStand = protokoll;
-        // Effekte werden im versteckten Browser nie entfernt (ihr Ende haengt an Animationen): wegraeumen, sonst wird es immer langsamer
-        // alles im Effekt-Layer weg, dazu Banner und Toasts (sonst waechst der Speicher ueber viele Runs immer weiter)
         fxLayer.innerHTML = "";
         document.querySelectorAll(".banner, .toast, #toasts > *").forEach(e => e.remove());
         document.querySelectorAll(".loot-kugel").forEach(e => { if (!lootKugeln.some(l => l.el === e)) e.remove(); });
-        // Zwischen den Tagen: Segen waehlen, einkaufen, Tag starten
         if (run.segenAuswahl) {
             segenSperreBis = 0;
             waehleSegen(run.segenAuswahl[0], document.body);
         }
         document.querySelectorAll(".popup-huelle").forEach(h => { if (!h.querySelector(".rechnung-frage")) h.remove(); });
-        // Wie ein Spieler: Rechnung frueher bezahlen, wenn das Gold deutlich reicht, danach den Segen waehlen
         if (frueh > 0 && kannFrueherBezahlen() && run.gold >= frueh * naechsteRechnung().betrag) {
             bezahleFrueher();
             if (run.segenAuswahl) {
@@ -128,7 +100,6 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
         let sicherung = 0;
         const tagStartZeit = Date.now();
         while (run.phase === "tag" && sicherung++ < 20000) {
-            // Tag dauert unrealistisch lange (mehr als 5 Minuten Spielzeit): festhalten, warum, und abbrechen
             if (sicherung * tickMs > 300000) {
                 window.sproutvaleBotProblem = { tag: run.tag, energie: run.energie, max: run.tagesMaxEnergie, bonus: run.bonusEnergie,
                     tagMs: run.tagMs, pausiert: spielPausiert(), fenster: [...document.querySelectorAll(".popup-titel")].map(e => e.textContent),
@@ -143,12 +114,10 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
             run.felder.filter(f => f.fertig && !f.kraehe).forEach(f => ernteFeld(f, false));
             run.felder.filter(f => f.kraehe).forEach(f => { f.kraehe = null; });
             [...lootKugeln].forEach(l => sammleEin(l));
-            // Gluehwuermchen: ein normaler Spieler erwischt etwa 60%
             fxLayer.querySelectorAll(".gluehwuermchen:not(.bot-gesehen)").forEach(g => {
                 g.classList.add("bot-gesehen");
                 if (Math.random() < 0.6) g.dispatchEvent(new Event("pointerdown"));
             });
-            // Neue Fenster, die das Spiel anhalten (Pokal, Briefe, Hinweise ...): wie ein Spieler wegklicken
             if (spielPausiert()) {
                 document.querySelectorAll(".popup-huelle").forEach(h => {
                     if (h.querySelector(".rechnung-frage")) return;
@@ -164,11 +133,9 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
                 if (typeof schliesseProfil === "function" && !$("profil-fenster").classList.contains("versteckt")) schliesseProfil();
             }
             tick();
-            // Die Rechnungs-Frage am Abend: bezahlen, wenn es reicht
             const frage = document.querySelector(".rechnung-frage");
             if (frage) break;
         }
-        // Abend: Rechnung bezahlen oder Run vorbei
         for (let i = 0; i < 50 && run.phase !== "tag"; i++) {
             const frage = document.querySelector(".rechnung-frage");
             if (frage) {
@@ -182,14 +149,11 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
             tick();
         }
         window.sproutvaleBotTag = { tag: run.tag, rechnungen: run.bezahlteRechnungen, gold: Math.round(run.gold), zeit: Date.now() };
-        // Fortschritt fuer den Simulator (eine Zeile pro Tag)
-        // Echte Spielzeit schaetzen: Tageslaenge (Spielzeit) plus 20 Sekunden zum Einkaufen zwischen den Tagen
         botSpielSek += (run.tagMs || 0) / 1000 + 20;
         console.log("TAG " + JSON.stringify({ tag: run.tag, rechnungen: run.bezahlteRechnungen, gold: Math.round(run.gold),
             naechste: run.phase === "runEnde" ? null : naechsteRechnung().betrag, energie: run.tagesMaxEnergie, tagSek: Math.round((run.tagMs || 0) / 1000),
             spielMin: Math.round(botSpielSek / 60), ssHeute: Math.round(run.statistik ? run.statistik.sternensamen : 0), ssBank: Math.round(run.skillpunkte),
             sternStufen: SKILLS.reduce((summe, d) => summe + (d.id === "p_weizen" ? 0 : level(d.id)), 0), felder: run.felder.length,
-            // Woher kommt das Wachstum? Multiplikatoren, beste Pflanze, Sterne und Markt mit hohen Stufen
             gm: Number(goldMulti().toPrecision(3)), sm: Number(sternWertMulti().toPrecision(3)),
             beste: bestePflanze().id, wert: Number(verkaufswert(bestePflanze()).toPrecision(3)), ertrag: bestePflanze().level.ertrag,
             hoch: SKILLS.filter(d => level(d.id) >= 6).map(d => d.id + ":" + level(d.id)).join(" "),
@@ -199,7 +163,6 @@ window.sproutvaleBot = async function sproutvaleBot({ tage = 40, klicksProSek = 
         window.sproutvaleBotProblem = null;
         protokoll.push({ tag: run.tag, gold: Math.round(run.gold), verdient: Math.round(run.gold - goldAmTagesStart), rechnungen: run.bezahlteRechnungen,
             naechste: run.phase === "runEnde" ? "-" : naechsteRechnung().betrag, felder: run.felder.length, sterne: Math.round(run.skillpunkte),
-            // fuer das Tempo: wie viele Stern-Stufen und Markt-Stufen man insgesamt hat, und die Sternensamen des Tages
             sternStufen: SKILLS.reduce((summe, d) => summe + (d.id === "p_weizen" ? 0 : level(d.id)), 0),
             marktStufen: SHOP_UPGRADES.reduce((summe, d) => summe + level(d.id), 0) + run.pflanzen.reduce((summe, p) => summe + Object.values(p.level || {}).reduce((a, b) => a + (Number(b) || 0), 0), 0),
             sternensamenHeute: Math.round(run.statistik ? run.statistik.sternensamen : 0), klicks: klicksProSamen(),
