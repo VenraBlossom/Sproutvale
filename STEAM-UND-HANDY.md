@@ -31,6 +31,8 @@ Die Steam-Version hat keinen eigenen Updater (Updates macht Steam), keine Entwic
 
 ## Steam einschalten
 
+Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
+
 1. Bei Steamworks anmelden (100 $ Gebühr pro Spiel) und die App anlegen. Du bekommst eine **App-ID** (eine Zahl).
 2. Im Ordner `desktop-app` einmal ausführen: `npm install steamworks.js`
 3. Die App-ID in die Datei `desktop-app/steam_appid.txt` schreiben (nur die Zahl).
