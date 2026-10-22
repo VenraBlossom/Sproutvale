@@ -21,3 +21,4 @@ handy-app/ios/
 *.aseprite
 
 desktop-app/geheim.txt
+werkzeuge/node_modules/
