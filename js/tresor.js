@@ -5,7 +5,8 @@
 // Desktop-App: Alles liegt verschluesselt im Hauptprozess (desktop-app/tresor.js). Das Spiel kann dort nur
 //   lesen, mit Gems kaufen und Codes einloesen. Die Preise und Codes kennt nur der Hauptprozess, und das
 //   Unterstuetzer-Paket kommt von Steam. Wer Dateien im Spielstand aendert, bekommt dadurch nichts.
-// Browser (nur zum Entwickeln und Testen): einfacher Speicher mit Pruefsumme im localStorage.
+// Browser und Handy: einfacher Speicher mit Pruefsumme im localStorage. Das schuetzt nur gegen versehentliches Aendern,
+//   nicht gegen Absicht (der Rechenweg steht hier). Auf dem Handy muessen Kaeufe spaeter ueber RevenueCat geprueft werden.
 // Der Stand wird zwischengespeichert, weil das Spiel ihn sehr oft fragt (z.B. fuer jeden Skin im Haus).
 // ============================================================
 
@@ -79,6 +80,8 @@ const Tresor = (() => {
     const browser = {
         lesen: () => browserOeffentlich(browserLesen()),
         kaufe(was) {
+            was = String(was || "");
+            if (!(was === "dlc" || /^[a-z_]+:[a-z0-9_]+$/i.test(was))) return { ok: false, grund: "ungueltig" };
             const stand = browserLesen();
             if (stand.gekauft.includes(was)) return { ok: false, grund: "schon" };
             const preis = was === "dlc" ? PREIS_DLC : PREIS_EINZELN;

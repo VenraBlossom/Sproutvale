@@ -97,5 +97,40 @@ try {
     fs.rmSync(ordner, { recursive: true, force: true });
 }
 
+// ---------- Browser- und Handy-Tresor (js/tresor.js) mit nachgebautem localStorage ----------
+try {
+    const vm = require("vm");
+    const code = fs.readFileSync(path.join(__dirname, "..", "js", "tresor.js"), "utf8") + "\n;globalThis.Tresor = Tresor;";
+    const speicher = {};
+    const neuerBrowser = () => {
+        const kontext = {
+            window: {}, console: { warn() {} }, atob, btoa, escape, unescape,
+            localStorage: { getItem: k => (k in speicher ? speicher[k] : null), setItem: (k, v) => { speicher[k] = String(v); } }
+        };
+        vm.createContext(kontext);
+        vm.runInContext(code, kontext);
+        return kontext.Tresor;
+    };
+    let b = neuerBrowser();
+    pruefe("Browser: leer", b.stand().gems === 0);
+    pruefe("Browser: ungueltiger Kauf", b.kaufe("../x").grund === "ungueltig");
+    b.gutschreibenBrowser(120);
+    pruefe("Browser: gutschreiben", b.stand().gems === 120);
+    pruefe("Browser: Einzelteil kaufen", b.kaufe("haus:sternenhaus").ok && b.stand().gems === 70);
+    pruefe("Browser: DLC zu teuer", b.kaufe("dlc").grund === "gems");
+    pruefe("Browser: Code", b.code("betavale").ok && b.stand().beta && b.stand().endlos && b.code("BETAVALE").grund === "schon");
+    b = neuerBrowser();
+    pruefe("Browser: bleibt nach Neustart", b.stand().gems === 70 && b.stand().gekauft.length === 1);
+    // von Hand geaendert: Pruefsumme passt nicht mehr, dann leer
+    const roh = JSON.parse(speicher.sproutvale_tresor);
+    roh.daten = btoa(JSON.stringify({ gems: 99999 }));
+    speicher.sproutvale_tresor = JSON.stringify(roh);
+    b = neuerBrowser();
+    pruefe("Browser: geaenderte Daten zaehlen nicht", b.stand().gems === 0);
+} catch (e) {
+    fehler++;
+    console.log("ABBRUCH Browser: " + e.stack);
+}
+
 console.log(ok + " Pruefungen ok, " + fehler + " Fehler");
 process.exitCode = fehler ? 1 : 0;

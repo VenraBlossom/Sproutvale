@@ -91,6 +91,9 @@ Die Handy-App packt das Spiel mit **Capacitor** in eine App. Alles liegt im Ordn
 2. Dort drei Produkte anlegen: `gems_100`, `gems_500`, `gems_1100`.
 3. Kostenloses Konto bei RevenueCat anlegen, die Produkte verbinden und den Schlüssel in `js/handy.js` bei
    `revenueCatSchluessel` eintragen.
+4. Wichtig: Auf dem Handy liegen Gems und Gekauftes bisher nur mit einer Prüfsumme im Speicher (`js/tresor.js`).
+   Das reicht nicht gegen Schummeln. Vor dem Handy-Release den Stand bei jedem Start aus RevenueCat holen
+   (gekaufte Pakete und Gem-Käufe), so wie die Desktop-App das Unterstützer-Paket bei jedem Start von Steam prüft.
 
 ### Werbung auf dem Handy (nur freiwillig)
 
