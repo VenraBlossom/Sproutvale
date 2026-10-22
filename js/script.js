@@ -959,6 +959,19 @@ const $ = id => document.getElementById(id);
 
 const topBar = $("top-bar");
 const topBarMasse = { breite: 1, hoehe: 1 };
+if (window.ResizeObserver) {
+    new ResizeObserver(() => {
+        topBarMasse.breite = topBar.clientWidth || 1;
+        topBarMasse.hoehe = topBar.clientHeight || 1;
+    }).observe(topBar);
+} else {
+    const miss = () => {
+        topBarMasse.breite = topBar.clientWidth || 1;
+        topBarMasse.hoehe = topBar.clientHeight || 1;
+    };
+    window.addEventListener("resize", miss);
+    setTimeout(miss, 0);
+}
 const himmelEl = $("himmel");
 const himmelSterne = $("himmel-sterne");
 const sonneEl = $("sonne");
@@ -5668,8 +5681,6 @@ let letzteZeit = performance.now();
 function hauptSchleife(jetzt) {
     const dtMs = Math.min(250, jetzt - letzteZeit);
     letzteZeit = jetzt;
-    topBarMasse.breite = topBar.clientWidth || 1;
-    topBarMasse.hoehe = topBar.clientHeight || 1;
 
     if (!spielPausiert()) {
         meta.lebenszeit.spielzeitMs = (meta.lebenszeit.spielzeitMs || 0) + dtMs;
