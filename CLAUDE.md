@@ -47,23 +47,22 @@ RUNS=8 TAGE=70 KPS=4 desktop-app/node_modules/.bin/electron werkzeuge/sim-electr
 
 | Pokal | Rechnung | Ziel |
 |---|---|---|
-| Holz | 4. | 45 bis 55 Min |
+| Holz | 5. | 45 bis 55 Min |
 | Gold | 7. | etwa 2,5 Std |
-| Platin | 10. | etwa 5,5 Std |
+| Platin | 11. | etwa 5,5 Std |
 | Kristall | 14. | 10 bis 15 Std |
 
 Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nur teurere Rechnungen.
 
 **Neueste Messung (22.10.2026, 14 Runs geplant, nach 2 bis 3 Runs abgebrochen):**
 
-- Ohne Änderung: Holz 28 Min (zu früh), Gold 2 Std 21 Min (passt), Platin 3 Std 35 Min (zu früh, Run 2 schafft 10 Rechnungen).
+- Mit den alten Plätzen (Holz 4., Platin 10.): Holz 28 Min (zu früh), Gold 2 Std 21 Min (passt), Platin 3 Std 35 Min (zu früh, Run 2 schafft 10 Rechnungen).
 - 20% weniger Gold + spätere Rechnungen x23 (Patch `goldMulti` x0.8, `KONFIG.rechnungFaktor = 23`): Holz 51 Min (passt),
   Gold nach 1 Std 42 Min noch nicht erreicht. 25% weniger Gold + x22: Holz 49 Min. Nur die 4. Rechnung teurer: bringt nichts (29 Min).
 - Zeiten ohne Änderung je Rechnung: 4. 28 Min, 5. 38 Min, 7. 2 Std 21 Min, 10. 3 Std 35 Min (Run 2 scheitert an der 11.).
-- Fertig vorbereitet: `werkzeuge/varianten/pokale-spaeter.js` (Holz 5., Platin 11. Rechnung, ohne Gold-/Preisänderung).
-  Start- und Auswertungsbefehl stehen in der Datei. Erst nach Erlaubnis des Nutzers laufen lassen (Electron).
-- Idee für den nächsten Versuch: frühes Gold etwas weniger (Holz später), spätere Rechnungen leicht teurer oder Pokale später,
-  damit Platin bei etwa 5,5 Std liegt. Läufe brauchen mehrere Stunden. Der Nutzer will nicht, dass ungefragt Electron auf seinem PC läuft.
+- **Eingebaut (22.10.2026):** Holz auf die 5. Rechnung (gemessen 38 Min), Platin auf die 11. (kommt im 3. Run, geschätzt
+  5,5 bis 7 Std), ohne Gold- oder Preisänderung. Gold bleibt 7., Kristall 14. Der Nutzer testet das selbst.
+- Falls Holz beim Testen noch zu früh kommt: frühes Gold etwas senken (siehe Patch oben, x0.8 gab 51 Min).
 
 **Ältere Messung** (nach Mondlicht und Pokalen zum Zusammenzählen, Läufe nicht fertig):
 
@@ -71,7 +70,7 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - Variante B, Pokale später (Gold 8., Platin 13., Kristall 17. Rechnung): Gold nach etwa 3,5 Std.
   Jeder Run kommt nur noch 1 bis 2 Rechnungen weiter als der davor.
 - Run 1 endet meist an der 5. Rechnung (1,87 Mio.).
-- **Nächster Schritt:** Läufe bis Platin und Kristall fertig laufen lassen, dann die Pokal-Plätze bzw. Werte festlegen.
+- **Nächster Schritt:** Der Nutzer testet die neuen Pokal-Plätze selbst. Keine Simulationen starten, außer er bittet darum.
 
 ## Was zuletzt gemacht wurde (Oktober 2026, Vorbereitung Steam-Release)
 
@@ -92,6 +91,7 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - 10 neue Sprachen, Systemsprache beim ersten Start.
 - Markt: Kaufmenge x1 / x10 / Max, Stellarium: mehrere Stufen auf einmal.
 - Käufe und Gems sicher im Tresor, Promocode BETAVALE.
+- Pokale: Holz jetzt auf der 5. Rechnung, Platin auf der 11.
 - VIP-Karte: +5 Spiele pro Pause statt unbegrenzt. Münzwurf: 45% bis höchstens 55% Gewinnchance (vorher bis 70%).
 - Fehler behoben: Segen Sammelwut wirkte nicht, falsche Texte.
 

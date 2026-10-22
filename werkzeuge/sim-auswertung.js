@@ -13,8 +13,8 @@ const datei = process.argv[2] || "_sim-log.txt";
 const zeilen = fs.readFileSync(datei, "utf8").split(/\r?\n/);
 
 // Rechnung (1 = erste), mit der ein Pokal kommt. Aus daten.js (TROPHAEEN.nummer + Kredit-Verschiebung)
-// Andere Plaetze testen (z.B. mit einem PATCH): POKALE=5,7,11,14 node werkzeuge/sim-auswertung.js _sim-x-log.txt
-const PLAETZE = (process.env.POKALE || "4,7,10,14").split(",").map(Number);
+// Andere Plaetze testen (z.B. mit einem PATCH): POKALE=4,7,10,14 node werkzeuge/sim-auswertung.js _sim-x-log.txt
+const PLAETZE = (process.env.POKALE || "5,7,11,14").split(",").map(Number);
 const POKALE = [["Holz", PLAETZE[0]], ["Gold", PLAETZE[1]], ["Platin", PLAETZE[2]], ["Kristall", PLAETZE[3]]];
 const ZIELE = { Holz: "45-55 Min", Gold: "ca. 2,5 Std", Platin: "ca. 5,5 Std", Kristall: "10-15 Std" };
 

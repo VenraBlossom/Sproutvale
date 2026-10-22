@@ -1550,12 +1550,13 @@ const BRIEFE = [
 // Jeder Pokal gilt fuer immer (auch nach einem Story-Reset) und vervielfacht Gold, Sternensamen, Mondblueten und
 // Sternensplitter (nicht die Gutscheine). Die Faktoren werden zusammengezaehlt: Holz + Gold = x3,5.
 // Ein gewonnener Pokal ist in spaeteren Runs wieder eine normale Rechnung.
-// nummer = Index der Rechnung (0 = erste), faellt sie auf einen Kredit, eine spaeter. Gedacht: Holz ~30-40 Min, Gold ~1,5-2 Std,
-// Platin ~5 Std, Kristall ~10-15 Std.
+// nummer = Index der Rechnung (0 = erste), faellt sie auf einen Kredit, eine spaeter. Plaetze: Holz 5., Gold 7., Platin 11.,
+// Kristall 14. Rechnung (seit 22.10.2026, vorher Holz 4. und Platin 10.: beide kamen zu frueh).
+// Ziel: Holz 45-55 Min, Gold ~2,5 Std, Platin ~5,5 Std, Kristall 10-15 Std (Spielzeit mit Neustarts).
 const TROPHAEEN = [
-    { id: "holz", nummer: 2, name: t("Holzpokal"), sprite: "sym_pokal_holz", farbe: "#c08a50", faktor: 1.5 },
+    { id: "holz", nummer: 4, name: t("Holzpokal"), sprite: "sym_pokal_holz", farbe: "#c08a50", faktor: 1.5 },
     { id: "gold", nummer: 5, name: t("Goldpokal"), sprite: "sym_pokal_gold", farbe: "#ffd23a", faktor: 2 },
-    { id: "platin", nummer: 9, name: t("Platinpokal"), sprite: "sym_pokal_platin", farbe: "#dfe8ff", faktor: 3 },
+    { id: "platin", nummer: 10, name: t("Platinpokal"), sprite: "sym_pokal_platin", farbe: "#dfe8ff", faktor: 3 },
     { id: "kristall", nummer: 13, name: t("Kristallpokal"), sprite: "sym_pokal_kristall", farbe: "#ff9ad5", faktor: 5 }
 ];
 function hatPokal(id) {
