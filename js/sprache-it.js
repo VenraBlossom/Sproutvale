@@ -1904,7 +1904,6 @@ if (SPRACHE === "it") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "L'acquisto è in corso nella finestra del negozio. Le gemme arrivano appena è finito.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "L'acquisto non è riuscito. Non ti è stato addebitato nulla.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Le gemme non si possono ancora comprare. Sarà possibile quando Sproutvale sarà su Steam o negli store delle app.",
     "💎 Gems kaufen": "💎 Compra gemme",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Guarda una pubblicità: il giorno dopo +{0}% oro",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Grazie! Il giorno dopo +{0}% oro.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "it") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Ancora {0} partite su {1} fino al giorno dopo",
     "🍀 Dein Glück: +{0}{1}": "🍀 La tua fortuna: +{0}{1}",
     "Freispielen: {0}": "Sblocca: {0}",
-    "Bald im Steam-Shop: {0}": "Presto nel negozio di Steam: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Fino a {0} decorazioni stanno sullo sfondo della tua fattoria. Clicca per posizionarle o toglierle.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "Nella fattoria ci stanno al massimo {0} decorazioni. Togline prima una.",
     "Neu im Haus: {0}": "Nuovo in casa: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "it") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trofei: il trofeo di legno ora è alla 5ª bolletta, quello di platino all'11ª.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Giochi d'azzardo più equi: la carta VIP dà 5 partite in più per pausa, il lancio della moneta vince dal 45 al 55% delle volte.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "La finestra ricorda dimensioni e schermo intero, e il gioco è più fluido.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Risolto: la benedizione Mania del raccolto non funzionava, l'acconciatura Chignon era invisibile, il blackjack poteva bloccarsi."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Risolto: la benedizione Mania del raccolto non funzionava, l'acconciatura Chignon era invisibile, il blackjack poteva bloccarsi.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Le gemme non si possono ancora comprare. Arriverà con un aggiornamento futuro."
 });

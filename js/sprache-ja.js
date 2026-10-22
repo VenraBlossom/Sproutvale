@@ -1904,7 +1904,6 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "購入はショップ画面で進行中。完了するとジェムが届く。",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "購入できなかった。料金は発生していない。",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "ジェムはまだ購入できない。SproutvaleがSteamやアプリストアに登場したら購入できるようになる。",
     "💎 Gems kaufen": "💎 ジェムを買う",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 広告を見る：翌日のゴールド+{0}%",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 ありがとう！翌日のゴールド+{0}%。",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "次の日まであと{0}/{1}回",
     "🍀 Dein Glück: +{0}{1}": "🍀 あなたの運：+{0}{1}",
     "Freispielen: {0}": "入手方法：{0}",
-    "Bald im Steam-Shop: {0}": "近日Steamストアで：{0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "最大{0}個の飾りを農場の奥に置ける。クリックで設置・片付け。",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "飾りは農場に最大{0}個まで。先に1つ片付けよう。",
     "Neu im Haus: {0}": "家に新入荷：{0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "トロフィー：木のトロフィーは5枚目、プラチナは11枚目の請求書に。",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "運試しがより公平に：VIPカードで休憩ごとに5回多く遊べ、コイントスの勝率は45〜55%です。",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "ウィンドウのサイズとフルスクリーンが記憶され、動作もより滑らかに。",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修正：祝福「収集マニア」が効いていなかった、髪型「お団子」が見えなかった、ブラックジャックが止まることがあった。"
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修正：祝福「収集マニア」が効いていなかった、髪型「お団子」が見えなかった、ブラックジャックが止まることがあった。",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "ジェムはまだ購入できません。今後のアップデートで対応予定です。"
 });

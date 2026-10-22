@@ -1904,7 +1904,6 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "Satın alma mağaza penceresinde sürüyor. Bitince mücevherlerin gelir.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "Satın alma başarısız. Hiçbir ücret alınmadı.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Mücevherler henüz satın alınamıyor. Sproutvale Steam'e veya uygulama mağazalarına gelince alınabilecek.",
     "💎 Gems kaufen": "💎 Mücevher al",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Reklam izle: ertesi gün +%{0} altın",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Teşekkürler! Ertesi gün +%{0} altın.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Ertesi güne kadar {1} oyundan {0} kaldı",
     "🍀 Dein Glück: +{0}{1}": "🍀 Şansın: +{0}{1}",
     "Freispielen: {0}": "Kazanmak için: {0}",
-    "Bald im Steam-Shop: {0}": "Yakında Steam mağazasında: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Çiftliğinin arka planında en fazla {0} dekor durur. Yerleştirmek ya da kaldırmak için tıkla.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "Çiftliğe en fazla {0} dekor sığar. Önce birini kaldır.",
     "Neu im Haus: {0}": "Evde yeni: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Kupalar: Tahta kupa artık 5. faturada, platin kupa 11. faturada.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Daha adil şans oyunları: VIP kart mola başına 5 oyun daha verir, yazı tura %45 ile %55 arasında kazanır.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Pencere boyutunu ve tam ekranı hatırlar, oyun daha akıcı çalışır.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Düzeltildi: Toplama hırsı kutsaması çalışmıyordu, Topuz saç görünmüyordu, blackjack takılabiliyordu."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Düzeltildi: Toplama hırsı kutsaması çalışmıyordu, Topuz saç görünmüyordu, blackjack takılabiliyordu.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Mücevherler henüz satın alınamıyor. Bu, ileriki bir güncellemeyle gelecek."
 });

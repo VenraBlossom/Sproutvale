@@ -80,7 +80,7 @@ function oeffneGemShop() {
     const inhalt = el("div", "gem-shop", null, [
         liste,
         el("p", "leise", bereit ? t("Käufe im Spiel unterstützen die Zukunft von Sproutvale. Sie haben keinerlei Einfluss auf das Spiel. ❤️")
-            : t("Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist."))
+            : t("Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update."))
     ]);
     zeigePopup({ titel: t("💎 Gems kaufen"), breite: 460, farbe: "#b0407a", inhalt, knoepfe: [{ text: t("Schließen") }] });
 }

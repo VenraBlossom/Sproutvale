@@ -1904,7 +1904,6 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "Покупка йде у вікні крамниці. Самоцвіти прийдуть, щойно вона завершиться.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "Покупка не вдалася. Гроші не списано.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Самоцвіти поки не можна купити. Це стане можливим, коли Sproutvale з'явиться в Steam або в магазинах застосунків.",
     "💎 Gems kaufen": "💎 Купити самоцвіти",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Переглянь рекламу: наступного дня +{0}% золота",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Дякуємо! Наступного дня +{0}% золота.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Залишилось {0} з {1} ігор до наступного дня",
     "🍀 Dein Glück: +{0}{1}": "🍀 Твоя удача: +{0}{1}",
     "Freispielen: {0}": "Як отримати: {0}",
-    "Bald im Steam-Shop: {0}": "Незабаром у крамниці Steam: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "До {0} предметів декору стоять на тлі ферми. Клацни, щоб поставити чи прибрати.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "На фермі вміщається не більше {0} предметів декору. Спершу прибери один.",
     "Neu im Haus: {0}": "Нове в домі: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Кубки: дерев'яний тепер чекає на 5-му рахунку, платиновий на 11-му.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Чесніші азартні ігри: VIP-картка дає на 5 ігор більше за перерву, монетка виграє у 45–55% випадків.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Вікно пам'ятає розмір і повноекранний режим, а гра працює плавніше.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Виправлено: благословення «Жага збирати» не діяло, зачіска «Гулька» була невидима, блекджек міг зависнути."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Виправлено: благословення «Жага збирати» не діяло, зачіска «Гулька» була невидима, блекджек міг зависнути.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Самоцвіти поки не можна купити. Це з'явиться в одному з наступних оновлень."
 });

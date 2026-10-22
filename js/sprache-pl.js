@@ -1904,7 +1904,6 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "Zakup trwa w oknie sklepu. Klejnoty pojawią się, gdy się zakończy.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "Zakup się nie udał. Nic nie zostało pobrane.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Klejnotów nie można jeszcze kupić. Będzie to możliwe, gdy Sproutvale trafi na Steam lub do sklepów z aplikacjami.",
     "💎 Gems kaufen": "💎 Kup klejnoty",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Obejrzyj reklamę: następnego dnia +{0}% złota",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Dzięki! Następnego dnia +{0}% złota.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Jeszcze {0} z {1} gier do następnego dnia",
     "🍀 Dein Glück: +{0}{1}": "🍀 Twoje szczęście: +{0}{1}",
     "Freispielen: {0}": "Do zdobycia: {0}",
-    "Bald im Steam-Shop: {0}": "Wkrótce w sklepie Steam: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Do {0} dekoracji stoi w tle twojej farmy. Kliknij, aby postawić lub zabrać.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "Na farmie zmieści się najwyżej {0} dekoracji. Najpierw usuń jedną.",
     "Neu im Haus: {0}": "Nowość w domu: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Puchary: drewniany czeka teraz przy 5. rachunku, platynowy przy 11.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Uczciwsze gry losowe: karta VIP daje 5 gier więcej na przerwę, a rzut monetą wygrywa w 45 do 55% przypadków.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Okno pamięta rozmiar i pełny ekran, a gra działa płynniej.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Naprawiono: błogosławieństwo Szał zbierania nie działało, fryzura Kok była niewidoczna, a blackjack mógł się zawiesić."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Naprawiono: błogosławieństwo Szał zbierania nie działało, fryzura Kok była niewidoczna, a blackjack mógł się zawiesić.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Klejnotów nie można jeszcze kupić. Pojawi się to w przyszłej aktualizacji."
 });

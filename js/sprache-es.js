@@ -1943,7 +1943,6 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "La compra se está haciendo en la ventana de la tienda. Las gemas llegan en cuanto termine.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "La compra no ha funcionado. No se ha cobrado nada.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Aún no se pueden comprar gemas. Será posible cuando Sproutvale esté en Steam o en las tiendas de apps.",
     "💎 Gems kaufen": "💎 Comprar gemas",
     "Schließen": "Cerrar",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Ver un anuncio: +{0}% de oro el día siguiente",
@@ -2249,7 +2248,6 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Aún {0} de {1} partidas hasta el próximo día",
     "🍀 Dein Glück: +{0}{1}": "🍀 Tu suerte: +{0}{1}",
     "Freispielen: {0}": "Consíguelo: {0}",
-    "Bald im Steam-Shop: {0}": "Pronto en la tienda de Steam: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Hasta {0} objetos decorativos están al fondo de tu granja. Haz clic para colocar o quitar.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "Como máximo {0} objetos decorativos en la granja. Quita uno primero.",
     "Neu im Haus: {0}": "Nuevo en la casa: {0}",
@@ -2585,5 +2583,6 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trofeos: el trofeo de madera ahora está en la 5.ª factura y el de platino en la 11.ª.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Juegos de azar más justos: la tarjeta VIP da 5 partidas más por pausa y la moneda gana entre el 45 y el 55 % de las veces.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "La ventana recuerda su tamaño y la pantalla completa, y el juego va más fluido.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Corregido: la bendición Frenesí recolector no funcionaba, el peinado Moño era invisible y el blackjack podía quedarse atascado."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Corregido: la bendición Frenesí recolector no funcionaba, el peinado Moño era invisible y el blackjack podía quedarse atascado.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Todavía no se pueden comprar gemas. Llegará con una actualización futura."
 });

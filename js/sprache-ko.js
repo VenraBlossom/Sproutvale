@@ -1904,7 +1904,6 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "구매가 상점 창에서 진행 중이에요. 끝나면 젬이 들어와요.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "구매에 실패했어요. 결제되지 않았어요.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "젬은 아직 살 수 없어요. Sproutvale이 Steam이나 앱 스토어에 출시되면 살 수 있어요.",
     "💎 Gems kaufen": "💎 젬 구매",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 광고 보기: 다음 날 골드 +{0}%",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 고마워요! 다음 날 골드 +{0}%.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "다음 날까지 {1}판 중 {0}판 남음",
     "🍀 Dein Glück: +{0}{1}": "🍀 내 행운: +{0}{1}",
     "Freispielen: {0}": "획득 방법: {0}",
-    "Bald im Steam-Shop: {0}": "곧 Steam 상점에서: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "농장 배경에 장식을 최대 {0}개 둘 수 있어요. 클릭해서 놓거나 치워요.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "농장에는 장식을 최대 {0}개까지 둘 수 있어요. 먼저 하나를 치워요.",
     "Neu im Haus: {0}": "집에 새로 들어옴: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "트로피: 나무 트로피는 이제 5번째 청구서, 플래티넘은 11번째에 있습니다.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "더 공정한 운 게임: VIP 카드는 휴식마다 5판 더, 동전 던지기 승률은 45~55%입니다.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "창 크기와 전체 화면을 기억하고, 게임이 더 부드럽게 돌아갑니다.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "수정: 축복 \"수집 광풍\"이 작동하지 않던 문제, 헤어스타일 \"올림머리\"가 보이지 않던 문제, 블랙잭이 멈추던 문제."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "수정: 축복 \"수집 광풍\"이 작동하지 않던 문제, 헤어스타일 \"올림머리\"가 보이지 않던 문제, 블랙잭이 멈추던 문제.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "젬은 아직 구매할 수 없습니다. 이후 업데이트에서 추가될 예정입니다."
 });

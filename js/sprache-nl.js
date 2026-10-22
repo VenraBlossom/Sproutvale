@@ -1904,7 +1904,6 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "De aankoop loopt in het winkelvenster. De gems komen zodra hij klaar is.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "De aankoop is mislukt. Er is niets afgeschreven.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Gems kun je nog niet kopen. Dat kan zodra Sproutvale op Steam of in de app-winkels staat.",
     "💎 Gems kaufen": "💎 Gems kopen",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Bekijk een reclame: de volgende dag +{0}% goud",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Bedankt! De volgende dag +{0}% goud.",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Nog {0} van {1} spellen tot de volgende dag",
     "🍀 Dein Glück: +{0}{1}": "🍀 Je geluk: +{0}{1}",
     "Freispielen: {0}": "Vrijspelen: {0}",
-    "Bald im Steam-Shop: {0}": "Binnenkort in de Steam-winkel: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Tot {0} decoratie-objecten staan op de achtergrond van je boerderij. Klik om neer te zetten of op te ruimen.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "Er passen hooguit {0} decoratie-objecten op de boerderij. Haal er eerst een weg.",
     "Neu im Haus: {0}": "Nieuw in huis: {0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Bekers: de houten beker wacht nu bij de 5e rekening, de platina beker bij de 11e.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Eerlijkere kansspellen: de VIP-kaart geeft 5 spellen extra per pauze, kop of munt wint in 45 tot 55% van de gevallen.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Het venster onthoudt grootte en volledig scherm, en het spel loopt soepeler.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Opgelost: de zegen Verzamelwoede werkte niet, het kapsel Knot was onzichtbaar en blackjack kon vastlopen."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Opgelost: de zegen Verzamelwoede werkte niet, het kapsel Knot was onzichtbaar en blackjack kon vastlopen.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Gems kun je nog niet kopen. Dat komt in een latere update."
 });

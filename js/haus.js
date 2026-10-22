@@ -1355,7 +1355,7 @@ function renderHaus(inhalt) {
 
     if (kosmetikVorschau && kosmetikVorschau.kategorie === kategorie) {
         const eintrag = KOSMETIK_LISTEN[kategorie].find(e => e.id === kosmetikVorschau.id);
-        const woher = eintrag.quelle === "dlc" ? tf("Bald im Steam-Shop: {0}", dlcPreisText(eintrag))
+        const woher = eintrag.quelle === "dlc" ? dlcPreisText(eintrag)
             : tf("Freispielen: {0}", eintrag.bedingungText);
         const ende = el("button", "knopf", t("Vorschau beenden"));
         ende.addEventListener("click", () => {

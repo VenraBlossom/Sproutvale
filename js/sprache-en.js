@@ -1904,7 +1904,6 @@ Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "The purchase is running in the shop window. Your gems arrive as soon as it is done.",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "The purchase didn't work. You were not charged.",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "Gems can't be bought yet. That will work once Sproutvale is on Steam or in the app stores.",
     "💎 Gems kaufen": "💎 Buy gems",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 Watch an ad: +{0}% gold on the next day",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 Thanks! +{0}% gold on the next day.",
@@ -2209,7 +2208,6 @@ Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "Still {0} of {1} games until the next day",
     "🍀 Dein Glück: +{0}{1}": "🍀 Your luck: +{0}{1}",
     "Freispielen: {0}": "Earn: {0}",
-    "Bald im Steam-Shop: {0}": "Soon in the Steam shop: {0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "Up to {0} decor objects stand in the background of your farm. Click to place or remove.",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "At most {0} decor objects on the farm. Remove one first.",
     "Neu im Haus: {0}": "New in the house: {0}",
@@ -2584,6 +2582,7 @@ Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trophies: the wood trophy now waits at the 5th bill, the platinum trophy at the 11th.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Fairer games of chance: the VIP card gives 5 more games per break, the coin toss wins 45 to 55% of the time.",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "The window remembers its size and fullscreen, and the game runs more smoothly.",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Fixed: the Collecting Frenzy blessing had no effect, the bun hairstyle was invisible, blackjack could get stuck."
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Fixed: the Collecting Frenzy blessing had no effect, the bun hairstyle was invisible, blackjack could get stuck.",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Gems can't be bought yet. That will come with a later update."
 });
 

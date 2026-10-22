@@ -1904,7 +1904,6 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "🎁 +{0} 💎": "🎁 +{0} 💎",
     "Der Kauf läuft im Shop-Fenster. Die Gems kommen, sobald er fertig ist.": "购买正在商店窗口中进行，完成后宝石就会到账。",
     "Der Kauf hat nicht geklappt. Es wurde nichts abgebucht.": "购买失败，未扣除任何费用。",
-    "Gems kann man aktuell noch nicht kaufen. Das geht, sobald Sproutvale auf Steam oder im App-Store ist.": "目前还不能购买宝石。等 Sproutvale 上线 Steam 或应用商店后即可购买。",
     "💎 Gems kaufen": "💎 购买宝石",
     "📺 Werbung ansehen: am nächsten Tag +{0}% Gold": "📺 观看广告：第二天金币 +{0}%",
     "📺 Danke! Am nächsten Tag +{0}% Gold.": "📺 谢谢！第二天金币 +{0}%。",
@@ -2209,7 +2208,6 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Noch {0} von {1} Spielen bis zum nächsten Tag": "距下一天还剩 {0}/{1} 局",
     "🍀 Dein Glück: +{0}{1}": "🍀 你的幸运：+{0}{1}",
     "Freispielen: {0}": "解锁方式：{0}",
-    "Bald im Steam-Shop: {0}": "即将在 Steam 商店推出：{0}",
     "Bis zu {0} Deko-Objekte stehen im Hintergrund deines Hofs. Klick zum Aufstellen oder Wegräumen.": "农场背景中最多可放 {0} 个装饰。点击放置或收起。",
     "Es passen höchstens {0} Deko-Objekte in den Hof. Nimm zuerst eins weg.": "农场最多放 {0} 个装饰。请先移走一个。",
     "Neu im Haus: {0}": "家中新品：{0}",
@@ -2586,5 +2584,6 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "奖杯：木奖杯现在在第 5 张账单，铂金奖杯在第 11 张。",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "博彩更公平：VIP 卡每次休息多 5 局，抛硬币的胜率为 45% 到 55%。",
     "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "窗口会记住大小和全屏状态，游戏运行更流畅。",
-    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修复：祝福“收集狂热”无效、发型“发髻”不可见、二十一点可能卡住。"
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修复：祝福“收集狂热”无效、发型“发髻”不可见、二十一点可能卡住。",
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "暂时还不能购买宝石，将在之后的更新中推出。"
 });
