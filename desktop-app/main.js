@@ -251,19 +251,37 @@ function liesJson(pfad) {
 })();
 
 try {
-    fs.writeFileSync(path.join(SPEICHER_ORDNER, "LIESMICH.txt"), "Das ist dein Sproutvale-Spielstand.\r\n\r\n" +
-        "Er liegt hier im Benutzerordner und bleibt bei jeder neuen Version automatisch erhalten.\r\n" +
-        "Du musst nichts kopieren. Zum Sichern kannst du diesen Ordner einfach irgendwo hin kopieren.\r\n\r\n" +
-        "fortschritt.json          = Story: Mondblueten, Upgrades, Kuscheltiere, Erfolge\r\n" +
-        "run.json                  = Story: der laufende Run (Tag, Gold, Felder ...)\r\n" +
-        "persistedsavefile_1.json  = Endlos, Speicherstand 1 (Fortschritt und Hof)\r\n" +
-        "persistedsavefile_2.json  = Endlos, Speicherstand 2\r\n" +
-        "persistedsavefile_3.json  = Endlos, Speicherstand 3\r\n" +
-        "koop_1.json bis _3.json   = Endlos im Duo (gemeinsame Speicherstaende)\r\n" +
-        "einstellungen.json        = Klang, Anzeige ...\r\n" +
-        "tresor.dat                = gekaufte Inhalte, Gems und Codes (verschluesselt, bitte nicht aendern)\r\n", "utf8");
+    fs.rmSync(path.join(SPEICHER_ORDNER, "LIESMICH.txt"), { force: true });
+    fs.writeFileSync(path.join(SPEICHER_ORDNER, "README.txt"), [
+        "This is your Sproutvale save folder.",
+        "It is kept automatically with every new version. To make a backup, just copy this folder somewhere else.",
+        "",
+        "fortschritt.json          = Story: moon blossoms, upgrades, plushies, achievements",
+        "run.json                  = Story: the current run (day, gold, fields ...)",
+        "persistedsavefile_1.json  = Endless, save 1 (progress and farm)",
+        "persistedsavefile_2.json  = Endless, save 2",
+        "persistedsavefile_3.json  = Endless, save 3",
+        "koop_1.json to _3.json    = Endless in Duo (shared saves)",
+        "einstellungen.json        = sound, display ...",
+        "tresor.dat                = purchased content, gems and codes (encrypted, please do not change)",
+        "",
+        "----------",
+        "",
+        "Das ist dein Sproutvale-Spielstand.",
+        "Er bleibt bei jeder neuen Version automatisch erhalten. Zum Sichern kannst du diesen Ordner einfach irgendwo hin kopieren.",
+        "",
+        "fortschritt.json          = Story: Mondblueten, Upgrades, Kuscheltiere, Erfolge",
+        "run.json                  = Story: der laufende Run (Tag, Gold, Felder ...)",
+        "persistedsavefile_1.json  = Endlos, Speicherstand 1 (Fortschritt und Hof)",
+        "persistedsavefile_2.json  = Endlos, Speicherstand 2",
+        "persistedsavefile_3.json  = Endlos, Speicherstand 3",
+        "koop_1.json bis _3.json   = Endlos im Duo (gemeinsame Speicherstaende)",
+        "einstellungen.json        = Klang, Anzeige ...",
+        "tresor.dat                = gekaufte Inhalte, Gems und Codes (verschluesselt, bitte nicht aendern)",
+        ""
+    ].join("\r\n"), "utf8");
 } catch (fehler) {
-    console.warn("LIESMICH konnte nicht geschrieben werden:", fehler.message);
+    console.warn("README konnte nicht geschrieben werden:", fehler.message);
 }
 
 ipcMain.on("speicher-lesen", event => {
