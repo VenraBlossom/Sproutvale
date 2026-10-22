@@ -105,4 +105,5 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 
 - Weitere Sprachen (z.B. Spanisch für Lateinamerika, Vietnamesisch, Thai): gleich aufbauen wie `js/sprache-it.js`, in `js/i18n.js` bei `SPRACHEN` eintragen.
 - Handy-App bauen und auf einem echten Gerät testen.
+- Nur die gewählte Sprachdatei laden statt aller 14 (2,8 MB, vor allem fürs Handy). Ändert den Spielstart, darum mit Test.
 - Allgemein: Quality-of-Life verbessern und neue Inhalte, ohne die erspielbare Kosmetik zu ändern.

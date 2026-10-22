@@ -3,6 +3,23 @@
 Diese Anleitung erklärt, was schon vorbereitet ist und was du noch tun musst, sobald das Kleingewerbe da ist.
 Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nur ausgeblendet.
 
+## Checkliste Steam-Release (der Reihe nach)
+
+1. Kleingewerbe, Impressum und Datenschutzerklärung (Duo: IP-Adressen, siehe unten). Steamworks-Konto (100 $).
+2. In Steamworks die App anlegen. App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen.
+3. `npm install steamworks.js` im Ordner `desktop-app`.
+4. Erfolge aus `werkzeuge/steam-erfolge.csv` anlegen (API-Namen genau übernehmen), alle 14 Sprachen eintragen.
+5. Unterstützer-Paket als DLC anlegen, DLC-App-ID in `STEAM_KONFIG.dlc.unterstuetzer`.
+6. Gem-Shop fertig machen (Gem-Stand aus dem Steam-Inventar lesen, siehe unten).
+7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder, Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
+8. Steam Cloud einschalten (siehe unten). Unterstützte Sprachen: alle 14.
+9. Beta-Sachen herausnehmen, wenn es keine Beta mehr ist (BETAVALE-Code, "Beta" in der Versionsanzeige).
+10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Version erhöhen und Neuigkeiten eintragen (Liste in `CLAUDE.md`).
+11. `node werkzeuge/pruefe-uebersetzung.js` und `node werkzeuge/teste-tresor.js` laufen lassen (beide ohne Fehler).
+12. `npm run steam`, den Ordner `desktop-app/dist-steam/Sproutvale` mit SteamPipe hochladen.
+13. Über Steam installieren und testen: Erfolg auslösen, Overlay (Umschalt+Tab), DLC, Steam-Status, Cloud auf zweitem PC.
+14. `desktop-app/geheim.txt` sicher aufbewahrt? (Ohne sie können Spieler ihre Käufe nicht mehr lesen.)
+
 ## Was schon im Spiel steckt
 
 | Bereich | Stand |
