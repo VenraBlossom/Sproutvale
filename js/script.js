@@ -1357,6 +1357,8 @@ function erstelleFeld(slot = naechsterSlot(null)) {
     varianteEl.classList.add("feld-variante");
     const markerEl = document.createElement("div");
     markerEl.classList.add("feld-marker");
+    const glanzEl = document.createElement("div");
+    glanzEl.classList.add("feld-glanz");
     const spriteEl = document.createElement("img");
     spriteEl.classList.add("feld-sprite");
     spriteEl.alt = "";
@@ -1372,7 +1374,7 @@ function erstelleFeld(slot = naechsterSlot(null)) {
 
     const bodenEl = document.createElement("div");
     bodenEl.classList.add("feld-boden");
-    feldDiv.append(varianteEl, markerEl, spriteEl, nameEl, balkenAussen, bodenEl);
+    feldDiv.append(varianteEl, markerEl, glanzEl, spriteEl, nameEl, balkenAussen, bodenEl);
 
     run.felder.push({
         index, slot, pflanze: null, variante: null, stufe: 0, fortschrittMs: 0, fertig: false, leer: true,
@@ -1453,9 +1455,7 @@ function klickFeld(feld) {
         const { x, y } = feldMitte(feld);
         partikel(x, y, ["#9fe8ff", "#ffffff", "#5aa9e6"], 6, 45);
         Klang.klick(40);
-        feld.el.feldDiv.classList.remove("wackeln");
-        void feld.el.feldDiv.offsetWidth;
-        feld.el.feldDiv.classList.add("wackeln");
+        neuAnimieren(feld.el.feldDiv, "wackeln");
         return false;
     }
     ernteFeld(feld, false);
@@ -1524,6 +1524,12 @@ function pflanzenSkinSprite(name) {
     return spriteVariante(name + "_" + skin.id, name, skin.farben);
 }
 
+const WACHSEN_SCHRITTE = [
+    { transform: "scale(0.6) translateY(15%)" },
+    { transform: "scale(1.12)", offset: 0.7 },
+    { transform: "scale(1)" }
+];
+
 function zeigeFeldSprite(feld) {
     const sprite = feld.el.spriteEl;
     if (feld.leer) {
@@ -1534,9 +1540,7 @@ function zeigeFeldSprite(feld) {
     sprite.src = spriteUrl(pflanzenSkinSprite(name));
     sprite.classList.toggle("unreif", feld.stufe === 2);
     sprite.hidden = false;
-    sprite.classList.remove("wachsen");
-    void sprite.offsetWidth;
-    sprite.classList.add("wachsen");
+    if (sprite.animate) sprite.animate(WACHSEN_SCHRITTE, { duration: 300, easing: "ease-out" });
 }
 
 function leereFeld(feld) {
@@ -2567,9 +2571,7 @@ function spawnSternschnuppe() {
         const liegend = lootKugeln.filter(loot => loot.typ === "gold" && !loot.weg && !loot.streicheln);
         liegend.forEach(loot => {
             loot.wert *= 2;
-            loot.el.classList.remove("loot-verdoppelt");
-            void loot.el.offsetWidth;
-            loot.el.classList.add("loot-verdoppelt");
+            neuAnimieren(loot.el, "loot-verdoppelt");
             if (loot.gelandet) partikel(loot.x, loot.y, ["#ffe89a", "#ffffff"], 4, 25);
         });
         zeigeSchwebeText(x, y, t("x2 Gold!"), "#e0a800", true);

@@ -188,9 +188,7 @@ function verscheucheKraehe(eintrag) {
 function vogelscheucheBuh(eintrag, herkunftX) {
     const scheuche = hofEbene.querySelector('.deko[data-deko="vogelscheuche"]');
     if (scheuche) {
-        scheuche.classList.remove("scheuche-buh");
-        void scheuche.offsetWidth;
-        scheuche.classList.add("scheuche-buh");
+        neuAnimieren(scheuche, "scheuche-buh");
         const r = scheuche.getBoundingClientRect();
         zeigeSchwebeText(r.left + r.width / 2, r.top - 10, t("🧑‍🌾 Buh!"), "#8a5a2b", true);
     }

@@ -730,9 +730,7 @@ function schiesseRakete(farben) {
 
 function ladenKlick() {
     if (!marktstand.dataset.bauweise) return;
-    marktstand.classList.remove("bau-klick");
-    void marktstand.offsetWidth;
-    marktstand.classList.add("bau-klick");
+    neuAnimieren(marktstand, "bau-klick");
 }
 
 function ladenIdle(laden) {
@@ -743,9 +741,7 @@ function ladenIdle(laden) {
     } else if (laden.bauweise === "zirkus") {
         partikel(spitze.x, spitze.y - 10, laden.funken, 18, 80);
         if (Math.random() < 0.5) {
-            marktstand.classList.remove("bau-trick");
-            void marktstand.offsetWidth;
-            marktstand.classList.add("bau-trick");
+            neuAnimieren(marktstand, "bau-trick");
         }
     } else if (laden.bauweise === "sternwarte") {
         const rohr = ladenPunkt(26, 5);
@@ -754,20 +750,14 @@ function ladenIdle(laden) {
         const kessel = ladenPunkt(27, 38);
         partikel(kessel.x, kessel.y, laden.funken, 12, 55);
         if (Math.random() < 0.5) {
-            marktstand.classList.remove("bau-trick");
-            void marktstand.offsetWidth;
-            marktstand.classList.add("bau-trick");
+            neuAnimieren(marktstand, "bau-trick");
         }
     } else if (laden.bauweise === "mondteich") {
-        marktstand.classList.remove("bau-trick");
-        void marktstand.offsetWidth;
-        marktstand.classList.add("bau-trick");
+        neuAnimieren(marktstand, "bau-trick");
         const wasser = ladenPunkt(16, 23);
         partikel(wasser.x, wasser.y, laden.funken, 8, 35);
     } else if (laden.bauweise === "leuchtturm") {
-        marktstand.classList.remove("bau-trick");
-        void marktstand.offsetWidth;
-        marktstand.classList.add("bau-trick");
+        neuAnimieren(marktstand, "bau-trick");
         partikel(spitze.x, spitze.y + 10, laden.funken, 8, 40);
     }
 }

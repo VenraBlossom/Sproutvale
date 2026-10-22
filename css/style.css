@@ -564,16 +564,6 @@ img.icon {
     filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3));
 }
 
-.feld-sprite.wachsen {
-    animation: wachsen 0.3s ease-out;
-}
-
-@keyframes wachsen {
-    0% { transform: scale(0.6) translateY(15%); }
-    70% { transform: scale(1.12); }
-    100% { transform: scale(1); }
-}
-
 .feld-sprite[hidden] {
     display: block;
     visibility: hidden;
@@ -640,7 +630,7 @@ img.icon {
 }
 
 @keyframes nass-glanz {
-    50% { filter: brightness(1.35); }
+    50% { opacity: 0.72; }
 }
 
 .feld-geduengt .feld-marker::after {
@@ -659,7 +649,7 @@ img.icon {
 }
 
 @keyframes duenger-funkeln {
-    50% { filter: brightness(1.4) saturate(1.3); }
+    50% { opacity: 0.6; }
 }
 
 .feld-ziel {
@@ -676,8 +666,23 @@ img.icon {
     50% { filter: brightness(1.18); }
 }
 
-.feld-fertig {
+.feld-glanz {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    pointer-events: none;
+    outline: 3px solid #ffe98a;
+    outline-offset: -2px;
+    background-color: rgba(255, 246, 205, 0.14);
+    opacity: 0;
+}
+
+.feld-fertig > .feld-glanz {
     animation: fertig-puls 1s ease-in-out infinite;
+}
+
+body.ohne-effekte .feld-fertig > .feld-glanz {
+    opacity: 0.7;
 }
 
 .feld-fertig .feld-sprite {
@@ -685,7 +690,7 @@ img.icon {
 }
 
 @keyframes fertig-puls {
-    50% { filter: brightness(1.12); outline: 3px solid #ffe98a; outline-offset: -2px; }
+    50% { opacity: 1; }
 }
 
 @keyframes wippen {
@@ -3789,10 +3794,6 @@ body.vorschau-ansicht #plant-button {
 
 body.felder-lava .feld:not(.kauf-kachel) {
     animation: lava-gluehen 2.4s ease-in-out infinite;
-}
-
-body.felder-lava .feld.feld-fertig:not(.kauf-kachel) {
-    animation: lava-gluehen 2.4s ease-in-out infinite, fertig-puls 1s ease-in-out infinite;
 }
 
 @keyframes lava-gluehen {
@@ -9375,10 +9376,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     animation: glas-glanz 3.2s linear infinite;
 }
 
-body.pflanzen-kristall .feld-sprite.wachsen:not([hidden]) {
-    animation: wachsen 0.3s ease-out, glas-glanz 3.2s linear infinite;
-}
-
 body.pflanzen-kristall .feld.feld-fertig .feld-sprite:not([hidden]) {
     animation: wippen 1.2s ease-in-out infinite, kristall-schimmer 2.2s ease-in-out infinite, glas-glanz 3.2s linear infinite;
 }
@@ -9392,10 +9389,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     animation: glut-glimmen 1.8s ease-in-out infinite, glut-flackern 0.24s steps(2) infinite;
 }
 
-body.pflanzen-glut .feld-sprite.wachsen:not([hidden]) {
-    animation: wachsen 0.3s ease-out, glut-flackern 0.24s steps(2) infinite;
-}
-
 body.pflanzen-glut .feld.feld-fertig .feld-sprite:not([hidden]) {
     animation: wippen 1.2s ease-in-out infinite, glut-glimmen 0.9s ease-in-out infinite, glut-flackern 0.24s steps(2) infinite;
 }
@@ -9407,10 +9400,6 @@ body.pflanzen-glut .feld.feld-fertig .feld-sprite:not([hidden]) {
 
 body.pflanzen-sterne .feld-sprite:not([hidden]) {
     animation: sterne-pflanze-licht 2.4s ease-in-out infinite;
-}
-
-body.pflanzen-sterne .feld-sprite.wachsen:not([hidden]) {
-    animation: wachsen 0.3s ease-out, sterne-pflanze-licht 2.4s ease-in-out infinite;
 }
 
 body.pflanzen-sterne .feld.feld-fertig .feld-sprite:not([hidden]) {

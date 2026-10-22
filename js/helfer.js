@@ -101,10 +101,7 @@ function aktualisiereEichhoernchen(dtMs) {
 function eichhoernchenKlickt() {
     const figuren = figurenVom("eichhoernchen");
     if (figuren.length === 0) return;
-    const f = zufall(figuren);
-    f.el.classList.remove("huepft");
-    void f.el.offsetWidth;
-    f.el.classList.add("huepft");
+    neuAnimieren(zufall(figuren).el, "huepft");
 }
 
 
@@ -137,9 +134,7 @@ function aktualisiereIgel(dtMs) {
             if (bewegeFigur(f, igelTempo(), dtMs)) {
                 lootKugeln.filter(l => l.gelandet && !l.weg && Math.hypot(l.x - f.x, l.y - f.y) < 45).forEach(sammleEin);
                 f.auftrag = null;
-                f.el.classList.remove("huepft");
-                void f.el.offsetWidth;
-                f.el.classList.add("huepft");
+                neuAnimieren(f.el, "huepft");
             }
         } else {
             if (!f.ziel || f.wartenMs <= 0) {
@@ -263,9 +258,7 @@ function aktualisiereHasen(dtMs) {
         if (feld.fertig && !feld.kraehe) ernteFeld(feld, false);
         hase.auftrag = null;
         hase.ziel = null;
-        hase.el.classList.remove("huepft");
-        void hase.el.offsetWidth;
-        hase.el.classList.add("huepft");
+        neuAnimieren(hase.el, "huepft");
     } else {
         hase.el.classList.remove("laeuft");
     }

@@ -70,9 +70,7 @@ let tickerTimer = null;
 
 function goldTicker(wert) {
     if (einstellungen.ohneTexte) return;
-    moneyDisplay.classList.remove("gold-glanz");
-    void moneyDisplay.offsetWidth;
-    moneyDisplay.classList.add("gold-glanz");
+    neuAnimieren(moneyDisplay, "gold-glanz");
     tickerSumme += wert;
     if (!tickerEl) {
         tickerEl = el("div", "gold-ticker");
@@ -83,9 +81,7 @@ function goldTicker(wert) {
     tickerEl.style.top = rect.bottom + 6 + "px";
     tickerEl.textContent = "+" + zahl(tickerSumme);
     tickerEl.classList.remove("weg");
-    tickerEl.classList.remove("pop");
-    void tickerEl.offsetWidth;
-    tickerEl.classList.add("pop");
+    neuAnimieren(tickerEl, "pop");
     clearTimeout(tickerTimer);
     tickerTimer = setTimeout(() => {
         tickerEl.classList.add("weg");
@@ -202,9 +198,8 @@ function sammelKette(x, y) {
     kette.el.style.left = x + "px";
     kette.el.style.top = y - 50 + "px";
     kette.el.style.setProperty("--kette", Math.min(1, kette.anzahl / 50));
-    kette.el.classList.remove("weg", "pop");
-    void kette.el.offsetWidth;
-    kette.el.classList.add("pop");
+    kette.el.classList.remove("weg");
+    neuAnimieren(kette.el, "pop");
     clearTimeout(kette.timer);
     kette.timer = setTimeout(() => kette.el.classList.add("weg"), KETTE_FENSTER_MS);
     if ([10, 25, 50, 100, 200].includes(kette.anzahl)) {

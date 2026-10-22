@@ -38,6 +38,11 @@ function pixelIcon(emoji, groesse = 32, klasse) {
     return img;
 }
 
+function neuAnimieren(element, klasse) {
+    element.classList.remove(klasse);
+    requestAnimationFrame(() => requestAnimationFrame(() => element.classList.add(klasse)));
+}
+
 
 const offenePopups = [];
 
