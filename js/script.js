@@ -4833,6 +4833,7 @@ function spieleModus(sandbox) {
     }
     wechsleZuModus(sandbox);
     Klang.start();
+    irisUebergang();
     hauptmenue.classList.add("versteckt");
     aktualisiereAlles();
     if (run.rechnungOffen) zeigeRechnungsFrage();
@@ -5045,6 +5046,7 @@ $("einstellungen-button").addEventListener("click", () => oeffneEinstellungen(fa
 einstellungenSchliessen.addEventListener("click", () => einstellungenFenster.classList.add("versteckt"));
 einstellungenHauptmenue.addEventListener("click", () => {
     if (typeof koop !== "undefined" && (koop.verbunden || koop.code || koop.imSpiel)) koopVerlassen();
+    irisUebergang();
     zeigeHauptmenue();
 });
 spielstandLoeschen.addEventListener("click", frageAllesLoeschen);

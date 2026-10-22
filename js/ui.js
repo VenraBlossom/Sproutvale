@@ -459,3 +459,12 @@ function ersetzeEmojisIn(knoten) {
     }).observe(document.body, { childList: true, subtree: true, characterData: true });
     ersetzeEmojisIn(document.body);
 })();
+
+function irisUebergang() {
+    if (einstellungen.wenigerEffekte) return;
+    document.querySelectorAll(".iris-uebergang").forEach(alt => alt.remove());
+    const blende = el("div", "iris-uebergang");
+    document.body.appendChild(blende);
+    blende.addEventListener("animationend", () => blende.remove());
+    setTimeout(() => blende.remove(), 2000);
+}
