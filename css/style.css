@@ -12726,3 +12726,22 @@ body.menue-offen #jahreszeit-ebene,
 body.menue-offen #jahreszeit-ebene * {
     animation-play-state: paused !important;
 }
+
+#menue-start #menue-einstellungen { order: 1; }
+#menue-start #menue-spielen { order: 2; }
+#menue-start #menue-beenden { order: 3; }
+#menue-start .menue-knoepfe:has(#menue-beenden.versteckt) #menue-spielen { order: 0; }
+
+#menue-start .menue-haupt {
+    min-width: 196px;
+    padding: 4px 12px 0;
+    font-size: 1.9em;
+}
+
+@media (max-height: 620px) {
+    #menue-start .menue-haupt {
+        min-width: 128px;
+        padding: 0 8px;
+        font-size: 1.3em;
+    }
+}

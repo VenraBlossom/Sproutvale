@@ -69,190 +69,81 @@ const DEBUG_ERLAUBT = false;
 
 const NEUIGKEITEN = [
     { version: "Beta 0.4.2", punkte: [
-        t("Balancing: Gold- und Sternensamen-Boni werden jetzt zusammengezählt statt malgenommen (wie die +%-Texte es sagen). Goldmarie und Sternenflut geben +100% pro Stufe. Das späte Spiel explodiert nicht mehr."),
-        t("Energie: Start 160, „Längerer Tag“ +20, Sonnenuhr +8, Grundwert Energie +3%. Alle Prozent-Boni auf Energie zusammen höchstens +100%."),
-        t("Glühwürmchen kommen früher am Abend, öfter und geben 15 Energie.")
+        t("Gold- und Sternensamen-Boni werden jetzt zusammengezählt, genau wie es in den Texten steht."),
+        t("Mehr Energie zum Start und stärkere Energie-Sterne."),
+        t("Glühwürmchen kommen früher am Abend, öfter und geben mehr Energie.")
     ] },
     { version: "Beta 0.4.1", punkte: [
-        t("Duo: Der Host kann per Rechtsklick auf die Figur des Mitspielers (oder in der Lobby) ihn zum Host machen oder rauswerfen. Der Host hat einen gelben Namen."),
-        t("Speichern: Im Reiter Speichern wählst du in Endlos (allein und im Duo) einen der 3 Speicherstände."),
-        t("Pokale zeigen ihren Bonus jetzt in Prozent (+50%, +100% …), die Vitrine zeigt unten den Gesamtbonus. Die Boni addieren sich in Prozent.")
+        t("Duo: Der Host kann seinen Mitspieler zum Host machen oder aus der Lobby entfernen. Der Host hat einen gelben Namen."),
+        t("Endlos: Wähle einen von 3 Speicherständen, allein und im Duo."),
+        t("Pokale zeigen ihren Bonus in Prozent, die Vitrine zeigt den Gesamtbonus.")
     ] },
     { version: "Beta 0.4.0", punkte: [
-        t("Shop: Gems (pinkes Symbol) mit Anzeige im Farmhaus und im Profil. Legendäre Skins lassen sich einzeln mit Gems kaufen, das Unterstützer-Paket gibt es für 500 Gems. Gems und Gekauftes gehören dir, nicht einem Spielstand."),
-        t("Promocodes: neuer Knopf „Code“ im Farmhaus und im Profil. Jeder Code geht nur einmal pro Spieler."),
-        t("Die Scheune ist jetzt ein Knopf: Dort kannst du den Tag früher beenden. Dazu 3 neue Scheunen-Skins."),
-        t("Neuer Stern „VIP-Karte“: Glücksspiele ohne Grenze pro Tag (nach Stammkunde, braucht Blackjack)."),
-        t("Sternenmeer und Sternengold entfernt, sie machten dasselbe wie Sternenschauer und Große Ernte, nur schwächer."),
-        t("Neue Einstellungen: „Weniger Partikel und Animationen“ und „Unnötige Texte entfernen“."),
-        t("Mythisches BETA Shirt für Beta-Tester. Blitzschuhe ganz in der Hauptfarbe, Wolkenschuhe mit größerer Animation. Skins immer nach Seltenheit sortiert."),
-        t("Popups öffnen sich immer über dem Fenster, aus dem sie kommen. Aura von Haus und Scheune liegt genau um das Gebäude.")
+        t("Promocodes: Gib im Bauernhaus oder im Profil einen Code ein."),
+        t("Die Scheune ist jetzt ein Knopf: Dort beendest du den Tag früher. Dazu gibt es 3 neue Scheunen."),
+        t("Neuer Stern „VIP-Karte“: mehr Glücksspiele pro Pause."),
+        t("Neue Einstellungen: weniger Partikel und Animationen sowie Texte ausblenden."),
+        t("Neue Kleidung und Schuhe mit Animationen, die Kosmetik ist nach Seltenheit sortiert.")
     ] },
     { version: "Beta 0.3.1", punkte: [
-        t("Kombo stärker: ab x2 arbeiten alle Helfer 25% schneller pro Stufe und deine Klicks geben +100% Sternensamen pro Stufe. Beides steht unter der Kombo."),
-        t("Die Schildkröte ist weg, sie machte dasselbe wie der Erntehase."),
-        t("Kugeln vom Begleiter geben 20% weniger (Mindestbetrag bleibt)."),
-        t("\"Alle abholen\" gibt es jetzt auch bei nur einem Erfolg. Die Moduswahl zählt komplett geschaffte Erfolge aus Story und dem besten Endlos-Spielstand."),
-        t("Seltenheiten angepasst: Hasenohren legendär, Krone, Laubweste, Rote Wangen und Breites Grinsen episch, Vollbart und Schnurrbart gewöhnlich."),
-        t("Duo: Die Lobby schließt sich, sobald du die Duo-Seite verlässt.")
+        t("Stärkere Kombo: Ab x2 arbeiten alle Helfer schneller und deine Klicks geben mehr Sternensamen."),
+        t("Erfolge lassen sich mit „Alle abholen“ auf einmal einsammeln.")
     ] },
     { version: "Beta 0.3.0", punkte: [
-        t("Pokale neu: Holz, Gold, Platin und Kristall. Jeder gewonnene Pokal vervielfacht für immer Gold, Sternensamen, Mondblüten und Sternensplitter (x1,5, x2, x3, x5, zusammengezählt)."),
-        t("Neuer Pokal-Knopf oben mit Vitrine. Pokale liegen nie auf einem Kredit und bleiben, bis der Spielstand gelöscht wird."),
-        t("BETA-Knopf im Hauptmenü: Als Dankeschön sind während der Beta alle Skins und Endlos frei. Der Beta-Tester-Begleiter bleibt für immer."),
-        t("Die 4. Rechnung ist günstiger (72.000 statt 150.000), dort blieb man vorher lange hängen."),
-        t("Intro: Copyright gut lesbar auf einem Automaten, Joystick vor dem Bildschirm."),
-        t("Fix: ständige Meldungen \"Neu im Haus\".")
+        t("Vier Pokale: Holz, Gold, Platin und Kristall. Jeder gewonnene Pokal stärkt deinen Hof für immer."),
+        t("Neue Pokal-Vitrine oben in der Leiste.")
     ] },
     { version: "Beta 0.2.0", punkte: [
-        t("Neues Spielziel: Pokale! Die 7. Rechnung ist ein Goldpokal, später kommen ein Platinpokal und ganz spät ein Kristallpokal. Bezahlst du ihn, hast du gewonnen und kannst neu starten oder weiterspielen. In Endlos an denselben Meilensteinen."),
-        t("Sternensamen gibt es erst ab dem Stellarium. Das Stellarium kostet jetzt 200 Gold."),
-        t("Klicks pro Samen: Start 30, mit allem zusammen bis 10 (Stellarium, Segen, Mondteich und Tarot). Schnellere Aussaat ist jetzt im Stellarium."),
-        t("Mehr Sternensamen im späteren Spiel, Sternenstaub und Sternenmeer stärker, Pflanzen-Sterne günstiger."),
-        t("Neuer Helfer: die Schildkröte erntet langsam für dich. Der Cursor ist von Anfang an 15% größer."),
-        t("Im Stellarium springt ein Klick auf „Gesperrt“ zum fehlenden Stern."),
-        t("Intro: Copyright-Hinweis auf einem Automaten. Fix: Erbsorte ließ sich zu früh kaufen.")
+        t("Neues Spielziel: Bezahle die Pokal-Rechnungen und gewinne. Danach startest du neu oder spielst weiter."),
+        t("Schnellere Aussaat im Stellarium: von 30 bis auf 10 Klicks pro Samen."),
+        t("Im Stellarium springt ein Klick auf „Gesperrt“ zum fehlenden Stern.")
     ] },
     { version: "Beta 0.1.2", punkte: [
-        t("Stellarium: neue Sterne Erbsorte (alte Pflanzen holen auf), Große Ernte (+100% Gold) und Sternenschauer (+100% Sternensamen), die unendlichen am Ende ihrer Äste."),
-        t("Stellarium: Sternensamen-Symbol vor den Preisen, keine kreuzenden Linien mehr, Sterne haben feste Plätze."),
-        t("Fix: Goldader zeigte +300%, wirkt aber +100% (Anzeige korrigiert)."),
-        t("Debug-Fenster übersetzt und ohne vorgeschlagene Zahlen.")
+        t("Neue Sterne: Erbsorte, Große Ernte und Sternenschauer."),
+        t("Ein aufgeräumteres Stellarium, in dem jeder Stern seinen festen Platz hat.")
     ] },
     { version: "Beta 0.1.1", punkte: [
-        t("Der Beta-Tester-Engel ist jetzt von vorne zu sehen, ganz in Weiß und Grau, mit schlagenden Flügeln und Schwert."),
-        t("Engelsflügel der Figur im selben Stil wie beim Engel."),
-        t("Hauptmenü-Knöpfe im Pixel-Stil mit gezeichneten Symbolen statt Emojis."),
-        t("Intro: kleiner CRT-Filter auf dem Automaten, kein Licht-Fehler mehr über dem Automaten."),
-        t("Nach dem Einklappen geht es per Klick auf den Mondteich zurück, der Teich leuchtet stärker."),
-        t("Haus-Skins zeigen im Haus-Fenster eigene Vorschaubilder. Schlafanzug entfernt.")
+        t("Neue Engelsflügel für deine Figur und Haus-Skins mit eigenen Vorschaubildern.")
     ] },
     { version: "Beta 0.1.0", punkte: [
-        t("Patch Notes sind jetzt eine Dorfzeitung (Sproutvale Tagblatt) mit Zeitungs-Knopf unten links im Hauptmenü."),
-        t("Hof-Stile: Ab dem 2. Run wählst du zu Beginn 1 von 3 Stilen, die den Run verändern."),
-        t("Pakte: riskante Segen mit Vor- und Nachteil (rote Karten)."),
-        t("Herausforderungen im Mondteich (ab 3 Runs): Runs mit Einschränkung und dauerhaftem Bonus."),
-        t("Werkzeug-Evolutionen: Werkzeug + passender Segen = doppelt so stark."),
-        t("Erntefieber, Briefe aus dem Dorf, Dorfzeitung am Feierabend und Feiertage nach echtem Datum."),
-        t("Neue Kosmetik-Kategorie Haus: 14 Bauernhaus-Skins."),
-        t("Viel neue Kosmetik: Saat-Skins, Samenläden, Landschaften, Begleiter, Hüte, Kleidung und Accessoires."),
-        t("Beta-Tester bekommen den mythischen Begleiter „Beta Tester“ (bleibt auch nach dem Release)."),
-        t("Level geben keine Spielvorteile mehr, nur Auren (alle 10 Level stärker). Regenbogen-Aura läuft jetzt richtig durch."),
-        t("Neue Preise: legendäre Skins 50 Kristalle, Unterstützer-Paket 4,99 €. Nur Kosmetik, kein Pay-to-Win."),
-        t("Alle Emojis im Spiel sind jetzt Pixel-Art. Lobby-Codes haben nur noch 5 Zeichen."),
-        t("Fehlerbehebungen: Krähen konnten nicht landen, Leuchtpilz-Haus war nicht wählbar, Aura ging beim Laden verloren.")
+        t("Die Neuigkeiten erscheinen als Dorfzeitung, dem Sproutvale Tagblatt."),
+        t("Hof-Stile: Ab dem 2. Run wählst du einen von 3 Stilen, der den Run verändert."),
+        t("Pakte: riskante Segen mit Vor- und Nachteil."),
+        t("Herausforderungen im Mondteich mit dauerhaftem Bonus."),
+        t("Werkzeug-Evolutionen: Werkzeug und passender Segen werden doppelt so stark."),
+        t("Erntefieber, Briefe aus dem Dorf und Feiertage nach echtem Datum."),
+        t("14 Bauernhaus-Skins und viel neue Kosmetik."),
+        t("Level schalten schöne Auren frei.")
     ] },
     { version: "Beta 0.0.1", punkte: [
-        t("Neues Intro: eine Arcade-Halle, der Automat zeigt „Venray Studios presents“."),
-        t("Level statt Bauernrang: Erfahrung gibt es für fast alles (Ernten, Tage, Rechnungen, Gold, Sternensamen, Mondblüten, Sternensplitter, Kuscheltiere, Erfolge). Level 100 ist ein Langzeit-Ziel, danach geht es endlos weiter."),
-        t("Erfahrungsleiste am Profil und im Profil-Fenster. Das Level steht auch in der Duo-Lobby."),
-        t("Auren statt Titel: alle 5 Level eine neue Aura um Figur und Namen (im Profil wählbar), alle 10 Level wird sie stärker."),
-        t("Kleidung, Kopf und Accessoire haben jetzt Haupt- und Zweitfarbe, auch legendäre Teile. Doppelte Farb-Teile wurden entfernt (du bekommst das Grundteil in deiner Farbe)."),
-        t("Rote Schleife größer, Pflaster sichtbar, Zauberhut entfernt, Gesicht im Debug-Menü."),
-        t("Mondteich am Run-Anfang nur noch über den Teich im Hintergrund."),
-        t("Neu in den Einstellungen: CRT-Filter.")
+        t("Neues Intro in einer Arcade-Halle."),
+        t("Level und Erfahrung für fast alles, was du tust. Level 100 ist ein Langzeit-Ziel."),
+        t("Kleidung mit Haupt- und Zweitfarbe und ein neuer CRT-Filter in den Einstellungen.")
     ] },
-    { version: "Alpha 1.0.1", punkte: [
-        t("Story-Spielstand löschen (Hauptmenü) setzt jetzt den ganzen Story-Fortschritt zurück. Kosmetik, Käufe, Profil, Bauernrang, Einstellungen und Endlos bleiben.")
+    { version: "Alpha 1.0", punkte: [
+        t("Drei neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum."),
+        t("Neue Begleiter und ein Charakter-Editor mit Gesicht und eigenen Farben."),
+        t("Fruchtbarer Boden: Felder werden durch Ernten besser."),
+        t("Mondphasen, Sternenfall-Upgrades, neue Sterne, Segen, Wetter und viele neue Erfolge.")
     ] },
-    { version: "Alpha 1.0.0", punkte: [
-        t("Mondteich: 4 neue Upgrades, die du nach und nach entdeckst (Erbstück, Sternenkarte, Segenstart, Saatbank)."),
-        t("Neue epische Begleiter: Winterhase, Kürbishund, Teufelchen, Kuhkatze, Schleifenhase und Panda-Welpe."),
-        t("Charakter-Editor: neue Kategorie Gesicht (Sommersprossen, Bart, Sternenwangen …), eigene Farben für Kleidung und Augen, Titel unter dem Namen (werden durch Fortschritt freigeschaltet)."),
-        t("Neuer Spielanfang: erst nur Klicken, Warten und der Markt (neu: Erntekorb, +1 Gold pro Ernte). Das Stellarium schaltest du im Markt für 1.000 Gold frei."),
-        t("Bunte Saaten muss man jetzt im Stellarium freischalten (Stufe 1 jeder Farbe). Weizen ist anfangs 1 Gold wert, die ersten Rechnungen sind 30, 150 und 1.500 Gold."),
-        t("Mondteich: Fruchtbarer Hof, Ausdauer, Verhandlungsgeschick, Startkapital, Bauernweisheit und Reiche Ernte werden mit jeder Stufe stärker als vorher."),
-        t("Neue Mechanik Fruchtbarer Boden: jedes Feld wird durch Ernten besser (bis Stufe 5, +10% Gold pro Stufe), dazu der Stern Bodenkunde."),
-        t("Mehr Erfolge: höhere Stufen in fast allen Ketten und neue Ketten für Bauernrang, Segen und früh bezahlte Rechnungen."),
-        t("3 neue Pflanzen für das späte Spiel: Kristallrose, Sonnenfrucht und Weltenbaum, jede mit eigener Art und eigenem Bonus."),
-        t("Langzeit-Ziele: Bauernrang (jede Ernte gibt Erfahrung, jeder Rang +1% Gold für immer), Mondphasen bis Sternenmond VI, Meisterschaft bis Stufe 12."),
-        t("Sternenfall: 5 neue Upgrades (Sternenrucksack, Kosmische Felder, Sternenwurzel, Ewige Kombo, Sternenmeister)."),
-        t("Stellarium: neue Sterne Saatkette, Goldene Stunde, Morgen-Schwung, Feldkunde und Sternenmeer."),
-        t("4 neue Kredit-Auflagen, 3 neue Wetter (Wind, Pollenflug, Frost) und 6 neue Segen."),
-        t("Mondteich: Startkapital, Bauernweisheit und Ausdauer wachsen jetzt mit dem Run (Prozent statt fester Werte)."),
-        t("Mondteich: neu Reiche Ernte (Saat zählt doppelt) und Meisterhände (Ernten zählen mehrfach für die Meisterschaft)."),
-        t("Stellarium: neuer Ast Grundwerte (Gold, Sternensamen, Energie, Wachstum und unendliche Harmonie)."),
-        t("Stellarium: jede Pflanze hat 2 neue Sterne, Sternenfrucht (mehr Sternensaat) und Frühreife (Samen starten als Keimling)."),
-        t("Balancing: Legendäre Saat bringt bis zur 2. Rechnung x25 statt x50 Gold. Runs hängen weniger vom frühen Glück ab."),
-        t("Endlos: nach einem Neuanfang bleibt der Spielstand im Mondteich gespeichert."),
-        t("Mondphasen auch in Endlos im Mondteich wählbar (sie gelten für Story), das Mond-Symbol oben ist immer da."),
-        t("Der Begleiter Schleifenkatze heißt jetzt Kitty.")
+    { version: "Alpha 0.9", punkte: [
+        t("Früh bezahlte Rechnungen machen den nächsten Segen stärker."),
+        t("Mondteich und Sternenfall sind deutlich stärker, Duo läuft flüssiger.")
     ] },
-    { version: "Alpha 0.9.2", punkte: [
-        t("Patch Notes: alle Versionen seit Alpha 0.2.0 zum Nachlesen (Klick auf die Versionsnummer im Hauptmenü).")
+    { version: "Alpha 0.8", punkte: [
+        t("Dein Profil mit eigener Figur, die über den Hof läuft, mit Emotes und Herzen."),
+        t("Eigene Pixel-Symbole, neue Deko und neue Begleiter.")
     ] },
-    { version: "Alpha 0.9.1", punkte: [
-        t("Duo läuft viel flüssiger: Figuren werden schneller gezeichnet."),
-        t("Duo: Der Lobby-Code ist versteckt (Anzeigen per Klick), Beitritt mit Namen, der Host kann Mitspieler rauswerfen."),
-        t("Duo: Felder kosten doppelt so viel wie solo."),
-        t("Duo: Rechnungen früher bezahlen geht jetzt auch zu zweit."),
-        t("Mehr Mondblüten für bezahlte Rechnungen: schon der erste Run bringt ein spürbares Upgrade."),
-        t("Neue Figur-Teile: Cargohose, Zerrissene Jeans, Sandalen, Cowboystiefel (episch), Lavahose und Blitzschuhe (legendär)."),
-        t("Spielstand als Datei sichern (Einstellungen, Spielstand)."),
-        t("Neue Einstellung: Im Hintergrund stumm."),
-        t("Patch Notes: Klick auf die Versionsnummer im Hauptmenü."),
-        t("Figuren laufen rechts, Begleiter links auf dem Hof."),
-        t("Viele fehlende englische Texte ergänzt, Regengeräusch im Menü behoben.")
+    { version: "Alpha 0.7", punkte: [
+        t("Online-Duo: Spiel mit einem Freund per Lobby-Code, jeder auf seiner Seite des Hofs."),
+        t("Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.")
     ] },
-    { version: "Alpha 0.9.0", punkte: [
-        t("Rechnungen früher bezahlen: pro Tag früher wird der nächste Segen 10% stärker, und der Run wird kürzer."),
-        t("Mondteich und Sternenfall deutlich stärker: Mondblüten x3 pro Sternenfall, mehr Sternensplitter, die Sense steht ganz vorne."),
-        t("Mondteich nach dem Run einklappbar: Markt und Stellarium ansehen, bevor du neu startest."),
-        t("Die Mondphase oben ist anklickbar und führt zur Auswahl."),
-        t("Deine Figur hat eine kleine Aura, der Heiligenschein ist ein richtiger Ring, Arme beim Jubeln seitlich am Kopf."),
-        t("Das Wetter-Banner kommt nicht mehr beim Laden eines Spielstands.")
+    { version: "Alpha 0.6", punkte: [
+        t("Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere."),
+        t("Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.")
     ] },
-    { version: "Alpha 0.8.1", punkte: [
-        t("Der Samenladen läuft heiß: ab 10 Klicks pro Sekunde zählt jeder weitere Klick zu drei Vierteln (mit Glühen und Dampf). Die Sense ist ausgenommen.")
-    ] },
-    { version: "Alpha 0.8.0", punkte: [
-        t("Profil mit eigener Figur: Charakter-Editor mit vielen Teilen, Accessoires, Flügeln und legendären Animationen."),
-        t("Deine Figur läuft über den Hof, mit Idle-Animationen, Herzen und Emotes (Rechtsklick)."),
-        t("Duo: Wiedereinstieg in Story und Endlos, Figur und Begleiter des Mitspielers laufen mit."),
-        t("Eigene Pixel-Symbole statt Emojis, neue Deko und neue Begleiter."),
-        t("Auto-Patcher in der Desktop-App: Updates werden beim Start geladen."),
-        t("Balancing der Wirtschaft: neue Pflanzen lohnen sich mehr, Weizen dominiert nicht mehr.")
-    ] },
-    { version: "Alpha 0.7.2", punkte: [
-        t("Roulette und Blackjack im eigenen Glücksspiel-Bereich des Markts."),
-        t("Die Sense: Maus auf dem Samenladen gedrückt halten klickt von allein."),
-        t("Die Mondphase wird oben angezeigt, der Mondteich hat einen Nacht-Look."),
-        t("Duo stabiler: Wiederverbinden, Erkennen von Abbrüchen, Geduld bei wackligem WLAN.")
-    ] },
-    { version: "Alpha 0.7.1", punkte: [
-        t("Duo: Wiedereinstieg direkt ins laufende Endlos-Spiel auf der eigenen Seite.")
-    ] },
-    { version: "Alpha 0.7.0", punkte: [
-        t("Online-Duo: spiel mit einem Freund per Lobby-Code, jeder auf seiner Seite des Hofs."),
-        t("Story und Endlos, Endlos mit 3 eigenen Speicherständen."),
-        t("Am Zahltag entscheidest du: Rechnung bezahlen oder Run beenden."),
-        t("Infoknöpfe oben mit festhaltbaren Infokarten, legendäre Landschaft Kosmische Nacht.")
-    ] },
-    { version: "Alpha 0.6.1", punkte: [
-        t("Erfolge zum Abholen, getrennt für Story und Endlos."),
-        t("Slotmaschine statt Gacha, Münzwurf mit Kopf und Zahl."),
-        t("Werkzeuge zeigen ihre Wirkung in Prozent, neue Kuscheltiere, Deko, Münzen und Rahmen."),
-        t("Klick auf wachsende Pflanzen lässt sie schneller wachsen.")
-    ] },
-    { version: "Alpha 0.5.2", punkte: [
-        t("Samenläden als eigene Pixel-Gebäude, neue Saat- und Pflanzen-Skins, neue Deko und Landschaften."),
-        t("Legendäre Pflanzen-Looks mit eigenen Ernte-Effekten.")
-    ] },
-    { version: "Alpha 0.5.1", punkte: [
-        t("Neues Hauptmenü im Pixel-Stil mit Holzschild-Knöpfen.")
-    ] },
-    { version: "Alpha 0.4.0", punkte: [
-        t("Sproutvale gibt es auf Englisch."),
-        t("Neuer Himmels-Ast im Stellarium, neue Markt-Stände, Kodex-Segen und neue Skins.")
-    ] },
-    { version: "Alpha 0.3.0", punkte: [
-        t("Neue Segen, Erfolge und Feld-Skins, Jahreszeiten-Ast und Kodex-Belohnungen.")
-    ] },
-    { version: "Alpha 0.2.1", punkte: [
-        t("Fehler behoben: Das Markt-Fenster war immer sichtbar.")
-    ] },
-    { version: "Alpha 0.2.0", punkte: [
-        t("Erste veröffentlichte Version: neuer Markt, neue Schrift, Feedback über Discord, Vollbild.")
+    { version: "Alpha 0.2", punkte: [
+        t("Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.")
     ] }
 ];
 
