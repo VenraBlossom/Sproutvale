@@ -118,7 +118,7 @@ async function packeSpielFuerSteam(ordner) {
 
 async function baue() {
     fs.mkdirSync(BUILD, { recursive: true });
-    if (RELEASE && !fs.existsSync(path.join(HIER, "geheim.txt"))) {
+    if ((RELEASE || STEAM) && !fs.existsSync(path.join(HIER, "geheim.txt"))) {
         throw new Error("desktop-app/geheim.txt fehlt (Schluessel fuer die Kaeufe). Einmal die Entwickler-Version starten oder die gesicherte Datei zurueckkopieren.");
     }
     const icon = erstelleIcon();
