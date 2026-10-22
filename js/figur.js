@@ -557,7 +557,7 @@ function figurHaare(g, blick, cx, cy, form, bild, anim) {
             p.fein(x - 0.5, cy + 1.5 + i * 1.6, "h");
         }
         p.rechteck(x - 0.5, cy + 8, 1, 0.5, "h");
-    } else if (form === "dutt") {    } else if (form === "dutt") {
+    } else if (form === "dutt") {
         const x = seite ? cx - 3 : cx;
         p.ellipse(x, cy - 5.4, 2, 1.9, "2");
         p.feinLinie(x - 1, cy - 6, x + 0.5, cy - 6.5, "h");
@@ -1667,7 +1667,7 @@ function neueFigur(art, optionen) {
     return f;
 }
 
-function entferneFigur(f) {
+function entferneHofFigur(f) {
     if (f.el) f.el.remove();
     const i = figuren.indexOf(f);
     if (i >= 0) figuren.splice(i, 1);
@@ -1880,8 +1880,8 @@ function aktualisiereFiguren(dtMs, jetzt) {
         if (!partnerTier) partnerTier = neueFigur("begleiter", { partner: true, skin: p.begleiter, zustand: "sitzen" });
         partnerTier.skin = p.begleiter;
     } else {
-        if (partner) entferneFigur(partner);
-        if (partnerTier) entferneFigur(partnerTier);
+        if (partner) entferneHofFigur(partner);
+        if (partnerTier) entferneHofFigur(partnerTier);
     }
     figuren.forEach(f => aktualisiereFigur(f, dtMs, jetzt));
 }

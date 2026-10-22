@@ -444,10 +444,6 @@ function kaufeSandbox() {
     renderPrestigeShop();
 }
 
-function storyMeta() {
-    return metaProfil === "standard" ? meta : metaRuhend || meta;
-}
-
 function waehleMondphase(index) {
     const m = storyMeta();
     if (index > (m.mondphaseFrei || 0)) return;
