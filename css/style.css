@@ -1447,18 +1447,6 @@ img.icon {
     50% { transform: translateY(-8px) rotate(-0.5deg); }
 }
 
-.menue-knoepfe {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 280px;
-}
-
-.menue-knopf {
-    font-size: 1.35em;
-    padding: 10px 20px;
-}
-
 
 #skilltree-fenster {
     position: fixed;
@@ -4143,15 +4131,6 @@ body.pflanzen-kristall .feld-sprite:not([hidden]) {
     z-index: 1;
 }
 
-.menue-haupt {
-    font-size: 1.6em;
-    padding: 12px 20px;
-    animation: menue-puls 2.4s ease-in-out infinite;
-}
-
-@keyframes menue-puls {
-    50% { box-shadow: inset 0 2px 0 #b8f07a, inset 0 -3px 0 #2f5a1a, 0 3px 0 #1a3010, 0 0 18px rgba(184, 240, 122, 0.7); }
-}
 
 .menue-fuss {
     position: absolute;
@@ -7971,63 +7950,9 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     100% { background-position: -60% 0; }
 }
 
-#menue-start .menue-knoepfe {
-    width: 330px;
-    gap: 14px;
-}
-
-#hauptmenue .menue-knopf {
-    position: relative;
-    overflow: hidden;
-    border-radius: 14px;
-    padding: 12px 24px;
-    font-size: 1.35em;
-    font-weight: 600;
-    box-shadow: 0 5px 0 rgba(46, 26, 9, 0.8), 0 10px 22px rgba(0, 0, 0, 0.3);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    animation: knopf-einblenden 0.5s ease-out both;
-}
-
-#hauptmenue .menue-knopf:hover:not(:disabled) {
-    transform: translateY(-3px) scale(1.03);
-    filter: brightness(1.08);
-    box-shadow: 0 8px 0 rgba(46, 26, 9, 0.8), 0 16px 30px rgba(0, 0, 0, 0.35);
-}
-
-#hauptmenue .menue-knopf:active:not(:disabled) {
-    transform: translateY(2px) scale(0.99);
-    box-shadow: 0 2px 0 rgba(46, 26, 9, 0.8), 0 6px 14px rgba(0, 0, 0, 0.3);
-}
-
-#hauptmenue .menue-knopf::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -60%;
-    width: 40%;
-    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    transform: skewX(-18deg);
-    transition: left 0.45s ease;
-    pointer-events: none;
-}
-
-#hauptmenue .menue-knopf:hover::after {
-    left: 120%;
-}
-
-#menue-start .menue-knopf:nth-child(1) { animation-delay: 0.45s; }
-#menue-start .menue-knopf:nth-child(2) { animation-delay: 0.6s; }
-#menue-start .menue-knopf:nth-child(3) { animation-delay: 0.75s; }
-
 @keyframes knopf-einblenden {
     0% { transform: translateY(24px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
-}
-
-#hauptmenue .menue-haupt {
-    font-size: 1.7em;
-    padding: 14px 24px;
 }
 
 .menue-funke {
@@ -8391,14 +8316,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     height: 90%;
 }
 
-#hauptmenue .menue-knopf::after {
-    display: none;
-}
-
-#hauptmenue .menue-knopf::after {
-    display: block;
-}
-
 .logo-buehne {
     animation: logo-einflug 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both, logo-schweben 4.5s ease-in-out 0.9s infinite;
 }
@@ -8415,70 +8332,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
     background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.18), transparent 55%);
 }
 
-#hauptmenue .menue-knopf {
-    padding: 13px 26px;
-    font-size: 1.4em;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: #fff6dc;
-    text-shadow: 2px 2px 0 #3b2210;
-    background:
-        radial-gradient(circle at 11px 11px, #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
-        radial-gradient(circle at calc(100% - 11px) 11px, #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
-        radial-gradient(circle at 11px calc(100% - 11px), #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
-        radial-gradient(circle at calc(100% - 11px) calc(100% - 11px), #e8e0d0 0 2px, #6a5a4a 2.5px, transparent 3.5px),
-        repeating-linear-gradient(0deg, transparent 0 9px, rgba(90, 50, 20, 0.18) 9px 11px),
-        linear-gradient(#d09554, #a8692f);
-    border: 4px solid #3b2210;
-    border-radius: 10px;
-    box-shadow:
-        inset 0 3px 0 rgba(255, 228, 176, 0.65),
-        inset 0 -5px 0 rgba(70, 36, 12, 0.35),
-        0 6px 0 #2e1a09,
-        0 12px 22px rgba(0, 0, 0, 0.35);
-}
-
-#hauptmenue .menue-haupt {
-    font-size: 1.75em;
-    color: #ffffff;
-    text-shadow: 2px 2px 0 #1f4a12;
-    background:
-        radial-gradient(circle at 12px 12px, #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
-        radial-gradient(circle at calc(100% - 12px) 12px, #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
-        radial-gradient(circle at 12px calc(100% - 12px), #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
-        radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #f4fff0 0 2px, #4a6a3a 2.5px, transparent 3.5px),
-        repeating-linear-gradient(0deg, transparent 0 9px, rgba(30, 70, 15, 0.16) 9px 11px),
-        linear-gradient(#95d95e, #58a02f);
-    border-color: #1f4a12;
-    box-shadow:
-        inset 0 3px 0 rgba(220, 255, 180, 0.75),
-        inset 0 -5px 0 rgba(20, 60, 10, 0.35),
-        0 6px 0 #143008,
-        0 12px 24px rgba(0, 0, 0, 0.35),
-        0 0 0 0 rgba(184, 240, 122, 0);
-    animation: knopf-einblenden 0.5s ease-out both, menue-puls2 2.6s ease-in-out 1.2s infinite;
-}
-
-@keyframes menue-puls2 {
-    50% { filter: brightness(1.08); box-shadow: inset 0 3px 0 rgba(220, 255, 180, 0.75), inset 0 -5px 0 rgba(20, 60, 10, 0.35), 0 6px 0 #143008, 0 12px 24px rgba(0, 0, 0, 0.35), 0 0 22px 4px rgba(184, 240, 122, 0.55); }
-}
-
-#hauptmenue .menue-knopf:hover:not(:disabled) {
-    box-shadow:
-        inset 0 3px 0 rgba(255, 228, 176, 0.75),
-        inset 0 -5px 0 rgba(70, 36, 12, 0.35),
-        0 9px 0 #2e1a09,
-        0 18px 30px rgba(0, 0, 0, 0.35);
-}
-
-#hauptmenue .menue-haupt:hover:not(:disabled) {
-    box-shadow:
-        inset 0 3px 0 rgba(220, 255, 180, 0.85),
-        inset 0 -5px 0 rgba(20, 60, 10, 0.35),
-        0 9px 0 #143008,
-        0 18px 30px rgba(0, 0, 0, 0.35),
-        0 0 24px 4px rgba(184, 240, 122, 0.6);
-}
 
 
 #marktstand.bau-ruhig #plant-button-bild {
@@ -9074,87 +8927,6 @@ body.pflanzen-glut .feld-sprite:not([hidden]) {
 .laden-vorschau.vorschau-bau-eiswagen { background: linear-gradient(#ff8fb1 0 30%, #ffe0ee 30%); }
 .laden-vorschau.vorschau-bau-nachtzelt { background: repeating-linear-gradient(90deg, #3a2a7a 0 10px, #2a1d5a 10px 20px); }
 .laden-vorschau.vorschau-bau-lebkuchenhaus { background: linear-gradient(#fff6f0 0 18%, #b8702f 18%); }
-
-#hauptmenue .menue-knopf,
-#hauptmenue .menue-haupt {
-    margin: 4px;
-    padding: 12px 24px;
-    font-size: 1.35em;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: #fff6dc;
-    text-shadow: 2px 2px 0 #3b2210;
-    background: #b87a3e;
-    border: none;
-    border-radius: 0;
-    filter: none;
-    box-shadow:
-        0 -4px 0 0 #2e1a09,
-        0 4px 0 0 #2e1a09,
-        -4px 0 0 0 #2e1a09,
-        4px 0 0 0 #2e1a09,
-        inset 0 4px 0 0 #dca062,
-        inset 0 -6px 0 0 #8a5426,
-        0 10px 0 0 rgba(30, 16, 6, 0.45);
-    transition: transform 0.08s steps(2);
-    animation: knopf-einblenden 0.5s ease-out both;
-}
-
-#hauptmenue .menue-haupt {
-    font-size: 1.6em;
-    padding: 14px 24px;
-    color: #ffffff;
-    text-shadow: 2px 2px 0 #1f3a10;
-    background: #6cb448;
-    box-shadow:
-        0 -4px 0 0 #1a3009,
-        0 4px 0 0 #1a3009,
-        -4px 0 0 0 #1a3009,
-        4px 0 0 0 #1a3009,
-        inset 0 4px 0 0 #a8e070,
-        inset 0 -6px 0 0 #3f7a22,
-        0 10px 0 0 rgba(20, 40, 10, 0.45);
-}
-
-#hauptmenue .menue-knopf::after,
-#hauptmenue .menue-knopf::before {
-    display: none;
-}
-
-#hauptmenue .menue-knopf:hover:not(:disabled) {
-    transform: translateY(-2px);
-    filter: brightness(1.08);
-    box-shadow:
-        0 -4px 0 0 #2e1a09,
-        0 4px 0 0 #2e1a09,
-        -4px 0 0 0 #2e1a09,
-        4px 0 0 0 #2e1a09,
-        inset 0 4px 0 0 #e8b474,
-        inset 0 -6px 0 0 #8a5426,
-        0 12px 0 0 rgba(30, 16, 6, 0.45);
-}
-
-#hauptmenue .menue-haupt:hover:not(:disabled) {
-    box-shadow:
-        0 -4px 0 0 #1a3009,
-        0 4px 0 0 #1a3009,
-        -4px 0 0 0 #1a3009,
-        4px 0 0 0 #1a3009,
-        inset 0 4px 0 0 #bdf085,
-        inset 0 -6px 0 0 #3f7a22,
-        0 12px 0 0 rgba(20, 40, 10, 0.45);
-}
-
-#hauptmenue .menue-knopf:active:not(:disabled) {
-    transform: translateY(4px);
-    box-shadow:
-        0 -4px 0 0 #2e1a09,
-        0 4px 0 0 #2e1a09,
-        -4px 0 0 0 #2e1a09,
-        4px 0 0 0 #2e1a09,
-        inset 0 6px 0 0 #8a5426,
-        0 6px 0 0 rgba(30, 16, 6, 0.45);
-}
 
 
 #marktstand[data-bauweise] .laden-bau > *:not(.laden-pixelbild) {
@@ -11813,81 +11585,6 @@ body.muenzen-drachenei .loot-kugel.loot-gelandet:not(.loot-stern) {
     50% { filter: drop-shadow(0 0 10px var(--leuchten)) brightness(1.08); }
 }
 
-#hauptmenue .menue-knopf {
-    --stufe: 4px;
-    --rand: #2e1a09;
-    --fuellung: #b8783a;
-    --licht: #e0a860;
-    --schatten: #7d4a1c;
-    border: none;
-    border-radius: 0;
-    background: var(--rand);
-    box-shadow: none;
-    padding: 12px 30px 14px;
-    font-family: "Jersey 15", "Pixelify Sans", sans-serif;
-    font-size: 1.7em;
-    font-weight: 400;
-    letter-spacing: 1px;
-    color: #fff6dc;
-    text-shadow: 2px 2px 0 var(--rand);
-    image-rendering: pixelated;
-    clip-path: polygon(0 calc(var(--stufe) * 2), var(--stufe) calc(var(--stufe) * 2), var(--stufe) var(--stufe), calc(var(--stufe) * 2) var(--stufe),
-        calc(var(--stufe) * 2) 0, calc(100% - var(--stufe) * 2) 0, calc(100% - var(--stufe) * 2) var(--stufe), calc(100% - var(--stufe)) var(--stufe),
-        calc(100% - var(--stufe)) calc(var(--stufe) * 2), 100% calc(var(--stufe) * 2), 100% calc(100% - var(--stufe) * 2),
-        calc(100% - var(--stufe)) calc(100% - var(--stufe) * 2), calc(100% - var(--stufe)) calc(100% - var(--stufe)),
-        calc(100% - var(--stufe) * 2) calc(100% - var(--stufe)), calc(100% - var(--stufe) * 2) 100%, calc(var(--stufe) * 2) 100%,
-        calc(var(--stufe) * 2) calc(100% - var(--stufe)), var(--stufe) calc(100% - var(--stufe)), var(--stufe) calc(100% - var(--stufe) * 2),
-        0 calc(100% - var(--stufe) * 2));
-    transition: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-#hauptmenue .menue-knopf::before {
-    content: "";
-    display: block;
-    position: absolute;
-    inset: var(--stufe);
-    background: var(--fuellung);
-    box-shadow: inset 0 var(--stufe) 0 var(--licht), inset 0 calc(var(--stufe) * -1.5) 0 var(--schatten),
-        inset var(--stufe) 0 0 var(--licht);
-    clip-path: polygon(0 var(--stufe), var(--stufe) var(--stufe), var(--stufe) 0, calc(100% - var(--stufe)) 0, calc(100% - var(--stufe)) var(--stufe),
-        100% var(--stufe), 100% calc(100% - var(--stufe)), calc(100% - var(--stufe)) calc(100% - var(--stufe)), calc(100% - var(--stufe)) 100%,
-        var(--stufe) 100%, var(--stufe) calc(100% - var(--stufe)), 0 calc(100% - var(--stufe)));
-    z-index: 0;
-}
-#hauptmenue .menue-knopf::after {
-    content: none;
-}
-#hauptmenue .menue-knopf > * {
-    position: relative;
-    z-index: 1;
-}
-#hauptmenue .menue-knopf.knopf-gruen {
-    --rand: #14360e;
-    --fuellung: #4f9e2c;
-    --licht: #8fdc5c;
-    --schatten: #2f6b1a;
-    text-shadow: 2px 2px 0 #14360e;
-}
-#hauptmenue .menue-knopf:hover:not(:disabled) {
-    transform: translateY(-4px);
-    filter: brightness(1.1);
-    box-shadow: none;
-}
-#hauptmenue .menue-knopf:active:not(:disabled) {
-    transform: translateY(2px);
-    filter: brightness(0.95);
-    box-shadow: none;
-}
-.menue-symbol {
-    display: inline-flex;
-}
-.menue-symbol img {
-    image-rendering: pixelated;
-    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
-}
-
 .intro-crt {
     position: absolute;
     left: 17.5%;
@@ -12316,4 +12013,249 @@ html.touch .slot {
 html.touch #field-grid,
 html.touch #fx-layer {
     touch-action: none;
+}
+
+#hauptmenue {
+    --rahmen-brett: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23a8703a'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%2386501f'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%235e3516'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%235e3516'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%2394602e'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%2386501f'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%2394602e'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%2386501f'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23a8703a'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%2386501f'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23d8ccb0'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%234a2810'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%234a2810'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%232e1a09'/%3E%3C/svg%3E");
+    --rahmen-holz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23e8b46e'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%23b8783a'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%238a5426'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%238a5426'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%23d49a5a'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%23b8783a'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23e8b46e'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%23b8783a'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23f4ecd8'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%237a4518'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%237a4518'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%232e1a09'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%232e1a09'/%3E%3C/svg%3E");
+    --rahmen-gruen: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Crect x='2' y='0' width='8' height='1' fill='%2314360e'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='1' width='8' height='1' fill='%23b4ec7c'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='3' y='2' width='6' height='1' fill='%235aa832'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='3' width='6' height='1' fill='%233f8a22'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='4' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='4' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='5' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='5' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='5' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='6' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='6' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='6' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='4' y='7' width='5' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='7' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='7' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='7' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='8' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='8' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='8' width='1' height='1' fill='%235aa832'/%3E%3Crect x='3' y='8' width='6' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='8' width='1' height='1' fill='%235aa832'/%3E%3Crect x='10' y='8' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='8' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='9' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='9' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='9' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='3' y='9' width='6' height='1' fill='%235aa832'/%3E%3Crect x='9' y='9' width='1' height='1' fill='%23f4fff0'/%3E%3Crect x='10' y='9' width='1' height='1' fill='%232f6b1a'/%3E%3Crect x='11' y='9' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='10' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='10' width='8' height='1' fill='%232f6b1a'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='11' width='8' height='1' fill='%2314360e'/%3E%3C/svg%3E");
+    --spross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='8' shape-rendering='crispEdges'%3E%3Crect x='1' y='0' width='2' height='1' fill='%2314360e'/%3E%3Crect x='8' y='0' width='2' height='1' fill='%2314360e'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='2' y='1' width='1' height='1' fill='%2378c24a'/%3E%3Crect x='3' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='7' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='8' y='1' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='9' y='1' width='1' height='1' fill='%2378c24a'/%3E%3Crect x='10' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%2378c24a'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%2378c24a'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='6' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='7' y='2' width='2' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='2' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='10' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='3' width='4' height='1' fill='%2378c24a'/%3E%3Crect x='5' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='6' y='3' width='4' height='1' fill='%2378c24a'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='4' width='3' height='1' fill='%2378c24a'/%3E%3Crect x='5' y='4' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='6' y='4' width='3' height='1' fill='%2378c24a'/%3E%3Crect x='9' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='5' width='3' height='1' fill='%2314360e'/%3E%3Crect x='5' y='5' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='6' y='5' width='3' height='1' fill='%2314360e'/%3E%3Crect x='4' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='5' y='6' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%2314360e'/%3E%3Crect x='4' y='7' width='1' height='1' fill='%2314360e'/%3E%3Crect x='5' y='7' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='6' y='7' width='1' height='1' fill='%2314360e'/%3E%3C/svg%3E");
+    --blatt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Crect x='3' y='0' width='3' height='1' fill='%2314360e'/%3E%3Crect x='2' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='3' y='1' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%2378c24a'/%3E%3Crect x='5' y='1' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23b4ec7c'/%3E%3Crect x='3' y='2' width='2' height='1' fill='%2378c24a'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='3' width='3' height='1' fill='%2378c24a'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='1' y='4' width='2' height='1' fill='%2378c24a'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%2314360e'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%233f8a22'/%3E%3Crect x='1' y='5' width='2' height='1' fill='%2314360e'/%3E%3C/svg%3E");
+}
+
+#menue-start {
+    gap: 26px;
+}
+
+.menue-knoepfe {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+}
+
+#menue-start .menue-knoepfe {
+    position: relative;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 22px;
+}
+
+#menue-start .menue-knoepfe {
+    isolation: isolate;
+    padding: 22px 28px 26px;
+    margin-bottom: 40px;
+}
+
+#menue-start .menue-knoepfe::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 16px solid transparent;
+    border-image: var(--rahmen-brett) 4 fill / 16px / 0 stretch;
+    background:
+        repeating-linear-gradient(180deg, transparent 0 22px, rgba(46, 26, 9, 0.28) 22px 25px) padding-box;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 8px 0 rgba(30, 50, 15, 0.35));
+    pointer-events: none;
+    z-index: -1;
+    animation: brett-rein 0.6s cubic-bezier(0.2, 1.3, 0.4, 1) 0.2s both;
+}
+
+#menue-start .menue-knoepfe::after {
+    content: "";
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    top: calc(100% - 10px);
+    height: 64px;
+    background:
+        linear-gradient(90deg, #2e1a09 0 4px, #7a4518 4px 8px, #a8703a 8px 12px, #86501f 12px 20px, #4a2810 20px 24px, #2e1a09 24px 28px) left top / 28px 100% no-repeat,
+        linear-gradient(90deg, #2e1a09 0 4px, #7a4518 4px 8px, #a8703a 8px 12px, #86501f 12px 20px, #4a2810 20px 24px, #2e1a09 24px 28px) right top / 28px 100% no-repeat;
+    pointer-events: none;
+    z-index: -2;
+    animation: brett-rein 0.6s cubic-bezier(0.2, 1.3, 0.4, 1) 0.2s both;
+}
+
+@keyframes brett-rein {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+}
+
+#hauptmenue .menue-knopf {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 0;
+    margin: 0;
+    padding: 2px 16px 4px;
+    border: 16px solid transparent;
+    border-image: var(--rahmen-holz) 4 fill / 16px / 0 stretch;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    font-family: "Jersey 15", "Pixelify Sans", sans-serif;
+    font-size: 1.7em;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #fff8e6;
+    text-shadow: 2px 2px 0 #5a3214, -1px -1px 0 rgba(90, 50, 20, 0.35);
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 0 rgba(46, 26, 9, 0.5));
+    transition: transform 0.12s steps(3), filter 0.12s steps(3);
+    animation: knopf-einblenden 0.5s ease-out both;
+    cursor: pointer;
+}
+
+#hauptmenue .menue-knopf::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(255, 236, 196, 0.22), transparent 38%),
+        repeating-linear-gradient(180deg, transparent 0 14px, rgba(122, 69, 24, 0.22) 14px 16px),
+        repeating-linear-gradient(90deg, transparent 0 37px, rgba(122, 69, 24, 0.12) 37px 39px, transparent 39px 83px);
+    z-index: 0;
+}
+
+#hauptmenue .menue-knopf::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: -22px;
+    width: 18px;
+    height: 18px;
+    background: var(--blatt) center / 100% 100% no-repeat;
+    image-rendering: pixelated;
+    transform: scale(0) rotate(-40deg);
+    transform-origin: 0 100%;
+    transition: transform 0.18s steps(3);
+    pointer-events: none;
+    z-index: 2;
+}
+
+#hauptmenue .menue-knopf > * {
+    position: relative;
+    z-index: 1;
+}
+
+#hauptmenue .menue-knopf:hover:not(:disabled),
+#hauptmenue .menue-knopf:focus-visible {
+    transform: translateY(-4px);
+    filter: brightness(1.08) drop-shadow(0 10px 0 rgba(46, 26, 9, 0.42)) drop-shadow(0 0 8px rgba(255, 226, 130, 0.75));
+    outline: none;
+}
+
+#hauptmenue .menue-knopf:hover:not(:disabled)::after,
+#hauptmenue .menue-knopf:focus-visible::after {
+    transform: scale(1) rotate(0deg);
+}
+
+#hauptmenue .menue-knopf:hover:not(:disabled) .menue-symbol {
+    animation: symbol-wackeln 0.6s steps(4) infinite;
+}
+
+#hauptmenue .menue-knopf:active:not(:disabled) {
+    transform: translateY(3px);
+    filter: brightness(0.96) drop-shadow(0 2px 0 rgba(46, 26, 9, 0.5));
+}
+
+@keyframes symbol-wackeln {
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+#menue-start .menue-knopf {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 196px;
+    padding: 4px 12px 0;
+    font-size: 1.9em;
+}
+
+#menue-start .menue-knopf:nth-child(1) { animation-delay: 0.35s; }
+#menue-start .menue-knopf:nth-child(2) { animation-delay: 0.5s; }
+#menue-start .menue-knopf:nth-child(3) { animation-delay: 0.65s; }
+
+#hauptmenue .menue-haupt {
+    border-image-source: var(--rahmen-gruen);
+    color: #ffffff;
+    text-shadow: 2px 2px 0 #1f4a12, -1px -1px 0 rgba(20, 54, 14, 0.35);
+    filter: drop-shadow(0 6px 0 rgba(20, 54, 14, 0.5));
+}
+
+#hauptmenue .menue-haupt::before {
+    background:
+        linear-gradient(rgba(230, 255, 200, 0.25), transparent 38%),
+        repeating-linear-gradient(180deg, transparent 0 14px, rgba(31, 74, 18, 0.18) 14px 16px);
+}
+
+#menue-start .menue-haupt {
+    min-width: 230px;
+    padding: 10px 18px 4px;
+    font-size: 2.2em;
+}
+
+#menue-start .menue-haupt::after {
+    left: 50%;
+    right: auto;
+    top: -36px;
+    width: 33px;
+    height: 24px;
+    margin-left: -16px;
+    background-image: var(--spross);
+    transform: none;
+    transform-origin: 50% 100%;
+    animation: spross-wippen 2.4s steps(4) 1.2s infinite;
+}
+
+#menue-start .menue-haupt:hover:not(:disabled)::after {
+    transform: scale(1.25);
+}
+
+@keyframes spross-wippen {
+    0%, 100% { rotate: 0deg; }
+    25% { rotate: -6deg; }
+    75% { rotate: 6deg; }
+}
+
+#menue-start .menue-haupt:hover:not(:disabled),
+#menue-start .menue-haupt:focus-visible {
+    filter: brightness(1.06) drop-shadow(0 10px 0 rgba(20, 54, 14, 0.42)) drop-shadow(0 0 10px rgba(200, 255, 150, 0.85));
+}
+
+.menue-symbol {
+    display: inline-flex;
+}
+
+.menue-symbol img {
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0 rgba(46, 26, 9, 0.45));
+}
+
+#menue-start .menue-symbol img {
+    width: 48px;
+    height: 48px;
+}
+
+.menue-knopf.gesperrt {
+    filter: grayscale(0.85);
+    opacity: 0.7;
+}
+
+#intro:not(.bereit) #intro-buehne {
+    visibility: hidden;
+}
+
+#intro.bereit #intro-buehne {
+    animation: intro-auftauchen 0.35s ease-out both;
+}
+
+@keyframes intro-auftauchen {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

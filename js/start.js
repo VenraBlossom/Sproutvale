@@ -829,7 +829,7 @@ aktualisiereProfilKnopf();
     }
 
     maleStatisch();
-    const start = performance.now();
+    let start = performance.now();
     const ZOOM_AB = 3.8, ENDE = 4.7;
     const inhalt = intro.querySelector(".intro-schirm");
     let laeuft = true;
@@ -864,12 +864,25 @@ aktualisiereProfilKnopf();
         document.removeEventListener("keydown", taste);
         fertig();
     });
-    (document.fonts ? Promise.all([document.fonts.load("32px 'Jersey 15'"), document.fonts.load("700 20px 'Pixelify Sans'")]).catch(() => {}) : Promise.resolve())
-        .finally(() => requestAnimationFrame(bild));
+    const logo = intro.querySelector(".intro-logo");
+    const schriften = document.fonts
+        ? Promise.all([document.fonts.load("32px 'Jersey 15'"), document.fonts.load("700 20px 'Pixelify Sans'")]).catch(() => {})
+        : Promise.resolve();
+    const logoBereit = logo && logo.decode ? logo.decode().catch(() => {}) : Promise.resolve();
+    const hoechstens = new Promise(fertigWarten => setTimeout(fertigWarten, 2500));
+    Promise.race([Promise.all([schriften, logoBereit]), hoechstens]).finally(() => requestAnimationFrame(jetzt => {
+        start = jetzt;
+        bild(jetzt);
+        intro.classList.add("bereit");
+    }));
 })();
 
 
+document.querySelectorAll("#hauptmenue .menue-knopf").forEach(knopf => {
+    knopf.addEventListener("mouseenter", () => { if (!knopf.disabled) Klang.menueTon(); });
+});
+
 document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
-    platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, 28));
+    platz.appendChild(pixelIcon("sprite:sym_" + platz.dataset.symbol, platz.closest("#menue-start") ? 48 : 30));
 });
 

@@ -615,6 +615,7 @@ const Klang = {
         this.rauschStoss(jetzt + 0.45, 0.8, 0.05, 6000, this.sfxBus, 0.6);
     },
     kaufen() { this.arpeggio([79, 84], 0.07, 0.3, 0.1, 0.25); },
+    menueTon() { this.arpeggio([86], 0, 0.25, 0.045, 0.3); },
     fehler() {
         if (!this.bereit()) return;
         this.plopp(this.ctx.currentTime, 220, 150, 0.2, 0.15, "triangle");
