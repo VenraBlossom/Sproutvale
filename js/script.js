@@ -3825,7 +3825,9 @@ function aktivTipp() {
         if (r.tageBis <= 1) {
             zeilen.push(tf("> ⚠️ {0} ist Zahltag: {1} Gold{2}", (run.phase === "tag" ? t("Heute") : t("Nach dem nächsten Tag")), zahl(r.betrag), (fehlt > 0 ? tf(" (es fehlen noch {0})", zahl(fehlt)) : t(" (hast du schon)"))));
         } else {
-            zeilen.push(tf("🧾 {0}: {1} Gold am Ende von Tag {2} (noch {3}{4}", (r.boss ? t("Kredit") : t("Rechnung")), zahl(r.betrag), r.tag, r.tageBis, (r.tageBis === 1 ? t(" Tag)") : t(" Tage)"))));
+            zeilen.push(r.tageBis === 1
+                ? tf("🧾 {0}: {1} Gold am Ende von Tag {2} (noch 1 Tag)", (r.boss ? t("Kredit") : t("Rechnung")), zahl(r.betrag), r.tag)
+                : tf("🧾 {0}: {1} Gold am Ende von Tag {2} (noch {3} Tage)", (r.boss ? t("Kredit") : t("Rechnung")), zahl(r.betrag), r.tag, r.tageBis));
         }
     }
     if (run.phase === "tag") {
@@ -4728,7 +4730,7 @@ function modusInfoText(sandbox, stand) {
         tf("📅 Tag {0} · {1} {2}", r.tag, z.symbol, z.name),
         sandbox ? tf("🏁 {0} Meilensteine erreicht", (r.meilensteine || 0)) : tf("🧾 {0} Rechnungen bezahlt", r.bezahlteRechnungen),
         tf("🪙 {0} Gold · ✨ {1} Sternensamen", zahl(r.gold), zahl(r.skillpunkte)),
-        tf("🌱 {0}{1} · 🟫 {2} Felder", stand.pflanzen, (stand.pflanzen === 1 ? t(" Pflanze") : t(" Pflanzen")), stand.felder),
+        (stand.pflanzen === 1 ? tf("🌱 1 Pflanze · 🟫 {0} Felder", stand.felder) : tf("🌱 {0} Pflanzen · 🟫 {1} Felder", stand.pflanzen, stand.felder)),
         tf("🙏 {0} Segen · 🧰 {1} Werkzeuge", stand.segen, (r.werkzeuge || []).length),
         tf("💰 Insgesamt {0} Gold verdient", zahl(r.gesamt ? r.gesamt.gold : 0))
     ];
@@ -4758,10 +4760,8 @@ function renderModusKarten() {
     const reihe = $("modus-reihe");
     reihe.innerHTML = "";
     [
-        { sandbox: false, symbol: "🌾", name: t("Story"), text: t("Alle 5 Tage kommt eine Rechnung. Bezahlst du sie, ") +
-            t("bekommst du einen Segen. Am Ende gibt es Mondblüten für dauerhafte Upgrades.") },
-        { sandbox: true, symbol: "♾️", name: t("Endlos"), text: t("Keine Rechnungen, keine Energie. Tag und Nacht laufen einfach weiter ") +
-            t("und du kannst jederzeit einkaufen. Meilensteine geben Segen.") }
+        { sandbox: false, symbol: "🌾", name: t("Story"), text: t("Alle 5 Tage kommt eine Rechnung. Bezahlst du sie, bekommst du einen Segen. Am Ende gibt es Mondblüten für dauerhafte Upgrades.") },
+        { sandbox: true, symbol: "♾️", name: t("Endlos"), text: t("Keine Rechnungen, keine Energie. Tag und Nacht laufen einfach weiter und du kannst jederzeit einkaufen. Meilensteine geben Segen.") }
     ].forEach(modus => {
         const frei = !modus.sandbox || hatSandbox();
         const stand = frei ? modusStand(modus.sandbox) : null;
@@ -4776,7 +4776,7 @@ function renderModusKarten() {
         else if (modus.sandbox) statusText = tf("Speicherstand {0} · {1}", endlosSlot(), (stand && !stand.neu ? tf("Tag {0}", stand.r.tag) : t("Neuer Anfang")));
         else if (!stand || stand.neu) statusText = t("Neuer Anfang");
         else statusText = tf("Tag {0} · {1}", stand.r.tag, (modus.sandbox ? tf("{0} Meilensteine", (stand.r.meilensteine || 0))
-            : stand.r.bezahlteRechnungen + (stand.r.bezahlteRechnungen === 1 ? t(" Rechnung") : t(" Rechnungen"))));
+            : (stand.r.bezahlteRechnungen === 1 ? t("1 Rechnung") : tf("{0} Rechnungen", stand.r.bezahlteRechnungen))));
         const mondblueten = frei ? profilMondblueten(modus.sandbox) : 0;
         const spielzeit = frei ? (modus.sandbox ? endlosMeta(endlosSlot()) : storyMeta()).lebenszeit.spielzeitMs : 0;
         const stats = frei && stand && !stand.neu
@@ -4825,10 +4825,8 @@ function frageModusReset(sandbox) {
     zeigePopup({
         titel: sandbox ? t("🏖️ Sandbox zurücksetzen?") : t("🌾 Story komplett löschen?"),
         farbe: "#b8232a",
-        inhalt: tf("Willst du {0} wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine (dafür {1} nutzen). {2}", name, (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")), (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). ") +
-                t("Story, Erfolge und Kosmetik bleiben.")
-                : t("ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. ") +
-                t("Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos."))),
+        inhalt: tf("Willst du {0} wirklich löschen und bei Tag 1 neu anfangen? Mondblüten gibt es dafür keine (dafür {1} nutzen). {2}", name, (sandbox ? t("den Neuanfang in Endlos") : t("\"Run jetzt beenden\" auf der Tageskarte")), (sandbox ? t("Dabei wird auch der ganze Sandbox-Fortschritt gelöscht (Mondblüten, Upgrades, Tarot und Kuscheltiere der Sandbox). Story, Erfolge und Kosmetik bleiben.")
+                : t("ACHTUNG: Dabei wird der ganze Story-Fortschritt gelöscht: Mondblüten, Mondteich-Upgrades, Tarot, Kuscheltiere, Sternenfall, Erfolge, Statistik und Meisterschaft. Es bleiben nur Kosmetik, gekaufte Inhalte, dein Profil, deine Einstellungen und Endlos."))),
         breite: 560,
         knoepfe: [
             { text: t("Abbrechen") },
@@ -5069,7 +5067,7 @@ function zeigeSpeicherWahl() {
         }
         const leer = !r && !(m && ((m.lebenszeit && m.lebenszeit.tage) || m.mondblueten));
         const zeile = el("div", "endlos-slot" + (slot === aktuell ? " aktiv" : ""), null, [
-            el("div", "endlos-slot-text", null, [el("b", null, (imDuo ? t("Koop-Speicherstand ") : t("Speicherstand ")) + slot), ...speicherZeilen(r, m)])
+            el("div", "endlos-slot-text", null, [el("b", null, (imDuo ? tf("Koop-Speicherstand {0}", slot) : tf("Speicherstand {0}", slot))), ...speicherZeilen(r, m)])
         ]);
         const knopf = el("button", "knopf " + (slot === aktuell || leer ? "knopf-gruen" : "knopf-rot"),
             slot === aktuell ? t("💾 Speichern") : leer ? t("💾 Hier speichern") : t("💾 Überschreiben"));
@@ -5602,8 +5600,7 @@ function frageSlotLoeschen(slot) {
         titel: tf("🗑️ Speicherstand {0} löschen?", slot),
         farbe: "#b8232a",
         breite: 520,
-        inhalt: t("Der ganze Speicherstand wird gelöscht: Hof, Mondblüten, Upgrades, Kuscheltiere und Erfolge dieses Speicherstands. ") +
-            t("Story, die anderen Speicherstände und deine Kosmetik bleiben."),
+        inhalt: t("Der ganze Speicherstand wird gelöscht: Hof, Mondblüten, Upgrades, Kuscheltiere und Erfolge dieses Speicherstands. Story, die anderen Speicherstände und deine Kosmetik bleiben."),
         knoepfe: [
             { text: t("Abbrechen"), aktion: zeigeEndlosSlots },
             { text: t("Löschen"), klasse: "knopf-rot", aktion: () => {

@@ -619,8 +619,7 @@ const SKILLS = [
         () => (level("sternenkalender") > 0 ? t("Aktiv") : t("Nicht aktiv"))),
 
     stern("radius", "helfer", "🖐️", [-520, -220], "kombo", t("Breiter Cursor"), 150, 1.35, 29,
-        t("+10% Radius um deinen Cursor. Er sammelt Saaten ein und erntet beim Klicken alle fertigen ") +
-            t("Pflanzen, die er berührt. Bis Stufe 29."),
+        t("+10% Radius um deinen Cursor. Er sammelt Saaten ein und erntet beim Klicken alle fertigen Pflanzen, die er berührt. Bis Stufe 29."),
         () => tf("{0} Pixel Radius", sammelRadius().toFixed(1).replace(".", ","))),
     stern("vogelscheuche", "helfer", "🧑‍🌾", [-300, 220], "kombo", t("Vogelscheuche"), 250, 1, 1,
         t("Die Vogelscheuche im Hof verscheucht jeden Tag die erste Krähe von allein."),
@@ -638,7 +637,7 @@ const SKILLS = [
         () => tf("{0} Chance alle {1} Sek.", prozentText(haustierHilfeChance()), KONFIG.haustierHilfeSek)),
     stern("igel", "helfer", "🦔", [-740, 220], "eichhoernchen", t("Igel-Sammler"), 150, 1.85, 20,
         t("Igel laufen zur gelandeten Saat und sammeln sie ein. Mehr Stufen: schnellere Igel, alle 5 Stufen ein Igel mehr."),
-        () => tf("{0}, Tempo {1}", (igelAnzahl() + (igelAnzahl() === 1 ? t(" Igel") : t(" Igel"))), igelTempo())),
+        () => tf("{0} Igel, Tempo {1}", igelAnzahl(), igelTempo())),
     stern("saatspatz", "helfer", "🐦", [-520, 440], "eichhoernchen", t("Saat-Spatz"), 800, 2.2, 5,
         t("Ein Spatz wirft regelmäßig einen Samen auf ein freies Feld."),
         () => (level("saatspatz") > 0 ? tf("Alle {0}", sekText(spatzIntervallSek())) : t("Noch kein Spatz"))),
@@ -697,8 +696,7 @@ const SKILLS = [
         () => tf("{0} Chance nach jedem Tag", prozentText(haendlerChance()))),
 
     stern("s_aussaat", "hof", "🌰", [0, 300], "p_weizen", t("Schnellere Aussaat"), 8, 1.55, 13,
-        t("-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), ") +
-            t("Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2)."),
+        t("-1 Klick pro Samen (13 Stufen). Mit allem zusammen kommst du von 30 auf 10 Klicks: 13 hier, der Segen Flinke Hände (2), Geschickte Hände im Mondteich (3) und die Tarotkarte Die Kraft (bis 2)."),
         () => tf("{0} Klicks pro Samen", klicksProSamen())),
     shopStern("s_energie", "hof", [-220, 520], "s_aussaat", 60),
     stern("giessen", "hof", "💧", [0, 520], "s_aussaat", t("Gießkanne"), 50, 2, 8,
@@ -1708,8 +1706,7 @@ const HAUSTIER_AKTIONEN = [
 const DLC_PAKETE = {
     unterstuetzer: {
         name: t("Unterstützer-Paket"), preis: 4.99,
-        inhalt: t("Endlos sofort und alle epischen Inhalte: Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, ") +
-            t("Münzen, Kuschel-Rahmen und Pflanzen-Looks")
+        inhalt: t("Endlos sofort und alle epischen Inhalte: Begleiter, Landschaften, Deko, Musik, Samenläden, Felder, Münzen, Kuschel-Rahmen und Pflanzen-Looks")
     }
 };
 const LEGENDAER_KRISTALLE = 50;

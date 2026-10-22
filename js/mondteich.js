@@ -389,8 +389,7 @@ function kaufeSternenfallUpgrade(def) {
 }
 
 function renderSternenfall() {
-    prestigeInfo.textContent = t("Der Sternenfall ist die zweite Prestige-Ebene. Er setzt Mondblüten und Mondteich-Upgrades zurück, ") +
-        t("dafür zählt jede zukünftige Mondblüte dreifach und du bekommst Sternensplitter für starke, dauerhafte Upgrades.");
+    prestigeInfo.textContent = t("Der Sternenfall ist die zweite Prestige-Ebene. Er setzt Mondblüten und Mondteich-Upgrades zurück, dafür zählt jede zukünftige Mondblüte dreifach und du bekommst Sternensplitter für starke, dauerhafte Upgrades.");
 
     const fortschritt = Math.min(1, meta.mondbluetenSeitSternenfall / STERNENFALL_KONFIG.mindestMondblueten);
     const balken = el("div", "erfolg-balken");
@@ -499,8 +498,7 @@ function renderHerausforderungen() {
         prestigeInhalt.appendChild(kasten);
         return;
     }
-    kasten.appendChild(el("div", "mondphasen-hinweis", t("Ein Story-Run mit einer Einschränkung. Schaffst du das Ziel, gibt es für immer einen Bonus. ") +
-        t("Klick nochmal auf die gewählte, um sie abzuwählen. Gilt ab dem nächsten Story-Run.")));
+    kasten.appendChild(el("div", "mondphasen-hinweis", t("Ein Story-Run mit einer Einschränkung. Schaffst du das Ziel, gibt es für immer einen Bonus. Klick nochmal auf die gewählte, um sie abzuwählen. Gilt ab dem nächsten Story-Run.")));
     const reihe = el("div", "mondphasen-reihe");
     HERAUSFORDERUNGEN.forEach(h => {
         const aktiv = m.herausforderung === h.id;
@@ -527,8 +525,7 @@ function renderHerausforderungen() {
 function renderSpielmodi() {
     prestigeInfo.textContent = t("Spielmodi verändern die Regeln eines Runs.");
     if (run.koop) {
-        prestigeInhalt.appendChild(erstelleHinweis(t("👥 Im Duo startet der Host neue Runs in der Lobby. Die Mondphase des Hosts gilt für euch beide. ") +
-            t("Deine Auswahl hier gilt für deine Solo-Runs.")));
+        prestigeInhalt.appendChild(erstelleHinweis(t("👥 Im Duo startet der Host neue Runs in der Lobby. Die Mondphase des Hosts gilt für euch beide. Deine Auswahl hier gilt für deine Solo-Runs.")));
         renderMondphasen();
         if (neueMondphase()) {
             storyMeta().mondphaseGesehen = storyMeta().mondphaseFrei || 0;
@@ -557,11 +554,7 @@ function renderSpielmodi() {
     prestigeInhalt.appendChild(erstelleKarte({
         icon: "♾️",
         titel: t("Endlos"),
-        beschreibung: t("Keine Rechnungen, unendliche Entwicklung: Bau deinen Hof so groß, wie du willst. ") +
-            t("Keine Energie: Tag und Nacht laufen einfach weiter, einkaufen kannst du jederzeit. Statt Rechnungen gibt es ") +
-            t("Meilensteine für verdientes Gold (je 1 Segen). Mit dem Neuanfang fängst du von vorn an und bekommst die Hälfte der ") +
-            t("Mondblüten, die die Meilensteine als Rechnungen bringen würden. Keine Erfolge. Eigener Spielstand, wählbar im Hauptmenü. ") +
-            t("Mit dem Unterstützer-Paket ist sie später sofort frei."),
+        beschreibung: t("Keine Rechnungen, unendliche Entwicklung: Bau deinen Hof so groß, wie du willst. Keine Energie: Tag und Nacht laufen einfach weiter, einkaufen kannst du jederzeit. Statt Rechnungen gibt es Meilensteine für verdientes Gold (je 1 Segen). Mit dem Neuanfang fängst du von vorn an und bekommst die Hälfte der Mondblüten, die die Meilensteine als Rechnungen bringen würden. Keine Erfolge. Eigener Spielstand, wählbar im Hauptmenü. Mit dem Unterstützer-Paket ist sie später sofort frei."),
         info: frei ? t("Freigeschaltet") : tf("Einmalig {0} Mondblüten", zahl(SANDBOX_KONFIG.preis)),
         knopfText: frei ? (run.sandbox ? t("Endlos neu starten") : t("Zu Endlos")) : tf("{0} Mondblüten", zahl(SANDBOX_KONFIG.preis)),
         aktiv: frei || meta.mondblueten >= SANDBOX_KONFIG.preis,
