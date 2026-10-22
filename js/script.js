@@ -5134,6 +5134,7 @@ const sfxStumm = $("sfx-stumm");
 function zeigeLautstaerken() {
     reglerMusik.value = Math.round(einstellungen.musik * 100);
     reglerSfx.value = Math.round(einstellungen.sfx * 100);
+    [reglerMusik, reglerSfx].forEach(regler => regler.style.setProperty("--wert", regler.value + "%"));
     musikStumm.textContent = einstellungen.musik > 0 ? "🎵" : "🔇";
     sfxStumm.textContent = einstellungen.sfx > 0 ? "🔊" : "🔇";
     musikStumm.classList.toggle("aus", einstellungen.musik <= 0);
