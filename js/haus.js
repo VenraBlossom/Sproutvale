@@ -1398,14 +1398,15 @@ function renderHaus(inhalt) {
         else status = aktiv ? t("✓ Ausgewählt") : t("Auswählen");
         const knopfText = !frei ? (kategorie === "musik" ? t("🎧 Probehören") : t("👀 Anprobieren")) : null;
 
+        const mitGems = istEinzelKaufbar(eintrag, kategorie);
         kachel.append(
             el("div", "haus-seltenheit", seltenheit.name),
             el("div", "haus-bild", null, [kosmetikBild(kategorie, eintrag)]),
-            el("div", "haus-name", eintrag.name),
-            el("div", "haus-status", status)
+            el("div", "haus-name", eintrag.name)
         );
+        if (!mitGems || vorschau) kachel.appendChild(el("div", "haus-status", status));
         if (knopfText && !vorschau) kachel.appendChild(el("div", "haus-testen", knopfText));
-        if (istEinzelKaufbar(eintrag, kategorie)) kachel.appendChild(kaufKnopf(kategorie, eintrag, () => renderHaus(inhalt)));
+        if (mitGems) kachel.appendChild(kaufKnopf(kategorie, eintrag, () => renderHaus(inhalt)));
         kachel.addEventListener("click", () => waehleKosmetik(kategorie, eintrag, inhalt));
         raster.appendChild(kachel);
     });

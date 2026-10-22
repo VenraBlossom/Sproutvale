@@ -2161,8 +2161,9 @@ function renderProfil() {
         zeigeFigurBild(mini, figurTeileAus(probe, false), "stehen", 0, false, "vorne");
         kachel.appendChild(mini.huelle);
         kachel.appendChild(el("div", "profil-kachel-name", teil.name));
-        kachel.appendChild(el("div", "profil-kachel-status", frei ? (teil.fx ? "✨ " + seltenheit.name : seltenheit.name) : "🔒 " + dlcPreisText(teil)));
-        if (istEinzelKaufbar(teil, kategorie)) kachel.appendChild(kaufKnopf(kategorie, teil, () => {
+        const mitGems = istEinzelKaufbar(teil, kategorie);
+        if (!mitGems) kachel.appendChild(el("div", "profil-kachel-status", frei ? (teil.fx ? "✨ " + seltenheit.name : seltenheit.name) : "🔒 " + dlcPreisText(teil)));
+        if (mitGems) kachel.appendChild(kaufKnopf(kategorie, teil, () => {
             if (!profilVorschau) return;
             profilVorschau[profilKategorie] = teil.id;
             profil().teile[profilKategorie] = teil.id;
