@@ -1,7 +1,7 @@
 "use strict";
 
 
-const { app, BrowserWindow, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, shell, session } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const https = require("https");
@@ -463,6 +463,8 @@ ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
 steam.starte();
 
 app.whenReady().then(() => {
+    const erlaubt = ["clipboard-sanitized-write", "fullscreen"];
+    session.defaultSession.setPermissionRequestHandler((_inhalt, recht, antwort) => antwort(erlaubt.includes(recht)));
     tresor.setzeSteamDlc(steam.dlcBesitz().includes("unterstuetzer"));
     erstelleFenster();
     beobachteSpielordner();
