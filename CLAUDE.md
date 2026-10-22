@@ -53,7 +53,15 @@ RUNS=8 TAGE=70 KPS=4 desktop-app/node_modules/.bin/electron werkzeuge/sim-electr
 
 Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nur teurere Rechnungen.
 
-**Letzte Messung** (nach Mondlicht und Pokalen zum Zusammenzählen, Läufe nicht fertig):
+**Neueste Messung (22.10.2026, 14 Runs geplant, nach 2 bis 3 Runs abgebrochen):**
+
+- Ohne Änderung: Holz 28 Min (zu früh), Gold 2 Std 21 Min (passt), Platin 3 Std 35 Min (zu früh, Run 2 schafft 10 Rechnungen).
+- 20% weniger Gold + spätere Rechnungen x23 (Patch `goldMulti` x0.8, `KONFIG.rechnungFaktor = 23`): Holz 51 Min (passt),
+  Gold nach 1 Std 42 Min noch nicht erreicht. 25% weniger Gold + x22: Holz 49 Min. Nur die 4. Rechnung teurer: bringt nichts (29 Min).
+- Idee für den nächsten Versuch: frühes Gold etwas weniger (Holz später), spätere Rechnungen leicht teurer oder Pokale später,
+  damit Platin bei etwa 5,5 Std liegt. Läufe brauchen mehrere Stunden. Der Nutzer will nicht, dass ungefragt Electron auf seinem PC läuft.
+
+**Ältere Messung** (nach Mondlicht und Pokalen zum Zusammenzählen, Läufe nicht fertig):
 
 - Variante A, Pokale wie im Code: Holz nach etwa 28 Min, Gold nach etwa 2 Std. Platin und Kristall noch nicht erreicht.
 - Variante B, Pokale später (Gold 8., Platin 13., Kristall 17. Rechnung): Gold nach etwa 3,5 Std.
@@ -87,7 +95,7 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 
 - Steamworks: App-ID, Erfolge (`werkzeuge/steam-erfolge.csv`), DLC, Gem-Pakete eintragen, dann Gem-Shop fertig machen.
 - Beta-Sachen (BETAVALE, Beta-Hinweise) später vor dem richtigen Release herausnehmen.
-- Balancing (siehe oben), Glücksspiel prüfen: VIP-Karte (unbegrenzt) plus Münzwurf mit 70% Glück ist sehr stark.
+- Balancing (siehe oben). Glücksspiel: VIP-Karte ist jetzt +5 Spiele pro Pause; Münzwurf bis 70% bleibt eine starke Gold-Quelle.
 - Übersetzungen von Muttersprachlern gegenlesen lassen (vor allem Japanisch, Chinesisch, Koreanisch, Türkisch).
 
 ## Ideen für danach
