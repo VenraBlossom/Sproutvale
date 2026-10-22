@@ -12873,3 +12873,78 @@ body.ohne-effekte #menue-strahlen,
 body.ohne-effekte .logo-buehne {
     animation: none;
 }
+
+:where(.feld:not(.feld-fertig):not(.feld-leer)) .feld-sprite {
+    transform-origin: 50% 95%;
+    animation: pflanze-wiegen 3.4s ease-in-out infinite;
+}
+
+:where(.feld:nth-child(3n)) .feld-sprite { animation-delay: -1.1s; }
+:where(.feld:nth-child(3n + 1)) .feld-sprite { animation-delay: -2.3s; }
+
+@keyframes pflanze-wiegen {
+    0%, 100% { rotate: -2deg; }
+    50% { rotate: 2deg; }
+}
+
+.zaehler-hops {
+    animation: zaehler-hops 0.28s ease-out;
+}
+
+@keyframes zaehler-hops {
+    0% { scale: 1; }
+    40% { scale: 1.08; }
+    100% { scale: 1; }
+}
+
+#energie-balken {
+    position: relative;
+    overflow: hidden;
+}
+
+#energie-fuellung {
+    position: relative;
+}
+
+#energie-fuellung::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%) no-repeat;
+    background-size: 40% 100%;
+    animation: energie-schimmer 3.2s ease-in-out infinite;
+}
+
+@keyframes energie-schimmer {
+    0% { background-position: -60% 0; }
+    60%, 100% { background-position: 170% 0; }
+}
+
+.knopf:not(:disabled) {
+    transition: filter 0.1s, translate 0.1s steps(2);
+}
+
+.knopf:hover:not(:disabled) {
+    translate: 0 -2px;
+}
+
+.knopf:active:not(:disabled) {
+    translate: 0 1px;
+}
+
+.overlay:not(.versteckt) > .pergament,
+.overlay:not(.versteckt) > .profil-rahmen,
+.overlay:not(.versteckt) > .segen-rahmen {
+    animation: fenster-auf 0.28s cubic-bezier(0.2, 1.35, 0.4, 1);
+}
+
+@keyframes fenster-auf {
+    0% { scale: 0.85; opacity: 0; }
+    100% { scale: 1; opacity: 1; }
+}
+
+body.ohne-effekte :where(.feld:not(.feld-fertig)) .feld-sprite,
+body.ohne-effekte #energie-fuellung::after,
+body.ohne-effekte .zaehler-hops {
+    animation: none;
+}

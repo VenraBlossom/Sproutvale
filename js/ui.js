@@ -348,6 +348,17 @@ function zaehleHoch(element, zielwert, format = zahl) {
         element.textContent = format(zielwert);
         return;
     }
+    const chip = element.parentElement;
+    if (chip && !chip.classList.contains("zaehler-hops") && !einstellungen.wenigerEffekte) {
+        chip.classList.add("zaehler-hops");
+        const ende = event => {
+            if (event.animationName !== "zaehler-hops") return;
+            chip.classList.remove("zaehler-hops");
+            chip.removeEventListener("animationend", ende);
+        };
+        chip.addEventListener("animationend", ende);
+        setTimeout(() => chip.classList.remove("zaehler-hops"), 600);
+    }
     if (z.laeuft) return;
     z.laeuft = true;
     const schritt = jetzt => {
