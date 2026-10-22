@@ -56,6 +56,9 @@ Vorbereitet ist der Weg über den Inventar-Dienst (kein eigener Server nötig):
 1. In Steamworks den Inventar-Dienst einschalten und drei Gegenstände anlegen: `gems_100`, `gems_500`, `gems_1100` mit Preis.
 2. Die Gegenstands-Nummern in `desktop-app/steam.js` bei `STEAM_KONFIG.gemPakete` eintragen.
 3. Danach öffnet der Kaufen-Knopf das Steam-Overlay mit dem Gegenstand. Die Gutschrift kommt, wenn Steam den Kauf meldet.
+4. Grenze des Tresors: Sein Schlüssel steckt in der App (das geht nicht anders). Wer sich auskennt, kann ihn herausholen und
+   sich Gems in die Datei schreiben. Ganz sicher wird es erst, wenn der Gem-Stand bei jedem Start aus dem Steam-Inventar
+   gelesen wird (dort kann niemand schummeln). Das beim Fertigmachen des Gem-Shops so bauen.
 
 ## Duo online (wichtig vor dem Verkauf)
 

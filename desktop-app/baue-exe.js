@@ -176,7 +176,7 @@ async function baue() {
         ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/dist-steam($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/,
             /^\/steam_appid\.txt$/],
         extraResource: extra,
-        appCopyright: "Venray Studios",
+        appCopyright: "© 2026 Venray Studios",
         win32metadata: {
             CompanyName: "Venray Studios",
             ProductName: "Sproutvale",
