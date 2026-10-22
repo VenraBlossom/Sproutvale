@@ -34,6 +34,7 @@ const RELEASE = process.argv.includes("--release") || STEAM;
 function istSpielDatei(name) {
     if (name.startsWith("_") || name.startsWith(".")) return false;
     if (["js", "css", "assets", "fonts"].includes(name)) return true;
+    if (name === "LIZENZ-SCHRIFTEN.txt") return true; // Lizenz der Schriften muss mit (OFL), andere .txt nicht
     return /\.(html|js|css|png|jpg|ogg|mp3|wav|woff2?)$/i.test(name);
 }
 
