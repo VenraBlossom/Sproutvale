@@ -130,3 +130,6 @@ Die Werbung erscheint nur, wenn der Spieler selbst auf den Knopf drückt. Es gib
 - Für Verkäufe: Gewerbe, Impressum, Datenschutzerklärung (Duo: IP-Adressen über PeerJS/Google, siehe oben; bei Werbung zusätzlich die Einwilligung nach DSGVO,
   AdMob bringt dafür ein eigenes Fenster mit).
 - Steam und die App-Stores kümmern sich um die Mehrwertsteuer im Ausland.
+- Schriften (Fredoka, Pixelify Sans, Jersey 15) laufen unter der SIL Open Font License: `assets/fonts/LIZENZ-SCHRIFTEN.txt` muss mit ins Spiel (passiert beim Bauen automatisch).
+- Die Instrumente der Musik (`js/klangproben.js`) stammen aus Versilian Studios Chamber Orchestra 2, Community Edition, Lizenz CC0.
+  Damit gibt es keine Pflichten, die Nennung im Feedback-Reiter ist freiwillig. Neu erzeugen mit `node werkzeuge/erzeuge-klangproben.js`.
