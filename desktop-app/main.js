@@ -483,8 +483,10 @@ ipcMain.on("update-anwenden", () => {
 });
 ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
 
+// Steam vor "ready" starten: das Steam-Overlay (Umschalt+Tab, auch fuer Kaeufe) laesst sich in Electron nur vorher einschalten
+steam.starte();
+
 app.whenReady().then(() => {
-    steam.starte();
     // Unterstuetzer-Paket auf Steam gekauft? Das zaehlt bei jedem Start neu (nicht aus einer Datei)
     tresor.setzeSteamDlc(steam.dlcBesitz().includes("unterstuetzer"));
     erstelleFenster();
