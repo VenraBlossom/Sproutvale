@@ -19,6 +19,7 @@ Gearbeitet wird im Branch **Beta**.
   zusammengesetzt (`t("Noch ") + n + t(" Tage")` geht in Japanisch, Türkisch usw. nicht). Übersetzungen in **alle 14** Dateien
   `js/sprache-xx.js` eintragen (en, es, fr, it, pt, nl, pl, tr, ru, uk, ja, zh, ko). Fehlt eine, erscheint Englisch.
 - Prüfen mit `node werkzeuge/pruefe-uebersetzung.js` (`--sprache=ja` nur eine Sprache, `--aufraeumen` löscht veraltete Einträge).
+- Tresor testen (ohne Electron): `node werkzeuge/teste-tresor.js`. Neue Texte in alle Sprachen: `node werkzeuge/uebersetzung-eintragen.js texte.json`.
 - `desktop-app/geheim.txt` (Schlüssel für den Tresor mit Käufen und Gems) nie hochladen, nie ändern, nie löschen.
 - Debug-Menü nur zum Testen: `DEBUG_ERLAUBT = true` in `js/daten.js`, vor dem Commit wieder `false`.
 - Sterne im Stellarium haben feste Positionen (`STERN_POSITIONEN`). Nach Änderungen `pruefeSternbild()` prüfen
