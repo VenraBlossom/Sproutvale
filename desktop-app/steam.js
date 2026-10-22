@@ -7,7 +7,8 @@
 //
 // So wird Steam eingeschaltet (Anleitung auch in STEAM-UND-HANDY.md im Projektordner):
 //   1. Im Ordner desktop-app:  npm install steamworks.js
-//   2. Die App-ID von Steamworks in desktop-app/steam_appid.txt schreiben (nur die Zahl)
+//   2. Die App-ID von Steamworks unten in STEAM_KONFIG.appId eintragen (zum Testen ohne Steam zusaetzlich in
+//      desktop-app/steam_appid.txt, die kommt nicht mit in die Steam-Version)
 //   3. Die DLC-App-ID des Unterstuetzer-Pakets in STEAM_KONFIG.dlc eintragen
 //   4. Die Erfolge in Steamworks anlegen (Liste: node werkzeuge/steam-erfolge.js)
 // Die Erfolg-IDs kommen aus dem Spiel (steamErfolgId in script.js), z.B. "GOLD_1", "RECHNUNG_3", "POKAL_HOLZ".
@@ -17,6 +18,8 @@ const fs = require("fs");
 const path = require("path");
 
 const STEAM_KONFIG = {
+    // App-ID des Spiels aus Steamworks (0 = noch nicht angelegt). Muss hier stehen: die Steam-Version hat keine steam_appid.txt.
+    appId: 0,
     // DLC-App-IDs aus Steamworks (0 = noch nicht angelegt)
     dlc: { unterstuetzer: 0 },
     // Gems: Steam kennt keine "Waehrung im Spiel" ohne eigenen Server. Vorbereitet ist der Weg ueber
@@ -29,8 +32,12 @@ let client = null;
 let appId = 0;
 const gemeldet = new Set();
 
+// Woher die App-ID kommt: Umgebungsvariable zum Testen, sonst STEAM_KONFIG.appId, sonst die Kennung, die Steam beim
+// Starten selbst setzt (SteamAppId), sonst steam_appid.txt (nur zum Testen ausserhalb von Steam)
 function leseAppId() {
     if (process.env.SPROUTVALE_STEAM_APPID) return Number(process.env.SPROUTVALE_STEAM_APPID) || 0;
+    if (STEAM_KONFIG.appId) return STEAM_KONFIG.appId;
+    if (process.env.SteamAppId) return Number(process.env.SteamAppId) || 0;
     const kandidaten = [path.join(__dirname, "steam_appid.txt")];
     if (process.resourcesPath) kandidaten.push(path.join(process.resourcesPath, "steam_appid.txt"));
     for (const datei of kandidaten) {

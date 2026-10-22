@@ -35,7 +35,8 @@ Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
 
 1. Bei Steamworks anmelden (100 $ Gebühr pro Spiel) und die App anlegen. Du bekommst eine **App-ID** (eine Zahl).
 2. Im Ordner `desktop-app` einmal ausführen: `npm install steamworks.js`
-3. Die App-ID in die Datei `desktop-app/steam_appid.txt` schreiben (nur die Zahl).
+3. Die App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen. Nur zum Testen ohne Steam zusätzlich in
+   `desktop-app/steam_appid.txt` (die kommt absichtlich nicht mit in die Steam-Version).
 4. In Steamworks unter "Statistiken und Errungenschaften" die Erfolge anlegen. Die Namen und Beschreibungen stehen in
    `werkzeuge/steam-erfolge.csv`. Der **API-Name** muss genau so heißen wie in der ersten Spalte (z.B. `GOLD_1`).
    Neu erzeugen geht mit: `desktop-app\node_modules\.bin\electron werkzeuge\steam-erfolge.js`

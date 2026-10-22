@@ -171,7 +171,8 @@ async function baue() {
         arch: "x64",
         icon,
         overwrite: true,
-        asar: true,
+        // Programmdateien (z.B. von steamworks.js) koennen nicht aus dem Archiv geladen werden: entpackt lassen
+        asar: { unpack: "**/*.{node,dll,so,dylib}" },
         prune: true,
         ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/dist-steam($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/,
             /^\/steam_appid\.txt$/],
