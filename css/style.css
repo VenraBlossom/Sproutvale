@@ -12791,7 +12791,8 @@ body.menue-offen #jahreszeit-ebene * {
 .menue-spaziergaenger {
     position: absolute;
     bottom: 0;
-    left: -10%;
+    left: 0;
+    will-change: translate;
     animation: menue-spazieren 46s linear infinite;
 }
 
@@ -12814,11 +12815,11 @@ body.menue-offen #jahreszeit-ebene * {
 }
 
 @keyframes menue-spazieren {
-    0% { left: -10%; }
-    46% { left: 104%; }
-    50% { left: 104%; }
-    96% { left: -10%; }
-    100% { left: -10%; }
+    0% { translate: -10vw 0; }
+    46% { translate: 104vw 0; }
+    50% { translate: 104vw 0; }
+    96% { translate: -10vw 0; }
+    100% { translate: -10vw 0; }
 }
 
 @keyframes menue-umdrehen {
