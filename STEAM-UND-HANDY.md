@@ -26,7 +26,7 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 |---|---|
 | Steam-Erfolge | Das Spiel meldet jeden Erfolg und jeden Pokal an Steam. Beim Start trägt es auch alte Erfolge nach. |
 | Liste der Erfolge | `werkzeuge/steam-erfolge.csv`: alle Erfolge mit Namen in allen 14 Sprachen (Spalten heißen wie in Steamworks: german, english, schinese, ...) |
-| Sprachen | Deutsch, Englisch, Spanisch, Französisch, Italienisch, Portugiesisch (Brasilien), Niederländisch, Polnisch, Türkisch, Russisch, Ukrainisch, Japanisch, Chinesisch (vereinfacht), Koreanisch. Beim ersten Start nimmt das Spiel die Sprache des Systems. |
+| Sprachen | Deutsch, Englisch, Spanisch, Französisch, Italienisch, Portugiesisch (Brasilien), Niederländisch, Polnisch, Türkisch, Russisch, Ukrainisch, Japanisch, Chinesisch (vereinfacht), Koreanisch. Beim ersten Start ist Englisch eingestellt, umstellen geht in den Einstellungen unter Sprache. |
 | Käufe sicher | Gems, gekaufte Skins, Unterstützer-Paket und Codes liegen verschlüsselt im Tresor (`save/tresor.dat`), nicht im Spielstand. Das Spiel selbst kann sie nur lesen und ausgeben. Das Steam-DLC wird bei jedem Start neu geprüft. |
 | Debug-Menü | Aus. Zum Testen in `js/daten.js` `DEBUG_ERLAUBT = true` setzen (nie so veröffentlichen). |
 | Steam-Status | Im Steam-Freundesfenster steht z.B. "Tag 12 · 3 Rechnungen bezahlt" |

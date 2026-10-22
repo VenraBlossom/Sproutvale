@@ -27,8 +27,7 @@ const SPRACHE = (() => {
     } catch (fehler) {
         console.warn("Sprache nicht lesbar", fehler);
     }
-    const system = (navigator.languages || [navigator.language || ""]).map(l => String(l).toLowerCase().slice(0, 2));
-    return system.find(id => SPRACHEN.some(s => s.id === id)) || "en";
+    return "en";
 })();
 
 const SPRACH_LOCALE = { en: "en-US", de: "de-DE", es: "es-ES", fr: "fr-FR", it: "it-IT", pt: "pt-BR", nl: "nl-NL", pl: "pl-PL",
