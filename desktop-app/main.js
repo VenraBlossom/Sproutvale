@@ -391,7 +391,9 @@ function merkeFensterStand() {
         }
         const vollbild = fenster.isFullScreen();
         const maximiert = fenster.isMaximized();
-        const b = vollbild || maximiert ? vorher : fenster.getContentBounds();
+        const aussen = fenster.getBounds();
+        const [breite, hoehe] = fenster.getContentSize();
+        const b = vollbild || maximiert ? vorher : { x: aussen.x, y: aussen.y, width: breite, height: hoehe };
         fs.writeFileSync(FENSTER_DATEI, JSON.stringify({ vollbild, maximiert, x: b.x, y: b.y, width: b.width, height: b.height }));
     } catch (fehler) {
         console.warn("Fenstergroesse konnte nicht gemerkt werden:", fehler.message);
