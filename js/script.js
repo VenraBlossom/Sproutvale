@@ -2830,7 +2830,8 @@ function renderErfolge() {
     erfolgeContent.appendChild(erstelleHinweis(
         tf("🏆 {0} von {1} Stufen geschafft{2}. Jede geschaffte Stufe gibt dir 1 Kuschel-Gutschein für den Kuschel-Automaten im Mondteich. Leuchtende Erfolge anklicken, um den Gutschein abzuholen.{3}", fertig, alle, (sandbox ? t(" (Endlos)") : t(" (Story)")), (offen > 0 && !aktiv ? t(" Abholen kannst du sie, wenn du in diesem Modus spielst.") : ""))));
 
-    erfolgKettenFuer(sandbox).forEach(kette => {
+    const rang = kette => abholbareStufen(kette, m).length > 0 ? 0 : kette.ziele.every((_, i) => m.erfolge[erfolgStufeId(kette, i)]) ? 2 : 1;
+    erfolgKettenFuer(sandbox).map((kette, i) => ({ kette, i, r: rang(kette) })).sort((a, b) => a.r - b.r || a.i - b.i).forEach(({ kette }) => {
         const offenIndex = kette.ziele.findIndex((_, i) => !m.erfolge[erfolgStufeId(kette, i)]);
         const item = el("div", "erfolg");
         const text = el("span", "erfolg-text");
