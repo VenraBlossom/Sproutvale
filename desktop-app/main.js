@@ -1,7 +1,7 @@
 "use strict";
 
 
-const { app, BrowserWindow, ipcMain, shell, session } = require("electron");
+const { app, BrowserWindow, ipcMain, shell, session, screen } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const https = require("https");
@@ -364,10 +364,47 @@ ipcMain.on("tresor-entwickler", (event, art, wert) => {
 ipcMain.on("entwickler", event => { event.returnValue = ENTWICKLER; });
 ipcMain.on("speicher-oeffnen", () => shell.openPath(SPEICHER_ORDNER));
 
+const FENSTER_DATEI = path.join(app.getPath("userData"), "fenster.json");
+
+function liesFensterStand() {
+    try {
+        const stand = JSON.parse(fs.readFileSync(FENSTER_DATEI, "utf8"));
+        if (stand.vollbild !== false) return { vollbild: true };
+        const passt = screen.getAllDisplays().some(anzeige => {
+            const b = anzeige.workArea;
+            return stand.x >= b.x - 50 && stand.y >= b.y - 50 && stand.x + 200 <= b.x + b.width && stand.y + 100 <= b.y + b.height;
+        });
+        return passt ? stand : { vollbild: false };
+    } catch (fehler) {
+        return { vollbild: true };
+    }
+}
+
+function merkeFensterStand() {
+    if (!fenster || fenster.isDestroyed()) return;
+    try {
+        let vorher = {};
+        try {
+            vorher = JSON.parse(fs.readFileSync(FENSTER_DATEI, "utf8"));
+        } catch (fehler) {
+            vorher = {};
+        }
+        const vollbild = fenster.isFullScreen();
+        const maximiert = fenster.isMaximized();
+        const b = vollbild || maximiert ? vorher : fenster.getContentBounds();
+        fs.writeFileSync(FENSTER_DATEI, JSON.stringify({ vollbild, maximiert, x: b.x, y: b.y, width: b.width, height: b.height }));
+    } catch (fehler) {
+        console.warn("Fenstergroesse konnte nicht gemerkt werden:", fehler.message);
+    }
+}
+
 function erstelleFenster() {
+    const stand = liesFensterStand();
     fenster = new BrowserWindow({
-        width: 1600,
-        height: 900,
+        width: stand.width || 1600,
+        height: stand.height || 900,
+        x: stand.x,
+        y: stand.y,
         minWidth: 1280,
         minHeight: 720,
         useContentSize: true,
@@ -375,7 +412,7 @@ function erstelleFenster() {
         title: "Sproutvale",
         icon: path.join(ORDNER, "assets", "Icon.png"),
         autoHideMenuBar: true,
-        fullscreen: true,
+        fullscreen: stand.vollbild,
         show: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
@@ -387,6 +424,8 @@ function erstelleFenster() {
     });
     fenster.setAspectRatio(16 / 9);
     fenster.setMenuBarVisibility(false);
+    if (stand.maximiert && !stand.vollbild) fenster.maximize();
+    fenster.on("close", merkeFensterStand);
     const startseite = path.join(ORDNER, "index.html");
     if (fs.existsSync(startseite)) {
         fenster.loadFile(startseite);
