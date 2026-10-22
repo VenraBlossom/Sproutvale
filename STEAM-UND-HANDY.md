@@ -136,3 +136,18 @@ Die Werbung erscheint nur, wenn der Spieler selbst auf den Knopf drückt. Es gib
 - Schriften (Fredoka, Pixelify Sans, Jersey 15) laufen unter der SIL Open Font License: `assets/fonts/LIZENZ-SCHRIFTEN.txt` muss mit ins Spiel (passiert beim Bauen automatisch).
 - Die Instrumente der Musik (`js/klangproben.js`) stammen aus Versilian Studios Chamber Orchestra 2, Community Edition, Lizenz CC0.
   Damit gibt es keine Pflichten, die Nennung im Feedback-Reiter ist freiwillig. Neu erzeugen mit `node werkzeuge/erzeuge-klangproben.js`.
+
+## Trailer
+
+Fertige Dateien liegen nur lokal in `steam-bilder/trailer/` (zu groß fürs Repo):
+
+- `sproutvale-trailer.mp4`: 55 s, 1920x1080, 30 fps, mit Musik.
+- `sproutvale-trailer-ohne-musik.mp4`: gleiches Bild ohne Ton, zum eigenen Abmischen mit Sprache.
+- `sproutvale-trailer-musik.wav`: nur die Musik (112 bpm, Schnitte liegen auf den Takten).
+
+Neu bauen (Chrome und ffmpeg nötig, Pfade oben in den Skripten):
+
+1. `node werkzeuge/trailer/clips.js` nimmt alle Szenen auf (oder nur einzelne: `node werkzeuge/trailer/clips.js kombo pokal`).
+2. `node werkzeuge/trailer/musik.js` erzeugt die Musik aus den Klangproben.
+3. `node werkzeuge/trailer/endtext.js` erzeugt das Bild "WISHLIST NOW ON STEAM".
+4. `node werkzeuge/trailer/schnitt.js` schneidet `trailer-ohne-ton.mp4` nach dem `PLAN` (Clip, Startsekunde, Takte, Zoom).

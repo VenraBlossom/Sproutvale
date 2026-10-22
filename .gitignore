@@ -23,3 +23,13 @@ handy-app/ios/
 desktop-app/geheim.txt
 werkzeuge/node_modules/
 _bilder/
+
+steam-bilder/trailer/
+werkzeuge/trailer/clips/
+werkzeuge/trailer/frames/
+werkzeuge/trailer/*.mp4
+werkzeuge/trailer/*.wav
+werkzeuge/trailer/*.raw
+werkzeuge/trailer/*.mp3
+werkzeuge/trailer/*.png
+werkzeuge/trailer/*.html
