@@ -11,7 +11,7 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 4. Erfolge aus `werkzeuge/steam-erfolge.csv` anlegen (API-Namen genau übernehmen), alle 14 Sprachen eintragen.
 5. Unterstützer-Paket als DLC anlegen, DLC-App-ID in `STEAM_KONFIG.dlc.unterstuetzer`.
 6. Gem-Shop fertig machen (Gem-Stand aus dem Steam-Inventar lesen, siehe unten).
-7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder, Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
+7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder aus `steam-bilder` (Screenshots 1920×1080, Kapseln in allen Steam-Größen, Erfolgsbilder; Entwürfe, gern noch nachbessern), Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
 8. Steam Cloud einschalten (siehe unten). Unterstützte Sprachen: alle 14.
 9. Beta-Sachen herausnehmen, wenn es keine Beta mehr ist (BETAVALE-Code, "Beta" in der Versionsanzeige).
 10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Version erhöhen und Neuigkeiten eintragen.
