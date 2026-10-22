@@ -57,6 +57,20 @@ Vorbereitet ist der Weg über den Inventar-Dienst (kein eigener Server nötig):
 2. Die Gegenstands-Nummern in `desktop-app/steam.js` bei `STEAM_KONFIG.gemPakete` eintragen.
 3. Danach öffnet der Kaufen-Knopf das Steam-Overlay mit dem Gegenstand. Die Gutschrift kommt, wenn Steam den Kauf meldet.
 
+## Duo online (wichtig vor dem Verkauf)
+
+Das Duo verbindet die Spieler direkt (WebRTC). Zum Finden nutzt es den **kostenlosen öffentlichen Server von PeerJS**
+(`0.peerjs.com`) und die STUN-Server von Google (Einstellungen oben in `js/koop.js`, `KOOP_KONFIG`).
+
+- Der öffentliche Server hat keine Garantie: Ist er überlastet oder weg, geht kein Duo.
+- Es gibt keinen TURN-Server. Hinter manchen Routern (z.B. Mobilfunk, Firmennetz) klappt die direkte Verbindung nicht.
+- Datenschutz: Beim Duo sehen sich die Spieler gegenseitig die IP-Adresse, und PeerJS bzw. Google bekommen sie auch.
+  Das muss in die Datenschutzerklärung.
+
+Empfehlung: Für Steam später die Verbindung über **Steam Networking** (Steam-Relay, mit steamworks.js) laufen lassen.
+Dann gibt es keine fremden Server, keine IP-Weitergabe und Freunde können sich über die Steam-Freundesliste einladen.
+Bis dahin: eigenen PeerJS-Server betreiben (kostenlos bei kleinem Bedarf) und nur `server` in `KOOP_KONFIG` ändern.
+
 ## Promocode
 
 `BETAVALE` gibt den Beta-Tester-Begleiter, das BETA-Shirt und Endlos (keine weiteren Skins). Jeder Code geht nur einmal pro PC.
@@ -89,6 +103,6 @@ Die Werbung erscheint nur, wenn der Spieler selbst auf den Knopf drückt. Es gib
 
 ## Was du rechtlich brauchst (kurz)
 
-- Für Verkäufe: Gewerbe, Impressum, Datenschutzerklärung (bei Werbung zusätzlich die Einwilligung nach DSGVO,
+- Für Verkäufe: Gewerbe, Impressum, Datenschutzerklärung (Duo: IP-Adressen über PeerJS/Google, siehe oben; bei Werbung zusätzlich die Einwilligung nach DSGVO,
   AdMob bringt dafür ein eigenes Fenster mit).
 - Steam und die App-Stores kümmern sich um die Mehrwertsteuer im Ausland.

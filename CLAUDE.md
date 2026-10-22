@@ -96,6 +96,8 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - Steamworks: App-ID, Erfolge (`werkzeuge/steam-erfolge.csv`), DLC, Gem-Pakete eintragen, dann Gem-Shop fertig machen.
 - Beta-Sachen (BETAVALE, Beta-Hinweise) später vor dem richtigen Release herausnehmen.
 - Balancing (siehe oben). Glücksspiel: VIP-Karte ist jetzt +5 Spiele pro Pause; Münzwurf bis 70% bleibt eine starke Gold-Quelle.
+- Duo läuft über den öffentlichen PeerJS-Server ohne TURN (siehe `STEAM-UND-HANDY.md`), für Steam besser Steam Networking.
+- Shop-Texte für Steam: `STEAM-SHOPTEXTE.md`.
 - Übersetzungen von Muttersprachlern gegenlesen lassen (vor allem Japanisch, Chinesisch, Koreanisch, Türkisch).
 
 ## Ideen für danach
