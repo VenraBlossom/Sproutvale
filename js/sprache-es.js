@@ -2684,5 +2684,7 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 partidas por pausa en todos los juegos de azar.",
     "Noch mehr Spiele pro Pause": "Aún más partidas por pausa",
     "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "La sala existe, pero la conexión directa no funciona. Quizá un router o un cortafuegos la bloquea. Probad con otra red.",
-    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fuentes: Fredoka, Pixelify Sans y Jersey 15 (SIL Open Font License 1.1)."
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fuentes: Fredoka, Pixelify Sans y Jersey 15 (SIL Open Font License 1.1).",
+    "🎻 Echte Instrumente in der Musik": "🎻 Instrumentos reales en la música",
+    "Instrumente: Versilian Studios Chamber Orchestra 2, Community Edition (CC0).": "Instrumentos: Versilian Studios Chamber Orchestra 2, Community Edition (CC0)."
 });

@@ -2683,6 +2683,8 @@ Object.assign(UEBERSETZUNG, {
     "🌍 Sprache / Language": "🌍 Language",
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "The game reloads briefly when you switch the language.",
     "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "The lobby exists, but the direct connection doesn't work. A router or firewall may be blocking it. Try a different network.",
-    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fonts: Fredoka, Pixelify Sans and Jersey 15 (SIL Open Font License 1.1)."
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fonts: Fredoka, Pixelify Sans and Jersey 15 (SIL Open Font License 1.1).",
+    "🎻 Echte Instrumente in der Musik": "🎻 Real instruments in the music",
+    "Instrumente: Versilian Studios Chamber Orchestra 2, Community Edition (CC0).": "Instruments: Versilian Studios Chamber Orchestra 2, Community Edition (CC0)."
 });
 

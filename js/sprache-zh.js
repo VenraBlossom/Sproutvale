@@ -2685,5 +2685,7 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "+5 Spiele pro Pause bei allen Glücksspielen.": "所有博彩游戏每次休息 +5 局。",
     "Noch mehr Spiele pro Pause": "每次休息可玩更多局",
     "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "大厅存在，但无法建立直接连接。可能是路由器或防火墙阻止了连接。请换一个网络试试。",
-    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "字体：Fredoka、Pixelify Sans 和 Jersey 15（SIL Open Font License 1.1）。"
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "字体：Fredoka、Pixelify Sans 和 Jersey 15（SIL Open Font License 1.1）。",
+    "🎻 Echte Instrumente in der Musik": "🎻 音乐使用真实乐器",
+    "Instrumente: Versilian Studios Chamber Orchestra 2, Community Edition (CC0).": "乐器：Versilian Studios Chamber Orchestra 2, Community Edition（CC0）。"
 });

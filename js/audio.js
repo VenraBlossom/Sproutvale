@@ -6,7 +6,7 @@ const EINSTELLUNGEN_KEY = "sproutvale_einstellungen";
 function ladeEinstellungen() {
     const standard = {
         musik: 0.4, sfx: 0.6, sprache: SPRACHE,
-        wackeln: true, blitze: true, farbenblind: false, crt: false, tipps: true, jahreszeitTeilchen: true, wenigerEffekte: false, ohneTexte: false, musikTitel: "auto"
+        wackeln: true, blitze: true, farbenblind: false, crt: false, tipps: true, jahreszeitTeilchen: true, wenigerEffekte: false, ohneTexte: false, musikTitel: "auto", echteInstrumente: true
     };
     try {
         const daten = JSON.parse(localStorage.getItem(EINSTELLUNGEN_KEY));
@@ -261,6 +261,8 @@ const Klang = {
     naechstesLiedId: "sproutvale",
     tempoFaktor: 1,
     regenQuelle: null,
+    proben: {},
+    probenFertig: {},
 
     start() {
         if (this.ctx) {
@@ -309,7 +311,80 @@ const Klang = {
 
         this.rauschen = this.erzeugeRauschen();
         this.setzeLautstaerken();
+        this.ladeProben();
         this.starteMusik();
+    },
+
+    ladeProben() {
+        if (typeof KLANGPROBEN === "undefined") return;
+        Object.entries(KLANGPROBEN).forEach(([name, liste]) => {
+            const fertig = [];
+            liste.forEach(([note, staerke, daten]) => {
+                let bytes;
+                try {
+                    const text = atob(daten);
+                    bytes = new Uint8Array(text.length);
+                    for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i);
+                } catch (fehler) {
+                    return;
+                }
+                const gelungen = puffer => {
+                    fertig.push({ note, staerke, puffer: this.schneideStille(puffer) });
+                    if (fertig.length === liste.length) {
+                        this.proben[name] = fertig.sort((a, b) => a.note - b.note);
+                        this.probenFertig[name] = true;
+                    }
+                };
+                try {
+                    const versuch = this.ctx.decodeAudioData(bytes.buffer, gelungen, () => {});
+                    if (versuch && versuch.catch) versuch.catch(() => {});
+                } catch (fehler) {
+                    return;
+                }
+            });
+        });
+    },
+
+    schneideStille(puffer) {
+        const daten = puffer.getChannelData(0);
+        let anfang = 0;
+        while (anfang < daten.length && Math.abs(daten[anfang]) < 0.004) anfang++;
+        anfang = Math.max(0, anfang - 24);
+        if (anfang === 0 || anfang >= daten.length - 1) return puffer;
+        const neu = this.ctx.createBuffer(puffer.numberOfChannels, puffer.length - anfang, puffer.sampleRate);
+        for (let kanal = 0; kanal < puffer.numberOfChannels; kanal++) neu.getChannelData(kanal).set(puffer.getChannelData(kanal).subarray(anfang));
+        return neu;
+    },
+
+    probe(name, zeit, note, dauer, lautstaerke, bus, hall = 0, echo = 0) {
+        if (einstellungen.echteInstrumente === false || !this.probenFertig[name]) return false;
+        const liste = this.proben[name];
+        let beste = liste[0];
+        if (note) liste.forEach(p => { if (Math.abs(p.note - note) < Math.abs(beste.note - note)) beste = p; });
+        const ctx = this.ctx;
+        const quelle = ctx.createBufferSource();
+        quelle.buffer = beste.puffer;
+        const tempo = note ? Math.pow(2, (note - beste.note) / 12) : 1;
+        quelle.playbackRate.value = tempo;
+        const ende = Math.min(zeit + dauer, zeit + beste.puffer.duration / tempo);
+        const huelle = ctx.createGain();
+        const staerke = Math.max(0.0002, lautstaerke * beste.staerke);
+        huelle.gain.setValueAtTime(staerke, zeit);
+        huelle.gain.setValueAtTime(staerke, Math.max(zeit, ende - 0.25));
+        huelle.gain.exponentialRampToValueAtTime(0.0001, ende);
+        quelle.connect(huelle);
+        quelle.start(zeit);
+        quelle.stop(ende + 0.02);
+        this.verbinde(huelle, bus, hall, echo);
+        return true;
+    },
+
+    musikTon(art, zeit, note, dauer, lautstaerke, hall, echo = 0) {
+        const bus = this.musikBus;
+        const klingen = art === "glocke" ? Math.max(1.2, dauer * 1.6) : Math.max(0.6, dauer * 1.5);
+        if (this.probe(art, zeit, note, klingen, lautstaerke, bus, hall, echo)) return;
+        if (art === "glocke") this.glocke(zeit, midiZuFrequenz(note), dauer, lautstaerke, bus, hall, echo);
+        else this.zupfen(zeit, midiZuFrequenz(note), dauer, lautstaerke, bus, hall, echo);
     },
 
     erzeugeHall(sekunden) {
@@ -426,6 +501,7 @@ const Klang = {
     },
 
     bass(zeit, note, dauer, lautstaerke) {
+        if (this.probe("bass", zeit, note + 12, Math.max(0.5, dauer), lautstaerke * 0.9, this.musikBus, 0.1)) return;
         const ctx = this.ctx;
         const huelle = ctx.createGain();
         huelle.gain.setValueAtTime(0.0001, zeit);
@@ -443,6 +519,7 @@ const Klang = {
     },
 
     kick(zeit, lautstaerke, bus = this.musikBus) {
+        if (this.probe("trommel", zeit, 0, 0.4, lautstaerke, bus)) return;
         const ctx = this.ctx;
         const osz = ctx.createOscillator();
         const huelle = ctx.createGain();
@@ -813,7 +890,9 @@ const Klang = {
                 [2, 6].forEach(i => this.rauschStoss(zeitVon(i), 0.07, 0.06, 2500, bus, 0.05));
                 break;
             case "schlitten":
-                for (let i = 0; i < n; i++) this.rauschStoss(zeitVon(i), 0.08, i % 2 ? 0.025 : 0.04, 9000, bus, 0.2);
+                for (let i = 0; i < n; i++) {
+                    if (!this.probe("schellen", zeitVon(i), 0, 0.5, i % 2 ? 0.06 : 0.1, bus, 0.2)) this.rauschStoss(zeitVon(i), 0.08, i % 2 ? 0.025 : 0.04, 9000, bus, 0.2);
+                }
                 break;
             default:
                 break;
@@ -823,20 +902,20 @@ const Klang = {
             case "zupfen":
                 [0, 2, 4, 6].forEach((i, k) => {
                     const note = akkord.toene[k % akkord.toene.length] + 12;
-                    this.zupfen(zeitVon(i), midiZuFrequenz(note), achtel * 1.5, 0.045, bus, 0.35);
+                    this.musikTon("marimba", zeitVon(i), note, achtel * 1.5, 0.045, 0.35);
                 });
                 break;
             case "arpeggio":
                 for (let i = 0; i < n; i++) {
                     const note = akkord.toene[i % akkord.toene.length] + 12;
-                    this.zupfen(zeitVon(i), midiZuFrequenz(note), achtel * 1.4, 0.032, bus, 0.4);
+                    this.musikTon("harfe", zeitVon(i), note, achtel * 1.4, 0.032, 0.4);
                 }
                 break;
             case "stabs":
-                [2, 6].forEach(i => akkord.toene.forEach(note => this.zupfen(zeitVon(i), midiZuFrequenz(note + 12), achtel * 0.9, 0.028, bus, 0.2)));
+                [2, 6].forEach(i => akkord.toene.forEach(note => this.musikTon("marimba", zeitVon(i), note + 12, achtel * 0.9, 0.028, 0.2)));
                 break;
             case "walzer":
-                [2, 4].forEach(i => akkord.toene.forEach(note => this.zupfen(zeitVon(i), midiZuFrequenz(note + 12), achtel * 1.2, 0.026, bus, 0.35)));
+                [2, 4].forEach(i => akkord.toene.forEach(note => this.musikTon("marimba", zeitVon(i), note + 12, achtel * 1.2, 0.026, 0.35)));
                 break;
             default:
                 break;
@@ -846,8 +925,8 @@ const Klang = {
         melodie.forEach(([note, laenge]) => {
             if (note) {
                 const zeit = zeitVon(position);
-                if (lied.melodie === "glocke") this.glocke(zeit, midiZuFrequenz(note), achtel * laenge * 1.2, 0.1, bus, 0.5, 0.35);
-                else this.zupfen(zeit, midiZuFrequenz(note), achtel * laenge * 1.3, 0.13, bus, 0.45, 0.35);
+                if (lied.melodie === "glocke") this.musikTon("glocke", zeit, note, achtel * laenge * 1.2, 0.1, 0.5, 0.35);
+                else this.musikTon("harfe", zeit, note, achtel * laenge * 1.3, 0.13, 0.45, 0.35);
             }
             position += laenge;
         });
@@ -858,7 +937,7 @@ document.addEventListener("pointerdown", () => Klang.start(), { once: true });
 
 (function drossleToene() {
     const intern = new Set(["start", "erzeugeHall", "erzeugeRauschen", "setzeLautstaerken", "verbinde", "zupfen", "glocke", "flaeche",
-        "bass", "kick", "rauschStoss", "plopp", "arpeggio", "glockenspiel", "bereit", "regen", "starteMusik", "waehleLied",
+        "bass", "kick", "rauschStoss", "plopp", "ladeProben", "schneideStille", "probe", "musikTon", "arpeggio", "glockenspiel", "bereit", "regen", "starteMusik", "waehleLied",
         "setzeTempoFaktor", "planeMusik", "spieleTakt"]);
     const zuletzt = {};
     let fensterStart = 0;

@@ -2685,5 +2685,7 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 spellen per pauze bij alle kansspelen.",
     "Noch mehr Spiele pro Pause": "Nog meer spellen per pauze",
     "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "De lobby bestaat, maar de directe verbinding lukt niet. Misschien blokkeert een router of firewall hem. Probeer een ander netwerk.",
-    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Lettertypen: Fredoka, Pixelify Sans en Jersey 15 (SIL Open Font License 1.1)."
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Lettertypen: Fredoka, Pixelify Sans en Jersey 15 (SIL Open Font License 1.1).",
+    "🎻 Echte Instrumente in der Musik": "🎻 Echte instrumenten in de muziek",
+    "Instrumente: Versilian Studios Chamber Orchestra 2, Community Edition (CC0).": "Instrumenten: Versilian Studios Chamber Orchestra 2, Community Edition (CC0)."
 });
