@@ -2688,5 +2688,6 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Tu partida Infinita vuelve a empezar en el día 1; antes puedes comprar en el Estanque lunar.",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 partidas por pausa en todos los juegos de azar.",
     "Noch mehr Spiele pro Pause": "Aún más partidas por pausa",
-    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "La sala existe, pero la conexión directa no funciona. Quizá un router o un cortafuegos la bloquea. Probad con otra red."
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "La sala existe, pero la conexión directa no funciona. Quizá un router o un cortafuegos la bloquea. Probad con otra red.",
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Fuentes: Fredoka, Pixelify Sans y Jersey 15 (SIL Open Font License 1.1)."
 });

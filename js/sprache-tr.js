@@ -2689,5 +2689,6 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "Tüm şans oyunlarında mola başına +5 oyun.",
     "Noch mehr Spiele pro Pause": "Mola başına daha da çok oyun",
-    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Lobi var ama doğrudan bağlantı kurulamıyor. Bir modem ya da güvenlik duvarı engelliyor olabilir. Başka bir ağ deneyin."
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Lobi var ama doğrudan bağlantı kurulamıyor. Bir modem ya da güvenlik duvarı engelliyor olabilir. Başka bir ağ deneyin.",
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Yazı tipleri: Fredoka, Pixelify Sans ve Jersey 15 (SIL Open Font License 1.1)."
 });

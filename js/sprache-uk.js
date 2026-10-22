@@ -2689,5 +2689,6 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 ігор за перерву в усіх азартних іграх.",
     "Noch mehr Spiele pro Pause": "Ще більше ігор за перерву",
-    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Лобі існує, але пряме з'єднання не встановлюється. Можливо, його блокує роутер або брандмауер. Спробуйте іншу мережу."
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Лобі існує, але пряме з'єднання не встановлюється. Можливо, його блокує роутер або брандмауер. Спробуйте іншу мережу.",
+    "Schriften: Fredoka, Pixelify Sans und Jersey 15 (SIL Open Font License 1.1).": "Шрифти: Fredoka, Pixelify Sans і Jersey 15 (SIL Open Font License 1.1)."
 });
