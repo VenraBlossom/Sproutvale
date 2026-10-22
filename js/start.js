@@ -948,6 +948,23 @@ document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
         setTimeout(() => flieger.remove(), 23000);
     }, 4200);
 
+    setInterval(() => {
+        if (!offen() || einstellungen.wenigerEffekte || Math.random() < 0.5) return;
+        const schwarm = el("div", "vogel-schwarm" + (Math.random() < 0.5 ? " links" : ""));
+        const anzahl = 3 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < anzahl; i++) {
+            const vogel = el("span", "vogel");
+            vogel.style.left = i * 18 + (Math.random() - 0.5) * 8 + "px";
+            vogel.style.top = Math.abs(i - anzahl / 2) * 7 + "px";
+            vogel.style.animationDelay = -Math.random() * 0.5 + "s";
+            schwarm.appendChild(vogel);
+        }
+        schwarm.style.top = 4 + Math.random() * 18 + "%";
+        schwarm.style.animationDuration = 16 + Math.random() * 8 + "s";
+        leben.appendChild(schwarm);
+        setTimeout(() => schwarm.remove(), 25000);
+    }, 11000);
+
     const buehne = menue.querySelector(".logo-buehne");
     if (!buehne) return;
     const funkeln = () => {
