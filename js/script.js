@@ -1619,6 +1619,7 @@ function pflanzeSamen(feld) {
     feld.el.nameEl.textContent = pflanze.name;
     feld.el.balkenInnen.style.width = "0%";
     zeigeFeldSprite(feld);
+    federeFeld(feld, [1, 1.05, 0.97, 1]);
 
     if (level("pr_" + pflanze.id) > 0 || Math.random() < 0.1 * segen("keimsegen")) wachseEineStufe(feld);
 
@@ -1630,6 +1631,11 @@ function pflanzeSamen(feld) {
         const { x, rect } = feldMitte(feld);
         zeigeSchwebeText(x, rect.top, t("🗼 Blitz!"), "#7c2fc2", false);
     }
+}
+
+function federeFeld(feld, stufen) {
+    if (einstellungen.wenigerEffekte || !feld.el || !feld.el.feldDiv.animate) return;
+    feld.el.feldDiv.animate(stufen.map(wert => ({ scale: String(wert) })), { duration: 260, easing: "ease-out" });
 }
 
 function pflanzeAufZufaelligeFelder(anzahl) {
@@ -1813,6 +1819,7 @@ function ernteFeld(feld, direkt, goldFaktor = 1) {
 
     if (!direkt) {
         Klang.ernte(pflanze.index);
+        federeFeld(feld, [1, 0.9, 1.06, 1]);
         partikel(x, y, ["#6cc24a", "#3f8a32", "#a3dc6f", "#8f6139"], 12, 55);
     }
     const energie = pflanze.eigenschaft === "wachmacher" ? 1 : pflanzenBonus(pflanze, "sonnenblume") ? 2 :
