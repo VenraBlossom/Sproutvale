@@ -1299,6 +1299,13 @@ function zeichneMenueHintergrund() {
         const pflanzen = ["weizen", "karotte", "kartoffel", "erdbeere", "tomate", "mais", "kuerbis", "sonnenblume"];
         const feld = erde.width;
         const abstand = 3;
+        let ebene = document.getElementById("menue-pflanzen");
+        if (!ebene) {
+            ebene = el("div");
+            ebene.id = "menue-pflanzen";
+            hauptmenue.insertBefore(ebene, hauptmenue.firstChild);
+        }
+        ebene.innerHTML = "";
         for (let reihe = 0; reihe < 3; reihe++) {
             const y = wieseY + 6 + reihe * (feld + abstand);
             if (y + feld > H) break;
@@ -1309,7 +1316,17 @@ function zeichneMenueHintergrund() {
                 if (x < -feld || x > W) continue;
                 g.drawImage(erde, x, y);
                 const art = pflanzen[(reihe * 5 + spalte * 3) % pflanzen.length];
-                if ((reihe + spalte) % 4 !== 3) g.drawImage(spriteLeinwand(art), x, y);
+                if ((reihe + spalte) % 4 === 3) continue;
+                const pflanze = document.createElement("img");
+                pflanze.alt = "";
+                pflanze.className = "menue-pflanze";
+                pflanze.src = spriteUrl(art);
+                pflanze.style.left = (x / W) * 100 + "%";
+                pflanze.style.top = (y / H) * 100 + "%";
+                pflanze.style.width = (feld / W) * 100 + "%";
+                pflanze.style.height = (feld / H) * 100 + "%";
+                pflanze.style.animationDelay = -((reihe * 7 + spalte * 3) % 11) * 0.37 + "s";
+                ebene.appendChild(pflanze);
             }
         }
         hauptmenue.style.backgroundImage = "url(" + leinwand.toDataURL() + ")";
