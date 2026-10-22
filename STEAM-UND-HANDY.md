@@ -58,7 +58,8 @@ Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
    `desktop-app/steam_appid.txt` (die kommt absichtlich nicht mit in die Steam-Version).
 4. In Steamworks unter "Statistiken und Errungenschaften" die Erfolge anlegen. Die Namen und Beschreibungen stehen in
    `werkzeuge/steam-erfolge.csv`. Der **API-Name** muss genau so heißen wie in der ersten Spalte (z.B. `GOLD_1`).
-   Neu erzeugen geht mit: `desktop-app\node_modules\.bin\electron werkzeuge\steam-erfolge.js`
+   Neu erzeugen geht ohne Electron mit: `node werkzeuge/steam-erfolge.js` (vorher einmal `cd werkzeuge && npm install`).
+   Die Bilder für die Erfolge (256×256, erreicht und gesperrt) erzeugt `node werkzeuge/steam-erfolge-bilder.js` nach `steam-bilder/erfolge`.
 5. Unterstützer-Paket: in Steamworks ein DLC anlegen und dessen App-ID in `desktop-app/steam.js` bei
    `STEAM_KONFIG.dlc.unterstuetzer` eintragen.
 6. Für den Steam-Status ("Rich Presence") in Steamworks den Text `#Status` mit `{#Status}` bzw. `%status%` anlegen.

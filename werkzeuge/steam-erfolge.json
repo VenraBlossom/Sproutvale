@@ -1,0 +1,894 @@
+[
+ {
+  "api": "GOLD_1",
+  "icon": "💰",
+  "stufe": 0,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_2",
+  "icon": "💰",
+  "stufe": 1,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_3",
+  "icon": "💰",
+  "stufe": 2,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_4",
+  "icon": "💰",
+  "stufe": 3,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_5",
+  "icon": "💰",
+  "stufe": 4,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_6",
+  "icon": "💰",
+  "stufe": 5,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_7",
+  "icon": "💰",
+  "stufe": 6,
+  "stufen": 8
+ },
+ {
+  "api": "GOLD_8",
+  "icon": "💰",
+  "stufe": 7,
+  "stufen": 8
+ },
+ {
+  "api": "ERNTE_1",
+  "icon": "🌾",
+  "stufe": 0,
+  "stufen": 6
+ },
+ {
+  "api": "ERNTE_2",
+  "icon": "🌾",
+  "stufe": 1,
+  "stufen": 6
+ },
+ {
+  "api": "ERNTE_3",
+  "icon": "🌾",
+  "stufe": 2,
+  "stufen": 6
+ },
+ {
+  "api": "ERNTE_4",
+  "icon": "🌾",
+  "stufe": 3,
+  "stufen": 6
+ },
+ {
+  "api": "ERNTE_5",
+  "icon": "🌾",
+  "stufe": 4,
+  "stufen": 6
+ },
+ {
+  "api": "ERNTE_6",
+  "icon": "🌾",
+  "stufe": 5,
+  "stufen": 6
+ },
+ {
+  "api": "RECHNUNG_1",
+  "icon": "🧾",
+  "stufe": 0,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_2",
+  "icon": "🧾",
+  "stufe": 1,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_3",
+  "icon": "🧾",
+  "stufe": 2,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_4",
+  "icon": "🧾",
+  "stufe": 3,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_5",
+  "icon": "🧾",
+  "stufe": 4,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_6",
+  "icon": "🧾",
+  "stufe": 5,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_7",
+  "icon": "🧾",
+  "stufe": 6,
+  "stufen": 8
+ },
+ {
+  "api": "RECHNUNG_8",
+  "icon": "🧾",
+  "stufe": 7,
+  "stufen": 8
+ },
+ {
+  "api": "BOSS_1",
+  "icon": "🏦",
+  "stufe": 0,
+  "stufen": 5
+ },
+ {
+  "api": "BOSS_2",
+  "icon": "🏦",
+  "stufe": 1,
+  "stufen": 5
+ },
+ {
+  "api": "BOSS_3",
+  "icon": "🏦",
+  "stufe": 2,
+  "stufen": 5
+ },
+ {
+  "api": "BOSS_4",
+  "icon": "🏦",
+  "stufe": 3,
+  "stufen": 5
+ },
+ {
+  "api": "BOSS_5",
+  "icon": "🏦",
+  "stufe": 4,
+  "stufen": 5
+ },
+ {
+  "api": "KOMBO_1",
+  "icon": "🥁",
+  "stufe": 0,
+  "stufen": 5
+ },
+ {
+  "api": "KOMBO_2",
+  "icon": "🥁",
+  "stufe": 1,
+  "stufen": 5
+ },
+ {
+  "api": "KOMBO_3",
+  "icon": "🥁",
+  "stufe": 2,
+  "stufen": 5
+ },
+ {
+  "api": "KOMBO_4",
+  "icon": "🥁",
+  "stufe": 3,
+  "stufen": 5
+ },
+ {
+  "api": "KOMBO_5",
+  "icon": "🥁",
+  "stufe": 4,
+  "stufen": 5
+ },
+ {
+  "api": "JACKPOT_1",
+  "icon": "🌟",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "JACKPOT_2",
+  "icon": "🌟",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "JACKPOT_3",
+  "icon": "🌟",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "JACKPOT_4",
+  "icon": "🌟",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "SPEZIAL_1",
+  "icon": "✨",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "SPEZIAL_2",
+  "icon": "✨",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "SPEZIAL_3",
+  "icon": "✨",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "SPEZIAL_4",
+  "icon": "✨",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "FELDER_1",
+  "icon": "🟫",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "FELDER_2",
+  "icon": "🟫",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "FELDER_3",
+  "icon": "🟫",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "FELDER_4",
+  "icon": "🟫",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "PFLANZEN_1",
+  "icon": "🥕",
+  "stufe": 0,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_2",
+  "icon": "🥕",
+  "stufe": 1,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_3",
+  "icon": "🥕",
+  "stufe": 2,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_4",
+  "icon": "🥕",
+  "stufe": 3,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_5",
+  "icon": "🥕",
+  "stufe": 4,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_6",
+  "icon": "🥕",
+  "stufe": 5,
+  "stufen": 7
+ },
+ {
+  "api": "PFLANZEN_7",
+  "icon": "🥕",
+  "stufe": 6,
+  "stufen": 7
+ },
+ {
+  "api": "TAROT_1",
+  "icon": "🔮",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "TAROT_2",
+  "icon": "🔮",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "TAROT_3",
+  "icon": "🔮",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "TAROT_4",
+  "icon": "🔮",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "KUSCHEL_1",
+  "icon": "🧸",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "KUSCHEL_2",
+  "icon": "🧸",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "KUSCHEL_3",
+  "icon": "🧸",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "KUSCHEL_4",
+  "icon": "🧸",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "STERNE_1",
+  "icon": "🌠",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "STERNE_2",
+  "icon": "🌠",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "STERNE_3",
+  "icon": "🌠",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "STERNE_4",
+  "icon": "🌠",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "GLUEHWUERMCHEN_1",
+  "icon": "🪲",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "GLUEHWUERMCHEN_2",
+  "icon": "🪲",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "GLUEHWUERMCHEN_3",
+  "icon": "🪲",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "GLUEHWUERMCHEN_4",
+  "icon": "🪲",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "KRAEHEN_1",
+  "icon": "🐦",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "KRAEHEN_2",
+  "icon": "🐦",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "KRAEHEN_3",
+  "icon": "🐦",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "KRAEHEN_4",
+  "icon": "🐦",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "WETTER_1",
+  "icon": "🌦️",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "WETTER_2",
+  "icon": "🌦️",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "WETTER_3",
+  "icon": "🌦️",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "WETTER_4",
+  "icon": "🌦️",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "GOLDREGEN_1",
+  "icon": "🌧️",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "GOLDREGEN_2",
+  "icon": "🌧️",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "GOLDREGEN_3",
+  "icon": "🌧️",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "GLUECKSSPIEL_1",
+  "icon": "🎲",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "GLUECKSSPIEL_2",
+  "icon": "🎲",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "GLUECKSSPIEL_3",
+  "icon": "🎲",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "GLUECKSSPIEL_4",
+  "icon": "🎲",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "WERKZEUGE_1",
+  "icon": "🧰",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "WERKZEUGE_2",
+  "icon": "🧰",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "WERKZEUGE_3",
+  "icon": "🧰",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "STERNENFALL_1",
+  "icon": "☄️",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENFALL_2",
+  "icon": "☄️",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENFALL_3",
+  "icon": "☄️",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENFALL_4",
+  "icon": "☄️",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "MEISTER_1",
+  "icon": "🏅",
+  "stufe": 0,
+  "stufen": 6
+ },
+ {
+  "api": "MEISTER_2",
+  "icon": "🏅",
+  "stufe": 1,
+  "stufen": 6
+ },
+ {
+  "api": "MEISTER_3",
+  "icon": "🏅",
+  "stufe": 2,
+  "stufen": 6
+ },
+ {
+  "api": "MEISTER_4",
+  "icon": "🏅",
+  "stufe": 3,
+  "stufen": 6
+ },
+ {
+  "api": "MEISTER_5",
+  "icon": "🏅",
+  "stufe": 4,
+  "stufen": 6
+ },
+ {
+  "api": "MEISTER_6",
+  "icon": "🏅",
+  "stufe": 5,
+  "stufen": 6
+ },
+ {
+  "api": "MONDPHASE_1",
+  "icon": "🌕",
+  "stufe": 0,
+  "stufen": 5
+ },
+ {
+  "api": "MONDPHASE_2",
+  "icon": "🌕",
+  "stufe": 1,
+  "stufen": 5
+ },
+ {
+  "api": "MONDPHASE_3",
+  "icon": "🌕",
+  "stufe": 2,
+  "stufen": 5
+ },
+ {
+  "api": "MONDPHASE_4",
+  "icon": "🌕",
+  "stufe": 3,
+  "stufen": 5
+ },
+ {
+  "api": "MONDPHASE_5",
+  "icon": "🌕",
+  "stufe": 4,
+  "stufen": 5
+ },
+ {
+  "api": "STREICHELN_1",
+  "icon": "🐾",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "STREICHELN_2",
+  "icon": "🐾",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "STREICHELN_3",
+  "icon": "🐾",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "STREICHELN_4",
+  "icon": "🐾",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "KODEX_1",
+  "icon": "📖",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "KODEX_2",
+  "icon": "📖",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "KODEX_3",
+  "icon": "📖",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "KODEX_4",
+  "icon": "📖",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENSAMEN_1",
+  "icon": "✨",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENSAMEN_2",
+  "icon": "✨",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENSAMEN_3",
+  "icon": "✨",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "STERNENSAMEN_4",
+  "icon": "✨",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "TAGE_1",
+  "icon": "📅",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "TAGE_2",
+  "icon": "📅",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "TAGE_3",
+  "icon": "📅",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "TAGE_4",
+  "icon": "📅",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "STELLARIUM_1",
+  "icon": "🌌",
+  "stufe": 0,
+  "stufen": 4
+ },
+ {
+  "api": "STELLARIUM_2",
+  "icon": "🌌",
+  "stufe": 1,
+  "stufen": 4
+ },
+ {
+  "api": "STELLARIUM_3",
+  "icon": "🌌",
+  "stufe": 2,
+  "stufen": 4
+ },
+ {
+  "api": "STELLARIUM_4",
+  "icon": "🌌",
+  "stufe": 3,
+  "stufen": 4
+ },
+ {
+  "api": "SEGENSAMMLER_1",
+  "icon": "🙏",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "SEGENSAMMLER_2",
+  "icon": "🙏",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "SEGENSAMMLER_3",
+  "icon": "🙏",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "POKALE_1",
+  "icon": "🏆",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "POKALE_2",
+  "icon": "🏆",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "POKALE_3",
+  "icon": "🏆",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "BRIEFE_1",
+  "icon": "📬",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "BRIEFE_2",
+  "icon": "📬",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "BRIEFE_3",
+  "icon": "📬",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "EVOLUTIONEN_1",
+  "icon": "🧬",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "EVOLUTIONEN_2",
+  "icon": "🧬",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "EVOLUTIONEN_3",
+  "icon": "🧬",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "HERAUSFORDERER_1",
+  "icon": "🏆",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "HERAUSFORDERER_2",
+  "icon": "🏆",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "HERAUSFORDERER_3",
+  "icon": "🏆",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "FIEBER_1",
+  "icon": "🔥",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "FIEBER_2",
+  "icon": "🔥",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "FIEBER_3",
+  "icon": "🔥",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "STILE_1",
+  "icon": "🏡",
+  "stufe": 0,
+  "stufen": 2
+ },
+ {
+  "api": "STILE_2",
+  "icon": "🏡",
+  "stufe": 1,
+  "stufen": 2
+ },
+ {
+  "api": "PAKTIERER_1",
+  "icon": "⚠️",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "PAKTIERER_2",
+  "icon": "⚠️",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "PAKTIERER_3",
+  "icon": "⚠️",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "FRUEHZAHLER_1",
+  "icon": "🧾",
+  "stufe": 0,
+  "stufen": 3
+ },
+ {
+  "api": "FRUEHZAHLER_2",
+  "icon": "🧾",
+  "stufe": 1,
+  "stufen": 3
+ },
+ {
+  "api": "FRUEHZAHLER_3",
+  "icon": "🧾",
+  "stufe": 2,
+  "stufen": 3
+ },
+ {
+  "api": "POKAL_HOLZ",
+  "pokal": "holz"
+ },
+ {
+  "api": "POKAL_GOLD",
+  "pokal": "gold"
+ },
+ {
+  "api": "POKAL_PLATIN",
+  "pokal": "platin"
+ },
+ {
+  "api": "POKAL_KRISTALL",
+  "pokal": "kristall"
+ }
+]
