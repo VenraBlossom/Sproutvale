@@ -1530,7 +1530,7 @@ function aktualisiereHaustier(dtMs, jetzt) {
 
     if (haustier.zustand === "laufen") {
         const tempo = haustier.ball ? 90 : 40;
-        const schritt = (tempo / topBar.clientWidth) * 100 * (dtMs / 1000);
+        const schritt = (tempo / topBarMasse.breite) * 100 * (dtMs / 1000);
         const rest = haustier.zielX - haustier.x;
         if (Math.abs(rest) <= schritt) {
             haustier.x = haustier.zielX;

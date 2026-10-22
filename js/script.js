@@ -958,6 +958,7 @@ function preisText(betrag, waehrung) {
 const $ = id => document.getElementById(id);
 
 const topBar = $("top-bar");
+const topBarMasse = { breite: 1, hoehe: 1 };
 const himmelEl = $("himmel");
 const himmelSterne = $("himmel-sterne");
 const sonneEl = $("sonne");
@@ -1149,7 +1150,7 @@ function aktualisiereHimmel(dtMs) {
     himmelEl.style.background = "linear-gradient(" + oben + ", " + unten + ")";
     himmelEl.style.filter = trueb ? "saturate(0.35) brightness(0.8)" : "";
 
-    const hoehe = topBar.clientHeight;
+    const hoehe = topBarMasse.hoehe > 1 ? topBarMasse.hoehe : topBar.clientHeight;
     const horizont = hoehe * 0.55;
     const gipfel = 62;
 
@@ -4859,6 +4860,12 @@ function frageModusReset(sandbox) {
     });
 }
 
+(function pausiereHofImMenue() {
+    const pruefe = () => document.body.classList.toggle("menue-offen", !hauptmenue.classList.contains("versteckt"));
+    new MutationObserver(pruefe).observe(hauptmenue, { attributes: true, attributeFilter: ["class"] });
+    pruefe();
+})();
+
 (function schmueckeHauptmenue() {
     const wolken = $("menue-wolken");
     for (let i = 0; i < 4; i++) {
@@ -5661,6 +5668,8 @@ let letzteZeit = performance.now();
 function hauptSchleife(jetzt) {
     const dtMs = Math.min(250, jetzt - letzteZeit);
     letzteZeit = jetzt;
+    topBarMasse.breite = topBar.clientWidth || 1;
+    topBarMasse.hoehe = topBar.clientHeight || 1;
 
     if (!spielPausiert()) {
         meta.lebenszeit.spielzeitMs = (meta.lebenszeit.spielzeitMs || 0) + dtMs;

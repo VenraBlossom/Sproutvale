@@ -1754,7 +1754,7 @@ function aktualisiereFigur(f, dtMs, jetzt) {
         }
     }
     if (f.zustand === "laufen") {
-        const schritt = ((f.art === "mensch" ? 34 : 40) / topBar.clientWidth) * 100 * (dtMs / 1000);
+        const schritt = ((f.art === "mensch" ? 34 : 40) / topBarMasse.breite) * 100 * (dtMs / 1000);
         const rest = f.zielX - f.x;
         if (Math.abs(rest) <= schritt) {
             f.x = f.zielX;
@@ -1852,7 +1852,7 @@ function figurFunkeln(f, teile) {
 }
 
 function aktualisiereFiguren(dtMs, jetzt) {
-    if (!hofEbene) return;
+    if (!hofEbene || !hauptmenue.classList.contains("versteckt")) return;
     let eigene = figuren.find(f => f.art === "mensch" && !f.partner);
     if (!eigene) eigene = neueFigur("mensch", { teile: profil().teile });
     eigene.teile = profil().teile;

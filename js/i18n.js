@@ -7,7 +7,7 @@ const SPRACHEN = [
     { id: "es", name: "Español" },
     { id: "fr", name: "Français" },
     { id: "it", name: "Italiano" },
-    { id: "pt", name: "Português (Brasil)" },
+    { id: "pt", name: "Português" },
     { id: "nl", name: "Nederlands" },
     { id: "pl", name: "Polski" },
     { id: "tr", name: "Türkçe" },

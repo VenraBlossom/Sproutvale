@@ -12720,3 +12720,14 @@ input[type="range"] {
     border-radius: 0;
     box-shadow: 0 0 0 2px #7a1418, 0 3px 0 2px #4a0c0e;
 }
+
+body.menue-offen #top-bar,
+body.menue-offen #top-bar *,
+body.menue-offen #field-grid,
+body.menue-offen #field-grid *,
+body.menue-offen #nacht-schleier,
+body.menue-offen #wetter-schleier,
+body.menue-offen #jahreszeit-ebene,
+body.menue-offen #jahreszeit-ebene * {
+    animation-play-state: paused !important;
+}
