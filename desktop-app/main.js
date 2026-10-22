@@ -411,9 +411,15 @@ function erstelleFenster() {
         }
     });
 
+    const istWebseite = url => /^https?:\/\//i.test(url);
     fenster.webContents.setWindowOpenHandler(({ url }) => {
-        shell.openExternal(url);
+        if (istWebseite(url)) shell.openExternal(url);
         return { action: "deny" };
+    });
+    fenster.webContents.on("will-navigate", (event, url) => {
+        if (url.startsWith("file:") || url.startsWith("data:")) return;
+        event.preventDefault();
+        if (istWebseite(url)) shell.openExternal(url);
     });
 }
 
