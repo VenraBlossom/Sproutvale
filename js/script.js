@@ -4979,7 +4979,6 @@ document.querySelectorAll("[data-option]").forEach(schalter => {
         if (schalter.dataset.option === "tipps" && !schalter.checked) versteckeTipp();
         if (schalter.dataset.option === "farbenblind") document.body.classList.toggle("farbenblind", schalter.checked);
         if (schalter.dataset.option === "crt") document.body.classList.toggle("crt", schalter.checked);
-        if (schalter.dataset.option === "pixelZeiger") document.body.classList.toggle("system-zeiger", !schalter.checked);
         if (schalter.dataset.option === "wenigerEffekte") {
             document.body.classList.toggle("ohne-effekte", schalter.checked);
         }

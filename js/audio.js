@@ -6,7 +6,7 @@ const EINSTELLUNGEN_KEY = "sproutvale_einstellungen";
 function ladeEinstellungen() {
     const standard = {
         musik: 0.4, sfx: 0.6, sprache: SPRACHE,
-        wackeln: true, blitze: true, farbenblind: false, crt: false, tipps: true, jahreszeitTeilchen: true, wenigerEffekte: false, ohneTexte: false, musikTitel: "auto", echteInstrumente: true, pixelZeiger: true
+        wackeln: true, blitze: true, farbenblind: false, crt: false, tipps: true, jahreszeitTeilchen: true, wenigerEffekte: false, ohneTexte: false, musikTitel: "auto", echteInstrumente: true
     };
     try {
         const daten = JSON.parse(localStorage.getItem(EINSTELLUNGEN_KEY));

@@ -146,7 +146,6 @@ function wendeKosmetikAn() {
     document.body.classList.toggle("farbenblind", Boolean(einstellungen.farbenblind));
     document.body.classList.toggle("ohne-effekte", Boolean(einstellungen.wenigerEffekte));
     document.body.classList.toggle("crt", Boolean(einstellungen.crt));
-    document.body.classList.toggle("system-zeiger", einstellungen.pixelZeiger === false);
 
     haustier.letzteUrl = "";
     if (haustier.bild) zeigeHaustierBild();

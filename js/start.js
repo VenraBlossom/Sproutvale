@@ -757,6 +757,12 @@ aktualisiereProfilKnopf();
         c.rect(A.x + A.w + 14, 0, B - A.x - A.w - 14, H);
         c.clip();
         [0, 1, 3, 2].map(i => [neben[i], i]).forEach(([n, i]) => {
+            c.save();
+            if (i === 3) {
+                c.beginPath();
+                c.rect(neben[2].x + neben[2].w + 1, 0, B, H);
+                c.clip();
+            }
             px(n.sx, n.sy, n.sw, n.sh, ["#0c1a3a", "#2a0c1a", "#0c2a14", "#2a1a08"][i]);
             if (i === 2) {
             } else {
@@ -767,6 +773,7 @@ aktualisiereProfilKnopf();
             }
             for (let yy = n.sy; yy < n.sy + n.sh; yy += 2) px(n.sx, yy, n.sw, 1, "rgba(0,0,0,0.3)");
             px(n.sx - 2, n.sy - 2, n.sw + 4, n.sh + 4, farben[i] + "12");
+            c.restore();
         });
         c.restore();
         const puls = 0.08 + 0.06 * Math.sin(zeit * 4);

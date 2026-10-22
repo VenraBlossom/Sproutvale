@@ -2663,6 +2663,5 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1 planta · 🟫 {0} campos",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 {0} plantas · 🟫 {1} campos",
     "1 Rechnung": "1 factura",
-    "{0} Rechnungen": "{0} facturas",
-    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ Cursor del ratón estilo píxel"
+    "{0} Rechnungen": "{0} facturas"
 });

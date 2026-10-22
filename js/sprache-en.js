@@ -2662,7 +2662,6 @@ Object.assign(UEBERSETZUNG, {
     "🌱 1 Pflanze · 🟫 {0} Felder": "🌱 1 plant · 🟫 {0} fields",
     "🌱 {0} Pflanzen · 🟫 {1} Felder": "🌱 {0} plants · 🟫 {1} fields",
     "1 Rechnung": "1 bill",
-    "{0} Rechnungen": "{0} bills",
-    "🖱️ Mauszeiger im Pixel-Stil": "🖱️ Pixel-style mouse cursor"
+    "{0} Rechnungen": "{0} bills"
 });
 
