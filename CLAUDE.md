@@ -92,14 +92,15 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - 10 neue Sprachen, Systemsprache beim ersten Start.
 - Markt: Kaufmenge x1 / x10 / Max, Stellarium: mehrere Stufen auf einmal.
 - Käufe und Gems sicher im Tresor, Promocode BETAVALE.
-- VIP-Karte: +5 Spiele pro Pause statt unbegrenzt.
+- VIP-Karte: +5 Spiele pro Pause statt unbegrenzt. Münzwurf: 45% bis höchstens 55% Gewinnchance (vorher bis 70%).
 - Fehler behoben: Segen Sammelwut wirkte nicht, falsche Texte.
 
 ## Offen
 
 - Steamworks: App-ID, Erfolge (`werkzeuge/steam-erfolge.csv`), DLC, Gem-Pakete eintragen, dann Gem-Shop fertig machen.
 - Beta-Sachen (BETAVALE, Beta-Hinweise) später vor dem richtigen Release herausnehmen.
-- Balancing (siehe oben). Glücksspiel: VIP-Karte ist jetzt +5 Spiele pro Pause; Münzwurf bis 70% bleibt eine starke Gold-Quelle.
+- Balancing: Der Nutzer testet selbst (22.10.2026: "lass die Messung weg, ich teste das vllt in person"). Keine Simulationen starten,
+  außer er bittet darum. Glücksspiel ist entschärft (VIP-Karte +5 Spiele, Münzwurf 45% bis 55%).
 - Duo läuft über den öffentlichen PeerJS-Server ohne TURN (siehe `STEAM-UND-HANDY.md`), für Steam besser Steam Networking.
 - Shop-Texte für Steam: `STEAM-SHOPTEXTE.md`.
 - Übersetzungen von Muttersprachlern gegenlesen lassen (vor allem Japanisch, Chinesisch, Koreanisch, Türkisch).

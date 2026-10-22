@@ -1135,7 +1135,9 @@ SKILLS.forEach(def => {
 // Alle Spiele zahlen im Schnitt etwas weniger aus, als man einsetzt (Glueck macht sie besser).
 
 const GLUECKSSPIEL = {
-    muenzwurf: { proPause: 3, einsaetze: [0.1, 0.25, 0.5, 1], gewinnChance: 0.5, maxChance: 0.7 },
+    // Ohne Glueck verliert man auf Dauer leicht (45%), mit viel Glueck gewinnt man leicht (hoechstens 55%).
+    // Frueher bis 70%: damit liess sich das Gold pro Tag etwa verdoppeln (so schnell wie die Rechnungen wachsen).
+    muenzwurf: { proPause: 3, einsaetze: [0.1, 0.25, 0.5, 1], gewinnChance: 0.45, maxChance: 0.55 },
     // Rubbellos: Einsatz in Prozent deines Goldes. Gewinn = drei gleiche Symbole (Einsatz x multi).
     // chance = Wahrscheinlichkeit fuer genau diesen Gewinn, sonst Niete. Erwartungswert ca. 0,85.
     rubbellos: { proPause: 3, einsaetze: [0.05, 0.1, 0.25],
