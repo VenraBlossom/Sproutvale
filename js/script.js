@@ -4896,7 +4896,7 @@ function frageModusReset(sandbox) {
 let aktiverEinstellungsReiter = "audio";
 
 function oeffneEinstellungen(ausMenue) {
-    einstellungenHauptmenue.classList.toggle("versteckt", ausMenue);
+    einstellungenHauptmenue.classList.toggle("versteckt", Boolean(ausMenue));
     resetZeile.classList.toggle("versteckt", !ausMenue);
     einstellungenSchliessen.textContent = ausMenue ? t("Zurück") : t("Zurück zum Spiel");
     einstellungenFenster.classList.remove("versteckt");
@@ -4924,6 +4924,14 @@ function renderEinstellungen() {
     document.querySelectorAll("#einstellungen-reiter .reiter-knopf").forEach((knopf, i) => {
         knopf.dataset.reiter = reiter[i].id;
     });
+    let seitenTitel = document.getElementById("einstellungen-seitentitel");
+    if (!seitenTitel) {
+        seitenTitel = el("div", "einstellungen-seitentitel");
+        seitenTitel.id = "einstellungen-seitentitel";
+        $("einstellungen-reiter").after(seitenTitel);
+    }
+    const aktiv = reiter.find(r => r.id === aktiverEinstellungsReiter);
+    seitenTitel.textContent = aktiv ? aktiv.text : "";
     document.querySelectorAll(".einstellungs-seite").forEach(seite => {
         seite.classList.toggle("versteckt", seite.dataset.seite !== aktiverEinstellungsReiter);
     });

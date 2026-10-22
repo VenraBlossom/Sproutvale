@@ -12941,3 +12941,140 @@ body.menue-offen #werkzeug-leiste {
     width: 100%;
     height: 100%;
 }
+
+.einstellungen-rahmen,
+.einstellungen-rahmen.breit {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    column-gap: 22px;
+    width: min(1080px, calc(100% - 48px));
+    height: min(740px, calc(100vh - 64px));
+    padding: 18px 22px 16px;
+}
+
+.einstellungen-rahmen > h2 {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    font-size: 1.7em;
+    border-bottom: 3px solid rgba(138, 84, 38, 0.25);
+}
+
+.einstellungen-rahmen > #einstellungen-reiter {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+    background: rgba(138, 84, 38, 0.1);
+    box-shadow: inset 0 0 0 2px rgba(138, 84, 38, 0.18);
+}
+
+#einstellungen-reiter .reiter-knopf {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 1.05em;
+    text-align: left;
+}
+
+#einstellungen-reiter .reiter-knopf.aktiv {
+    background: linear-gradient(#7cc04a, #5a9a32);
+    border-color: #1f3a10;
+    box-shadow: inset 0 2px 0 #a8e070, inset 0 -3px 0 #3f7020, 0 3px 0 #1a3009;
+    text-shadow: 1px 1px 0 #24401a;
+    translate: 6px 0;
+}
+
+#einstellungen-reiter .reiter-knopf[data-reiter="audio"] {
+    margin-top: 14px;
+}
+
+#einstellungen-reiter .reiter-knopf[data-reiter="feedback"] {
+    margin-top: 14px;
+}
+
+.einstellungen-seitentitel {
+    grid-column: 2;
+    grid-row: 2;
+    margin-bottom: 10px;
+    font-family: var(--schrift-titel);
+    font-size: 1.45em;
+    color: var(--holz-dunkel);
+}
+
+.einstellungen-rahmen > .einstellungs-seite {
+    grid-column: 2;
+    grid-row: 3;
+    min-height: 0;
+}
+
+.einstellungen-rahmen > .einstellungs-seite:not(.versteckt) {
+    overflow-y: auto;
+    padding: 2px 8px 8px 2px;
+    animation: seite-rein 0.22s ease-out;
+}
+
+@keyframes seite-rein {
+    from { opacity: 0; translate: 10px 0; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+.einstellungen-rahmen > .einstellungen-knoepfe {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 3px solid rgba(138, 84, 38, 0.25);
+}
+
+.einstellungs-seite .einstellung {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-bottom: none;
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 0 0 2px rgba(138, 84, 38, 0.2), 0 2px 0 rgba(138, 84, 38, 0.15);
+    font-size: 1.05em;
+}
+
+.einstellungs-seite .einstellung:hover {
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.einstellungs-seite .einstellung-hinweis {
+    padding: 0 4px;
+}
+
+@media (max-height: 620px), (max-width: 900px) {
+    .einstellungen-rahmen,
+    .einstellungen-rahmen.breit {
+        grid-template-columns: 150px minmax(0, 1fr);
+        column-gap: 12px;
+        padding: 10px 12px;
+        height: calc(100vh - 24px);
+        width: calc(100% - 24px);
+    }
+    .einstellungen-rahmen > h2 {
+        font-size: 1.2em;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+    }
+    #einstellungen-reiter .reiter-knopf {
+        padding: 5px 8px;
+        font-size: 0.9em;
+    }
+    .einstellungs-seite .einstellung {
+        padding: 7px 10px;
+        margin-bottom: 5px;
+    }
+    .einstellungen-seitentitel {
+        font-size: 1.15em;
+        margin-bottom: 4px;
+    }
+}
