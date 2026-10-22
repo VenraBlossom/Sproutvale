@@ -5,7 +5,7 @@ let glueckAnimation = false;
 let glueckUeberspringen = null;
 
 function zeigeUeberspringen(element) {
-    const karte = element.closest(".spiel-karte");
+    const karte = element && element.closest(".spiel-karte");
     if (!karte) return;
     const knopf = el("button", "knopf spiel-skip", t("⏭ Überspringen"));
     knopf.addEventListener("click", () => {
