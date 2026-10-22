@@ -59,6 +59,9 @@ Der Nutzer will lieber "etwas weniger Gold, etwas günstigere Rechnungen" als nu
 - Ohne Änderung: Holz 28 Min (zu früh), Gold 2 Std 21 Min (passt), Platin 3 Std 35 Min (zu früh, Run 2 schafft 10 Rechnungen).
 - 20% weniger Gold + spätere Rechnungen x23 (Patch `goldMulti` x0.8, `KONFIG.rechnungFaktor = 23`): Holz 51 Min (passt),
   Gold nach 1 Std 42 Min noch nicht erreicht. 25% weniger Gold + x22: Holz 49 Min. Nur die 4. Rechnung teurer: bringt nichts (29 Min).
+- Zeiten ohne Änderung je Rechnung: 4. 28 Min, 5. 38 Min, 7. 2 Std 21 Min, 10. 3 Std 35 Min (Run 2 scheitert an der 11.).
+- Fertig vorbereitet: `werkzeuge/varianten/pokale-spaeter.js` (Holz 5., Platin 11. Rechnung, ohne Gold-/Preisänderung).
+  Start- und Auswertungsbefehl stehen in der Datei. Erst nach Erlaubnis des Nutzers laufen lassen (Electron).
 - Idee für den nächsten Versuch: frühes Gold etwas weniger (Holz später), spätere Rechnungen leicht teurer oder Pokale später,
   damit Platin bei etwa 5,5 Std liegt. Läufe brauchen mehrere Stunden. Der Nutzer will nicht, dass ungefragt Electron auf seinem PC läuft.
 
