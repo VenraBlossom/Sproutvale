@@ -2688,5 +2688,6 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "切换语言时游戏会短暂重新加载。",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "所有博彩游戏每次休息 +5 局。",
-    "Noch mehr Spiele pro Pause": "每次休息可玩更多局"
+    "Noch mehr Spiele pro Pause": "每次休息可玩更多局",
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "大厅存在，但无法建立直接连接。可能是路由器或防火墙阻止了连接。请换一个网络试试。"
 });

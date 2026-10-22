@@ -2688,5 +2688,6 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "Dili değiştirdiğinde oyun kısa bir süre yeniden yüklenir.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "Tüm şans oyunlarında mola başına +5 oyun.",
-    "Noch mehr Spiele pro Pause": "Mola başına daha da çok oyun"
+    "Noch mehr Spiele pro Pause": "Mola başına daha da çok oyun",
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Lobi var ama doğrudan bağlantı kurulamıyor. Bir modem ya da güvenlik duvarı engelliyor olabilir. Başka bir ağ deneyin."
 });

@@ -283,6 +283,7 @@ async function koopSignal(nachricht) {
             koopVermittlerSende({ type: "ANSWER", dst: koop.partnerId, payload: { sdp: { type: pc.localDescription.type, sdp: pc.localDescription.sdp }, ...koopPaketDaten() } });
             koop.wartendeKandidaten.splice(0).forEach(k => pc.addIceCandidate(k).catch(() => {}));
         } else if (nachricht.type === "ANSWER" && koop.pc) {
+            koop.antwortDa = true; // die Lobby gibt es, jetzt fehlt nur noch die direkte Verbindung
             await koop.pc.setRemoteDescription(payload.sdp);
             koop.wartendeKandidaten.splice(0).forEach(k => koop.pc.addIceCandidate(k).catch(() => {}));
         } else if (nachricht.type === "CANDIDATE" && koop.pc && payload.candidate) {
@@ -373,6 +374,7 @@ async function koopBeitreten(eingabe) {
     koop.rolle = "gast";
     koop.code = code;
     koop.status = t("Verbinde …");
+    koop.antwortDa = false;
     renderKoopLobby();
     try {
         setzeVermittler(await koopVermittler(KOOP_KONFIG.praefix + "g-" + zufallsCode(10)));
@@ -388,7 +390,10 @@ async function koopBeitreten(eingabe) {
     koop.verbindungsId = "dc_" + zufallsCode(12).toLowerCase();
     koopVermittlerSende({ type: "OFFER", dst: koop.partnerId, payload: { sdp: { type: pc.localDescription.type, sdp: pc.localDescription.sdp }, ...koopPaketDaten() } });
     setTimeout(() => {
-        if (koop.rolle === "gast" && !koop.verbunden && koop.code === code) koopFehler(t("Lobby nicht gefunden. Stimmt der Code?"));
+        if (koop.rolle !== "gast" || koop.verbunden || koop.code !== code) return;
+        // Hat der Host geantwortet, gibt es die Lobby: dann blockiert meist ein Router oder eine Firewall die direkte Verbindung
+        koopFehler(koop.antwortDa ? t("Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.")
+            : t("Lobby nicht gefunden. Stimmt der Code?"));
     }, 15000);
 }
 

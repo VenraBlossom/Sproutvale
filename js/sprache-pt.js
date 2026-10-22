@@ -2688,5 +2688,6 @@ if (SPRACHE === "pt") Object.assign(UEBERSETZUNG, {
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "O jogo recarrega rapidinho quando você troca de idioma.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 jogos por pausa em todos os jogos de azar.",
-    "Noch mehr Spiele pro Pause": "Ainda mais jogos por pausa"
+    "Noch mehr Spiele pro Pause": "Ainda mais jogos por pausa",
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "O lobby existe, mas a conexão direta não funciona. Talvez um roteador ou firewall esteja bloqueando. Tentem outra rede."
 });

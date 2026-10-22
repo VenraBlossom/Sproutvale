@@ -2688,5 +2688,6 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Das Spiel lädt kurz neu, wenn du die Sprache wechselst. / The game reloads briefly when you switch.": "언어를 바꾸면 게임이 잠깐 다시 불러와져요.",
     "VenraBlossom": "VenraBlossom",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "모든 도박 게임에서 휴식마다 +5판.",
-    "Noch mehr Spiele pro Pause": "휴식마다 더 많은 판"
+    "Noch mehr Spiele pro Pause": "휴식마다 더 많은 판",
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "로비는 있지만 직접 연결이 안 돼요. 공유기나 방화벽이 막고 있을 수 있어요. 다른 네트워크로 해 보세요."
 });

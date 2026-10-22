@@ -2687,5 +2687,6 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "Im Duo fangt ihr beide neu an, danach startet der Host in der Lobby das nächste Spiel.": "En Duo, vous recommencez tous les deux, puis l'hôte lance la partie suivante dans le salon.",
     "Deine Sandbox beginnt danach wieder bei Tag 1, vorher kannst du im Mondteich einkaufen.": "Ta partie Infinie recommence alors au jour 1 ; avant, tu peux faire tes achats dans l'Étang lunaire.",
     "+5 Spiele pro Pause bei allen Glücksspielen.": "+5 parties par pause à tous les jeux de hasard.",
-    "Noch mehr Spiele pro Pause": "Encore plus de parties par pause"
+    "Noch mehr Spiele pro Pause": "Encore plus de parties par pause",
+    "Die Lobby gibt es, aber die direkte Verbindung klappt nicht. Vielleicht blockiert ein Router oder eine Firewall sie. Versucht es in einem anderen Netz.": "Le salon existe, mais la connexion directe ne fonctionne pas. Un routeur ou un pare-feu la bloque peut-être. Essayez un autre réseau."
 });
