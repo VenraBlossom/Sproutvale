@@ -45,6 +45,8 @@ Die Steam-Version hat keinen eigenen Updater (Updates macht Steam), keine Entwic
 - Nie ins Repository hochladen (steht in `.gitignore`).
 - Nie ändern und nicht löschen, sonst können Spieler ihre Käufe nicht mehr lesen.
 - Unbedingt sicher aufbewahren (z.B. Passwort-Manager oder USB-Stick).
+- Für den automatischen itch.io-Upload (GitHub Actions): auf GitHub unter Settings, Secrets and variables, Actions ein Secret
+  `SPROUTVALE_GEHEIM` anlegen und den Inhalt von `geheim.txt` hineinkopieren. Ohne das Secret bricht der Build mit einer Meldung ab.
 
 ## Steam einschalten
 

@@ -20,6 +20,15 @@ jobs:
         working-directory: desktop-app
         run: npm ci
 
+      - name: Schluessel fuer den Tresor
+        working-directory: desktop-app
+        shell: pwsh
+        env:
+          GEHEIM: ${{ secrets.SPROUTVALE_GEHEIM }}
+        run: |
+          if (-not $env:GEHEIM) { throw "Secret SPROUTVALE_GEHEIM fehlt (Inhalt von desktop-app/geheim.txt)" }
+          [System.IO.File]::WriteAllText((Join-Path (Get-Location) "geheim.txt"), $env:GEHEIM.Trim())
+
       - name: Windows-Version bauen
         working-directory: desktop-app
         run: npm run release
