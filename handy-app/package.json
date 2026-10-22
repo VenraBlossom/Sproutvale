@@ -1,6 +1,6 @@
 {
   "name": "sproutvale-handy",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "private": true,
   "description": "Sproutvale als Handy-App (Android und iOS) mit Capacitor",
   "scripts": {

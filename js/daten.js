@@ -63,7 +63,7 @@ function klemme(wert, min, max) {
 }
 
 
-const SPIEL_VERSION = "Beta 0.4.2";
+const SPIEL_VERSION = "1.0.0";
 
 const DEBUG_ERLAUBT = false;
 
