@@ -1852,7 +1852,7 @@ function figurFunkeln(f, teile) {
 }
 
 function aktualisiereFiguren(dtMs, jetzt) {
-    if (!hofEbene || !hauptmenue.classList.contains("versteckt")) return;
+    if (!hofEbene) return;
     let eigene = figuren.find(f => f.art === "mensch" && !f.partner);
     if (!eigene) eigene = neueFigur("mensch", { teile: profil().teile });
     eigene.teile = profil().teile;

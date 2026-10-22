@@ -906,36 +906,6 @@ document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     const leben = el("div", "menue-leben");
     menue.insertBefore(leben, document.getElementById("menue-teilchen"));
 
-    const groesse = () => Math.max(2, Math.round((window.innerHeight * 0.12) / FIGUR_HOEHE));
-    const spaziergang = el("div", "menue-spaziergang");
-    const figurHuelle = el("div", "menue-spaziergaenger");
-    const tierHuelle = el("div", "menue-spaziergaenger menue-tier");
-    let figur = erstelleFigurBild(groesse());
-    figurHuelle.appendChild(figur.huelle);
-    const tier = document.createElement("img");
-    tier.alt = "";
-    tier.className = "menue-tier-bild";
-    tierHuelle.appendChild(tier);
-    spaziergang.append(tierHuelle, figurHuelle);
-    leben.appendChild(spaziergang);
-
-    let bild = 0;
-    setInterval(() => {
-        if (!offen()) return;
-        bild += 1;
-        try {
-            zeigeFigurBild(figur, figurTeileAus(profil().teile || FIGUR_STANDARD), "laufen", bild % FIGUR_BILDER.laufen, bild % 23 === 0, "seite");
-            const skin = aktuellerSkin();
-            tier.src = haustierUrl(skin, "laufen", bild % HAUSTIER_BILDER.laufen, false, Math.floor(bild / 2) % 4);
-        } catch (fehler) {
-        }
-    }, 150);
-    window.addEventListener("resize", () => {
-        figur.huelle.remove();
-        figur = erstelleFigurBild(groesse());
-        figurHuelle.appendChild(figur.huelle);
-    });
-
     setInterval(() => {
         if (!offen() || einstellungen.wenigerEffekte || leben.querySelectorAll(".jz-schmetterling").length >= 3) return;
         const flieger = el("div", "jz-schmetterling" + (Math.random() < 0.5 ? " links" : ""));

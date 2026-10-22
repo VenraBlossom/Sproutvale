@@ -1238,100 +1238,52 @@ function erstelleHimmel() {
 
 let hofSzene = null;
 
-function zeichneMenueHintergrund() {
-    const P = HOF_PIXEL;
-    const W = Math.ceil(window.innerWidth / P);
-    const H = Math.ceil(window.innerHeight / P);
-    const thema = gewaehlteKosmetik("landschaft").id;
-    const hofH = Math.round(H * 0.42);
-    const hofY = Math.round(H * 0.2);
-    const hof = zeichneHof(W, hofH, thema);
-    const hofBild = new Image();
-    hofBild.onload = () => {
-        const leinwand = document.createElement("canvas");
-        leinwand.width = W;
-        leinwand.height = H;
-        const g = leinwand.getContext("2d");
-        g.imageSmoothingEnabled = false;
-
-        const nacht = gewaehlteKosmetik("landschaft").ewigeNacht;
-        const himmel = g.createLinearGradient(0, 0, 0, hofY + hofH * 0.5);
-        himmel.addColorStop(0, nacht ? "#0e0a36" : "#5fb0ea");
-        himmel.addColorStop(1, nacht ? "#4a2a8a" : "#cfeefb");
-        g.fillStyle = himmel;
-        g.fillRect(0, 0, W, hofY + hofH);
-        if (nacht) {
-            const zufallsZahl = zufallsGenerator(42);
-            for (let i = 0; i < W * 0.25; i++) {
-                g.fillStyle = zufallsZahl() < 0.7 ? "#fff6d8" : "#c9b0f5";
-                g.fillRect(Math.floor(zufallsZahl() * W), Math.floor(zufallsZahl() * (hofY + hofH * 0.4)), 1, 1);
-            }
-            g.drawImage(spriteLeinwand("grosserstern"), Math.round(W * 0.8), Math.round(H * 0.06));
-        } else {
-            g.drawImage(spriteLeinwand("sonne"), Math.round(W * 0.8), Math.round(H * 0.06));
+function zeichneMenueBeete() {
+    let ebene = document.getElementById("menue-pflanzen");
+    if (!ebene) {
+        ebene = el("div");
+        ebene.id = "menue-pflanzen";
+        hauptmenue.insertBefore(ebene, hauptmenue.firstChild);
+    }
+    ebene.innerHTML = "";
+    if (hauptmenue.classList.contains("versteckt")) return;
+    const H = window.innerHeight;
+    const W = window.innerWidth;
+    const oben = topBar.getBoundingClientRect().bottom;
+    const weg = document.getElementById("weg");
+    const wegRect = weg ? weg.getBoundingClientRect() : null;
+    const feld = Math.max(24, Math.round(Math.min((H - oben) / 4.3, W / 19)));
+    const abstand = Math.round(feld * 0.2);
+    const links = wegRect && wegRect.width ? wegRect.left : W / 2 - feld * 0.6;
+    const rechts = wegRect && wegRect.width ? wegRect.right : W / 2 + feld * 0.6;
+    const pflanzen = ["weizen", "karotte", "kartoffel", "erdbeere", "tomate", "mais", "kuerbis", "sonnenblume"];
+    const erde = spriteUrl("erde");
+    for (let reihe = 0; reihe < 4; reihe++) {
+        const y = oben + abstand * 2 + reihe * (feld + abstand);
+        if (y > H) break;
+        for (let i = 0; i < 9; i++) {
+            [-1, 1].forEach(seite => {
+                const x = seite < 0 ? links - abstand * 2 - (i + 1) * feld - i * abstand : rechts + abstand * 2 + i * (feld + abstand);
+                if (x < -feld || x > W) return;
+                const beet = el("div", "menue-beet");
+                beet.style.left = x + "px";
+                beet.style.top = y + "px";
+                beet.style.width = feld + "px";
+                beet.style.height = feld + "px";
+                beet.style.backgroundImage = "url(" + erde + ")";
+                const n = reihe * 5 + i * 3 + (seite > 0 ? 2 : 0);
+                if (n % 4 !== 3) {
+                    const pflanze = document.createElement("img");
+                    pflanze.alt = "";
+                    pflanze.className = "menue-pflanze";
+                    pflanze.src = spriteUrl(pflanzen[n % pflanzen.length]);
+                    pflanze.style.animationDelay = -((n * 7) % 11) * 0.37 + "s";
+                    beet.appendChild(pflanze);
+                }
+                ebene.appendChild(beet);
+            });
         }
-        const wolke = spriteLeinwand("wolke");
-        if (!nacht) {
-            [[0.06, 0.07], [0.3, 0.03], [0.55, 0.1], [0.9, 0.16], [0.72, 0.02]].forEach(([x, y]) =>
-                g.drawImage(wolke, Math.round(W * x), Math.round(H * y)));
-        }
-
-        g.drawImage(hofBild, 0, hofY);
-
-        const wieseY = hofY + hofH;
-        const grasName = SPRITE_ABWANDLUNGEN["gras_" + thema] ? "gras_" + thema : "gras";
-        g.fillStyle = g.createPattern(spriteLeinwand(grasName), "repeat");
-        g.fillRect(0, wieseY, W, H - wieseY);
-
-        const wegB = Math.round(W * 0.07);
-        const wegX = Math.round(W / 2 - wegB / 2);
-        g.fillStyle = "#c9a46a";
-        g.fillRect(wegX, wieseY, wegB, H - wieseY);
-        g.fillStyle = "#b08a55";
-        g.fillRect(wegX, wieseY, 1, H - wieseY);
-        g.fillRect(wegX + wegB - 1, wieseY, 1, H - wieseY);
-        for (let y = wieseY + 3; y < H; y += 4) {
-            g.fillStyle = "rgba(120, 85, 45, 0.25)";
-            g.fillRect(wegX + 1, y, wegB - 2, 1);
-        }
-
-        const erde = spriteLeinwand("erde");
-        const pflanzen = ["weizen", "karotte", "kartoffel", "erdbeere", "tomate", "mais", "kuerbis", "sonnenblume"];
-        const feld = erde.width;
-        const abstand = 3;
-        let ebene = document.getElementById("menue-pflanzen");
-        if (!ebene) {
-            ebene = el("div");
-            ebene.id = "menue-pflanzen";
-            hauptmenue.insertBefore(ebene, hauptmenue.firstChild);
-        }
-        ebene.innerHTML = "";
-        for (let reihe = 0; reihe < 3; reihe++) {
-            const y = wieseY + 6 + reihe * (feld + abstand);
-            if (y + feld > H) break;
-            for (let spalte = 0; spalte < 12; spalte++) {
-                const seite = spalte < 6 ? -1 : 1;
-                const i = spalte < 6 ? spalte : spalte - 6;
-                const x = seite < 0 ? wegX - 4 - (i + 1) * (feld + abstand) : wegX + wegB + 4 + i * (feld + abstand);
-                if (x < -feld || x > W) continue;
-                g.drawImage(erde, x, y);
-                const art = pflanzen[(reihe * 5 + spalte * 3) % pflanzen.length];
-                if ((reihe + spalte) % 4 === 3) continue;
-                const pflanze = document.createElement("img");
-                pflanze.alt = "";
-                pflanze.className = "menue-pflanze";
-                pflanze.src = spriteUrl(art);
-                pflanze.style.left = (x / W) * 100 + "%";
-                pflanze.style.top = (y / H) * 100 + "%";
-                pflanze.style.width = (feld / W) * 100 + "%";
-                pflanze.style.height = (feld / H) * 100 + "%";
-                pflanze.style.animationDelay = -((reihe * 7 + spalte * 3) % 11) * 0.37 + "s";
-                ebene.appendChild(pflanze);
-            }
-        }
-        hauptmenue.style.backgroundImage = "url(" + leinwand.toDataURL() + ")";
-    };
-    hofBild.src = hof.url;
+    }
 }
 
 function zeichneLandschaften() {
@@ -1360,7 +1312,7 @@ function zeichneLandschaften() {
         el.style.animationDelay = -(i * 0.7) + "s";
         hofEbene.appendChild(el);
     });
-    zeichneMenueHintergrund();
+    zeichneMenueBeete();
     letzteHimmelZeit = -1;
     haken("landschaftGezeichnet", hofSzene);
 }
@@ -4890,8 +4842,16 @@ function frageModusReset(sandbox) {
     });
 }
 
-(function pausiereHofImMenue() {
-    const pruefe = () => document.body.classList.toggle("menue-offen", !hauptmenue.classList.contains("versteckt"));
+(function hofImMenue() {
+    let vorher = null;
+    const pruefe = () => {
+        const offen = !hauptmenue.classList.contains("versteckt");
+        if (offen === vorher) return;
+        const ersterAufruf = vorher === null;
+        vorher = offen;
+        document.body.classList.toggle("menue-offen", offen);
+        if (!ersterAufruf) zeichneLandschaften();
+    };
     new MutationObserver(pruefe).observe(hauptmenue, { attributes: true, attributeFilter: ["class"] });
     pruefe();
 })();
@@ -5725,6 +5685,10 @@ function hauptSchleife(jetzt) {
         }
     } else {
         kombo.letzterKlick += dtMs;
+        if (!hauptmenue.classList.contains("versteckt") && einstellungenFenster.classList.contains("versteckt")) {
+            aktualisiereHaustier(dtMs, jetzt);
+            aktualisiereHimmel(dtMs);
+        }
     }
     if (typeof aktualisiereFiguren === "function") aktualisiereFiguren(dtMs, jetzt);
 
