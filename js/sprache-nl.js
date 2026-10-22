@@ -2577,5 +2577,14 @@ if (SPRACHE === "nl") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "Verhaal en Eindeloos, roulette, blackjack en de zeis om door te klikken.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "Prestaties om op te halen, gokkast, kop of munt en nieuwe knuffels.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Zaadkraampjes als pixelgebouwen, nieuwe plantlooks en landschappen.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "De eerste versie van Sproutvale: markt, volledig scherm en feedback via Discord."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "De eerste versie van Sproutvale: markt, volledig scherm en feedback via Discord.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale is nu beschikbaar in 14 talen.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Nieuw hoofdmenu met je boerderij op de achtergrond, nieuwe houten knoppen en een levendig logo.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Alle vensters en instellingen in een nieuwe pixellook, met veel kleine animaties.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Muziek met echte instrumenten, uit te zetten in de instellingen.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Markt: koop x1, x10 of Max. In het Stellarium koop je meerdere niveaus tegelijk.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Bekers: de houten beker wacht nu bij de 5e rekening, de platina beker bij de 11e.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Eerlijkere kansspellen: de VIP-kaart geeft 5 spellen extra per pauze, kop of munt wint in 45 tot 55% van de gevallen.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Het venster onthoudt grootte en volledig scherm, en het spel loopt soepeler.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Opgelost: de zegen Verzamelwoede werkte niet, het kapsel Knot was onzichtbaar en blackjack kon vastlopen."
 });

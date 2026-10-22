@@ -2577,5 +2577,14 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "ストーリーとエンドレス、ルーレット、ブラックジャック、連続クリックできる鎌。",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "受け取れる実績、スロットマシン、コイントス、新しいぬいぐるみ。",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "ドット絵の建物になった種屋、新しい植物の見た目と風景。",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvaleの最初のバージョン：マーケット、フルスクリーン、Discordでのフィードバック。"
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvaleの最初のバージョン：マーケット、フルスクリーン、Discordでのフィードバック。",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvaleが14言語に対応しました。",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "あなたの農場が背景に広がる新しいメインメニュー。木のボタンと動くロゴも。",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "すべてのウィンドウと設定が新しいドット絵風に。小さなアニメーションもたくさん。",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "本物の楽器を使った音楽。設定でオフにできます。",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "マーケット：x1、x10、最大で購入できます。ステラリウムでは複数レベルをまとめて購入。",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "トロフィー：木のトロフィーは5枚目、プラチナは11枚目の請求書に。",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "運試しがより公平に：VIPカードで休憩ごとに5回多く遊べ、コイントスの勝率は45〜55%です。",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "ウィンドウのサイズとフルスクリーンが記憶され、動作もより滑らかに。",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修正：祝福「収集マニア」が効いていなかった、髪型「お団子」が見えなかった、ブラックジャックが止まることがあった。"
 });

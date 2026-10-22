@@ -2576,5 +2576,14 @@ if (SPRACHE === "es") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "Historia e Infinito, ruleta, blackjack y la guadaña para clics continuos.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "Logros para recoger, tragaperras, cara o cruz y nuevos peluches.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Puestos de semillas como edificios de píxel, nuevos aspectos de plantas y paisajes.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "La primera versión de Sproutvale: mercado, pantalla completa y opiniones por Discord."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "La primera versión de Sproutvale: mercado, pantalla completa y opiniones por Discord.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale ya está disponible en 14 idiomas.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Nuevo menú principal con tu granja de fondo, nuevos botones de madera y un logo con vida.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Todas las ventanas y ajustes con un nuevo estilo píxel y muchas animaciones pequeñas.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Música con instrumentos reales, se puede desactivar en los ajustes.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Mercado: compra x1, x10 o Máx. En el Stellarium compras varios niveles a la vez.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trofeos: el trofeo de madera ahora está en la 5.ª factura y el de platino en la 11.ª.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Juegos de azar más justos: la tarjeta VIP da 5 partidas más por pausa y la moneda gana entre el 45 y el 55 % de las veces.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "La ventana recuerda su tamaño y la pantalla completa, y el juego va más fluido.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Corregido: la bendición Frenesí recolector no funcionaba, el peinado Moño era invisible y el blackjack podía quedarse atascado."
 });

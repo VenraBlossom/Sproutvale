@@ -2577,5 +2577,14 @@ if (SPRACHE === "fr") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "Histoire et Infini, roulette, blackjack et la faux pour cliquer en continu.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "Succès à récupérer, machine à sous, pile ou face et nouvelles peluches.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Étals de graines en bâtiments pixel art, nouveaux looks de plantes et paysages.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "La première version de Sproutvale : marché, plein écran et retours via Discord."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "La première version de Sproutvale : marché, plein écran et retours via Discord.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale est maintenant disponible en 14 langues.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Nouveau menu principal avec ta ferme en arrière-plan, de nouveaux boutons en bois et un logo plein de vie.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Toutes les fenêtres et les réglages au nouveau style pixel, avec plein de petites animations.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Musique avec de vrais instruments, désactivable dans les réglages.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Marché : achète x1, x10 ou Max. Dans le Stellarium, tu achètes plusieurs niveaux d'un coup.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trophées : le trophée en bois attend désormais à la 5e facture, celui en platine à la 11e.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Jeux de hasard plus équitables : la carte VIP donne 5 parties de plus par pause, le pile ou face gagne dans 45 à 55 % des cas.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "La fenêtre retient sa taille et le plein écran, et le jeu est plus fluide.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Corrigé : la bénédiction Frénésie de ramassage n'avait aucun effet, la coiffure Chignon était invisible, le blackjack pouvait se bloquer."
 });

@@ -68,6 +68,17 @@ const SPIEL_VERSION = "1.0.0";
 const DEBUG_ERLAUBT = false;
 
 const NEUIGKEITEN = [
+    { version: "1.0.0", punkte: [
+        t("Sproutvale gibt es jetzt in 14 Sprachen."),
+        t("Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo."),
+        t("Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen."),
+        t("Musik mit echten Instrumenten, in den Einstellungen abschaltbar."),
+        t("Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal."),
+        t("Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11."),
+        t("Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle."),
+        t("Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger."),
+        t("Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.")
+    ] },
     { version: "Beta 0.4.2", punkte: [
         t("Gold- und Sternensamen-Boni werden jetzt zusammengezählt, genau wie es in den Texten steht."),
         t("Mehr Energie zum Start und stärkere Energie-Sterne."),

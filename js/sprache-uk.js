@@ -2577,5 +2577,14 @@ if (SPRACHE === "uk") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "Сюжет і Безкінечний режим, рулетка, блекджек і коса для безперервних кліків.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "Досягнення з нагородами, ігровий автомат, орел і решка та нові плюшеві іграшки.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Крамниці насіння як піксельні будівлі, нові вигляди рослин і пейзажі.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Перша версія Sproutvale: ринок, повноекранний режим і відгуки через Discord."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Перша версія Sproutvale: ринок, повноекранний режим і відгуки через Discord.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale тепер доступна 14 мовами.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Нове головне меню з твоєю фермою на тлі, новими дерев'яними кнопками та живим логотипом.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Усі вікна й налаштування в новому піксельному стилі, з багатьма маленькими анімаціями.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Музика зі справжніми інструментами, її можна вимкнути в налаштуваннях.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Ринок: купуй x1, x10 або Макс. У Зоряріумі можна купити кілька рівнів одразу.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Кубки: дерев'яний тепер чекає на 5-му рахунку, платиновий на 11-му.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Чесніші азартні ігри: VIP-картка дає на 5 ігор більше за перерву, монетка виграє у 45–55% випадків.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Вікно пам'ятає розмір і повноекранний режим, а гра працює плавніше.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Виправлено: благословення «Жага збирати» не діяло, зачіска «Гулька» була невидима, блекджек міг зависнути."
 });

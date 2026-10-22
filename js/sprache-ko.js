@@ -2577,5 +2577,14 @@ if (SPRACHE === "ko") Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "스토리와 엔드리스, 룰렛, 블랙잭, 연속 클릭용 낫.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "받을 수 있는 업적, 슬롯머신, 동전 던지기, 새 인형.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "픽셀 건물이 된 씨앗 가게, 새 식물 외형과 풍경.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvale 첫 버전: 시장, 전체 화면, 디스코드 피드백."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvale 첫 버전: 시장, 전체 화면, 디스코드 피드백.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale을 이제 14개 언어로 즐길 수 있습니다.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "내 농장이 배경에 펼쳐지는 새 메인 메뉴, 새 나무 버튼과 생동감 있는 로고.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "모든 창과 설정이 새로운 픽셀 스타일로, 작은 애니메이션도 가득.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "실제 악기로 연주한 음악, 설정에서 끌 수 있습니다.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "시장: x1, x10, 최대로 구매. 스텔라리움에서는 여러 단계를 한 번에 구매.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "트로피: 나무 트로피는 이제 5번째 청구서, 플래티넘은 11번째에 있습니다.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "더 공정한 운 게임: VIP 카드는 휴식마다 5판 더, 동전 던지기 승률은 45~55%입니다.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "창 크기와 전체 화면을 기억하고, 게임이 더 부드럽게 돌아갑니다.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "수정: 축복 \"수집 광풍\"이 작동하지 않던 문제, 헤어스타일 \"올림머리\"가 보이지 않던 문제, 블랙잭이 멈추던 문제."
 });

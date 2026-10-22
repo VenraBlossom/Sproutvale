@@ -2575,6 +2575,15 @@ Object.assign(UEBERSETZUNG, {
     "Story und Endlos, Roulette, Blackjack und die Sense zum Dauerklicken.": "Story and Endless, roulette, blackjack and the scythe for continuous clicking.",
     "Erfolge zum Abholen, Slotmaschine, Münzwurf und neue Kuscheltiere.": "Achievements to collect, slot machine, coin toss and new plushies.",
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Seed stalls as pixel buildings, new plant looks and landscapes.",
-    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "The first version of Sproutvale: market, fullscreen and feedback via Discord."
+    "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "The first version of Sproutvale: market, fullscreen and feedback via Discord.",
+    "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale is now available in 14 languages.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "New main menu with your farm in the background, new wooden buttons and a lively logo.",
+    "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "All windows and settings in a new pixel look, with lots of little animations.",
+    "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Music with real instruments, can be turned off in the settings.",
+    "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Market: buy x1, x10 or Max. In the Stellarium you can buy several levels at once.",
+    "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Trophies: the wood trophy now waits at the 5th bill, the platinum trophy at the 11th.",
+    "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Fairer games of chance: the VIP card gives 5 more games per break, the coin toss wins 45 to 55% of the time.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "The window remembers its size and fullscreen, and the game runs more smoothly.",
+    "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Fixed: the Collecting Frenzy blessing had no effect, the bun hairstyle was invisible, blackjack could get stuck."
 });
 
