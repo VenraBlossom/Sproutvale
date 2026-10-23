@@ -10,7 +10,7 @@ async function aufnehmen(name, schritte, opt = {}) {
   const B = opt.b || 1920, H = opt.h || 1080;
   const port = 9300 + Math.floor(Math.random() * 500);
   const profil = fs.mkdtempSync(path.join(os.tmpdir(), "sv-rec-"));
-  const chrome = spawn(CHROME, ["--headless=new", "--mute-audio", "--hide-scrollbars", "--remote-debugging-port=" + port, "--user-data-dir=" + profil, "--window-size=" + B + "," + H, "about:blank"], { stdio: "ignore" });
+  const chrome = spawn(CHROME, ["--headless=new", ...(process.env.CHROME_FLAGS ? process.env.CHROME_FLAGS.split(" ") : []), "--mute-audio", "--hide-scrollbars", "--remote-debugging-port=" + port, "--user-data-dir=" + profil, "--window-size=" + B + "," + H, "about:blank"], { stdio: "ignore" });
   let ziele; for (let i = 0; i < 60 && !ziele; i++) { try { ziele = await holeJson("http://127.0.0.1:" + port + "/json"); } catch (e) { await warte(200); } }
   const ws = new WebSocket(ziele.find(z => z.type === "page").webSocketDebuggerUrl);
   await new Promise(ok => ws.addEventListener("open", ok));
@@ -33,7 +33,8 @@ async function aufnehmen(name, schritte, opt = {}) {
     }
   });
   await sende("Page.enable");
-  await sende("Emulation.setDeviceMetricsOverride", { width: B, height: H, deviceScaleFactor: 1, mobile: false });
+  const zoom = opt.zoom || 1;
+  await sende("Emulation.setDeviceMetricsOverride", { width: Math.round(B / zoom), height: Math.round(H / zoom), deviceScaleFactor: zoom, mobile: false });
   if (opt.vorher) await sende("Page.addScriptToEvaluateOnNewDocument", { source: opt.vorher });
   await sende("Page.navigate", { url: SPIEL });
   await sende("Emulation.setFocusEmulationEnabled", { enabled: true });
@@ -61,7 +62,7 @@ async function aufnehmen(name, schritte, opt = {}) {
   fs.writeFileSync(listeDatei, liste);
   const ziel = path.join(__dirname, "clips", name + ".mp4");
   fs.mkdirSync(path.dirname(ziel), { recursive: true });
-  execFileSync(FFMPEG, ["-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", listeDatei, "-vf", "fps=30,scale=1920:1080:flags=lanczos,format=yuv420p", "-c:v", "libx264", "-crf", "16", "-preset", "medium", ziel]);
+  execFileSync(FFMPEG, ["-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", listeDatei, "-vf", "fps=30,scale=" + B + ":" + H + ":flags=lanczos,format=yuv420p", "-c:v", "libx264", "-crf", "16", "-preset", "medium", ziel]);
   const dauer = bilder[bilder.length - 1].zeit - bilder[0].zeit;
   console.log(name + ": " + bilder.length + " Bilder, " + dauer.toFixed(1) + " s, " + (bilder.length / dauer).toFixed(1) + " fps");
   return ziel;

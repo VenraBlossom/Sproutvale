@@ -139,15 +139,18 @@ Die Werbung erscheint nur, wenn der Spieler selbst auf den Knopf drückt. Es gib
 
 ## Trailer
 
-Fertige Dateien liegen nur lokal in `steam-bilder/trailer/` (zu groß fürs Repo):
+Die fertige Datei liegt nur lokal in `steam-bilder/trailer/` (zu groß fürs Repo):
 
-- `sproutvale-trailer.mp4`: 55 s, 1920x1080, 30 fps, mit Musik.
-- `sproutvale-trailer-ohne-musik.mp4`: gleiches Bild ohne Ton, zum eigenen Abmischen mit Sprache.
-- `sproutvale-trailer-musik.wav`: nur die Musik (112 bpm, Schnitte liegen auf den Takten).
+- `sproutvale-trailer.mp4`: etwa 53 s, 1920x1080, 30 fps, ohne Ton. Gedacht zum Darübersprechen.
+- Schnitte liegen auf einem Raster von 120 BPM (ein Schlag = 0,5 s), damit später Musik dazu passt.
+- Ablauf: Hook (Lategame-Ernte, Jackpot, Logo), Early (säen, wachsen, ernten, Feld kaufen), Mid (Kombo, Goldregen,
+  Krähen, Herbst, Nacht, Stellarium), Late (Riesenernten, Magnet, Jackpots, Winter, Gewitter, Fieber, Kristallpokal), Logo mit "Wishlist".
 
 Neu bauen (Chrome und ffmpeg nötig, Pfade oben in den Skripten):
 
-1. `node werkzeuge/trailer/clips.js` nimmt alle Szenen auf (oder nur einzelne: `node werkzeuge/trailer/clips.js kombo pokal`).
-2. `node werkzeuge/trailer/musik.js` erzeugt die Musik aus den Klangproben.
-3. `node werkzeuge/trailer/endtext.js` erzeugt das Bild "WISHLIST NOW ON STEAM".
-4. `node werkzeuge/trailer/schnitt.js` schneidet `trailer-ohne-ton.mp4` nach dem `PLAN` (Clip, Startsekunde, Takte, Zoom).
+1. `node werkzeuge/trailer/clips.js` nimmt alle Szenen auf (oder nur einzelne: `node werkzeuge/trailer/clips.js e_saat s_jackpot`).
+   Early und Mid werden in 4K aufgenommen, damit der Zoom im Schnitt scharf bleibt. `szene.js` baut die Höfe auf und steuert die Maus.
+2. `node werkzeuge/trailer/endtext.js` erzeugt das Bild "WISHLIST NOW ON STEAM".
+3. `node werkzeuge/trailer/blatt.js` macht Übersichtsbilder mit Zeitstempeln (Ordner `blatt/`), um Startzeiten zu wählen.
+4. `node werkzeuge/trailer/schnitt.js` schneidet `trailer.mp4` nach `plan.js`
+   (Szene, Startsekunde, Schläge, dazu Zoom `z0`/`z1`, Ausschnitt `fx`/`fy`, `tempo`, `wackeln`, `blitz`).
