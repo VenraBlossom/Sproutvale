@@ -13090,3 +13090,67 @@ body.menue-offen #werkzeug-leiste {
     border-radius: 0;
     box-shadow: inset 0 3px 0 rgba(46, 26, 9, 0.15);
 }
+
+.segen-karte {
+    position: relative;
+    overflow: hidden;
+}
+
+.segen-karte .segen-bild {
+    margin-top: auto;
+    padding: 10px;
+    box-sizing: content-box;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 246, 190, 0.95) 0 45%, rgba(255, 233, 150, 0) 70%);
+    transition: transform 0.2s ease;
+}
+
+.segen-karte:hover .segen-bild {
+    transform: scale(1.12) rotate(-4deg);
+}
+
+.segen-karte .segen-text {
+    flex: 0 0 auto;
+}
+
+.segen-karte .segen-stufe {
+    margin-top: auto;
+    padding: 2px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.segen-karte .segen-neu {
+    color: #fff;
+    background: var(--gruen);
+    box-shadow: 0 2px 0 var(--gruen-dunkel);
+}
+
+.segen-karte .segen-stapel {
+    color: #6b4a00;
+    background: #ffe89a;
+    box-shadow: 0 2px 0 #c99a2e;
+}
+
+.segen-karte::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: skewX(-12deg);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.segen-karte:hover::before {
+    opacity: 1;
+    animation: segen-glanz 0.7s ease-out;
+}
+
+@keyframes segen-glanz {
+    from { left: -60%; }
+    to { left: 130%; }
+}

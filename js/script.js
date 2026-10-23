@@ -3048,7 +3048,7 @@ function zeigeSegenAuswahl(auswahl) {
                 .map(e => el("div", "segen-evo-schild", "🧬 " + tf("Entwickelt {0}", e.name)))),
             el("div", "segen-name", s.name),
             el("div", "segen-text", s.text),
-            el("div", "segen-stufe", (stufe > 0 ? tf("Du hast ihn schon {0}x, stapelt sich", stufe) : t("Neu")) +
+            el("div", "segen-stufe" + (stufe > 0 ? " segen-stapel" : " segen-neu"), (stufe > 0 ? tf("Du hast ihn schon {0}x, stapelt sich", stufe) : t("Neu")) +
                 (run.fruehBonus ? tf(" · +{0}% stärker", Math.round(run.fruehBonus * 100)) : ""))
         );
         karte.addEventListener("click", () => waehleSegen(id, karte));
