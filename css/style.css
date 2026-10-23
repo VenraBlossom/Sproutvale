@@ -591,7 +591,9 @@ img.icon {
 
 .fortschritt-innen {
     height: 100%;
-    width: 0%;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
     background: linear-gradient(#ffe98a, #f0b82e);
 }
 

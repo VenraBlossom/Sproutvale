@@ -855,7 +855,7 @@ function renderPartnerFelder() {
         }
         el.classList.toggle("feld-leer", !f.bild);
         el.classList.toggle("feld-fertig", Boolean(f.fertig));
-        el.querySelector(".fortschritt-innen").style.width = Math.round(f.anteil * 100) + "%";
+        setzeBalken(el.querySelector(".fortschritt-innen"), f.anteil);
     });
 }
 

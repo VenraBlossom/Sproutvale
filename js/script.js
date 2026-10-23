@@ -1550,7 +1550,7 @@ function leereFeld(feld) {
     setzeTipp(feld.el.feldDiv, null);
     feld.el.varianteEl.textContent = "";
     feld.el.nameEl.textContent = "";
-    feld.el.balkenInnen.style.width = "0%";
+    setzeBalken(feld.el.balkenInnen, 0);
     zeigeFeldSprite(feld);
 }
 
@@ -1617,7 +1617,7 @@ function pflanzeSamen(feld) {
     setzeVariantenKlasse(feld, variante);
     setzeTipp(feld.el.feldDiv, feldTipp(feld));
     feld.el.nameEl.textContent = pflanze.name;
-    feld.el.balkenInnen.style.width = "0%";
+    setzeBalken(feld.el.balkenInnen, 0);
     zeigeFeldSprite(feld);
     federeFeld(feld, [1, 1.05, 0.97, 1]);
 
@@ -1651,7 +1651,7 @@ function wachseEineStufe(feld) {
         feld.fertig = true;
         feld.fortschrittMs = 0;
         feld.el.feldDiv.classList.add("feld-fertig");
-        feld.el.balkenInnen.style.width = "100%";
+        setzeBalken(feld.el.balkenInnen, 1);
         if (feld.ernteKlicksRest > 0) feld.el.nameEl.textContent = tf("Noch {0}x", feld.ernteKlicksRest);
     }
     zeigeFeldSprite(feld);
@@ -1659,7 +1659,7 @@ function wachseEineStufe(feld) {
 
 function setzeWachstumsBalken(feld, stufenMs) {
     const anteil = (feld.stufe + Math.min(1, feld.fortschrittMs / stufenMs)) / 3;
-    feld.el.balkenInnen.style.width = anteil * 100 + "%";
+    setzeBalken(feld.el.balkenInnen, anteil);
 }
 
 function aktualisiereWachstum(dtMs) {
@@ -2092,7 +2092,7 @@ function aktualisiereKnopfAnzeige() {
     plantButtonCounter.textContent = Math.min(run.klickZaehler, benoetigt) + " / " + benoetigt;
     plantButtonFortschritt.style.width = anteil;
     plantButtonFortschritt.style.setProperty("--fortschritt", anteil);
-    if (run.zielFeld) run.zielFeld.el.balkenInnen.style.width = anteil;
+    if (run.zielFeld) setzeBalken(run.zielFeld.el.balkenInnen, run.klickZaehler / benoetigt);
 }
 
 function pruefeHaengendenSamen() {
@@ -5389,7 +5389,7 @@ function stelleFeldWiederHer(feld, stand) {
     setzeVariantenKlasse(feld, variante);
     setzeTipp(feld.el.feldDiv, feldTipp(feld));
     feld.el.nameEl.textContent = feld.fertig && feld.ernteKlicksRest > 0 ? tf("Noch {0}x", feld.ernteKlicksRest) : pflanze.name;
-    feld.el.balkenInnen.style.width = feld.fertig ? "100%" : (feld.stufe / 3) * 100 + "%";
+    setzeBalken(feld.el.balkenInnen, feld.fertig ? 1 : feld.stufe / 3);
     zeigeFeldSprite(feld);
 }
 

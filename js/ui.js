@@ -38,6 +38,14 @@ function pixelIcon(emoji, groesse = 32, klasse) {
     return img;
 }
 
+function setzeBalken(element, anteil) {
+    const wert = Math.max(0, Math.min(1, anteil || 0));
+    if (element.balkenWert !== undefined && wert > 0 && wert < 1 && Math.abs(element.balkenWert - wert) < 0.004) return;
+    if (element.balkenWert === wert) return;
+    element.balkenWert = wert;
+    element.style.transform = "scaleX(" + wert.toFixed(4) + ")";
+}
+
 function neuAnimieren(element, klasse) {
     element.classList.remove(klasse);
     requestAnimationFrame(() => requestAnimationFrame(() => element.classList.add(klasse)));
