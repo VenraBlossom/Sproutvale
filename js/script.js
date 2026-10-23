@@ -2094,7 +2094,7 @@ function pruefeKomboStufe() {
 function aktualisiereKnopfAnzeige() {
     const benoetigt = klicksProSamen();
     const anteil = Math.min(100, (run.klickZaehler / benoetigt) * 100) + "%";
-    plantButtonCounter.textContent = Math.min(run.klickZaehler, benoetigt) + " / " + benoetigt;
+    plantButtonCounter.textContent = Math.floor(Math.min(run.klickZaehler, benoetigt)) + " / " + benoetigt;
     plantButtonFortschritt.style.width = anteil;
     plantButtonFortschritt.style.setProperty("--fortschritt", anteil);
     if (run.zielFeld) setzeBalken(run.zielFeld.el.balkenInnen, run.klickZaehler / benoetigt);
