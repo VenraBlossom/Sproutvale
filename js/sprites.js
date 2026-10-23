@@ -3159,6 +3159,18 @@ SPRITE_PIXEL.form_kristall = [
 ];
 
 const PIXEL_SYMBOL_DATEN = {
+    pfote: [{ o: "#4a2a14", B: "#c07a3c", b: "#8a5226", P: "#ff9ab0" }, [
+        "...oo..oo...",
+        "..oBBooBBo..",
+        "..oBBooBBo..",
+        ".o.obo.obo.o",
+        "oBo......oBo",
+        "oBo.oooo.oBo",
+        ".o.oBBBBo.o.",
+        "..oBBPPBBo..",
+        "..oBPPPPBo..",
+        "..obBBBBbo..",
+        "...oooooo..."]],
     herz: [{ o: "#5a1a24", R: "#ff4a6a", r: "#c8243a", w: "#ffffff" }, [
         ".oo...oo..",
         "oRRo.oRRo.",
@@ -3553,7 +3565,7 @@ const PIXEL_SYMBOL_DATEN = {
 const PIXEL_SYMBOLE = {
     "💗": "herz", "❤️": "herz", "💛": "herz", "✨": "funkeln", "🔥": "flamme", "⭐": "stern", "🌟": "stern",
     "❄️": "schnee", "🟫": "block", "👋": "hand", "✋": "hand", "🎉": "party", "💃": "note", "🎵": "note", "⛏️": "hacke",
-    "😂": "lachen", "👍": "daumen", "💤": "zzz", "☀️": "sonne", "💎": "kristall"
+    "😂": "lachen", "👍": "daumen", "💤": "zzz", "☀️": "sonne", "💎": "kristall", "🐾": "pfote"
 };
 
 Object.entries(PIXEL_SYMBOL_DATEN).forEach(([name, [farben, zeilen]]) => {
