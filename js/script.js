@@ -211,10 +211,6 @@ function istBetaTester() {
     return Boolean(Tresor.stand().beta);
 }
 
-function istBetaVersion() {
-    return /^(Alpha|Beta)\b/.test(SPIEL_VERSION);
-}
-
 const meta = uebernehmeKaeufe(ladeMeta());
 
 function metaLevel(id) {
