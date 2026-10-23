@@ -2749,12 +2749,6 @@ function anzahlErfolge(m = meta, sandbox = run ? run.sandbox : metaProfil === "s
     return { geschafft, gesamt };
 }
 
-function komplettErfolge(m, sandbox) {
-    const ketten = erfolgKettenFuer(sandbox);
-    const geschafft = ketten.filter(k => k.ziele.every((_, i) => m && m.erfolge && m.erfolge[erfolgStufeId(k, i)])).length;
-    return { geschafft, gesamt: ketten.length };
-}
-
 function abholbareStufen(kette, m = meta) {
     const abgeholt = m.erfolgeAbgeholt || {};
     return kette.ziele.map((_, i) => erfolgStufeId(kette, i)).filter(id => m.erfolge[id] && !abgeholt[id]);
@@ -4759,11 +4753,11 @@ function renderModusKarten() {
     guthaben.innerHTML = "";
     guthaben.append(
         el("span", null, null, [spriteIcon("pokal"), el("span", null, (() => {
-            const story = komplettErfolge(erfolgsProfil(false).m, false);
+            const story = anzahlErfolge(erfolgsProfil(false).m, false);
             const endlos = [1, 2, 3].map(slot => {
-                try { return komplettErfolge(endlosMeta(slot), true).geschafft; } catch (fehler) { return 0; }
+                try { return anzahlErfolge(endlosMeta(slot), true).geschafft; } catch (fehler) { return 0; }
             });
-            const gesamt = story.gesamt + erfolgKettenFuer(true).length;
+            const gesamt = story.gesamt + anzahlErfolge(meta, true).gesamt;
             return tf("{0} / {1} Erfolge", (story.geschafft + Math.max(0, ...endlos)), gesamt);
         })())]),
         el("span", null, tf("📅 {0} Tage gespielt", zahl(meta.lebenszeit.tage)))
