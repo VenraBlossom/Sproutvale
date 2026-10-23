@@ -820,6 +820,8 @@ function tagesFortschritt() {
 
 const SANDBOX_TAG_MS = 180000;
 const NACHT_ENDE = 1.3;
+const MENUE_TAG_MS = 90000;
+let menueUhrMs = MENUE_TAG_MS * 0.12;
 
 function sandboxTageszeit() {
     return klemme((run.tagMs || 0) / SANDBOX_TAG_MS, 0, 1) * NACHT_ENDE;
@@ -1139,6 +1141,7 @@ function himmelsFarben(p) {
 
 function zielTageszeit() {
     if (debugTageszeit !== null) return debugTageszeit;
+    if (imHauptmenue()) return (menueUhrMs % MENUE_TAG_MS) / MENUE_TAG_MS * NACHT_ENDE;
     if (run.phase === "tag") return klemme(tagesAnteil(), 0, run.sandbox ? NACHT_ENDE : 1);
     if (run.phase === "vorTag" && run.tag === 1) return 0.05;
     return 1;
@@ -1148,7 +1151,7 @@ let letzteHimmelZeit = -1;
 
 function aktualisiereHimmel(dtMs) {
     const ziel = zielTageszeit();
-    if (run.sandbox && ziel < tageszeit - 0.6) tageszeit = ziel;
+    if ((run.sandbox || imHauptmenue()) && ziel < tageszeit - 0.6) tageszeit = ziel;
     else tageszeit += (ziel - tageszeit) * Math.min(1, (dtMs / 1000) * 2.5);
     if (Math.abs(tageszeit - letzteHimmelZeit) < 0.002) return;
     letzteHimmelZeit = tageszeit;
@@ -1191,6 +1194,8 @@ function aktualisiereHimmel(dtMs) {
     himmelSterne.style.opacity = Math.min(klemme((p - 0.75) / 0.2, 0, 1), klemme(1 - (p - 1.15) / 0.1, 0, 1));
     fensterLichter.style.opacity = Math.min(klemme((p - 0.6) / 0.25, 0, 1), nachtWeg);
     nachtSchleier.style.opacity = nacht * 0.45;
+    const menueEbene = imHauptmenue() && document.getElementById("menue-pflanzen");
+    if (menueEbene) menueEbene.style.setProperty("--nacht", nacht.toFixed(3));
     wolkenEl.style.filter = "brightness(" + (1 - nacht * 0.55) * (trueb ? 0.75 : 1) + ")";
 
     const kosmisch = Boolean(gewaehlteKosmetik("landschaft").ewigeNacht);
@@ -5700,6 +5705,7 @@ function hauptSchleife(jetzt) {
     } else {
         kombo.letzterKlick += dtMs;
         if (!hauptmenue.classList.contains("versteckt") && einstellungenFenster.classList.contains("versteckt")) {
+            menueUhrMs += dtMs;
             aktualisiereHaustier(dtMs, jetzt);
             aktualisiereHimmel(dtMs);
         }

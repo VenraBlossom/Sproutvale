@@ -13176,3 +13176,20 @@ body.menue-offen #werkzeug-leiste {
     from { left: -60%; }
     to { left: 130%; }
 }
+
+body.menue-offen #sammel-ring {
+    display: none;
+}
+
+#menue-pflanzen::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: var(--kopf-hoehe);
+    background-color: #141c48;
+    mix-blend-mode: multiply;
+    opacity: calc(var(--nacht, 0) * 0.45);
+    pointer-events: none;
+}
