@@ -1,0 +1,101 @@
+"lang"
+{
+	"english"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"german"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"spanish"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"french"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"italian"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"brazilian"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"dutch"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"polish"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"turkish"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"russian"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"ukrainian"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"japanese"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"schinese"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+	"koreana"
+	{
+		"Tokens"
+		{
+			"#Status"	"%status%"
+		}
+	}
+}

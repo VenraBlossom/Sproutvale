@@ -30,12 +30,13 @@ function leseAppId() {
 }
 
 module.exports = {
-    starte() {
+    starte({ ueberSteamStarten = false } = {}) {
         client = null;
         appId = leseAppId();
-        if (!appId) return;
+        if (!appId) return true;
         try {
             const steamworks = require("steamworks.js");
+            if (ueberSteamStarten && steamworks.restartAppIfNecessary(appId)) return false;
             client = steamworks.init(appId);
             if (steamworks.electronEnableSteamOverlay) steamworks.electronEnableSteamOverlay();
             console.log("[Steam] verbunden, App-ID", appId);
@@ -43,6 +44,7 @@ module.exports = {
             client = null;
             console.warn("[Steam] nicht verfuegbar:", fehler.message);
         }
+        return true;
     },
     aktiv() {
         return Boolean(client);

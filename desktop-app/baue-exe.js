@@ -145,7 +145,7 @@ async function baue() {
         asar: { unpack: "**/*.{node,dll,so,dylib}" },
         prune: true,
         ignore: [/^\/dist($|\/)/, /^\/dist-release($|\/)/, /^\/dist-steam($|\/)/, /^\/build($|\/)/, /^\/baue-exe\.js$/,
-            /^\/steam_appid\.txt$/],
+            /^\/steam_appid\.txt$/, /^\/node_modules\/steamworks\.js\/dist\/(linux64|osx)($|\/)/],
         extraResource: extra,
         appCopyright: "© 2026 Venray Studios",
         win32metadata: {

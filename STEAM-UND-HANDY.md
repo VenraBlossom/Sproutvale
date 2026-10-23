@@ -7,14 +7,14 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 
 1. Kleingewerbe, Impressum und Datenschutzerklärung (Duo: IP-Adressen, siehe unten). Steamworks-Konto (100 $).
 2. In Steamworks die App anlegen. App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen.
-3. `npm install steamworks.js` im Ordner `desktop-app`.
+3. `steamworks.js` ist schon installiert (feste Version 0.4.0 in `desktop-app/package.json`), nichts zu tun.
 4. Erfolge aus `werkzeuge/steam-erfolge.csv` anlegen (API-Namen genau übernehmen), alle 14 Sprachen eintragen.
 5. Unterstützer-Paket als DLC anlegen, DLC-App-ID in `STEAM_KONFIG.dlc.unterstuetzer`.
-6. Gem-Shop fertig machen (Gem-Stand aus dem Steam-Inventar lesen, siehe unten).
+6. Gems auf Steam entscheiden (siehe "Gems auf Steam" unten, braucht noch Arbeit oder eine andere Lösung).
 7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder aus `steam-bilder` (Screenshots 1920×1080, Kapseln in allen Steam-Größen, Erfolgsbilder; Entwürfe, gern noch nachbessern), Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
 8. Steam Cloud einschalten (siehe unten). Unterstützte Sprachen: alle 14.
 9. Beta-Sachen herausnehmen, wenn es keine Beta mehr ist (BETAVALE-Code, "Beta" in der Versionsanzeige).
-10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Version erhöhen und Neuigkeiten eintragen.
+10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Die Version bleibt für Steam 1.0.0.
 11. `node werkzeuge/pruefe-uebersetzung.js` und `node werkzeuge/teste-tresor.js` laufen lassen (beide ohne Fehler).
 12. `npm run steam`, den Ordner `desktop-app/dist-steam/Sproutvale` mit SteamPipe hochladen.
 13. Über Steam installieren und testen: Erfolg auslösen, Overlay (Umschalt+Tab), DLC, Steam-Status, Cloud auf zweitem PC.
@@ -53,7 +53,8 @@ Die Steam-Version hat keinen eigenen Updater (Updates macht Steam), keine Entwic
 Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
 
 1. Bei Steamworks anmelden (100 $ Gebühr pro Spiel) und die App anlegen. Du bekommst eine **App-ID** (eine Zahl).
-2. Im Ordner `desktop-app` einmal ausführen: `npm install steamworks.js`
+2. `steamworks.js` ist schon installiert. Die Steam-Version startet sich über Steam neu, wenn jemand die exe direkt öffnet
+   (nur wenn die App-ID eingetragen ist, in der Entwickler-Version nie).
 3. Die App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen. Nur zum Testen ohne Steam zusätzlich in
    `desktop-app/steam_appid.txt` (die kommt absichtlich nicht mit in die Steam-Version).
 4. In Steamworks unter "Statistiken und Errungenschaften" die Erfolge anlegen. Die Namen und Beschreibungen stehen in
@@ -62,7 +63,8 @@ Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
    Die Bilder für die Erfolge (256×256, erreicht und gesperrt) erzeugt `node werkzeuge/steam-erfolge-bilder.js` nach `steam-bilder/erfolge`.
 5. Unterstützer-Paket: in Steamworks ein DLC anlegen und dessen App-ID in `desktop-app/steam.js` bei
    `STEAM_KONFIG.dlc.unterstuetzer` eintragen.
-6. Für den Steam-Status ("Rich Presence") in Steamworks den Text `#Status` mit `{#Status}` bzw. `%status%` anlegen.
+6. Steam-Status ("Rich Presence"): in Steamworks unter "Rich Presence" die fertige Datei `werkzeuge/steam-rich-presence.vdf`
+   hochladen (alle 14 Sprachen, der Text kommt schon übersetzt aus dem Spiel, z.B. "Tag 12 · 3 Rechnungen bezahlt").
 
 ### Spielstände in der Steam-Cloud
 
@@ -76,7 +78,12 @@ Vorbereitet ist der Weg über den Inventar-Dienst (kein eigener Server nötig):
 
 1. In Steamworks den Inventar-Dienst einschalten und drei Gegenstände anlegen: `gems_100`, `gems_500`, `gems_1100` mit Preis.
 2. Die Gegenstands-Nummern in `desktop-app/steam.js` bei `STEAM_KONFIG.gemPakete` eintragen.
-3. Danach öffnet der Kaufen-Knopf das Steam-Overlay mit dem Gegenstand. Die Gutschrift kommt, wenn Steam den Kauf meldet.
+3. Danach öffnet der Kaufen-Knopf das Steam-Overlay mit dem Gegenstand.
+   **Noch nicht gebaut:** die Gutschrift. `steamworks.js` (0.4.0) kann das Steam-Inventar nicht lesen. Dafür braucht es
+   entweder eine eigene kleine Erweiterung für `ISteamInventory` oder einen kleinen Server mit der Steam-Web-API.
+   Solange die Gegenstands-Nummern leer sind, bleiben die Kaufen-Knöpfe aus, es kann also nichts schiefgehen.
+   Einfachere Alternative für ein Kaufspiel auf Steam: statt Gems die Skins als DLC-Pakete verkaufen (das geht schon,
+   genau wie das Unterstützer-Paket) und den Gem-Shop auf Steam ausblenden.
 4. Grenze des Tresors: Sein Schlüssel steckt in der App (das geht nicht anders). Wer sich auskennt, kann ihn herausholen und
    sich Gems in die Datei schreiben. Ganz sicher wird es erst, wenn der Gem-Stand bei jedem Start aus dem Steam-Inventar
    gelesen wird (dort kann niemand schummeln). Das beim Fertigmachen des Gem-Shops so bauen.

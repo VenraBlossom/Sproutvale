@@ -501,7 +501,7 @@ ipcMain.on("update-anwenden", () => {
 });
 ipcMain.on("update-status", event => { event.returnValue = bereitesUpdate; });
 
-steam.starte();
+if (!steam.starte({ ueberSteamStarten: VERTRIEB === "steam" && !ENTWICKLER })) app.exit(0);
 
 app.whenReady().then(() => {
     const erlaubt = ["clipboard-sanitized-write", "fullscreen"];
