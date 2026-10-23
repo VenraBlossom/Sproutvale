@@ -71,8 +71,15 @@ function eichhoernchenAnzahl() {
     return Math.min(5, 1 + Math.floor((level("eichhoernchen") - 1) / 5) + (level("eichhoernchen2") > 0 ? 1 : 0));
 }
 
+let ladenRectStand = { zeit: null, rect: null };
+
+function ladenRect() {
+    if (ladenRectStand.zeit !== letzteZeit) ladenRectStand = { zeit: letzteZeit, rect: marktstand.getBoundingClientRect() };
+    return ladenRectStand.rect;
+}
+
 function punktAmLaden() {
-    const rect = marktstand.getBoundingClientRect();
+    const rect = ladenRect();
     const seite = Math.floor(Math.random() * 3);
     if (seite === 0) return { x: rect.left - 14, y: rect.top + Math.random() * rect.height };
     if (seite === 1) return { x: rect.right + 14, y: rect.top + Math.random() * rect.height };
@@ -115,7 +122,7 @@ function igelTempo() {
 
 function aktualisiereIgel(dtMs) {
     passeAnzahlAn("igel", igelAnzahl(), () => {
-        const rect = marktstand.getBoundingClientRect();
+        const rect = ladenRect();
         neueHelferFigur("igel", "🦔", 40, rect.left + rect.width / 2, rect.bottom + 20);
     });
     figurenVom("igel").forEach(f => {
