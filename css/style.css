@@ -13193,3 +13193,55 @@ body.menue-offen #sammel-ring {
     opacity: calc(var(--nacht, 0) * 0.45);
     pointer-events: none;
 }
+
+#tages-karte {
+    max-height: calc(100vh - 120px);
+}
+
+#tages-karte-buttons {
+    position: sticky;
+    bottom: -18px;
+    z-index: 2;
+    margin: 14px -20px 0;
+    padding: 12px 20px 16px;
+    background: linear-gradient(rgba(246, 231, 193, 0), var(--pergament) 12px);
+}
+
+#rechnung-display {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+#rechnung-display span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#energie-balken {
+    flex-shrink: 1;
+    min-width: 64px;
+}
+
+#energie-text {
+    flex-shrink: 0;
+}
+
+#energie-box {
+    min-width: 150px;
+    flex-shrink: 4;
+}
+
+@media (max-width: 1400px) and (min-width: 1101px) {
+    #top-leiste {
+        gap: 8px;
+    }
+    #top-leiste .stat {
+        font-size: 1.15em;
+    }
+    #money-display,
+    #skillpoint-display {
+        font-size: 1.3em;
+    }
+}
