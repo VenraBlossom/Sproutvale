@@ -906,8 +906,19 @@ document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     const leben = el("div", "menue-leben");
     menue.insertBefore(leben, document.getElementById("menue-teilchen"));
 
+    const gluehen = el("div", "menue-gluehen");
+    for (let i = 0; i < 18; i++) {
+        const punkt = el("span");
+        punkt.style.left = 3 + Math.random() * 94 + "%";
+        punkt.style.top = 58 + Math.random() * 38 + "%";
+        punkt.style.animationDuration = 5 + Math.random() * 5 + "s, " + (1.6 + Math.random() * 2.2) + "s";
+        punkt.style.animationDelay = -Math.random() * 8 + "s, " + -Math.random() * 3 + "s";
+        gluehen.appendChild(punkt);
+    }
+    leben.appendChild(gluehen);
+
     setInterval(() => {
-        if (!offen() || einstellungen.wenigerEffekte || leben.querySelectorAll(".jz-schmetterling").length >= 3) return;
+        if (!offen() || einstellungen.wenigerEffekte || istNacht() || leben.querySelectorAll(".jz-schmetterling").length >= 3) return;
         const flieger = el("div", "jz-schmetterling" + (Math.random() < 0.5 ? " links" : ""));
         const fluegel = pixelIcon("🦋", 28, "jz-fluegel");
         fluegel.style.filter = "hue-rotate(" + zufall([0, 140, 200, 260, 300]) + "deg)";
@@ -919,7 +930,7 @@ document.querySelectorAll(".menue-symbol[data-symbol]").forEach(platz => {
     }, 4200);
 
     setInterval(() => {
-        if (!offen() || einstellungen.wenigerEffekte || Math.random() < 0.5) return;
+        if (!offen() || einstellungen.wenigerEffekte || istNacht() || Math.random() < 0.5) return;
         const schwarm = el("div", "vogel-schwarm" + (Math.random() < 0.5 ? " links" : ""));
         const anzahl = 3 + Math.floor(Math.random() * 4);
         for (let i = 0; i < anzahl; i++) {

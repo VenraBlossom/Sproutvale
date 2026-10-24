@@ -1194,8 +1194,7 @@ function aktualisiereHimmel(dtMs) {
     himmelSterne.style.opacity = Math.min(klemme((p - 0.75) / 0.2, 0, 1), klemme(1 - (p - 1.15) / 0.1, 0, 1));
     fensterLichter.style.opacity = Math.min(klemme((p - 0.6) / 0.25, 0, 1), nachtWeg);
     nachtSchleier.style.opacity = nacht * 0.45;
-    const menueEbene = imHauptmenue() && document.getElementById("menue-pflanzen");
-    if (menueEbene) menueEbene.style.setProperty("--nacht", nacht.toFixed(3));
+    if (imHauptmenue()) hauptmenue.style.setProperty("--nacht", nacht.toFixed(3));
     wolkenEl.style.filter = "brightness(" + (1 - nacht * 0.55) * (trueb ? 0.75 : 1) + ")";
 
     const kosmisch = Boolean(gewaehlteKosmetik("landschaft").ewigeNacht);

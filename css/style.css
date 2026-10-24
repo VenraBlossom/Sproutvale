@@ -13241,3 +13241,35 @@ body.menue-offen #banner-box .banner {
     width: min(400px, 30vw);
     font-size: 0.85em;
 }
+
+.menue-gluehen {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    opacity: var(--nacht, 0);
+    pointer-events: none;
+}
+
+.menue-gluehen span {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #fff3a0;
+    box-shadow: 0 0 6px 3px rgba(220, 255, 120, 0.7);
+    animation: gluehen-schweben 7s ease-in-out infinite alternate, gluehen-blinken 2.4s ease-in-out infinite;
+}
+
+@keyframes gluehen-schweben {
+    0% { translate: 0 0; }
+    50% { translate: 26px -18px; }
+    100% { translate: -14px -34px; }
+}
+
+@keyframes gluehen-blinken {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 1; }
+}
+
+body.ohne-effekte .menue-gluehen {
+    display: none;
+}
