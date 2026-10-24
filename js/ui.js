@@ -6,6 +6,8 @@ const pixelIconCache = {};
 
 function pixelIconUrl(emoji, pixel = 16) {
     if (emoji.startsWith("sprite:")) return spriteUrl(emoji.slice(7));
+    const eigenes = EMOJI_SPRITES[emoji] || EMOJI_SPRITES[emoji.replace(/️/g, "")] || EMOJI_SPRITES[emoji + "️"];
+    if (eigenes) return spriteUrl(eigenes);
     const symbol = PIXEL_SYMBOLE[emoji] || PIXEL_SYMBOLE[emoji.replace(/️/g, "")] || PIXEL_SYMBOLE[emoji + "️"];
     if (symbol) return spriteUrl("sym_" + symbol);
     const schluessel = emoji + "|" + pixel;
