@@ -8,14 +8,14 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 1. Kleingewerbe, Impressum und Datenschutzerklärung (Duo: IP-Adressen, siehe unten). Steamworks-Konto (100 $).
 2. In Steamworks die App anlegen. App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen.
 3. `steamworks.js` ist schon installiert (feste Version 0.4.0 in `desktop-app/package.json`), nichts zu tun.
-4. Erfolge aus `werkzeuge/steam-erfolge.csv` anlegen (API-Namen genau übernehmen), alle 14 Sprachen eintragen.
+4. Erfolge aus `steam/erfolge.csv` anlegen (API-Namen genau übernehmen), alle 14 Sprachen eintragen.
 5. Unterstützer-Paket als DLC anlegen, DLC-App-ID in `STEAM_KONFIG.dlc.unterstuetzer`.
 6. Gems auf Steam entscheiden (siehe "Gems auf Steam" unten, braucht noch Arbeit oder eine andere Lösung).
-7. Shopseite: Texte aus `STEAM-SHOPTEXTE.md`, Bilder aus `steam-bilder` (Screenshots 1920×1080, Kapseln in allen Steam-Größen, Erfolgsbilder; Entwürfe, gern noch nachbessern), Trailer. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
+7. Shopseite: Texte aus `steam/SHOPTEXTE.md`, Bilder aus `steam/bilder` (Screenshots 1920×1080, Kapseln in allen Steam-Größen, Erfolgsbilder; Entwürfe, gern noch nachbessern), Trailer aus `steam/trailer`. Fragebogen zu Inhalten: **simuliertes Glücksspiel** angeben.
 8. Steam Cloud einschalten (siehe unten). Unterstützte Sprachen: alle 14.
 9. Beta-Sachen herausnehmen, wenn es keine Beta mehr ist (BETAVALE-Code, "Beta" in der Versionsanzeige).
 10. In `js/daten.js` prüfen: `DEBUG_ERLAUBT = false`. Die Version bleibt für Steam 1.0.0.
-11. `node werkzeuge/pruefe-uebersetzung.js` und `node werkzeuge/teste-tresor.js` laufen lassen (beide ohne Fehler).
+11. Einmal komplett durchspielen: Story-Start, Tutorial, Markt, Stellarium, Rechnung, Mondteich, Einstellungen.
 12. `npm run steam`, den Ordner `desktop-app/dist-steam/Sproutvale` mit SteamPipe hochladen.
 13. Über Steam installieren und testen: Erfolg auslösen, Overlay (Umschalt+Tab), DLC, Steam-Status, Cloud auf zweitem PC.
 14. `desktop-app/geheim.txt` sicher aufbewahrt? (Ohne sie können Spieler ihre Käufe nicht mehr lesen.)
@@ -25,7 +25,7 @@ Alles im Spiel funktioniert auch ohne diese Schritte. Kaufen und Werbung sind nu
 | Bereich | Stand |
 |---|---|
 | Steam-Erfolge | Das Spiel meldet jeden Erfolg und jeden Pokal an Steam. Beim Start trägt es auch alte Erfolge nach. |
-| Liste der Erfolge | `werkzeuge/steam-erfolge.csv`: alle Erfolge mit Namen in allen 14 Sprachen (Spalten heißen wie in Steamworks: german, english, schinese, ...) |
+| Liste der Erfolge | `steam/erfolge.csv`: alle Erfolge mit Namen in allen 14 Sprachen (Spalten heißen wie in Steamworks: german, english, schinese, ...) |
 | Sprachen | Deutsch, Englisch, Spanisch, Französisch, Italienisch, Portugiesisch (Brasilien), Niederländisch, Polnisch, Türkisch, Russisch, Ukrainisch, Japanisch, Chinesisch (vereinfacht), Koreanisch. Beim ersten Start ist Englisch eingestellt, umstellen geht in den Einstellungen unter Sprache. |
 | Käufe sicher | Gems, gekaufte Skins, Unterstützer-Paket und Codes liegen verschlüsselt im Tresor (`save/tresor.dat`), nicht im Spielstand. Das Spiel selbst kann sie nur lesen und ausgeben. Das Steam-DLC wird bei jedem Start neu geprüft. |
 | Debug-Menü | Aus. Zum Testen in `js/daten.js` `DEBUG_ERLAUBT = true` setzen (nie so veröffentlichen). |
@@ -50,7 +50,7 @@ Die Steam-Version hat keinen eigenen Updater (Updates macht Steam), keine Entwic
 
 ## Steam einschalten
 
-Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
+Texte für die Shopseite in allen 14 Sprachen stehen in `steam/SHOPTEXTE.md`.
 
 1. Bei Steamworks anmelden (100 $ Gebühr pro Spiel) und die App anlegen. Du bekommst eine **App-ID** (eine Zahl).
 2. `steamworks.js` ist schon installiert. Die Steam-Version startet sich über Steam neu, wenn jemand die exe direkt öffnet
@@ -58,12 +58,11 @@ Texte für die Shopseite in allen 14 Sprachen stehen in `STEAM-SHOPTEXTE.md`.
 3. Die App-ID in `desktop-app/steam.js` bei `STEAM_KONFIG.appId` eintragen. Nur zum Testen ohne Steam zusätzlich in
    `desktop-app/steam_appid.txt` (die kommt absichtlich nicht mit in die Steam-Version).
 4. In Steamworks unter "Statistiken und Errungenschaften" die Erfolge anlegen. Die Namen und Beschreibungen stehen in
-   `werkzeuge/steam-erfolge.csv`. Der **API-Name** muss genau so heißen wie in der ersten Spalte (z.B. `GOLD_1`).
-   Neu erzeugen geht ohne Electron mit: `node werkzeuge/steam-erfolge.js` (vorher einmal `cd werkzeuge && npm install`).
-   Die Bilder für die Erfolge (256×256, erreicht und gesperrt) erzeugt `node werkzeuge/steam-erfolge-bilder.js` nach `steam-bilder/erfolge`.
+   `steam/erfolge.csv`. Der **API-Name** muss genau so heißen wie in der ersten Spalte (z.B. `GOLD_1`).
+   Die Bilder für die Erfolge (256×256, erreicht und gesperrt) liegen in `steam/bilder/erfolge`.
 5. Unterstützer-Paket: in Steamworks ein DLC anlegen und dessen App-ID in `desktop-app/steam.js` bei
    `STEAM_KONFIG.dlc.unterstuetzer` eintragen.
-6. Steam-Status ("Rich Presence"): in Steamworks unter "Rich Presence" die fertige Datei `werkzeuge/steam-rich-presence.vdf`
+6. Steam-Status ("Rich Presence"): in Steamworks unter "Rich Presence" die fertige Datei `steam/rich-presence.vdf`
    hochladen (alle 14 Sprachen, der Text kommt schon übersetzt aus dem Spiel, z.B. "Tag 12 · 3 Rechnungen bezahlt").
 
 ### Spielstände in der Steam-Cloud
@@ -140,24 +139,15 @@ Die Werbung erscheint nur, wenn der Spieler selbst auf den Knopf drückt. Es gib
 - Für Verkäufe: Gewerbe, Impressum, Datenschutzerklärung (Duo: IP-Adressen über PeerJS/Google, siehe oben; bei Werbung zusätzlich die Einwilligung nach DSGVO,
   AdMob bringt dafür ein eigenes Fenster mit).
 - Steam und die App-Stores kümmern sich um die Mehrwertsteuer im Ausland.
-- Schriften (Fredoka, Pixelify Sans, Jersey 15) laufen unter der SIL Open Font License: `assets/fonts/LIZENZ-SCHRIFTEN.txt` muss mit ins Spiel (passiert beim Bauen automatisch).
+- Schriften (Fredoka, Pixelify Sans, Jersey 15) laufen unter der SIL Open Font License: `css/schriften/LIZENZ-SCHRIFTEN.txt` muss mit ins Spiel (passiert beim Bauen automatisch).
 - Die Instrumente der Musik (`js/klangproben.js`) stammen aus Versilian Studios Chamber Orchestra 2, Community Edition, Lizenz CC0.
-  Damit gibt es keine Pflichten, die Nennung im Feedback-Reiter ist freiwillig. Neu erzeugen mit `node werkzeuge/erzeuge-klangproben.js`.
+  Damit gibt es keine Pflichten, die Nennung im Feedback-Reiter ist freiwillig.
 
 ## Trailer
 
-Die fertige Datei liegt nur lokal in `steam-bilder/trailer/` (zu groß fürs Repo):
+Die fertige Datei liegt nur lokal in `steam/trailer/` (zu groß fürs Repo):
 
 - `sproutvale-trailer.mp4`: etwa 53 s, 1920x1080, 30 fps, ohne Ton. Gedacht zum Darübersprechen.
 - Schnitte liegen auf einem Raster von 120 BPM (ein Schlag = 0,5 s), damit später Musik dazu passt.
 - Ablauf: Hook (Lategame-Ernte, Jackpot, Logo), Early (säen, wachsen, ernten, Feld kaufen), Mid (Kombo, Goldregen,
   Krähen, Herbst, Nacht, Stellarium), Late (Riesenernten, Magnet, Jackpots, Winter, Gewitter, Fieber, Kristallpokal), Logo mit "Wishlist".
-
-Neu bauen (Chrome und ffmpeg nötig, Pfade oben in den Skripten):
-
-1. `node werkzeuge/trailer/clips.js` nimmt alle Szenen auf (oder nur einzelne: `node werkzeuge/trailer/clips.js e_saat s_jackpot`).
-   Early und Mid werden in 4K aufgenommen, damit der Zoom im Schnitt scharf bleibt. `szene.js` baut die Höfe auf und steuert die Maus.
-2. `node werkzeuge/trailer/endtext.js` erzeugt das Bild "WISHLIST NOW ON STEAM".
-3. `node werkzeuge/trailer/blatt.js` macht Übersichtsbilder mit Zeitstempeln (Ordner `blatt/`), um Startzeiten zu wählen.
-4. `node werkzeuge/trailer/schnitt.js` schneidet `trailer.mp4` nach `plan.js`
-   (Szene, Startsekunde, Schläge, dazu Zoom `z0`/`z1`, Ausschnitt `fx`/`fy`, `tempo`, `wackeln`, `blitz`).

@@ -9,7 +9,7 @@ const ZIEL = path.join(__dirname, "www");
 fs.rmSync(ZIEL, { recursive: true, force: true });
 fs.mkdirSync(ZIEL, { recursive: true });
 fs.copyFileSync(path.join(PROJEKT, "index.html"), path.join(ZIEL, "index.html"));
-["js", "css", "assets"].forEach(ordner => {
+["js", "css"].forEach(ordner => {
     fs.cpSync(path.join(PROJEKT, ordner), path.join(ZIEL, ordner), {
         recursive: true,
         filter: quelle => !path.basename(quelle).startsWith("_") && !/\.(psd|kra|aseprite|ase|xcf)$/i.test(quelle)

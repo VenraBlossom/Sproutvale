@@ -38,7 +38,7 @@ function spielOrdner() {
 
 const UPDATE_REPO = "VenraBlossom/Sproutvale";
 const UPDATE_ORDNER = path.join(app.getPath("userData"), "updates");
-const UPDATE_AUSLASSEN = [/^desktop-app\//, /^werkzeuge\//, /^\.github\//, /^\.git/, /\.md$/i, /^docs\//];
+const UPDATE_AUSLASSEN = [/^desktop-app\//, /^steam\//, /^\.github\//, /^\.git/, /\.md$/i, /^docs\//];
 
 function istReleaseOrdner(ordner) {
     if (VERTRIEB === "steam") return false;
@@ -412,7 +412,7 @@ function erstelleFenster() {
         useContentSize: true,
         backgroundColor: "#86c457",
         title: "Sproutvale",
-        icon: path.join(ORDNER, "assets", "Icon.png"),
+        icon: path.join(ORDNER, "css", "bilder", "Icon.png"),
         autoHideMenuBar: true,
         fullscreen: stand.vollbild,
         show: false,

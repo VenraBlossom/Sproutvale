@@ -14,8 +14,7 @@ const RELEASE = process.argv.includes("--release") || STEAM;
 
 function istSpielDatei(name) {
     if (name.startsWith("_") || name.startsWith(".")) return false;
-    if (["js", "css", "assets", "fonts"].includes(name)) return true;
-    if (name === "LIZENZ-SCHRIFTEN.txt") return true;
+    if (["js", "css"].includes(name)) return true;
     return /\.(html|js|css|png|jpg|ogg|mp3|wav|woff2?)$/i.test(name);
 }
 
@@ -47,7 +46,7 @@ function packeRar(ordner, rarDatei) {
 
 function erstelleIcon() {
     const groessen = [16, 24, 32, 48, 64, 128, 256];
-    const quelle = path.join(PROJEKT, "assets", "Icon.png");
+    const quelle = path.join(PROJEKT, "css", "bilder", "Icon.png");
     const befehl = ["Add-Type -AssemblyName System.Drawing;", `$q = [System.Drawing.Image]::FromFile('${quelle}');`];
     groessen.forEach(g => {
         const ziel = path.join(BUILD, "icon-" + g + ".png");
