@@ -2577,13 +2577,14 @@ if (SPRACHE === "tr") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Piksel binalar olarak tohum tezgâhları, yeni bitki görünümleri ve manzaralar.",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvale'in ilk sürümü: pazar, tam ekran ve Discord üzerinden geri bildirim.",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale artık 14 dilde.",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Arka planda çiftliğinin olduğu yeni ana menü, yeni ahşap düğmeler ve canlı bir logo.",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Tüm pencereler ve ayarlar yeni piksel görünümünde, birçok küçük animasyonla.",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Gerçek enstrümanlarla müzik, ayarlardan kapatılabilir.",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Pazar: x1, x10 ya da Maks al. Stellarium'da birden çok seviyeyi tek seferde alırsın.",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Kupalar: Tahta kupa artık 5. faturada, platin kupa 11. faturada.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Daha adil şans oyunları: VIP kart mola başına 5 oyun daha verir, yazı tura %45 ile %55 arasında kazanır.",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Pencere boyutunu ve tam ekranı hatırlar, oyun daha akıcı çalışır.",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Düzeltildi: Toplama hırsı kutsaması çalışmıyordu, Topuz saç görünmüyordu, blackjack takılabiliyordu.",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Mücevherler henüz satın alınamıyor. Bu, ileriki bir güncellemeyle gelecek."
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Mücevherler henüz satın alınamıyor. Bu, ileriki bir güncellemeyle gelecek.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "Arka planda çiftliğin, gece ve gündüz, yeni ahşap düğmeler ve canlı bir logo ile yeni ana menü.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "Pencere boyutunu ve tam ekranı hatırlıyor, oyun çok tarla olsa bile daha akıcı çalışıyor.",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "Daha güzel kutsama kartları, hasatta daha fazla efekt ve uzun dillerde bile daha net göstergeler."
 });

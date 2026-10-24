@@ -2577,13 +2577,14 @@ if (SPRACHE === "pt") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Barracas de sementes como prédios em pixel, novos visuais de plantas e paisagens.",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "A primeira versão de Sproutvale: mercado, tela cheia e feedback pelo Discord.",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale agora está disponível em 14 idiomas.",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Novo menu principal com sua fazenda ao fundo, novos botões de madeira e um logo cheio de vida.",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Todas as janelas e configurações com novo visual em pixel e muitas pequenas animações.",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Música com instrumentos reais, dá para desativar nas configurações.",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Mercado: compre x1, x10 ou Máx. No Stellarium você compra vários níveis de uma vez.",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Troféus: o troféu de madeira agora está na 5ª conta e o de platina na 11ª.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Jogos de azar mais justos: o cartão VIP dá 5 jogos a mais por pausa, e o cara ou coroa ganha de 45 a 55% das vezes.",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "A janela lembra o tamanho e a tela cheia, e o jogo roda mais liso.",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Corrigido: a bênção Mania de coleta não funcionava, o penteado Coque era invisível e o blackjack podia travar.",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Ainda não dá para comprar gemas. Isso virá em uma atualização futura."
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Ainda não dá para comprar gemas. Isso virá em uma atualização futura.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "Novo menu principal com a sua fazenda ao fundo, dia e noite, novos botões de madeira e um logo cheio de vida.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "A janela lembra o tamanho e a tela cheia, e o jogo roda mais suave, mesmo com muitos campos.",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "Cartas de bênção mais bonitas, mais efeitos na colheita e informações mais claras, também em idiomas longos."
 });

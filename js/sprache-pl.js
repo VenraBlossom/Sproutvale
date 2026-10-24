@@ -2577,13 +2577,14 @@ if (SPRACHE === "pl") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Stragany z nasionami jako pikselowe budynki, nowe wyglądy roślin i krajobrazy.",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Pierwsza wersja Sproutvale: targ, pełny ekran i opinie przez Discord.",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale jest teraz dostępne w 14 językach.",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Nowe menu główne z twoją farmą w tle, nowymi drewnianymi przyciskami i żywym logo.",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Wszystkie okna i ustawienia w nowym pikselowym stylu, z mnóstwem małych animacji.",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Muzyka z prawdziwymi instrumentami, można ją wyłączyć w ustawieniach.",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Targ: kupuj x1, x10 albo Maks. W Stellarium kupisz kilka poziomów naraz.",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Puchary: drewniany czeka teraz przy 5. rachunku, platynowy przy 11.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Uczciwsze gry losowe: karta VIP daje 5 gier więcej na przerwę, a rzut monetą wygrywa w 45 do 55% przypadków.",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Okno pamięta rozmiar i pełny ekran, a gra działa płynniej.",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Naprawiono: błogosławieństwo Szał zbierania nie działało, fryzura Kok była niewidoczna, a blackjack mógł się zawiesić.",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Klejnotów nie można jeszcze kupić. Pojawi się to w przyszłej aktualizacji."
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Klejnotów nie można jeszcze kupić. Pojawi się to w przyszłej aktualizacji.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "Nowe menu główne z twoją farmą w tle, dniem i nocą, nowymi drewnianymi przyciskami i żywym logo.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "Okno zapamiętuje rozmiar i pełny ekran, a gra działa płynniej, nawet przy wielu polach.",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "Ładniejsze karty błogosławieństw, więcej efektów przy zbiorach i czytelniejsze wskaźniki, także w dłuższych językach."
 });

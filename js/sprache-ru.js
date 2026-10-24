@@ -2577,13 +2577,14 @@ if (SPRACHE === "ru") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "Лавки семян в виде пиксельных зданий, новые облики растений и пейзажи.",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Первая версия Sproutvale: рынок, полноэкранный режим и отзывы через Discord.",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale теперь доступна на 14 языках.",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "Новое главное меню с твоей фермой на фоне, новыми деревянными кнопками и живым логотипом.",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "Все окна и настройки в новом пиксельном стиле, с множеством маленьких анимаций.",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "Музыка с настоящими инструментами, её можно отключить в настройках.",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "Рынок: покупай x1, x10 или Макс. В Звездарии можно купить несколько уровней сразу.",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "Кубки: деревянный теперь ждёт на 5-м счёте, платиновый на 11-м.",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "Азартные игры честнее: VIP-карта даёт на 5 игр больше за перерыв, монетка выигрывает в 45–55% случаев.",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "Окно запоминает размер и полноэкранный режим, а игра работает плавнее.",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "Исправлено: благословение «Жажда собирать» не работало, причёска «Пучок» была невидимой, блэкджек мог зависнуть.",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Самоцветы пока нельзя купить. Это появится в одном из следующих обновлений."
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "Самоцветы пока нельзя купить. Это появится в одном из следующих обновлений.",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "Новое главное меню: твоя ферма на фоне, день и ночь, новые деревянные кнопки и живой логотип.",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "Окно запоминает размер и полноэкранный режим, а игра работает плавнее, даже с большим количеством грядок.",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "Красивее карты благословений, больше эффектов при сборе урожая и понятнее надписи даже в длинных языках."
 });

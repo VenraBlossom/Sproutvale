@@ -2577,13 +2577,14 @@ if (SPRACHE === "ja") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "ドット絵の建物になった種屋、新しい植物の見た目と風景。",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvaleの最初のバージョン：マーケット、フルスクリーン、Discordでのフィードバック。",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvaleが14言語に対応しました。",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "あなたの農場が背景に広がる新しいメインメニュー。木のボタンと動くロゴも。",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "すべてのウィンドウと設定が新しいドット絵風に。小さなアニメーションもたくさん。",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "本物の楽器を使った音楽。設定でオフにできます。",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "マーケット：x1、x10、最大で購入できます。ステラリウムでは複数レベルをまとめて購入。",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "トロフィー：木のトロフィーは5枚目、プラチナは11枚目の請求書に。",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "運試しがより公平に：VIPカードで休憩ごとに5回多く遊べ、コイントスの勝率は45〜55%です。",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "ウィンドウのサイズとフルスクリーンが記憶され、動作もより滑らかに。",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修正：祝福「収集マニア」が効いていなかった、髪型「お団子」が見えなかった、ブラックジャックが止まることがあった。",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "ジェムはまだ購入できません。今後のアップデートで対応予定です。"
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "ジェムはまだ購入できません。今後のアップデートで対応予定です。",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "新しいメインメニュー：背景にあなたの農場、昼と夜、新しい木のボタン、動くロゴ。",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "ウィンドウがサイズと全画面を覚えるようになり、畑が多くても動作がなめらかになりました。",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "祝福カードがきれいになり、収穫の演出が増え、長い言語でも表示が見やすくなりました。"
 });

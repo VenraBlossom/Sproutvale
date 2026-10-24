@@ -2577,13 +2577,14 @@ if (SPRACHE === "zh") Object.assign(UEBERSETZUNG, {
     "Samenläden als Pixel-Gebäude, neue Pflanzen-Looks und Landschaften.": "像素风建筑的种子摊、新的植物外观和风景。",
     "Die erste Version von Sproutvale: Markt, Vollbild und Feedback über Discord.": "Sproutvale 的第一个版本：市场、全屏和通过 Discord 反馈。",
     "Sproutvale gibt es jetzt in 14 Sprachen.": "Sproutvale 现已支持 14 种语言。",
-    "Neues Hauptmenü mit deinem Hof im Hintergrund, neuen Holzknöpfen und einem lebendigen Logo.": "全新主菜单：背景是你的农场，配有新的木质按钮和灵动的标志。",
     "Alle Fenster und Einstellungen im neuen Pixel-Look, mit vielen kleinen Animationen.": "所有窗口和设置都换上了新的像素风格，还有许多小动画。",
     "Musik mit echten Instrumenten, in den Einstellungen abschaltbar.": "使用真实乐器的音乐，可在设置中关闭。",
     "Markt: Kaufmenge x1, x10 oder Max. Im Stellarium kaufst du mehrere Stufen auf einmal.": "市场：可按 x1、x10 或最大购买。星象馆中可一次购买多个等级。",
     "Pokale: Der Holzpokal wartet jetzt auf der 5. Rechnung, der Platinpokal auf der 11.": "奖杯：木奖杯现在在第 5 张账单，铂金奖杯在第 11 张。",
     "Faireres Glücksspiel: Die VIP-Karte gibt 5 Spiele mehr pro Pause, der Münzwurf gewinnt in 45 bis 55 % der Fälle.": "博彩更公平：VIP 卡每次休息多 5 局，抛硬币的胜率为 45% 到 55%。",
-    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger.": "窗口会记住大小和全屏状态，游戏运行更流畅。",
     "Fehler behoben: Der Segen Sammelwut wirkte nicht, die Frisur Dutt war unsichtbar, Blackjack konnte hängen bleiben.": "修复：祝福“收集狂热”无效、发型“发髻”不可见、二十一点可能卡住。",
-    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "暂时还不能购买宝石，将在之后的更新中推出。"
+    "Gems kann man gerade noch nicht kaufen. Das kommt mit einem späteren Update.": "暂时还不能购买宝石，将在之后的更新中推出。",
+    "Neues Hauptmenü mit deinem Hof im Hintergrund, Tag und Nacht, neuen Holzknöpfen und einem lebendigen Logo.": "全新主菜单：背景是你的农场，有昼夜变化、新的木制按钮和生动的标志。",
+    "Das Fenster merkt sich Größe und Vollbild, und das Spiel läuft flüssiger, auch mit vielen Feldern.": "窗口会记住大小和全屏状态，即使田地很多，游戏也更流畅。",
+    "Schönere Segen-Karten, mehr Effekte beim Ernten und klarere Anzeigen auch in langen Sprachen.": "祝福卡更漂亮，收获特效更多，即使在较长的语言中显示也更清晰。"
 });
